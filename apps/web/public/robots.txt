@@ -1,0 +1,7 @@
+# Allow all search crawlers
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://hydrauliccourse.com/sitemap.xml

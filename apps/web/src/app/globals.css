@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: #0a192f;
+  --background: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Enforce thin black borders on buttons and tabs without shadows or gradients */
+.btn-primary {
+  background-color: #e05305;
+  color: #ffffff;
+  border: 1px solid #000000;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: #c44500;
+}
+
+.btn-outline {
+  background-color: #ffffff;
+  color: #0a192f;
+  border: 1px solid #000000;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.btn-outline:hover {
+  background-color: #fff7ed;
+}
+
+.tab-item {
+  border: 1px solid #000000;
+  padding: 0.5rem 1rem;
+  background-color: #ffffff;
+  color: #0a192f;
+}
+
+.tab-item.active {
+  background-color: #0a192f;
+  color: #ffffff;
+}

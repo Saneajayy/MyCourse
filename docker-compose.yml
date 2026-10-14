@@ -1,0 +1,106 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: course_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mycourse
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d mycourse']
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: course_redis
+    restart: unless-stopped
+    ports:
+      - '6380:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: course_api
+    restart: unless-stopped
+    ports:
+      - '4000:4000'
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      APP_URL: http://localhost:3000
+      API_URL: http://localhost:4000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/mycourse?schema=public
+      REDIS_URL: redis://redis:6379
+      JWT_ACCESS_SECRET: dev_jwt_access_secret_must_be_at_least_32_characters_long_for_security!
+      JWT_ACCESS_TTL: 15m
+      REFRESH_TOKEN_TTL_DAYS: 30
+      COOKIE_DOMAIN: localhost
+      CORS_ORIGINS: http://localhost:3000
+      ADMIN_EMAIL: admin@hydrauliccourse.com
+      ADMIN_PASSWORD: ChangeMeInProd!2026Hydraulics
+      ADMIN_NAME: Admin User
+      RAZORPAY_KEY_ID: rzp_test_placeholder_key_id
+      RAZORPAY_KEY_SECRET: placeholder_razorpay_secret
+      RAZORPAY_WEBHOOK_SECRET: placeholder_razorpay_webhook_secret_hex
+      BUNNY_STREAM_API_KEY: placeholder_bunny_api_key
+      BUNNY_STREAM_LIBRARY_ID: placeholder_bunny_library_id
+      BUNNY_STREAM_TOKEN_AUTH_KEY: placeholder_bunny_token_auth_key
+      BUNNY_STREAM_CDN_HOSTNAME: video.hydrauliccourse.com
+      MAX_CONCURRENT_STREAMS: 2
+      EMAIL_PROVIDER: console
+      EMAIL_API_KEY: placeholder_email_api_key
+      EMAIL_FROM: support@hydrauliccourse.com
+      BUSINESS_NAME: Hydraulic Engineering Academy
+      BUSINESS_ADDRESS: 123 Industrial Area, Phase 2, New Delhi, India
+      GSTIN: ''
+      GST_RATE_PERCENT: 0
+      PRICES_TAX_INCLUSIVE: 'true'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'wget --no-verbose --tries=1 --spider http://localhost:4000/healthz || exit 1',
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: course_web
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      PORT: 3000
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:

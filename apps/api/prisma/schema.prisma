@@ -1,0 +1,416 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  STUDENT
+  ADMIN
+  SUPPORT
+}
+
+enum UserStatus {
+  ACTIVE
+  BANNED
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum LessonStatus {
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum OrderStatus {
+  CREATED
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  CAPTURED
+  FAILED
+  REFUNDED
+}
+
+enum RefundStatus {
+  PENDING
+  PROCESSED
+  FAILED
+}
+
+enum EntitlementStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
+}
+
+enum EntitlementSource {
+  PURCHASE
+  ADMIN_GRANT
+  COUPON_100
+}
+
+enum CouponType {
+  PERCENT
+  FLAT
+}
+
+enum WebhookEventStatus {
+  PENDING
+  PROCESSED
+  FAILED
+  IGNORED
+}
+
+model User {
+  id                     String                  @id @db.Uuid
+  email                  String                  @unique
+  passwordHash           String?
+  name                   String
+  phone                  String?
+  role                   UserRole                @default(STUDENT)
+  status                 UserStatus              @default(ACTIVE)
+  emailVerifiedAt        DateTime?               @db.Timestamptz
+  googleId               String?                 @unique
+  tokenVersion           Int                     @default(0)
+  twoFactorSecret        String?
+  twoFactorEnabled       Boolean                 @default(false)
+  twoFactorRecoveryCodes String[]
+  lastLoginAt            DateTime?               @db.Timestamptz
+  createdAt              DateTime                @default(now()) @db.Timestamptz
+  updatedAt              DateTime                @updatedAt @db.Timestamptz
+  deletedAt              DateTime?               @db.Timestamptz
+
+  refreshTokens          RefreshToken[]
+  emailVerifications     EmailVerificationToken[]
+  passwordResetTokens    PasswordResetToken[]
+  orders                 Order[]
+  entitlements           Entitlement[]
+  lessonProgresses       LessonProgress[]
+  couponRedemptions      CouponRedemption[]
+  auditLogs              AuditLog[]
+
+  @@index([role, status])
+  @@index([email])
+}
+
+model RefreshToken {
+  id          String    @id @db.Uuid
+  userId      String    @db.Uuid
+  tokenHash   String    @unique
+  familyId    String    @db.Uuid
+  userAgent   String?
+  ipAddress   String?
+  deviceLabel String?
+  expiresAt   DateTime  @db.Timestamptz
+  revokedAt   DateTime? @db.Timestamptz
+  lastUsedAt  DateTime  @default(now()) @db.Timestamptz
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+}
+
+model EmailVerificationToken {
+  id        String    @id @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique
+  expiresAt DateTime  @db.Timestamptz
+  usedAt    DateTime? @db.Timestamptz
+  createdAt DateTime  @default(now()) @db.Timestamptz
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String    @id @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique
+  expiresAt DateTime  @db.Timestamptz
+  usedAt    DateTime? @db.Timestamptz
+  createdAt DateTime  @default(now()) @db.Timestamptz
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Product {
+  id                  String        @id @db.Uuid
+  slug                String        @unique
+  title               String
+  description         String        @db.Text
+  thumbnailUrl        String?
+  pricePaise          Int
+  compareAtPricePaise Int?
+  currency            String        @default("INR")
+  validityDays        Int?          // null means lifetime access
+  allowRenewals       Boolean       @default(true)
+  renewalWindowDays   Int?          @default(30)
+  status              ProductStatus @default(DRAFT)
+  createdAt           DateTime      @default(now()) @db.Timestamptz
+  updatedAt           DateTime      @updatedAt @db.Timestamptz
+  deletedAt           DateTime?     @db.Timestamptz
+
+  sections            Section[]
+  lessons             Lesson[]
+  orders              Order[]
+  entitlements        Entitlement[]
+  coupons             Coupon[]
+
+  @@index([status])
+  @@index([slug])
+}
+
+model Section {
+  id        String   @id @db.Uuid
+  productId String   @db.Uuid
+  title     String
+  position  Int
+  createdAt DateTime @default(now()) @db.Timestamptz
+  updatedAt DateTime @updatedAt @db.Timestamptz
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  lessons   Lesson[]
+
+  @@index([productId, position])
+}
+
+model Lesson {
+  id              String         @id @db.Uuid
+  sectionId       String         @db.Uuid
+  productId       String         @db.Uuid
+  title           String
+  description     String?        @db.Text
+  position        Int
+  videoProviderId String?
+  durationSeconds Int            @default(0)
+  isFreePreview   Boolean        @default(false)
+  status          LessonStatus   @default(PROCESSING)
+  createdAt       DateTime       @default(now()) @db.Timestamptz
+  updatedAt       DateTime       @updatedAt @db.Timestamptz
+
+  section         Section        @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  product         Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  progresses      LessonProgress[]
+
+  @@index([sectionId, position])
+  @@index([productId])
+  @@index([videoProviderId])
+}
+
+model Order {
+  id               String            @id @db.Uuid
+  userId           String            @db.Uuid
+  productId        String            @db.Uuid
+  couponId         String?           @db.Uuid
+  idempotencyKey   String            @unique
+  status           OrderStatus       @default(CREATED)
+  subtotalPaise    Int
+  discountPaise    Int               @default(0)
+  taxPaise         Int               @default(0)
+  totalPaise       Int
+  currency         String            @default("INR")
+  razorpayOrderId  String?           @unique
+  billingDetails   Json?
+  paidAt           DateTime?         @db.Timestamptz
+  createdAt        DateTime          @default(now()) @db.Timestamptz
+  updatedAt        DateTime          @updatedAt @db.Timestamptz
+
+  user             User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  product          Product           @relation(fields: [productId], references: [id], onDelete: Restrict)
+  coupon           Coupon?           @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  payments         Payment[]
+  entitlements     Entitlement[]
+  invoice          Invoice?
+  couponRedemption CouponRedemption?
+
+  @@index([userId])
+  @@index([productId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Payment {
+  id                String        @id @db.Uuid
+  orderId           String        @db.Uuid
+  razorpayPaymentId String        @unique
+  method            String?
+  status            PaymentStatus @default(PENDING)
+  amountPaise       Int
+  rawGatewayPayload Json?
+  capturedAt        DateTime?     @db.Timestamptz
+  createdAt         DateTime      @default(now()) @db.Timestamptz
+  updatedAt         DateTime      @updatedAt @db.Timestamptz
+
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  refunds           Refund[]
+
+  @@index([orderId])
+  @@index([status])
+}
+
+model Refund {
+  id                 String       @id @db.Uuid
+  paymentId          String       @db.Uuid
+  razorpayRefundId   String       @unique
+  amountPaise        Int
+  reason             String?
+  status             RefundStatus @default(PENDING)
+  initiatedByAdminId String?      @db.Uuid
+  createdAt          DateTime     @default(now()) @db.Timestamptz
+  updatedAt          DateTime     @updatedAt @db.Timestamptz
+
+  payment            Payment      @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId])
+  @@index([status])
+}
+
+model Entitlement {
+  id            String            @id @db.Uuid
+  userId        String            @db.Uuid
+  productId     String            @db.Uuid
+  orderId       String?           @db.Uuid
+  source        EntitlementSource @default(PURCHASE)
+  startsAt      DateTime          @default(now()) @db.Timestamptz
+  expiresAt     DateTime?         @db.Timestamptz
+  status        EntitlementStatus @default(ACTIVE)
+  revokedAt     DateTime?         @db.Timestamptz
+  revokedReason String?
+  createdAt     DateTime          @default(now()) @db.Timestamptz
+  updatedAt     DateTime          @updatedAt @db.Timestamptz
+
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product       Product           @relation(fields: [productId], references: [id], onDelete: Restrict)
+  order         Order?            @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId, productId, status])
+  @@index([expiresAt])
+}
+
+model LessonProgress {
+  id                  String    @id @db.Uuid
+  userId              String    @db.Uuid
+  lessonId            String    @db.Uuid
+  watchedSeconds      Int       @default(0)
+  lastPositionSeconds Int       @default(0)
+  completedAt         DateTime? @db.Timestamptz
+  createdAt           DateTime  @default(now()) @db.Timestamptz
+  updatedAt           DateTime  @updatedAt @db.Timestamptz
+
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson              Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
+}
+
+model Coupon {
+  id             String             @id @db.Uuid
+  code           String             @unique
+  type           CouponType
+  value          Int
+  maxRedemptions Int?
+  perUserLimit   Int                @default(1)
+  validFrom      DateTime           @default(now()) @db.Timestamptz
+  validUntil     DateTime?          @db.Timestamptz
+  productId      String?            @db.Uuid
+  isActive       Boolean            @default(true)
+  createdAt      DateTime           @default(now()) @db.Timestamptz
+  updatedAt      DateTime           @updatedAt @db.Timestamptz
+
+  product        Product?           @relation(fields: [productId], references: [id], onDelete: SetNull)
+  orders         Order[]
+  redemptions    CouponRedemption[]
+
+  @@index([code, isActive])
+}
+
+model CouponRedemption {
+  id            String   @id @db.Uuid
+  couponId      String   @db.Uuid
+  userId        String   @db.Uuid
+  orderId       String   @unique @db.Uuid
+  discountPaise Int
+  redeemedAt    DateTime @default(now()) @db.Timestamptz
+
+  coupon        Coupon   @relation(fields: [couponId], references: [id], onDelete: Restrict)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([couponId, userId])
+}
+
+model WebhookEvent {
+  id              String             @id @db.Uuid
+  provider        String
+  providerEventId String             @unique
+  eventType       String
+  payload         Json
+  status          WebhookEventStatus @default(PENDING)
+  processedAt     DateTime?          @db.Timestamptz
+  error           String?            @db.Text
+  createdAt       DateTime           @default(now()) @db.Timestamptz
+
+  @@index([provider, status])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id          String   @id @db.Uuid
+  actorUserId String?  @db.Uuid
+  action      String
+  entityType  String
+  entityId    String
+  beforeState Json?
+  afterState  Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  actor       User?    @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([actorUserId])
+  @@index([entityType, entityId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model Invoice {
+  id             String   @id @db.Uuid
+  orderId        String   @unique @db.Uuid
+  invoiceNumber  String   @unique
+  financialYear  String
+  sequenceNumber Int
+  pdfUrl         String?
+  subtotalPaise  Int
+  taxPaise       Int      @default(0)
+  totalPaise     Int
+  billingDetails Json
+  issuedAt       DateTime @default(now()) @db.Timestamptz
+  createdAt      DateTime @default(now()) @db.Timestamptz
+
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([financialYear, sequenceNumber])
+}

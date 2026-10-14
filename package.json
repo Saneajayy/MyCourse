@@ -1,0 +1,35 @@
+{
+  "name": "mycourse-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"@course/*\" dev",
+    "dev:api": "pnpm --filter @course/api dev",
+    "dev:web": "pnpm --filter @course/web dev",
+    "build": "pnpm --filter @course/shared build && pnpm --filter @course/api build && pnpm --filter @course/web build",
+    "typecheck": "pnpm --recursive --parallel typecheck",
+    "lint": "pnpm --recursive lint",
+    "test": "pnpm --recursive test",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md,yml,yaml}\"",
+    "db:generate": "dotenv -e .env -- pnpm --filter @course/api prisma:generate",
+    "db:migrate:dev": "dotenv -e .env -- pnpm --filter @course/api prisma:migrate:dev",
+    "db:migrate:deploy": "dotenv -e .env -- pnpm --filter @course/api prisma:migrate:deploy",
+    "db:seed": "dotenv -e .env -- pnpm --filter @course/api prisma:seed",
+    "db:studio": "dotenv -e .env -- pnpm --filter @course/api prisma:studio",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.7.1",
+    "@commitlint/config-conventional": "^19.7.1",
+    "dotenv-cli": "^8.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.5.1",
+    "typescript": "^5.7.3"
+  }
+}

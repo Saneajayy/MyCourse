@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Lint, Typecheck, Test, and Build
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mycourse
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile || pnpm install
+
+      - name: Verify code formatting
+        run: pnpm format:check
+
+      - name: Generate Prisma Client
+        run: pnpm --filter @course/api prisma:generate
+
+      - name: Typecheck across all packages
+        run: pnpm typecheck
+
+      - name: Run automated test suites
+        run: pnpm test
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mycourse?schema=public
+          REDIS_URL: redis://localhost:6379
+          JWT_ACCESS_SECRET: test_jwt_access_secret_must_be_at_least_32_characters_long_for_security!
+
+      - name: Build all packages (Shared, API, Next.js Web)
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:4000
