@@ -8,10 +8,12 @@ import { env } from './config/env.js';
 import { logger } from './common/logger/logger.js';
 import { requestIdMiddleware } from './common/middleware/request-id.js';
 import { errorHandler } from './common/middleware/error-handler.js';
-import { NotFoundError } from './common/errors/app-error.js';
+import { NotFoundError, ForbiddenError } from './common/errors/app-error.js';
 import { healthRouter } from './modules/health/health.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
 import { sessionsRouter } from './modules/sessions/sessions.routes.js';
+import { requireAuth, requireRole, requireAdmin2FA } from './common/middleware/auth.js';
+import { UserRole } from '@course/shared';
 
 export function createApp(): Express {
   const app = express();
@@ -56,7 +58,11 @@ export function createApp(): Express {
         if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
-          callback(new Error(`Origin [${origin}] not permitted by CORS policy`));
+          callback(
+            new ForbiddenError(
+              `Cross-origin request rejected: Origin [${origin}] not permitted by CORS policy`,
+            ),
+          );
         }
       },
       credentials: true,
@@ -98,6 +104,15 @@ export function createApp(): Express {
   });
   v1Router.use('/auth', authRouter);
   v1Router.use('/sessions', sessionsRouter);
+
+  // Admin management routes protected by Authentication, Admin Role, and Mandatory 2FA
+  const adminRouter = express.Router();
+  adminRouter.use(requireAuth, requireRole(UserRole.ADMIN), requireAdmin2FA);
+  adminRouter.get('/overview', (_req, res) => {
+    res.json({ success: true, data: { status: 'admin_dashboard_accessible' } });
+  });
+  v1Router.use('/admin', adminRouter);
+
   app.use('/api/v1', v1Router);
 
   // 10. 404 Handler for undefined routes

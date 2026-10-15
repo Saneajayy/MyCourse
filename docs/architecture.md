@@ -242,3 +242,20 @@ erDiagram
         datetime createdAt
     }
 ```
+
+---
+
+## 3. Project Phase Roadmap
+
+- **Phase 1**: Monorepo Foundation & Baseline Infrastructure (Complete)
+- **Phase 2**: Authentication, Sessions & Admin 2FA (Complete with Part B Hardening)
+- **Phase 3**: Video Pipeline & Bunny Stream CDN Integration (Direct Tus upload, signed tokenized HLS)
+- **Phase 4**: Course Catalog & Content Access Control (Sections, lessons, entitlements)
+- **Phase 5**: Orders, Pricing & Razorpay Payment Integration (Idempotency, HMAC webhook verification, GST calculation)
+- **Phase 6**: Student Frontend UI, Course Catalog, Auth UI (including **Google Login button** & Student Auth Modals), and Checkout Flow
+- **Phase 7**: Course Player, Dynamic DRM Watermarking & Progress Tracking (HLS player, watermark canvas, heartbeat)
+- **Phase 8**: Admin Dashboard, Video Upload UI, Course Management & AppSetting Tax/Invoice Editing
+- **Phase 9**: Email Notifications & Invoicing (Automated receipts, GST invoices)
+- **Phase 10**: Production Hardening & Security Audit
+- **Phase 11**: End-to-End Testing & Performance Verification
+- **Phase 12**: Production Deployment & Launch

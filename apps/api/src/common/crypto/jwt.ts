@@ -17,6 +17,7 @@ export interface Temp2FAPayload {
 
 export function signAccessToken(payload: AccessTokenPayload): string {
   const options: SignOptions = {
+    algorithm: 'HS256',
     expiresIn: env.JWT_ACCESS_TTL as unknown as NonNullable<SignOptions['expiresIn']>,
     issuer: 'hydraulic-course-api',
   };
@@ -26,6 +27,7 @@ export function signAccessToken(payload: AccessTokenPayload): string {
 export function verifyAccessToken(token: string): AccessTokenPayload {
   try {
     const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET, {
+      algorithms: ['HS256'],
       issuer: 'hydraulic-course-api',
     }) as AccessTokenPayload;
     return decoded;
@@ -39,6 +41,7 @@ export function verifyAccessToken(token: string): AccessTokenPayload {
 
 export function signTemp2FAToken(userId: string): string {
   const options: SignOptions = {
+    algorithm: 'HS256',
     expiresIn: '5m',
     issuer: 'hydraulic-course-api',
   };
@@ -48,6 +51,7 @@ export function signTemp2FAToken(userId: string): string {
 export function verifyTemp2FAToken(token: string): { sub: string } {
   try {
     const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET, {
+      algorithms: ['HS256'],
       issuer: 'hydraulic-course-api',
     }) as Temp2FAPayload;
 

@@ -93,6 +93,32 @@ export class EmailService {
     await this.dispatchEmail({ to, subject, text, html });
   }
 
+  public async sendAccountExistsEmail(to: string, name: string): Promise<void> {
+    const loginUrl = `${env.APP_URL}/login`;
+    const resetUrl = `${env.APP_URL}/forgot-password`;
+    const subject = 'Account Registration Attempt - Hydraulic Engineering Academy';
+    const text = `Hello ${name},\n\nSomeone recently attempted to create an account at Hydraulic Engineering Academy using your email address.\n\nIf this was you, you can log in at: ${loginUrl}\nOr reset your password at: ${resetUrl}\n\nIf you did not attempt this, you can safely ignore this email.`;
+    const html = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #000; padding: 24px; color: #0a192f; background-color: #fff;">
+        <h2 style="color: #0a192f; border-bottom: 2px solid #e05305; padding-bottom: 8px;">Account Registration Notice</h2>
+        <p>Hello <strong>${name}</strong>,</p>
+        <p>Someone recently attempted to register a new account on Hydraulic Engineering Academy using this email address.</p>
+        <p>If you already have an account, you can log in directly or reset your password if you forgot it:</p>
+        <div style="margin: 24px 0;">
+          <a href="${loginUrl}" style="background-color: #e05305; color: #fff; padding: 12px 24px; text-decoration: none; font-weight: bold; border: 1px solid #000; display: inline-block; margin-right: 12px;">
+            Log In
+          </a>
+          <a href="${resetUrl}" style="background-color: #0a192f; color: #fff; padding: 12px 24px; text-decoration: none; font-weight: bold; border: 1px solid #000; display: inline-block;">
+            Reset Password
+          </a>
+        </div>
+        <p style="font-size: 12px; color: #64748b;">If you did not make this request, you do not need to take any action. Your account remains secure.</p>
+      </div>
+    `;
+
+    await this.dispatchEmail({ to, subject, text, html });
+  }
+
   public async close(): Promise<void> {
     if (this.worker) await this.worker.close();
     if (this.queue) await this.queue.close();

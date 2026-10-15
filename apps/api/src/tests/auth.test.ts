@@ -1,35 +1,44 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../app.js';
 import { prisma } from '../common/db/prisma.js';
 import { redisClient } from '../common/redis/redis.js';
 import { uuidv7 } from 'uuidv7';
 import { hashPassword } from '../common/crypto/argon2.js';
-import { generateRandomToken, hashToken, decryptData } from '../common/crypto/tokens.js';
+import {
+  generateRandomToken,
+  hashToken,
+  decryptData,
+  hmacRecoveryCode,
+} from '../common/crypto/tokens.js';
 import { generate as generateTOTP } from 'otplib';
 import { env } from '../config/env.js';
 import { lockoutService } from '../common/middleware/lockout.js';
 import { UserRole, UserStatus } from '@course/shared';
 
-describe('Phase 2 Authentication and Session Integration Suite', () => {
+describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () => {
   const app = createApp();
 
   const testStudentEmail = `student_${Date.now()}@testcourse.com`;
-  const testStudentPassword = 'SecurePassword123!@#';
+  const testStudentPassword = 'ComplexPassword#2026!Secure';
   let studentAccessToken = '';
   let studentRefreshTokenCookie = '';
   let studentId = '';
 
   const testAdminEmail = `admin_${Date.now()}@testcourse.com`;
-  const testAdminPassword = 'AdminPassword123!@#';
+  const testAdminPassword = 'ComplexAdmin#2026!Secure';
   let adminAccessToken = '';
   let adminId = '';
 
   beforeAll(async () => {
-    // Clean up test data if any
+    // Ensure test database is ready and clean
     await prisma.user.deleteMany({
       where: {
-        email: { in: [testStudentEmail, testAdminEmail] },
+        OR: [
+          { email: { in: [testStudentEmail, testAdminEmail] } },
+          { email: { contains: 'prehijack' } },
+          { googleId: { startsWith: 'google-uid' } },
+        ],
       },
     });
   });
@@ -41,479 +50,796 @@ describe('Phase 2 Authentication and Session Integration Suite', () => {
         email: { in: [testStudentEmail, testAdminEmail] },
       },
     });
+    vi.restoreAllMocks();
   });
 
   // ---------------------------------------------------------------------------
-  // 1. REGISTRATION & EMAIL VERIFICATION
+  // 1. PASSWORD POLICY VALIDATION (B2)
   // ---------------------------------------------------------------------------
-  it('registers a new student with argon2id password and generates verification token', async () => {
-    const res = await request(app).post('/api/v1/auth/register').send({
-      email: testStudentEmail,
-      password: testStudentPassword,
-      name: 'Test Student',
-      phone: '+919876543210',
+  describe('Password Policy & Strength Enforcement (B2)', () => {
+    it('rejects trivial or common passwords like Password123!', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/register')
+        .send({
+          email: `weak_${Date.now()}@testcourse.com`,
+          password: 'Password123!',
+          name: 'Weak Pass User',
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.message).toContain('too common or easily guessable');
     });
 
-    expect(res.status).toBe(201);
-    expect(res.body.success).toBe(true);
-    expect(res.body.data.user.email).toBe(testStudentEmail.toLowerCase());
-    expect(res.body.data.user.role).toBe(UserRole.STUDENT);
+    it('rejects short passwords under 10 characters', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/register')
+        .send({
+          email: `short_${Date.now()}@testcourse.com`,
+          password: 'Short9!',
+          name: 'Short Pass User',
+        });
 
-    studentId = res.body.data.user.id;
-
-    // Verify user in real PostgreSQL
-    const dbUser = await prisma.user.findUnique({
-      where: { id: studentId },
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
     });
-    expect(dbUser).toBeDefined();
-    expect(dbUser?.emailVerifiedAt).toBeNull();
-    expect(dbUser?.passwordHash).toMatch(/^\$argon2id\$/);
-
-    // Verify token was stored hashed in EmailVerificationToken table
-    const tokenRecord = await prisma.emailVerificationToken.findFirst({
-      where: { userId: studentId },
-    });
-    expect(tokenRecord).toBeDefined();
-    expect(tokenRecord?.usedAt).toBeNull();
-  });
-
-  it('rejects registration with duplicate email address with 409 Conflict', async () => {
-    const res = await request(app).post('/api/v1/auth/register').send({
-      email: testStudentEmail,
-      password: testStudentPassword,
-      name: 'Duplicate Student',
-    });
-
-    expect(res.status).toBe(409);
-    expect(res.body.success).toBe(false);
-    expect(res.body.error.code).toBe('CONFLICT');
-  });
-
-  it('verifies email using verification token', async () => {
-    // Generate a known token in database
-    const rawToken = generateRandomToken(32);
-    const tokenHash = hashToken(rawToken);
-
-    await prisma.emailVerificationToken.create({
-      data: {
-        id: uuidv7(),
-        userId: studentId,
-        tokenHash,
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-      },
-    });
-
-    const res = await request(app).post('/api/v1/auth/verify-email').send({ token: rawToken });
-
-    expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
-
-    const updatedUser = await prisma.user.findUnique({ where: { id: studentId } });
-    expect(updatedUser?.emailVerifiedAt).not.toBeNull();
-  });
-
-  it('rejects email verification with already used token', async () => {
-    const rawToken = generateRandomToken(32);
-    const tokenHash = hashToken(rawToken);
-
-    await prisma.emailVerificationToken.create({
-      data: {
-        id: uuidv7(),
-        userId: studentId,
-        tokenHash,
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-        usedAt: new Date(),
-      },
-    });
-
-    const res = await request(app).post('/api/v1/auth/verify-email').send({ token: rawToken });
-
-    expect(res.status).toBe(400);
-    expect(res.body.success).toBe(false);
-    expect(res.body.error.message).toContain('invalid or has expired');
-  });
-
-  it('rejects email verification with expired token', async () => {
-    const rawToken = generateRandomToken(32);
-    const tokenHash = hashToken(rawToken);
-
-    await prisma.emailVerificationToken.create({
-      data: {
-        id: uuidv7(),
-        userId: studentId,
-        tokenHash,
-        expiresAt: new Date(Date.now() - 1000), // expired
-      },
-    });
-
-    const res = await request(app).post('/api/v1/auth/verify-email').send({ token: rawToken });
-
-    expect(res.status).toBe(400);
-    expect(res.body.success).toBe(false);
   });
 
   // ---------------------------------------------------------------------------
-  // 2. LOGIN, TIMING PROTECTION, AND COOKIE FLAGS
+  // 2. REGISTRATION & ZERO-ENUMERATION (B7)
   // ---------------------------------------------------------------------------
-  it('returns generic error on non-existent email (zero user enumeration)', async () => {
-    const res = await request(app).post('/api/v1/auth/login').send({
-      email: 'nonexistent_account@domain.com',
-      password: 'AnyPassword123!',
+  describe('Registration & Zero Email Enumeration (B7)', () => {
+    it('registers a new student with strong argon2id password and sends verification token', async () => {
+      const res = await request(app).post('/api/v1/auth/register').send({
+        email: testStudentEmail,
+        password: testStudentPassword,
+        name: 'Test Student',
+        phone: '+919876543210',
+      });
+
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.message).toContain('verification link has been sent');
+
+      // Verify user created in PostgreSQL
+      const dbUser = await prisma.user.findUnique({
+        where: { email: testStudentEmail.toLowerCase() },
+      });
+      expect(dbUser).toBeDefined();
+      expect(dbUser?.emailVerifiedAt).toBeNull();
+      expect(dbUser?.passwordHash).toMatch(/^\$argon2id\$/);
+
+      studentId = dbUser!.id;
+
+      // Verify verification token hashed in DB
+      const tokenRecord = await prisma.emailVerificationToken.findFirst({
+        where: { userId: studentId },
+      });
+      expect(tokenRecord).toBeDefined();
+      expect(tokenRecord?.usedAt).toBeNull();
     });
 
-    expect(res.status).toBe(401);
-    expect(res.body.success).toBe(false);
-    expect(res.body.error.message).toBe('Invalid email or password');
-  });
+    it('returns generic zero-enumeration response when registering an already registered email (B7)', async () => {
+      const res = await request(app).post('/api/v1/auth/register').send({
+        email: testStudentEmail,
+        password: testStudentPassword,
+        name: 'Duplicate Student Attempt',
+      });
 
-  it('returns generic error on wrong password', async () => {
-    const res = await request(app).post('/api/v1/auth/login').send({
-      email: testStudentEmail,
-      password: 'WrongPassword123!',
+      // B7: Must NOT return 409 Conflict. Must return generic success message
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.message).toContain('verification link has been sent');
     });
-
-    expect(res.status).toBe(401);
-    expect(res.body.success).toBe(false);
-    expect(res.body.error.message).toBe('Invalid email or password');
-  });
-
-  it('logs in student successfully and verifies cookie flags (httpOnly, SameSite=Lax)', async () => {
-    const res = await request(app).post('/api/v1/auth/login').send({
-      email: testStudentEmail,
-      password: testStudentPassword,
-    });
-
-    expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
-    expect(res.body.data.accessToken).toBeDefined();
-    expect(res.body.data.user.email).toBe(testStudentEmail.toLowerCase());
-
-    studentAccessToken = res.body.data.accessToken;
-
-    // Verify Set-Cookie header contains HttpOnly and SameSite=Lax
-    const cookies = res.headers['set-cookie'] as string[] | undefined;
-    expect(cookies).toBeDefined();
-    const refreshCookie = cookies?.find((c: string) => c.startsWith('refresh_token='));
-    expect(refreshCookie).toBeDefined();
-    expect(refreshCookie).toMatch(/HttpOnly/i);
-    expect(refreshCookie).toMatch(/SameSite=Lax/i);
-    expect(refreshCookie).toMatch(/Path=\//i);
-
-    studentRefreshTokenCookie = refreshCookie!.split(';')[0]!;
-  });
-
-  // ---------------------------------------------------------------------------
-  // 3. REFRESH TOKEN ROTATION & REPLAY REUSE DETECTION
-  // ---------------------------------------------------------------------------
-  it('rotates refresh token and issues a new access token on POST /refresh', async () => {
-    const res = await request(app)
-      .post('/api/v1/auth/refresh')
-      .set('Cookie', studentRefreshTokenCookie);
-
-    expect(res.status).toBe(200);
-    expect(res.body.success).toBe(true);
-    expect(res.body.data.accessToken).toBeDefined();
-
-    // Old studentRefreshTokenCookie should now be revoked in the database
-    const oldRawToken = studentRefreshTokenCookie.replace('refresh_token=', '');
-    const oldTokenRecord = await prisma.refreshToken.findUnique({
-      where: { tokenHash: hashToken(oldRawToken) },
-    });
-    expect(oldTokenRecord?.revokedAt).not.toBeNull();
-
-    // Capture the newly rotated cookie
-    const cookies = res.headers['set-cookie'] as string[];
-    const newRefreshCookie = cookies.find((c: string) => c.startsWith('refresh_token='));
-    expect(newRefreshCookie).toBeDefined();
-
-    studentAccessToken = res.body.data.accessToken;
-
-    // -------------------------------------------------------------------------
-    // CRITICAL SECURITY TEST: REPLAY REUSE ATTACK
-    // Replaying the old already-revoked refresh token must trigger family revocation!
-    // -------------------------------------------------------------------------
-    const replayRes = await request(app)
-      .post('/api/v1/auth/refresh')
-      .set('Cookie', studentRefreshTokenCookie); // Replaying OLD token!
-
-    expect(replayRes.status).toBe(401);
-    expect(replayRes.body.error.message).toContain('Session revoked due to detected token reuse');
-
-    // Verify that the NEW token from the same family is now ALSO revoked!
-    const newRawToken = newRefreshCookie!.split(';')[0]!.replace('refresh_token=', '');
-    const newTokenRecord = await prisma.refreshToken.findUnique({
-      where: { tokenHash: hashToken(newRawToken) },
-    });
-    expect(newTokenRecord?.revokedAt).not.toBeNull();
-
-    // Any subsequent call with the new token must also be rejected
-    const blockedRes = await request(app)
-      .post('/api/v1/auth/refresh')
-      .set('Cookie', newRefreshCookie!.split(';')[0]!);
-
-    expect(blockedRes.status).toBe(401);
   });
 
   // ---------------------------------------------------------------------------
-  // 4. BRUTE-FORCE LOCKOUT
+  // 3. EMAIL VERIFICATION & UNVERIFIED LOGIN BEHAVIOR (B6)
   // ---------------------------------------------------------------------------
-  it('locks out account after 5 consecutive failed login attempts', async () => {
-    const victimEmail = `victim_${Date.now()}@test.com`;
-    const passwordHash = await hashPassword('CorrectPassword123!');
-    await prisma.user.create({
-      data: {
-        id: uuidv7(),
-        email: victimEmail,
-        name: 'Victim User',
-        passwordHash,
-      },
+  describe('Email Verification Lifecycle', () => {
+    it('allows login with unverified email but flags emailVerifiedAt as null (B6)', async () => {
+      const res = await request(app).post('/api/v1/auth/login').send({
+        email: testStudentEmail,
+        password: testStudentPassword,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.user.emailVerifiedAt).toBeNull();
+      expect(res.body.data.accessToken).toBeDefined();
     });
 
-    // 5 consecutive wrong password attempts
-    for (let i = 0; i < 5; i++) {
+    it('verifies email using valid single-use verification token', async () => {
+      const rawToken = generateRandomToken(32);
+      const tokenHash = hashToken(rawToken);
+
+      await prisma.emailVerificationToken.create({
+        data: {
+          id: uuidv7(),
+          userId: studentId,
+          tokenHash,
+          expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+        },
+      });
+
+      const res = await request(app).post('/api/v1/auth/verify-email').send({ token: rawToken });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+
+      const updatedUser = await prisma.user.findUnique({ where: { id: studentId } });
+      expect(updatedUser?.emailVerifiedAt).not.toBeNull();
+    });
+
+    it('rejects email verification with already used token', async () => {
+      const rawToken = generateRandomToken(32);
+      const tokenHash = hashToken(rawToken);
+
+      await prisma.emailVerificationToken.create({
+        data: {
+          id: uuidv7(),
+          userId: studentId,
+          tokenHash,
+          expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+          usedAt: new Date(),
+        },
+      });
+
+      const res = await request(app).post('/api/v1/auth/verify-email').send({ token: rawToken });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.message).toContain('invalid or has expired');
+    });
+
+    it('rejects email verification with expired token', async () => {
+      const rawToken = generateRandomToken(32);
+      const tokenHash = hashToken(rawToken);
+
+      await prisma.emailVerificationToken.create({
+        data: {
+          id: uuidv7(),
+          userId: studentId,
+          tokenHash,
+          expiresAt: new Date(Date.now() - 1000), // expired
+        },
+      });
+
+      const res = await request(app).post('/api/v1/auth/verify-email').send({ token: rawToken });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 4. LOGIN, ZERO-ENUMERATION & COOKIE ATTRIBUTES (B6, B8)
+  // ---------------------------------------------------------------------------
+  describe('Login & Session Cookie Flags', () => {
+    it('returns generic 401 on non-existent email (zero user enumeration)', async () => {
+      const res = await request(app).post('/api/v1/auth/login').send({
+        email: 'unknown_nonexistent@testcourse.com',
+        password: 'AnyPassword123!@#',
+      });
+
+      expect(res.status).toBe(401);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.message).toBe('Invalid email or password');
+    });
+
+    it('returns generic 401 on wrong password', async () => {
+      const res = await request(app).post('/api/v1/auth/login').send({
+        email: testStudentEmail,
+        password: 'WrongPassword123!@#',
+      });
+
+      expect(res.status).toBe(401);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.message).toBe('Invalid email or password');
+    });
+
+    it('logs in student successfully and verifies cookie attributes (HttpOnly, SameSite=Lax, Path=/)', async () => {
+      const res = await request(app).post('/api/v1/auth/login').send({
+        email: testStudentEmail,
+        password: testStudentPassword,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.accessToken).toBeDefined();
+
+      studentAccessToken = res.body.data.accessToken;
+
+      const cookies = res.headers['set-cookie'] as string[] | undefined;
+      expect(cookies).toBeDefined();
+      const refreshCookie = cookies?.find((c: string) => c.startsWith('refresh_token='));
+      expect(refreshCookie).toBeDefined();
+      expect(refreshCookie).toMatch(/HttpOnly/i);
+      expect(refreshCookie).toMatch(/SameSite=Lax/i);
+      expect(refreshCookie).toMatch(/Path=\//i);
+
+      studentRefreshTokenCookie = refreshCookie!.split(';')[0]!;
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 5. CSRF DEFENSE ON COOKIE-AUTHENTICATED ROUTES (B5)
+  // ---------------------------------------------------------------------------
+  describe('CSRF Origin & Host Validation (B5)', () => {
+    it('rejects cross-origin POST /refresh from unauthorized origin with 403 Forbidden', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/refresh')
+        .set('Cookie', studentRefreshTokenCookie)
+        .set('Origin', 'https://malicious-attacker.com');
+
+      expect(res.status).toBe(403);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.message).toContain('Cross-origin request rejected');
+    });
+
+    it('rejects cross-origin POST /logout from unauthorized origin with 403 Forbidden', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/logout')
+        .set('Cookie', studentRefreshTokenCookie)
+        .set('Origin', 'https://evil-phishing-site.org');
+
+      expect(res.status).toBe(403);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error.message).toContain('Cross-origin request rejected');
+    });
+
+    it('accepts POST /refresh with allowed CORS origin or same host', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/refresh')
+        .set('Cookie', studentRefreshTokenCookie)
+        .set('Origin', 'http://localhost:3000'); // Configured in CORS_ORIGINS
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+
+      const cookies = res.headers['set-cookie'] as string[];
+      const newCookie = cookies.find((c: string) => c.startsWith('refresh_token='));
+      studentRefreshTokenCookie = newCookie!.split(';')[0]!;
+      studentAccessToken = res.body.data.accessToken;
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 6. REFRESH TOKEN ROTATION & REPLAY REUSE DETECTION
+  // ---------------------------------------------------------------------------
+  describe('Refresh Token Rotation & Replay Reuse Detection', () => {
+    it('detects refresh token replay attack and revokes entire token family', async () => {
+      const oldCookie = studentRefreshTokenCookie;
+
+      // 1. Legitimate rotation
+      const rotateRes = await request(app).post('/api/v1/auth/refresh').set('Cookie', oldCookie);
+
+      expect(rotateRes.status).toBe(200);
+      const cookies = rotateRes.headers['set-cookie'] as string[];
+      const activeCookie = cookies
+        .find((c: string) => c.startsWith('refresh_token='))!
+        .split(';')[0]!;
+
+      // 2. Replay attack: Attacker re-uses old already-rotated cookie!
+      const replayRes = await request(app).post('/api/v1/auth/refresh').set('Cookie', oldCookie);
+
+      expect(replayRes.status).toBe(401);
+      expect(replayRes.body.error.message).toContain('Session revoked due to detected token reuse');
+
+      // 3. Legitimate user's active token is now also revoked
+      const blockedRes = await request(app)
+        .post('/api/v1/auth/refresh')
+        .set('Cookie', activeCookie);
+
+      expect(blockedRes.status).toBe(401);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 7. BRUTE-FORCE LOCKOUT (B9)
+  // ---------------------------------------------------------------------------
+  describe('Composite Brute-Force Lockout (B9)', () => {
+    it('locks out composite email+IP after 5 failed login attempts', async () => {
+      const victimEmail = `victim_${Date.now()}@test.com`;
+      const passwordHash = await hashPassword('CorrectPassword123!@#');
+      await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: victimEmail,
+          name: 'Lockout Test User',
+          passwordHash,
+        },
+      });
+
+      for (let i = 0; i < 5; i++) {
+        const res = await request(app)
+          .post('/api/v1/auth/login')
+          .send({ email: victimEmail, password: 'WrongPassword!' });
+        expect(res.status).toBe(401);
+      }
+
+      // 6th attempt should be blocked by composite lockout
+      const lockedRes = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: victimEmail, password: 'CorrectPassword123!@#' });
+
+      expect(lockedRes.status).toBe(429);
+      expect(lockedRes.body.error.code).toBe('RATE_LIMIT_EXCEEDED');
+
+      await lockoutService.clearFailedAttempts(victimEmail, '::ffff:127.0.0.1');
+      await lockoutService.clearFailedAttempts(victimEmail, '127.0.0.1');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 8. LOGOUT-ALL & TOKEN VERSION INVALIDATION (B6)
+  // ---------------------------------------------------------------------------
+  describe('Logout-All & Access Token Invalidation (B6)', () => {
+    it('invalidates existing access tokens when calling /logout-all', async () => {
+      const loginRes = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: testStudentEmail, password: testStudentPassword });
+
+      const token = loginRes.body.data.accessToken;
+
+      // Access /me succeeds
+      const me1 = await request(app).get('/api/v1/auth/me').set('Authorization', `Bearer ${token}`);
+      expect(me1.status).toBe(200);
+
+      // Call logout-all
+      const logoutAllRes = await request(app)
+        .post('/api/v1/auth/logout-all')
+        .set('Authorization', `Bearer ${token}`);
+      expect(logoutAllRes.status).toBe(200);
+
+      // Subsequent /me with same token is rejected
+      const me2 = await request(app).get('/api/v1/auth/me').set('Authorization', `Bearer ${token}`);
+      expect(me2.status).toBe(401);
+      expect(me2.body.error.message).toContain('Session has been revoked');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 9. CHANGE PASSWORD (B6)
+  // ---------------------------------------------------------------------------
+  describe('Change Password Flow (B6)', () => {
+    it('changes password with valid current password and rejects common new password', async () => {
+      const loginRes = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: testStudentEmail, password: testStudentPassword });
+      const token = loginRes.body.data.accessToken;
+
+      // Reject common password
+      const weakRes = await request(app)
+        .post('/api/v1/auth/change-password')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          currentPassword: testStudentPassword,
+          newPassword: 'Password123!',
+        });
+      expect(weakRes.status).toBe(400);
+
+      // Reject wrong current password
+      const wrongCurrentRes = await request(app)
+        .post('/api/v1/auth/change-password')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          currentPassword: 'IncorrectPassword!123',
+          newPassword: 'NewBrandNew#Password2026!',
+        });
+      expect(wrongCurrentRes.status).toBe(400);
+      expect(wrongCurrentRes.body.error.message).toContain('Current password is incorrect');
+
+      // Successful change
+      const successRes = await request(app)
+        .post('/api/v1/auth/change-password')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          currentPassword: testStudentPassword,
+          newPassword: 'NewBrandNew#Password2026!',
+        });
+      expect(successRes.status).toBe(200);
+
+      // Login with new password succeeds
+      const newLogin = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: testStudentEmail, password: 'NewBrandNew#Password2026!' });
+      expect(newLogin.status).toBe(200);
+
+      // Reset back for subsequent tests
+      const resetToken = newLogin.body.data.accessToken;
+      await request(app)
+        .post('/api/v1/auth/change-password')
+        .set('Authorization', `Bearer ${resetToken}`)
+        .send({
+          currentPassword: 'NewBrandNew#Password2026!',
+          newPassword: testStudentPassword,
+        });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 10. FORGOT & RESET PASSWORD HAPPY PATH (B6)
+  // ---------------------------------------------------------------------------
+  describe('Forgot & Reset Password Lifecycle (B6)', () => {
+    it('executes forgot-then-reset happy path and rejects common new passwords', async () => {
+      // 1. Request forgot password
+      const forgotRes = await request(app)
+        .post('/api/v1/auth/forgot-password')
+        .send({ email: testStudentEmail });
+      expect(forgotRes.status).toBe(200);
+      expect(forgotRes.body.data.message).toContain('password reset instructions have been sent');
+
+      // 2. Fetch reset token from test database
+      const resetRecord = await prisma.passwordResetToken.findFirst({
+        where: { user: { email: testStudentEmail.toLowerCase() }, usedAt: null },
+      });
+      expect(resetRecord).toBeDefined();
+
+      // Create a known token
+      const rawResetToken = generateRandomToken(32);
+      await prisma.passwordResetToken.create({
+        data: {
+          id: uuidv7(),
+          userId: studentId,
+          tokenHash: hashToken(rawResetToken),
+          expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+        },
+      });
+
+      // 3. Attempt reset with common password -> rejected
+      const weakReset = await request(app)
+        .post('/api/v1/auth/reset-password')
+        .send({ token: rawResetToken, password: 'Password123!' });
+      expect(weakReset.status).toBe(400);
+
+      // 4. Reset with valid password -> succeeds
+      const resetSuccess = await request(app)
+        .post('/api/v1/auth/reset-password')
+        .send({ token: rawResetToken, password: 'UpdatedSecretPassword#2026!' });
+      expect(resetSuccess.status).toBe(200);
+
+      // 5. Login with new password
+      const loginNew = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: testStudentEmail, password: 'UpdatedSecretPassword#2026!' });
+      expect(loginNew.status).toBe(200);
+
+      // 6. Reusing reset token fails
+      const replayReset = await request(app)
+        .post('/api/v1/auth/reset-password')
+        .send({ token: rawResetToken, password: 'AnotherPassword#2026!' });
+      expect(replayReset.status).toBe(400);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 11. ADMIN 2FA HARDENING, RATE LIMITING & REPLAY PREVENTION (B3, B4, B6)
+  // ---------------------------------------------------------------------------
+  describe('Admin TOTP 2FA Hardening & Timestep Anti-Replay (B3, B4)', () => {
+    it('blocks unenrolled admin from protected admin management routes (B6)', async () => {
+      const passwordHash = await hashPassword(testAdminPassword);
+      const admin = await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: testAdminEmail,
+          name: 'Super Admin',
+          passwordHash,
+          role: UserRole.ADMIN,
+          status: UserStatus.ACTIVE,
+          emailVerifiedAt: new Date(),
+          twoFactorEnabled: false,
+        },
+      });
+      adminId = admin.id;
+
+      // Admin logs in before 2FA enrollment
+      const loginRes = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: testAdminEmail, password: testAdminPassword });
+
+      adminAccessToken = loginRes.body.data.accessToken;
+
+      // Access to /api/v1/admin/overview is blocked by requireAdmin2FA
+      const adminBlocked = await request(app)
+        .get('/api/v1/admin/overview')
+        .set('Authorization', `Bearer ${adminAccessToken}`);
+
+      expect(adminBlocked.status).toBe(403);
+      expect(adminBlocked.body.error.message).toContain(
+        'Mandatory two-factor authentication setup is required',
+      );
+    });
+
+    it('generates 60-bit recovery codes with HMAC and refuses /2fa/setup once enabled (B4)', async () => {
+      // 1. Setup 2FA wizard
+      const setupRes = await request(app)
+        .post('/api/v1/auth/2fa/setup')
+        .set('Authorization', `Bearer ${adminAccessToken}`);
+
+      expect(setupRes.status).toBe(200);
+      expect(setupRes.body.data.recoveryCodes).toHaveLength(10);
+      // B4: 12-character Base32 recovery code (60 bits of entropy) formatted as XXXX-XXXX-XXXX
+      const codeSample = setupRes.body.data.recoveryCodes[0];
+      expect(codeSample).toMatch(/^[2-9A-Z]{4}-[2-9A-Z]{4}-[2-9A-Z]{4}$/);
+
+      const secret = setupRes.body.data.manualEntryKey;
+      const validTotp = await generateTOTP({ secret });
+
+      // 2. Activate 2FA
+      const verifyRes = await request(app)
+        .post('/api/v1/auth/2fa/verify')
+        .set('Authorization', `Bearer ${adminAccessToken}`)
+        .send({ token: validTotp });
+
+      expect(verifyRes.status).toBe(200);
+
+      // B4: Calling /2fa/setup after 2FA is already enabled must be refused
+      const refuseSetupRes = await request(app)
+        .post('/api/v1/auth/2fa/setup')
+        .set('Authorization', `Bearer ${adminAccessToken}`);
+
+      expect(refuseSetupRes.status).toBe(400);
+      expect(refuseSetupRes.body.error.message).toContain('already enabled');
+    });
+
+    it('rejects reuse of a TOTP code within its 30-second window (timestep anti-replay) (B3)', async () => {
+      // Clear any prior timestep cache for this admin
+      await redisClient.del(`totp:last_timestep:${adminId}`);
+
+      // Admin logs in, gets 2FA tempToken challenge
+      const loginRes = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: testAdminEmail, password: testAdminPassword });
+
+      expect(loginRes.body.data.requires2FA).toBe(true);
+      const tempToken = loginRes.body.data.tempToken;
+
+      const admin = await prisma.user.findUnique({ where: { id: adminId } });
+      const secret = decryptData(admin!.twoFactorSecretEncrypted!, env.TOTP_ENCRYPTION_KEY);
+      const code = await generateTOTP({ secret });
+
+      // 1. First verification succeeds
+      const firstRes = await request(app).post('/api/v1/auth/2fa/login').send({ tempToken, code });
+
+      expect(firstRes.status).toBe(200);
+
+      // 2. Replaying the exact same TOTP code in the same 30s window must fail (anti-replay)
+      const loginRes2 = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: testAdminEmail, password: testAdminPassword });
+      const tempToken2 = loginRes2.body.data.tempToken;
+
+      const replayRes = await request(app)
+        .post('/api/v1/auth/2fa/login')
+        .send({ tempToken: tempToken2, code });
+
+      expect(replayRes.status).toBe(401);
+      expect(replayRes.body.error.message).toContain('already been used');
+    });
+
+    it('rate-limits and locks out failed 2FA attempts after 5 failures (B3)', async () => {
+      await redisClient.del(`2fa_fail:user:${adminId}`);
+      await redisClient.del(`totp:last_timestep:${adminId}`);
+
+      const loginRes = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: testAdminEmail, password: testAdminPassword });
+      const tempToken = loginRes.body.data.tempToken;
+
+      // 5 failed 2FA code attempts
+      for (let i = 0; i < 5; i++) {
+        const failRes = await request(app)
+          .post('/api/v1/auth/2fa/login')
+          .send({ tempToken, code: '000000' });
+        expect(failRes.status).toBe(401);
+      }
+
+      // 6th attempt is locked out
+      const lockedRes = await request(app)
+        .post('/api/v1/auth/2fa/login')
+        .send({ tempToken, code: '000000' });
+
+      expect(lockedRes.status).toBe(429);
+      expect(lockedRes.body.error.message).toContain('locked');
+
+      // Clear test lockout counters
+      await redisClient.del(`2fa_fail:user:${adminId}`);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 12. GOOGLE OAUTH FLOWS & PRE-HIJACK MITIGATION (B1, B6)
+  // ---------------------------------------------------------------------------
+  describe('Google OAuth & Account Linking (B1, B6)', () => {
+    it('rejects Google OAuth callback with state mismatch (B6)', async () => {
+      const res = await request(app)
+        .get('/api/v1/auth/google/callback')
+        .query({ code: 'mock-code', state: 'invalid-nonexistent-state' });
+
+      expect(res.status).toBe(401);
+      expect(res.body.error.message).toContain('OAuth state mismatch');
+    });
+
+    it('rejects Google account when email is not verified by Google (B6)', async () => {
+      const state = 'test-state-unverified';
+      await redisClient.set(`oauth_state:${state}`, 'test-verifier-code', 'EX', 300);
+
+      // Mock Google fetch responses
+      vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
+        const urlStr = url.toString();
+        if (urlStr.includes('oauth2.googleapis.com/token')) {
+          return new Response(JSON.stringify({ access_token: 'mock-google-token' }), {
+            status: 200,
+          });
+        }
+        if (urlStr.includes('googleapis.com/oauth2/v3/userinfo')) {
+          return new Response(
+            JSON.stringify({
+              sub: 'google-uid-unverified',
+              email: 'unverified_google_user@testcourse.com',
+              name: 'Unverified Google',
+              email_verified: false, // NOT VERIFIED
+            }),
+            { status: 200 },
+          );
+        }
+        return new Response('Not found', { status: 404 });
+      });
+
+      const res = await request(app)
+        .get('/api/v1/auth/google/callback')
+        .query({ code: 'valid-google-code', state });
+
+      expect(res.status).toBe(403);
+      expect(res.body.error.message).toContain('Google account email is not verified');
+    });
+
+    it('creates and verifies new student on first-time Google OAuth login (B6)', async () => {
+      const state = 'test-state-new-user';
+      await redisClient.set(`oauth_state:${state}`, 'test-verifier-code', 'EX', 300);
+      const newGoogleEmail = `new_google_${Date.now()}@testcourse.com`;
+
+      vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
+        const urlStr = url.toString();
+        if (urlStr.includes('oauth2.googleapis.com/token')) {
+          return new Response(JSON.stringify({ access_token: 'mock-google-token' }), {
+            status: 200,
+          });
+        }
+        if (urlStr.includes('googleapis.com/oauth2/v3/userinfo')) {
+          return new Response(
+            JSON.stringify({
+              sub: `google-uid-${Date.now()}`,
+              email: newGoogleEmail,
+              name: 'New Google Student',
+              email_verified: true,
+            }),
+            { status: 200 },
+          );
+        }
+        return new Response('Not found', { status: 404 });
+      });
+
+      const res = await request(app)
+        .get('/api/v1/auth/google/callback')
+        .query({ code: 'valid-google-code', state });
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toContain(`${env.APP_URL}/auth/callback?token=`);
+      expect(res.headers['set-cookie']).toBeDefined();
+
+      const dbUser = await prisma.user.findUnique({
+        where: { email: newGoogleEmail.toLowerCase() },
+      });
+      expect(dbUser?.emailVerifiedAt).not.toBeNull();
+      expect(dbUser?.googleId).toBeDefined();
+    });
+
+    it('PRE-HIJACK SCENARIO (B1): wipes attacker password, revokes sessions, and marks verified when Google links to unverified account', async () => {
+      const targetEmail = `prehijack_${Date.now()}_${Math.floor(Math.random() * 100000)}@testcourse.com`;
+      const victimGoogleSub = `google-uid-victim-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
+      const attackerPassword = 'AttackerPassword#2026!';
+      const passwordHash = await hashPassword(attackerPassword);
+      const attackerTokenRaw = `attacker_token_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+
+      // Attacker created an account locally with victim's email, but could not verify it
+      const victimUser = await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: targetEmail,
+          name: 'Victim Student',
+          passwordHash,
+          emailVerifiedAt: null, // UNVERIFIED!
+          status: UserStatus.ACTIVE,
+        },
+      });
+
+      // Attacker had an active refresh token
+      await prisma.refreshToken.create({
+        data: {
+          id: uuidv7(),
+          userId: victimUser.id,
+          tokenHash: hashToken(attackerTokenRaw),
+          familyId: uuidv7(),
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      const state = `test-state-prehijack-${Date.now()}`;
+      await redisClient.set(`oauth_state:${state}`, 'test-verifier-code', 'EX', 300);
+
+      // Legitimate victim logs in with Google OAuth
+      vi.spyOn(globalThis, 'fetch').mockImplementation(async (url) => {
+        const urlStr = url.toString();
+        if (urlStr.includes('oauth2.googleapis.com/token')) {
+          return new Response(JSON.stringify({ access_token: 'mock-google-token' }), {
+            status: 200,
+          });
+        }
+        if (urlStr.includes('googleapis.com/oauth2/v3/userinfo')) {
+          return new Response(
+            JSON.stringify({
+              sub: victimGoogleSub,
+              email: targetEmail,
+              name: 'Victim Student',
+              email_verified: true,
+            }),
+            { status: 200 },
+          );
+        }
+        return new Response('Not found', { status: 404 });
+      });
+
+      const res = await request(app)
+        .get('/api/v1/auth/google/callback')
+        .query({ code: 'valid-google-code', state });
+
+      expect(res.status).toBe(302);
+      expect(res.headers.location).toContain(`${env.APP_URL}/auth/callback?token=`);
+
+      // B1: Verify attacker's password was WIPED
+      const updatedUser = await prisma.user.findUnique({ where: { id: victimUser.id } });
+      expect(updatedUser?.passwordHash).toBeNull();
+      expect(updatedUser?.emailVerifiedAt).not.toBeNull();
+      expect(updatedUser?.googleId).toBe(victimGoogleSub);
+      expect(updatedUser?.tokenVersion).toBe(victimUser.tokenVersion + 1);
+
+      // B1: Verify all prior attacker sessions were revoked
+      const attackerSessions = await prisma.refreshToken.findMany({
+        where: { userId: victimUser.id },
+      });
+      // Only the newly created Google login session should exist
+      expect(attackerSessions).toHaveLength(1);
+      expect(attackerSessions[0].tokenHash).not.toBe(hashToken(attackerTokenRaw));
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 13. BANNED USER BLOCKED ACROSS ALL ENDPOINTS
+  // ---------------------------------------------------------------------------
+  describe('Banned User Enforcement', () => {
+    it('blocks banned users from logging in with 403 Forbidden', async () => {
+      const bannedEmail = `banned_${Date.now()}@test.com`;
+      const password = 'Password#2026!Secure';
+      const passwordHash = await hashPassword(password);
+      await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: bannedEmail,
+          name: 'Banned User',
+          passwordHash,
+          status: UserStatus.BANNED,
+          emailVerifiedAt: new Date(),
+        },
+      });
+
       const res = await request(app)
         .post('/api/v1/auth/login')
-        .send({ email: victimEmail, password: 'WrongPassword!' });
-      expect(res.status).toBe(401);
-    }
+        .send({ email: bannedEmail, password });
 
-    // 6th attempt should be blocked by RateLimitError (429)
-    const lockedRes = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: victimEmail, password: 'CorrectPassword123!' });
-
-    expect(lockedRes.status).toBe(429);
-    expect(lockedRes.body.error.code).toBe('RATE_LIMIT_EXCEEDED');
-
-    // Clean up lockout state so subsequent test cases on 127.0.0.1 are unaffected
-    await lockoutService.clearFailedAttempts('127.0.0.1');
-    await lockoutService.clearFailedAttempts(victimEmail);
-  });
-
-  // ---------------------------------------------------------------------------
-  // 5. SESSION MANAGEMENT & IDOR PROTECTION
-  // ---------------------------------------------------------------------------
-  it('protects session revocation against IDOR (User B cannot revoke User A session)', async () => {
-    // Log User A in fresh
-    const loginARes = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: testStudentEmail, password: testStudentPassword });
-
-    const tokenA = loginARes.body.data.accessToken;
-    const cookieA = (loginARes.headers['set-cookie'] as string[])
-      .find((c: string) => c.startsWith('refresh_token='))!
-      .split(';')[0]!;
-
-    // Get User A's session ID
-    const listRes = await request(app)
-      .get('/api/v1/sessions')
-      .set('Authorization', `Bearer ${tokenA}`)
-      .set('Cookie', cookieA);
-
-    expect(listRes.status).toBe(200);
-    const userASessionId = listRes.body.data.sessions[0].id;
-    expect(userASessionId).toBeDefined();
-
-    // Create User B
-    const userBEmail = `userb_${Date.now()}@test.com`;
-    const userBPassword = 'Password123!@#';
-    await request(app).post('/api/v1/auth/register').send({
-      email: userBEmail,
-      password: userBPassword,
-      name: 'User B',
+      expect(res.status).toBe(403);
+      expect(res.body.error.message).toContain('account has been suspended');
     });
-
-    const loginBRes = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: userBEmail, password: userBPassword });
-    const tokenB = loginBRes.body.data.accessToken;
-
-    // IDOR ATTEMPT: User B attempts to revoke User A's session
-    const idorRes = await request(app)
-      .delete(`/api/v1/sessions/${userASessionId}`)
-      .set('Authorization', `Bearer ${tokenB}`);
-
-    expect(idorRes.status).toBe(403);
-    expect(idorRes.body.error.code).toBe('FORBIDDEN');
-    expect(idorRes.body.error.message).toContain('not have permission');
-
-    // User A revokes own session -> succeeds
-    const legitRevokeRes = await request(app)
-      .delete(`/api/v1/sessions/${userASessionId}`)
-      .set('Authorization', `Bearer ${tokenA}`);
-
-    expect(legitRevokeRes.status).toBe(200);
-  });
-
-  // ---------------------------------------------------------------------------
-  // 6. LOGOUT-ALL AND TOKEN VERSION INVALIDATION
-  // ---------------------------------------------------------------------------
-  it('terminates all active sessions on POST /logout-all by bumping tokenVersion', async () => {
-    const loginRes = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: testStudentEmail, password: testStudentPassword });
-
-    const activeAccessToken = loginRes.body.data.accessToken;
-
-    // Verify token works
-    const meRes1 = await request(app)
-      .get('/api/v1/auth/me')
-      .set('Authorization', `Bearer ${activeAccessToken}`);
-    expect(meRes1.status).toBe(200);
-
-    // Call logout-all
-    const logoutAllRes = await request(app)
-      .post('/api/v1/auth/logout-all')
-      .set('Authorization', `Bearer ${activeAccessToken}`);
-    expect(logoutAllRes.status).toBe(200);
-
-    // Previously issued access token should now be rejected because tokenVersion changed
-    const meRes2 = await request(app)
-      .get('/api/v1/auth/me')
-      .set('Authorization', `Bearer ${activeAccessToken}`);
-
-    expect(meRes2.status).toBe(401);
-    expect(meRes2.body.error.message).toContain('Session has been revoked');
-  });
-
-  // ---------------------------------------------------------------------------
-  // 7. BANNED USER BLOCKED ACROSS ALL ENDPOINTS
-  // ---------------------------------------------------------------------------
-  it('immediately blocks banned users from login and authenticated routes', async () => {
-    const bannedEmail = `banned_${Date.now()}@test.com`;
-    const password = 'Password123!@#';
-    const passwordHash = await hashPassword(password);
-    const bannedUser = await prisma.user.create({
-      data: {
-        id: uuidv7(),
-        email: bannedEmail,
-        name: 'Banned User',
-        passwordHash,
-        status: UserStatus.BANNED,
-        emailVerifiedAt: new Date(),
-      },
-    });
-
-    // Login attempt
-    const loginRes = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: bannedEmail, password });
-
-    expect(loginRes.status).toBe(403);
-    expect(loginRes.body.error.message).toContain('account has been suspended');
-  });
-
-  // ---------------------------------------------------------------------------
-  // 8. ADMIN TOTP 2FA ENROLLMENT & TWO-FACTOR LOGIN
-  // ---------------------------------------------------------------------------
-  it('enforces mandatory TOTP 2FA for admin and allows single-use recovery code login', async () => {
-    // Create admin user
-    const passwordHash = await hashPassword(testAdminPassword);
-    const admin = await prisma.user.create({
-      data: {
-        id: uuidv7(),
-        email: testAdminEmail,
-        name: 'Super Admin',
-        passwordHash,
-        role: UserRole.ADMIN,
-        status: UserStatus.ACTIVE,
-        emailVerifiedAt: new Date(),
-        twoFactorEnabled: false,
-      },
-    });
-    adminId = admin.id;
-
-    // First login: twoFactorEnabled is false, so it logs in and issues access token
-    const firstLoginRes = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: testAdminEmail, password: testAdminPassword });
-
-    expect(firstLoginRes.status).toBe(200);
-    expect(firstLoginRes.body.data.requires2FA).toBe(false);
-    adminAccessToken = firstLoginRes.body.data.accessToken;
-
-    // Student with valid active token trying to hit admin 2FA setup gets 403 Forbidden
-    const studentLoginRes = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: testStudentEmail, password: testStudentPassword });
-    const freshStudentToken = studentLoginRes.body.data.accessToken;
-
-    const studentRes = await request(app)
-      .post('/api/v1/auth/2fa/setup')
-      .set('Authorization', `Bearer ${freshStudentToken}`);
-    expect(studentRes.status).toBe(403);
-    expect(studentRes.body.error.code).toBe('FORBIDDEN');
-
-    // Admin starts 2FA setup wizard
-    const setupRes = await request(app)
-      .post('/api/v1/auth/2fa/setup')
-      .set('Authorization', `Bearer ${adminAccessToken}`);
-
-    expect(setupRes.status).toBe(200);
-    expect(setupRes.body.data.qrCodeDataUrl).toMatch(/^data:image\/png;base64,/);
-    expect(setupRes.body.data.manualEntryKey).toBeDefined();
-    expect(setupRes.body.data.recoveryCodes).toHaveLength(10);
-
-    const secretKey = setupRes.body.data.manualEntryKey;
-    const recoveryCodeSample = setupRes.body.data.recoveryCodes[0];
-
-    // Verify secret is encrypted with AES-256-GCM in database
-    const dbAdmin = await prisma.user.findUnique({ where: { id: adminId } });
-    expect(dbAdmin?.twoFactorSecretEncrypted).toBeDefined();
-    expect(dbAdmin?.twoFactorSecretEncrypted).not.toBe(secretKey); // Must not be plaintext!
-    expect(dbAdmin?.twoFactorSecretEncrypted?.split(':')).toHaveLength(3); // iv:tag:ciphertext
-
-    // Decrypted secret must match
-    const decrypted = decryptData(dbAdmin!.twoFactorSecretEncrypted!, env.TOTP_ENCRYPTION_KEY);
-    expect(decrypted).toBe(secretKey);
-
-    // Generate valid TOTP token using otplib
-    const validToken = await generateTOTP({ secret: secretKey });
-
-    // Complete enrollment
-    const verifyRes = await request(app)
-      .post('/api/v1/auth/2fa/verify')
-      .set('Authorization', `Bearer ${adminAccessToken}`)
-      .send({ token: validToken });
-
-    expect(verifyRes.status).toBe(200);
-    expect(verifyRes.body.success).toBe(true);
-
-    const activeAdmin = await prisma.user.findUnique({ where: { id: adminId } });
-    expect(activeAdmin?.twoFactorEnabled).toBe(true);
-    expect(activeAdmin?.twoFactorEnrolledAt).not.toBeNull();
-
-    // Now, subsequent admin login requires 2FA!
-    const secondLoginRes = await request(app)
-      .post('/api/v1/auth/login')
-      .send({ email: testAdminEmail, password: testAdminPassword });
-
-    expect(secondLoginRes.status).toBe(200);
-    expect(secondLoginRes.body.data.requires2FA).toBe(true);
-    const tempToken = secondLoginRes.body.data.tempToken;
-    expect(tempToken).toBeDefined();
-
-    // -------------------------------------------------------------------------
-    // TEST SINGLE-USE RECOVERY CODE
-    // -------------------------------------------------------------------------
-    const recoveryLoginRes = await request(app).post('/api/v1/auth/2fa/login').send({
-      tempToken,
-      code: recoveryCodeSample, // Using recovery code
-    });
-
-    expect(recoveryLoginRes.status).toBe(200);
-    expect(recoveryLoginRes.body.data.accessToken).toBeDefined();
-
-    // Verify recovery code was BURNED from database (single-use!)
-    const postRecoveryAdmin = await prisma.user.findUnique({ where: { id: adminId } });
-    expect(postRecoveryAdmin?.twoFactorRecoveryCodes).toHaveLength(9); // 10 - 1 = 9
-
-    // Replay the SAME recovery code -> must fail
-    const replayRecoveryRes = await request(app).post('/api/v1/auth/2fa/login').send({
-      tempToken,
-      code: recoveryCodeSample,
-    });
-
-    expect(replayRecoveryRes.status).toBe(401);
   });
 });

@@ -3,49 +3,84 @@ import { RateLimitError } from '../errors/app-error.js';
 import { logger } from '../logger/logger.js';
 import { env } from '../../config/env.js';
 
-const MAX_FAILED_ATTEMPTS = 5;
+const MAX_TARGET_FAILED_ATTEMPTS = 5; // 5 failed attempts on a specific email from a specific IP
+const MAX_IP_FAILED_ATTEMPTS = 20; // 20 failed attempts total from an IP across any emails
 const LOCKOUT_WINDOW_SECONDS = 15 * 60; // 15 minutes
 
 export class LockoutService {
   private inMemoryStore = new Map<string, { count: number; expiresAt: number }>();
 
-  public async checkLockout(identifier: string): Promise<void> {
-    const key = `lockout:${identifier.toLowerCase()}`;
+  /**
+   * Checks both composite (email + IP) and IP-wide lockout state.
+   */
+  public async checkLockout(email: string, ip: string): Promise<void> {
+    const targetKey = `lockout:target:${email.toLowerCase().trim()}:${ip}`;
+    const ipKey = `lockout:ip:${ip}`;
 
     if (env.NODE_ENV === 'test') {
-      const entry = this.inMemoryStore.get(key);
-      if (entry && entry.expiresAt > Date.now() && entry.count >= MAX_FAILED_ATTEMPTS) {
-        throw new RateLimitError('Too many failed attempts. Please try again in 15 minutes.');
+      const targetEntry = this.inMemoryStore.get(targetKey);
+      if (
+        targetEntry &&
+        targetEntry.expiresAt > Date.now() &&
+        targetEntry.count >= MAX_TARGET_FAILED_ATTEMPTS
+      ) {
+        throw new RateLimitError(
+          'Too many failed login attempts for this account from your IP. Please try again in 15 minutes.',
+        );
+      }
+      const ipEntry = this.inMemoryStore.get(ipKey);
+      if (ipEntry && ipEntry.expiresAt > Date.now() && ipEntry.count >= MAX_IP_FAILED_ATTEMPTS) {
+        throw new RateLimitError('Too many failed attempts from your IP. Please try again later.');
       }
       return;
     }
 
     try {
-      const attempts = await redisClient.get(key);
-      if (attempts && parseInt(attempts, 10) >= MAX_FAILED_ATTEMPTS) {
-        const ttl = await redisClient.ttl(key);
+      // 1. Check composite target key
+      const targetAttempts = await redisClient.get(targetKey);
+      if (targetAttempts && parseInt(targetAttempts, 10) >= MAX_TARGET_FAILED_ATTEMPTS) {
+        const ttl = await redisClient.ttl(targetKey);
         logger.warn(
-          { identifier, remainingTtl: ttl },
-          'Blocked request due to brute-force lockout',
+          { email, ip, remainingTtl: ttl },
+          'Blocked request due to composite brute-force lockout',
         );
         throw new RateLimitError(
-          `Too many failed attempts. Account temporarily locked. Please try again in ${Math.ceil(ttl / 60)} minutes.`,
+          `Too many failed attempts for this account. Locked for ${Math.ceil(ttl / 60)} more minutes.`,
+        );
+      }
+
+      // 2. Check IP key
+      const ipAttempts = await redisClient.get(ipKey);
+      if (ipAttempts && parseInt(ipAttempts, 10) >= MAX_IP_FAILED_ATTEMPTS) {
+        const ttl = await redisClient.ttl(ipKey);
+        logger.warn({ ip, remainingTtl: ttl }, 'Blocked request due to IP brute-force lockout');
+        throw new RateLimitError(
+          `Too many failed attempts from your IP. Locked for ${Math.ceil(ttl / 60)} more minutes.`,
         );
       }
     } catch (err) {
       if (err instanceof RateLimitError) throw err;
-      logger.error({ err, key }, 'Error querying lockout state in Redis');
+      logger.error({ err, email, ip }, 'Error querying lockout state in Redis');
     }
   }
 
-  public async recordFailedAttempt(identifier: string): Promise<void> {
-    const key = `lockout:${identifier.toLowerCase()}`;
+  public async recordFailedAttempt(email: string, ip: string): Promise<void> {
+    const targetKey = `lockout:target:${email.toLowerCase().trim()}:${ip}`;
+    const ipKey = `lockout:ip:${ip}`;
 
     if (env.NODE_ENV === 'test') {
-      const entry = this.inMemoryStore.get(key);
-      const count = entry && entry.expiresAt > Date.now() ? entry.count + 1 : 1;
-      this.inMemoryStore.set(key, {
-        count,
+      const targetEntry = this.inMemoryStore.get(targetKey);
+      const targetCount =
+        targetEntry && targetEntry.expiresAt > Date.now() ? targetEntry.count + 1 : 1;
+      this.inMemoryStore.set(targetKey, {
+        count: targetCount,
+        expiresAt: Date.now() + LOCKOUT_WINDOW_SECONDS * 1000,
+      });
+
+      const ipEntry = this.inMemoryStore.get(ipKey);
+      const ipCount = ipEntry && ipEntry.expiresAt > Date.now() ? ipEntry.count + 1 : 1;
+      this.inMemoryStore.set(ipKey, {
+        count: ipCount,
         expiresAt: Date.now() + LOCKOUT_WINDOW_SECONDS * 1000,
       });
       return;
@@ -53,26 +88,28 @@ export class LockoutService {
 
     try {
       const multi = redisClient.multi();
-      multi.incr(key);
-      multi.expire(key, LOCKOUT_WINDOW_SECONDS);
+      multi.incr(targetKey);
+      multi.expire(targetKey, LOCKOUT_WINDOW_SECONDS);
+      multi.incr(ipKey);
+      multi.expire(ipKey, LOCKOUT_WINDOW_SECONDS);
       await multi.exec();
     } catch (err) {
-      logger.error({ err, key }, 'Error recording failed attempt in Redis');
+      logger.error({ err, email, ip }, 'Error recording failed attempt in Redis');
     }
   }
 
-  public async clearFailedAttempts(identifier: string): Promise<void> {
-    const key = `lockout:${identifier.toLowerCase()}`;
+  public async clearFailedAttempts(email: string, ip: string): Promise<void> {
+    const targetKey = `lockout:target:${email.toLowerCase().trim()}:${ip}`;
 
     if (env.NODE_ENV === 'test') {
-      this.inMemoryStore.delete(key);
+      this.inMemoryStore.delete(targetKey);
       return;
     }
 
     try {
-      await redisClient.del(key);
+      await redisClient.del(targetKey);
     } catch (err) {
-      logger.error({ err, key }, 'Error clearing lockout in Redis');
+      logger.error({ err, email, ip }, 'Error clearing lockout in Redis');
     }
   }
 }

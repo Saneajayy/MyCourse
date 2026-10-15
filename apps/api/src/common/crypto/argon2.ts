@@ -20,16 +20,59 @@ export const ARGON2_OPTIONS: argon2.Options & { type: 2 } = {
 const DUMMY_HASH =
   '$argon2id$v=19$m=65536,t=3,p=4$dGVzdHNhbHRmb3JkdW1teXZlcmlmeQ$8pY3V7vH1Q9K9P+5r8s8L0qW3vH1Q9K9P+5r8s8L0qU';
 
+const MAX_CONCURRENT_HASHES = 4;
+const MAX_QUEUE_SIZE = 32;
+
+let activeHashes = 0;
+const waitingQueue: (() => void)[] = [];
+
+async function acquireSlot(): Promise<void> {
+  if (activeHashes < MAX_CONCURRENT_HASHES) {
+    activeHashes++;
+    return;
+  }
+  if (waitingQueue.length >= MAX_QUEUE_SIZE) {
+    throw new Error(
+      'AUTH_SERVER_BUSY: Too many concurrent authentication requests. Please try again shortly.',
+    );
+  }
+  return new Promise<void>((resolve) => {
+    waitingQueue.push(() => {
+      activeHashes++;
+      resolve();
+    });
+  });
+}
+
+function releaseSlot(): void {
+  activeHashes--;
+  if (waitingQueue.length > 0) {
+    const next = waitingQueue.shift();
+    if (next) next();
+  }
+}
+
+export async function withArgon2ConcurrencyCap<T>(fn: () => Promise<T>): Promise<T> {
+  await acquireSlot();
+  try {
+    return await fn();
+  } finally {
+    releaseSlot();
+  }
+}
+
 export async function hashPassword(password: string): Promise<string> {
-  return argon2.hash(password, ARGON2_OPTIONS);
+  return withArgon2ConcurrencyCap(() => argon2.hash(password, ARGON2_OPTIONS));
 }
 
 export async function verifyPassword(hash: string, plaintext: string): Promise<boolean> {
-  try {
-    return await argon2.verify(hash, plaintext, ARGON2_OPTIONS);
-  } catch {
-    return false;
-  }
+  return withArgon2ConcurrencyCap(async () => {
+    try {
+      return await argon2.verify(hash, plaintext, ARGON2_OPTIONS);
+    } catch {
+      return false;
+    }
+  });
 }
 
 /**
@@ -37,9 +80,11 @@ export async function verifyPassword(hash: string, plaintext: string): Promise<b
  * consume identical CPU time, preventing timing-based user enumeration.
  */
 export async function dummyVerifyPassword(plaintext: string): Promise<void> {
-  try {
-    await argon2.verify(DUMMY_HASH, plaintext, ARGON2_OPTIONS);
-  } catch {
-    // Ignore dummy failure
-  }
+  return withArgon2ConcurrencyCap(async () => {
+    try {
+      await argon2.verify(DUMMY_HASH, plaintext, ARGON2_OPTIONS);
+    } catch {
+      // Ignore dummy failure
+    }
+  });
 }

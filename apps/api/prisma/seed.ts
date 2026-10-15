@@ -30,6 +30,17 @@ function validateAdminPassword(password: string): void {
       'Admin password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
     );
   }
+
+  // Common passwords check
+  const normalized = password.trim().toLowerCase();
+  if (
+    normalized.includes('password') ||
+    normalized.includes('admin') ||
+    normalized.includes('123456') ||
+    normalized.includes('qwerty')
+  ) {
+    throw new Error('Admin password is too common or predictable.');
+  }
 }
 
 async function main() {

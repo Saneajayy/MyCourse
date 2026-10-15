@@ -3,9 +3,12 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Load .env from workspace root if not already loaded
+// Load .env or .env.test depending on NODE_ENV
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+if (process.env.NODE_ENV === 'test') {
+  dotenv.config({ path: path.resolve(__dirname, '../../../../.env.test'), override: true });
+}
 dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
 const envSchema = z.object({

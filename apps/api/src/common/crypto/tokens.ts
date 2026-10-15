@@ -15,24 +15,34 @@ export function hashToken(token: string): string {
 }
 
 /**
- * Generates human-friendly 8-character alphanumeric recovery codes formatted as XXXX-XXXX
+ * Generates human-friendly 12-character alphanumeric recovery codes formatted as XXXX-XXXX-XXXX
+ * (12 Base32 characters * 5 bits/char = exactly 60 bits of cryptographic entropy per code)
  */
 export function generateRecoveryCodes(count = 10): string[] {
   const codes: string[] = [];
-  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // Base32 unambiguous set
+  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // Base32 unambiguous set (32 chars = 5 bits each)
 
   for (let i = 0; i < count; i++) {
-    const bytes = crypto.randomBytes(8);
+    const bytes = crypto.randomBytes(12);
     let code = '';
-    for (let j = 0; j < 8; j++) {
+    for (let j = 0; j < 12; j++) {
       const idx = (bytes[j] ?? 0) % chars.length;
       code += chars[idx];
-      if (j === 3) code += '-';
+      if (j === 3 || j === 7) code += '-';
     }
     codes.push(code);
   }
 
   return codes;
+}
+
+/**
+ * Computes keyed HMAC-SHA256 for recovery code storage using the server's TOTP encryption key.
+ * This ensures that even in the event of a read-only database leak, an attacker without the server key
+ * cannot verify or brute-force recovery codes.
+ */
+export function hmacRecoveryCode(code: string, serverKey: string): string {
+  return crypto.createHmac('sha256', serverKey).update(code.trim().toUpperCase()).digest('hex');
 }
 
 /**

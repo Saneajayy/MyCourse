@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authController } from './auth.controller.js';
 import { requireAuth, requireRole } from '../../common/middleware/auth.js';
 import { authRateLimiter, standardRateLimiter } from '../../common/middleware/rate-limiter.js';
+import { validateCookieCsrf } from '../../common/middleware/csrf.js';
 import { UserRole } from '@course/shared';
 
 export const authRouter: Router = Router();
@@ -19,10 +20,10 @@ authRouter.post('/login', authRateLimiter, (req, res, next) =>
 authRouter.post('/2fa/login', authRateLimiter, (req, res, next) =>
   authController.verify2FALogin(req, res, next),
 );
-authRouter.post('/refresh', standardRateLimiter, (req, res, next) =>
+authRouter.post('/refresh', standardRateLimiter, validateCookieCsrf, (req, res, next) =>
   authController.refresh(req, res, next),
 );
-authRouter.post('/logout', standardRateLimiter, (req, res, next) =>
+authRouter.post('/logout', standardRateLimiter, validateCookieCsrf, (req, res, next) =>
   authController.logout(req, res, next),
 );
 authRouter.post('/forgot-password', authRateLimiter, (req, res, next) =>
@@ -44,8 +45,12 @@ authRouter.get('/google/callback', standardRateLimiter, (req, res, next) =>
 authRouter.get('/me', standardRateLimiter, requireAuth, (req, res, next) =>
   authController.getMe(req, res, next),
 );
-authRouter.post('/logout-all', standardRateLimiter, requireAuth, (req, res, next) =>
-  authController.logoutAll(req, res, next),
+authRouter.post(
+  '/logout-all',
+  standardRateLimiter,
+  requireAuth,
+  validateCookieCsrf,
+  (req, res, next) => authController.logoutAll(req, res, next),
 );
 authRouter.post('/change-password', standardRateLimiter, requireAuth, (req, res, next) =>
   authController.changePassword(req, res, next),

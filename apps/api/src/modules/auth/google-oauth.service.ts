@@ -80,17 +80,11 @@ export class GoogleOAuthService {
     }
 
     const key = `oauth_state:${state}`;
-    let codeVerifier: string | null = null;
-
-    if (env.NODE_ENV === 'test') {
-      codeVerifier = 'test-verifier';
-    } else {
-      codeVerifier = await redisClient.get(key);
-      if (!codeVerifier) {
-        throw new UnauthorizedError('OAuth state mismatch or expired session. Please try again.');
-      }
-      await redisClient.del(key);
+    const codeVerifier = await redisClient.get(key);
+    if (!codeVerifier) {
+      throw new UnauthorizedError('OAuth state mismatch or expired session. Please try again.');
     }
+    await redisClient.del(key);
 
     const redirectUri = `${env.API_URL}/api/v1/auth/google/callback`;
 
@@ -146,15 +140,48 @@ export class GoogleOAuthService {
         throw new ForbiddenError('Your account has been suspended.');
       }
 
-      // Link googleId if missing, ensure emailVerifiedAt is set
-      user = await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          googleId: user.googleId ?? profile.sub,
-          emailVerifiedAt: user.emailVerifiedAt ?? new Date(),
-          lastLoginAt: new Date(),
-        },
-      });
+      const wasUnverified = user.emailVerifiedAt === null;
+
+      if (wasUnverified) {
+        // Pre-hijack defense: an attacker may have registered an unverified account with victim's email.
+        // Wipe attacker's password, revoke all existing sessions, bump tokenVersion, and mark email verified.
+        await prisma.refreshToken.deleteMany({
+          where: { userId: user.id },
+        });
+
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            googleId: profile.sub,
+            passwordHash: null,
+            tokenVersion: { increment: 1 },
+            emailVerifiedAt: new Date(),
+            lastLoginAt: new Date(),
+          },
+        });
+
+        await auditService.log({
+          actorUserId: user.id,
+          action: AuditAction.USER_LOGIN,
+          entityType: 'User',
+          entityId: user.id,
+          ipAddress: ip,
+          userAgent,
+          afterState: {
+            securityNotice:
+              'PRE_HIJACK_PREVENTED: Unverified local account linked to verified Google account. Password cleared and previous sessions revoked.',
+          },
+        });
+      } else {
+        // Legitimate existing verified user linking Google account
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            googleId: user.googleId ?? profile.sub,
+            lastLoginAt: new Date(),
+          },
+        });
+      }
     } else {
       // Create new verified student account
       const userId = uuidv7();
