@@ -1,4 +1,5 @@
 import * as argon2 from 'argon2';
+import { ServiceUnavailableError } from '../errors/app-error.js';
 
 /**
  * RFC 9106 Recommended Argon2id Parameters for high-security password hashing:
@@ -20,20 +21,32 @@ export const ARGON2_OPTIONS: argon2.Options & { type: 2 } = {
 const DUMMY_HASH =
   '$argon2id$v=19$m=65536,t=3,p=4$dGVzdHNhbHRmb3JkdW1teXZlcmlmeQ$8pY3V7vH1Q9K9P+5r8s8L0qW3vH1Q9K9P+5r8s8L0qU';
 
-const MAX_CONCURRENT_HASHES = 4;
-const MAX_QUEUE_SIZE = 32;
+let maxConcurrent = 4;
+let maxQueue = 32;
 
 let activeHashes = 0;
 const waitingQueue: (() => void)[] = [];
 
+export function _configureArgon2CapacityForTesting(concurrent: number, queue: number): void {
+  maxConcurrent = concurrent;
+  maxQueue = queue;
+}
+
+export function _resetArgon2CapacityForTesting(): void {
+  maxConcurrent = 4;
+  maxQueue = 32;
+  activeHashes = 0;
+  waitingQueue.length = 0;
+}
+
 async function acquireSlot(): Promise<void> {
-  if (activeHashes < MAX_CONCURRENT_HASHES) {
+  if (activeHashes < maxConcurrent) {
     activeHashes++;
     return;
   }
-  if (waitingQueue.length >= MAX_QUEUE_SIZE) {
-    throw new Error(
-      'AUTH_SERVER_BUSY: Too many concurrent authentication requests. Please try again shortly.',
+  if (waitingQueue.length >= maxQueue) {
+    throw new ServiceUnavailableError(
+      'Authentication server busy: too many concurrent requests. Please retry shortly.',
     );
   }
   return new Promise<void>((resolve) => {

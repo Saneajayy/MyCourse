@@ -37,27 +37,43 @@ export function generateRecoveryCodes(count = 10): string[] {
 }
 
 /**
- * Computes keyed HMAC-SHA256 for recovery code storage using the server's TOTP encryption key.
+ * Derives a domain-separated 32-byte cryptographic subkey using RFC 5869 HKDF-SHA256 (F4)
+ */
+export function deriveSubKey(masterKey: string, info: string, length = 32): Buffer {
+  return Buffer.from(
+    crypto.hkdfSync(
+      'sha256',
+      Buffer.from(masterKey, 'utf-8'),
+      Buffer.alloc(0),
+      Buffer.from(info, 'utf-8'),
+      length,
+    ),
+  );
+}
+
+/**
+ * Computes keyed HMAC-SHA256 for recovery code storage using derived HMAC subkey.
  * This ensures that even in the event of a read-only database leak, an attacker without the server key
  * cannot verify or brute-force recovery codes.
  */
 export function hmacRecoveryCode(code: string, serverKey: string): string {
-  return crypto.createHmac('sha256', serverKey).update(code.trim().toUpperCase()).digest('hex');
+  const hmacKey = deriveSubKey(serverKey, 'recovery_code_hmac_v1', 32);
+  return crypto.createHmac('sha256', hmacKey).update(code.trim().toUpperCase()).digest('hex');
 }
 
 /**
- * Derives a consistent 32-byte key from any input string using SHA-256
+ * Legacy 32-byte key derivation fallback for seamless migration of older records
  */
-function derive32ByteKey(secretKey: string): Buffer {
+function deriveLegacyKey(secretKey: string): Buffer {
   return crypto.createHash('sha256').update(secretKey).digest();
 }
 
 /**
- * Encrypts plaintext using AES-256-GCM authenticated encryption
+ * Encrypts plaintext using AES-256-GCM authenticated encryption with HKDF-derived key
  * Format: iv_hex:authTag_hex:ciphertext_hex
  */
 export function encryptData(plaintext: string, secretKey: string): string {
-  const key = derive32ByteKey(secretKey);
+  const key = deriveSubKey(secretKey, 'totp_aes_encryption_v1', 32);
   const iv = crypto.randomBytes(12); // Standard 96-bit IV for GCM
   const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
 
@@ -68,7 +84,8 @@ export function encryptData(plaintext: string, secretKey: string): string {
 }
 
 /**
- * Decrypts AES-256-GCM encrypted payload and verifies message integrity tag
+ * Decrypts AES-256-GCM encrypted payload and verifies message integrity tag.
+ * Supports transparent fallback to legacy SHA-256 key derivation for backwards compatibility.
  */
 export function decryptData(encryptedString: string, secretKey: string): string {
   const parts = encryptedString.split(':');
@@ -80,14 +97,21 @@ export function decryptData(encryptedString: string, secretKey: string): string 
   const tagHex = parts[1] ?? '';
   const ciphertextHex = parts[2] ?? '';
 
-  const key = derive32ByteKey(secretKey);
   const iv = Buffer.from(ivHex, 'hex');
   const authTag = Buffer.from(tagHex, 'hex');
   const ciphertext = Buffer.from(ciphertextHex, 'hex');
 
-  const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-  decipher.setAuthTag(authTag);
-
-  const decrypted = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
-  return decrypted.toString('utf8');
+  // 1. Try HKDF derived subkey (standard)
+  try {
+    const key = deriveSubKey(secretKey, 'totp_aes_encryption_v1', 32);
+    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+    decipher.setAuthTag(authTag);
+    return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
+  } catch {
+    // 2. Safe fallback to legacy key derivation for pre-existing records
+    const legacyKey = deriveLegacyKey(secretKey);
+    const decipher = crypto.createDecipheriv('aes-256-gcm', legacyKey, iv);
+    decipher.setAuthTag(authTag);
+    return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
+  }
 }

@@ -28,6 +28,9 @@ We adopt a **shared registrable domain** strategy for production, supplemented b
    - Wildcards (`*`) are disallowed when `credentials: true`.
 4. **Next.js Proxying for SSR**:
    - For server-side rendering (SSR) data fetching inside Next.js Server Components, Next.js forwards the incoming request cookies directly to the internal Express API URL (`http://api:4000` in Docker or `API_URL`).
+5. **Webhook Routes Exemption (Phase 4 & Phase 3 Webhooks)**:
+   - External server-to-server webhook endpoints (e.g. `/api/v1/webhooks/razorpay`, `/api/v1/webhooks/bunny`) are triggered by third-party payment gateways and CDN video servers without browser `Origin` headers, CORS contexts, or session cookies.
+   - These routes are strictly exempt from CORS allow-list restrictions and CSRF Origin validation. They are secured exclusively through cryptographic payload signature verification (HMAC-SHA256) over the raw request body.
 
 ## Consequences
 

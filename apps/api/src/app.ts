@@ -12,16 +12,40 @@ import { NotFoundError, ForbiddenError } from './common/errors/app-error.js';
 import { healthRouter } from './modules/health/health.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
 import { sessionsRouter } from './modules/sessions/sessions.routes.js';
-import { requireAuth, requireRole, requireAdmin2FA } from './common/middleware/auth.js';
-import { UserRole } from '@course/shared';
+import { adminCourseRouter, publicCourseRouter } from './modules/courses/course.routes.js';
+import { bunnyWebhookController } from './modules/webhooks/bunny.webhook.js';
+import { docsRouter } from './docs/openapi.js';
+
+declare global {
+  namespace Express {
+    interface Request {
+      rawBody?: Buffer;
+    }
+  }
+}
 
 export function createApp(): Express {
   const app = express();
 
-  // 1. Trust proxy in production/reverse-proxy environments
+  // 1. Trust proxy configuration for Cloudflare + 1 reverse proxy (F2)
   if (env.NODE_ENV === 'production') {
-    app.set('trust proxy', 1);
+    app.set('trust proxy', 2);
+  } else {
+    app.set('trust proxy', 'loopback, linklocal, uniquelocal');
   }
+
+  // Normalize client IP from CF-Connecting-IP header when running behind Cloudflare
+  app.use((req: Request, _res: Response, next: NextFunction) => {
+    const cfIp = req.headers['cf-connecting-ip'];
+    if (cfIp && typeof cfIp === 'string' && cfIp.trim().length > 0) {
+      Object.defineProperty(req, 'ip', {
+        value: cfIp.trim(),
+        writable: true,
+        configurable: true,
+      });
+    }
+    next();
+  });
 
   // 2. Request ID correlation
   app.use(requestIdMiddleware);
@@ -54,7 +78,7 @@ export function createApp(): Express {
   app.use(
     cors({
       origin: (origin, callback) => {
-        // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
+        // Allow requests with no origin (e.g. mobile apps, curl, server-to-server webhooks)
         if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
@@ -78,20 +102,25 @@ export function createApp(): Express {
   // 7. Body Parsing with rawBody preservation (critical for webhook HMAC verification)
   app.use(
     express.json({
-      limit: '1mb',
+      limit: '2mb',
       verify: (req: Request, _res: Response, buf: Buffer) => {
         req.rawBody = buf;
       },
     }),
   );
-  app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '2mb' }));
   app.use(cookieParser());
 
   // 8. Health and Readiness probes (available at both root and /api/v1)
   app.use(healthRouter);
   app.use('/api/v1', healthRouter);
 
-  // 9. API Version 1 Router
+  // 9. Interactive API Documentation (served at /docs in non-production)
+  if (env.NODE_ENV !== 'production') {
+    app.use('/docs', docsRouter);
+  }
+
+  // 10. API Version 1 Router
   const v1Router = express.Router();
   v1Router.get('/', (_req, res) => {
     res.json({
@@ -102,25 +131,30 @@ export function createApp(): Express {
       },
     });
   });
+
+  // Auth & Session routes
   v1Router.use('/auth', authRouter);
   v1Router.use('/sessions', sessionsRouter);
 
-  // Admin management routes protected by Authentication, Admin Role, and Mandatory 2FA
-  const adminRouter = express.Router();
-  adminRouter.use(requireAuth, requireRole(UserRole.ADMIN), requireAdmin2FA);
-  adminRouter.get('/overview', (_req, res) => {
-    res.json({ success: true, data: { status: 'admin_dashboard_accessible' } });
-  });
-  v1Router.use('/admin', adminRouter);
+  // Public Course Catalog routes (zero-leakage of paid video IDs)
+  v1Router.use('/courses', publicCourseRouter);
+
+  // Admin Management routes (Protected by Auth + Admin Role + Mandatory 2FA)
+  v1Router.use('/admin', adminCourseRouter);
+
+  // Bunny Webhook endpoint (Signature-verified, exempt from CORS/CSRF)
+  v1Router.post('/webhooks/bunny', (req, res, next) =>
+    bunnyWebhookController.handleWebhook(req, res, next),
+  );
 
   app.use('/api/v1', v1Router);
 
-  // 10. 404 Handler for undefined routes
+  // 11. 404 Handler for undefined routes
   app.use((req: Request, _res: Response, next: NextFunction) => {
     next(new NotFoundError(`Route ${req.method} ${req.originalUrl} not found`));
   });
 
-  // 11. Centralized Error Handler
+  // 12. Centralized Error Handler
   app.use(errorHandler);
 
   return app;

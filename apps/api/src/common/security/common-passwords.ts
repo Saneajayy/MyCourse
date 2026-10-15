@@ -1,7 +1,7 @@
 import { BadRequestError } from '../errors/app-error.js';
 
 // Top common password roots compiled from SecLists / OWASP Top Passwords datasets
-const COMMON_PASSWORD_LIST: string[] = [
+export const COMMON_PASSWORD_LIST: string[] = [
   'password',
   'password123',
   'password123!',
@@ -61,7 +61,7 @@ const COMMON_PASSWORD_LIST: string[] = [
 ];
 
 // Pre-populate HashSet for O(1) lookup
-const COMMON_PASSWORDS_SET = new Set<string>(COMMON_PASSWORD_LIST.map((p) => p.toLowerCase()));
+export const COMMON_PASSWORDS_SET = new Set<string>(COMMON_PASSWORD_LIST.map((p) => p.toLowerCase()));
 
 /**
  * Checks if a given password is too common or follows trivial predictable patterns

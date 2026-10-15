@@ -6,6 +6,7 @@ export const redisClient: Redis = new Redis(env.REDIS_URL, {
   maxRetriesPerRequest: env.NODE_ENV === 'test' ? 3 : null,
   enableReadyCheck: true,
   enableOfflineQueue: true,
+  keyPrefix: env.NODE_ENV === 'test' ? 'test:' : undefined,
   retryStrategy(times) {
     if (env.NODE_ENV === 'test' && times > 3) {
       return null;

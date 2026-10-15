@@ -182,15 +182,16 @@ model Product {
 }
 
 model Section {
-  id        String   @id @db.Uuid
-  productId String   @db.Uuid
-  title     String
-  position  Int
-  createdAt DateTime @default(now()) @db.Timestamptz
-  updatedAt DateTime @updatedAt @db.Timestamptz
+  id          String   @id @db.Uuid
+  productId   String   @db.Uuid
+  title       String
+  position    Int
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @updatedAt @db.Timestamptz
 
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  lessons   Lesson[]
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  lessons     Lesson[]
 
   @@index([productId, position])
 }
@@ -205,6 +206,7 @@ model Lesson {
   videoProviderId String?
   durationSeconds Int            @default(0)
   isFreePreview   Boolean        @default(false)
+  isPublished     Boolean        @default(true)
   status          LessonStatus   @default(PROCESSING)
   createdAt       DateTime       @default(now()) @db.Timestamptz
   updatedAt       DateTime       @updatedAt @db.Timestamptz

@@ -24,6 +24,9 @@ We enforce server-side **Origin and Host Header Verification** via `validateCook
    - The server's own `Host` header (same-host origin).
 3. If an `Origin` header is present and does not match an authorized origin or same-host, the request is immediately rejected with `403 Forbidden: Cross-origin request rejected`.
 4. Requests with no `Origin` header (such as native mobile applications or server-to-server calls) are permitted to proceed only if they do not exhibit browser cross-origin signatures.
+5. **Webhook Routes Exemption (Phase 4 & Phase 3 Webhooks)**:
+   - External server-to-server webhook endpoints (e.g. `/api/v1/webhooks/razorpay`, `/api/v1/webhooks/bunny`) are triggered by third-party payment gateways and CDN video servers without browser `Origin` headers, CORS contexts, or session cookies.
+   - These routes are strictly exempt from CORS allow-list restrictions and CSRF Origin validation. They are secured exclusively through cryptographic payload signature verification (HMAC-SHA256) over the raw request body.
 
 ## Consequences
 

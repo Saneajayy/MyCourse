@@ -8,6 +8,10 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
   const requestId = req.id || 'unknown';
 
   if (err instanceof AppError) {
+    if (err.statusCode === 503) {
+      res.setHeader('Retry-After', '1');
+    }
+
     if (err.statusCode >= 500) {
       logger.error(
         { err, requestId, path: req.path, method: req.method },

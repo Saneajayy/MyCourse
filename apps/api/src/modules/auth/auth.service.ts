@@ -90,6 +90,9 @@ export class AuthService {
     });
 
     if (existingUser) {
+      // F1: Equalize timing with new-registration path by running argon2 hash
+      await hashPassword(input.password);
+
       // B7: Zero email enumeration - notify owner without revealing existence to caller
       await emailService.sendAccountExistsEmail(existingUser.email, existingUser.name);
 
@@ -157,7 +160,6 @@ export class AuthService {
     });
 
     return {
-      user: sanitizeUser(user),
       message:
         'If this email is not already registered, a verification link has been sent. Please check your inbox.',
     };

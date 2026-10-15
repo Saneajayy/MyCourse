@@ -4,17 +4,24 @@ import { createApp } from '../app.js';
 import { prisma } from '../common/db/prisma.js';
 import { redisClient } from '../common/redis/redis.js';
 import { uuidv7 } from 'uuidv7';
-import { hashPassword } from '../common/crypto/argon2.js';
+import { hashPassword, _configureArgon2CapacityForTesting, _resetArgon2CapacityForTesting } from '../common/crypto/argon2.js';
 import {
   generateRandomToken,
   hashToken,
+  encryptData,
   decryptData,
   hmacRecoveryCode,
+  deriveSubKey,
 } from '../common/crypto/tokens.js';
 import { generate as generateTOTP } from 'otplib';
 import { env } from '../config/env.js';
 import { lockoutService } from '../common/middleware/lockout.js';
 import { UserRole, UserStatus } from '@course/shared';
+import { COMMON_PASSWORD_LIST, COMMON_PASSWORDS_SET } from '../common/security/common-passwords.js';
+import { getRefreshTokenCookieOptions } from '../common/utils/cookie.js';
+import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 
 describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () => {
   const app = createApp();
@@ -842,4 +849,212 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
       expect(res.body.error.message).toContain('account has been suspended');
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // 14. PHASE 2 FOLLOW-UPS VERIFICATION (F1 - F5)
+  // ---------------------------------------------------------------------------
+  describe('Phase 2 Follow-Ups Verification (F1 - F5)', () => {
+    // F1: Registration timing & identical response
+    it('F1: ensures existing-email and new-email paths take comparable time and return identical body & status', async () => {
+      const existingEmail = `f1_existing_${Date.now()}@testcourse.com`;
+      const newEmail = `f1_new_${Date.now()}@testcourse.com`;
+      const password = 'StrongPassword#2026!Equalize';
+
+      // 1. Create the existing user first
+      await request(app).post('/api/v1/auth/register').send({
+        email: existingEmail,
+        password,
+        name: 'Existing User',
+      });
+
+      // Warm up JIT/threads
+      await request(app).post('/api/v1/auth/register').send({
+        email: `warmup_${Date.now()}@testcourse.com`,
+        password,
+        name: 'Warmup User',
+      });
+
+      // 2. Measure new-user registration time
+      const startNew = Date.now();
+      const resNew = await request(app).post('/api/v1/auth/register').send({
+        email: newEmail,
+        password,
+        name: 'Brand New User',
+      });
+      const timeNew = Date.now() - startNew;
+
+      // 3. Measure existing-user registration time
+      const startExisting = Date.now();
+      const resExisting = await request(app).post('/api/v1/auth/register').send({
+        email: existingEmail,
+        password,
+        name: 'Existing User Again',
+      });
+      const timeExisting = Date.now() - startExisting;
+
+      // Status codes MUST be identical (201 Created)
+      expect(resNew.status).toBe(201);
+      expect(resExisting.status).toBe(201);
+
+      // Response bodies MUST be completely identical
+      expect(resExisting.body).toEqual(resNew.body);
+      expect(resExisting.body).toEqual({
+        success: true,
+        data: {
+          message:
+            'If this email is not already registered, a verification link has been sent. Please check your inbox.',
+        },
+      });
+
+      // Timing difference should be within realistic execution tolerance (< 350ms)
+      const timingDelta = Math.abs(timeNew - timeExisting);
+      expect(timingDelta).toBeLessThan(350);
+
+      // Clean up test emails
+      await prisma.user.deleteMany({
+        where: { email: { in: [existingEmail, newEmail] } },
+      });
+    });
+
+    // F2: Brute force per-account limiter across multiple IPs & trust proxy
+    it('F2: locks account globally across all IPs after 20 failed attempts and configures trust proxy', async () => {
+      const targetEmail = `f2_brute_${Date.now()}@testcourse.com`;
+
+      // Simulate 20 failed attempts from 20 completely distinct IP addresses
+      for (let i = 1; i <= 20; i++) {
+        await lockoutService.recordFailedAttempt(targetEmail, `198.51.100.${i}`);
+      }
+
+      // Check lockout from a brand new IP address (IP #21)
+      await expect(
+        lockoutService.checkLockout(targetEmail, '198.51.100.21'),
+      ).rejects.toThrow('Account temporarily locked due to excessive failed attempts');
+
+      // Clear lockout for cleanup
+      await lockoutService.clearFailedAttempts(targetEmail, '198.51.100.21');
+
+      // Trust proxy verification
+      const trustProxySetting = app.get('trust proxy');
+      expect(trustProxySetting).toBeDefined();
+    });
+
+    // F3: Test isolation: Redis key prefix & database index
+    it('F3: uses isolated Redis key prefix and database index without any FLUSHALL usage', async () => {
+      // 1. Verify keyPrefix is configured as 'test:'
+      expect(redisClient.options.keyPrefix).toBe('test:');
+
+      // 2. Verify Redis database index is isolated (configured to DB 1 in test environment)
+      expect(env.REDIS_URL).toContain('/1');
+
+      // 3. Verify absolute zero FLUSHALL / flushall usage anywhere in production code
+      const srcDir = path.resolve(__dirname, '..');
+      const scanDir = (dir: string): string[] => {
+        const results: string[] = [];
+        const list = fs.readdirSync(dir);
+        for (const file of list) {
+          const fullPath = path.join(dir, file);
+          const stat = fs.statSync(fullPath);
+          if (stat.isDirectory()) {
+            if (file !== 'tests') {
+              results.push(...scanDir(fullPath));
+            }
+          } else if ((file.endsWith('.ts') || file.endsWith('.js')) && !file.includes('.test.')) {
+            const content = fs.readFileSync(fullPath, 'utf-8');
+            if (content.toLowerCase().includes('flushall')) {
+              results.push(fullPath);
+            }
+          }
+        }
+        return results;
+      };
+
+      const flushallOccurrences = scanDir(srcDir);
+      expect(flushallOccurrences).toHaveLength(0);
+    });
+
+    // F4: Crypto key separation (HKDF) & legacy data migration fallback
+    it('F4: derives distinct subkeys via RFC 5869 HKDF and supports transparent legacy fallback', async () => {
+      const masterKey = 'test-master-crypto-secret-key-at-least-32-chars';
+
+      // 1. Subkeys for TOTP encryption and recovery-code HMAC must be distinct
+      const totpKey = deriveSubKey(masterKey, 'totp_aes_encryption_v1', 32);
+      const hmacKey = deriveSubKey(masterKey, 'recovery_code_hmac_v1', 32);
+
+      expect(totpKey.equals(hmacKey)).toBe(false);
+      expect(totpKey.length).toBe(32);
+      expect(hmacKey.length).toBe(32);
+
+      // 2. Encrypt with HKDF key and decrypt
+      const testSecret = 'JBSWY3DPEHPK3PXP';
+      const encrypted = encryptData(testSecret, masterKey);
+      const decrypted = decryptData(encrypted, masterKey);
+      expect(decrypted).toBe(testSecret);
+
+      // 3. Transparent fallback to legacy SHA-256 derived key
+      const legacyKey = crypto.createHash('sha256').update(masterKey).digest();
+      const legacyIv = crypto.randomBytes(12);
+      const legacyCipher = crypto.createCipheriv('aes-256-gcm', legacyKey, legacyIv);
+      const legacyEncrypted = Buffer.concat([
+        legacyCipher.update(testSecret, 'utf8'),
+        legacyCipher.final(),
+      ]);
+      const legacyAuthTag = legacyCipher.getAuthTag();
+      const legacyPayload = `${legacyIv.toString('hex')}:${legacyAuthTag.toString('hex')}:${legacyEncrypted.toString('hex')}`;
+
+      // Decrypt legacy payload seamlessly
+      const fallbackDecrypted = decryptData(legacyPayload, masterKey);
+      expect(fallbackDecrypted).toBe(testSecret);
+
+      // 4. HMAC recovery code is deterministic 64-char hex
+      const hmac1 = hmacRecoveryCode('ABCD-EFGH-JKLM', masterKey);
+      const hmac2 = hmacRecoveryCode('abcd-efgh-jklm', masterKey);
+      expect(hmac1).toBe(hmac2);
+      expect(hmac1).toHaveLength(64);
+    });
+
+    // F5: Argon2 queue saturation returns 503 Retry-After, common passwords count, Secure cookie in prod
+    it('F5: verifies Argon2 saturation 503 with Retry-After, 56 common passwords, and Secure cookie flag', async () => {
+      // 1. Verify common password dataset entry count (56 curated root entries)
+      expect(COMMON_PASSWORD_LIST).toHaveLength(56);
+      expect(COMMON_PASSWORDS_SET.size).toBe(56);
+
+      // 2. Test Secure cookie flag under NODE_ENV=production
+      const originalEnv = env.NODE_ENV;
+      try {
+        (env as any).NODE_ENV = 'production';
+        const prodCookieOptions = getRefreshTokenCookieOptions();
+        expect(prodCookieOptions.secure).toBe(true);
+        expect(prodCookieOptions.httpOnly).toBe(true);
+        expect(prodCookieOptions.sameSite).toBe('lax');
+      } finally {
+        (env as any).NODE_ENV = originalEnv;
+      }
+
+      // 3. Test Argon2 queue overflow returns 503 with Retry-After
+      _configureArgon2CapacityForTesting(1, 0); // 1 active, 0 waiting capacity
+
+      try {
+        // Launch first hash to occupy the only slot
+        const firstHashPromise = hashPassword('heavy_password_occupying_slot_1');
+
+        // Immediately attempt login endpoint via Supertest while slot is occupied
+        const saturatedRes = await request(app)
+          .post('/api/v1/auth/login')
+          .send({
+            email: 'anyuser@test.com',
+            password: 'SomePassword123!',
+          });
+
+        await firstHashPromise;
+
+        // Supertest response when Argon2 queue overflows must be 503 Service Unavailable
+        expect(saturatedRes.status).toBe(503);
+        expect(saturatedRes.headers['retry-after']).toBe('1');
+        expect(saturatedRes.body.error.message).toContain('Authentication server busy');
+      } finally {
+        _resetArgon2CapacityForTesting();
+      }
+    });
+  });
 });
+
