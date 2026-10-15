@@ -87,7 +87,8 @@ model User {
   emailVerifiedAt        DateTime?               @db.Timestamptz
   googleId               String?                 @unique
   tokenVersion           Int                     @default(0)
-  twoFactorSecret        String?
+  twoFactorSecretEncrypted String?
+  twoFactorEnrolledAt    DateTime?               @db.Timestamptz
   twoFactorEnabled       Boolean                 @default(false)
   twoFactorRecoveryCodes String[]
   lastLoginAt            DateTime?               @db.Timestamptz
@@ -414,3 +415,15 @@ model Invoice {
 
   @@index([financialYear, sequenceNumber])
 }
+
+model AppSetting {
+  id          String   @id @db.Uuid
+  key         String   @unique
+  value       Json
+  description String?
+  updatedAt   DateTime @updatedAt @db.Timestamptz
+  createdAt   DateTime @default(now()) @db.Timestamptz
+
+  @@index([key])
+}
+

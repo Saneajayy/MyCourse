@@ -59,6 +59,11 @@ jobs:
       - name: Generate Prisma Client
         run: pnpm --filter @course/api prisma:generate
 
+      - name: Run database migrations
+        run: pnpm --filter @course/api prisma:migrate:deploy
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mycourse?schema=public
+
       - name: Typecheck across all packages
         run: pnpm typecheck
 
@@ -69,6 +74,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mycourse?schema=public
           REDIS_URL: redis://localhost:6379
           JWT_ACCESS_SECRET: test_jwt_access_secret_must_be_at_least_32_characters_long_for_security!
+          TOTP_ENCRYPTION_KEY: dev_totp_encryption_key_32_bytes_long_min_len!
 
       - name: Build all packages (Shared, API, Next.js Web)
         run: pnpm build

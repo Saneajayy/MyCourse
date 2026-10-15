@@ -16,12 +16,15 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   REDIS_URL: z.string().min(1, 'REDIS_URL is required'),
 
-  // Auth
   JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters'),
   JWT_ACCESS_TTL: z.string().default('15m'),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().default(30),
-  COOKIE_DOMAIN: z.string().default('localhost'),
+  COOKIE_DOMAIN: z.string().optional().default(''),
   CORS_ORIGINS: z.string().default('http://localhost:3000'),
+  TOTP_ENCRYPTION_KEY: z
+    .string()
+    .min(32, 'TOTP_ENCRYPTION_KEY must be at least 32 characters')
+    .default('dev_totp_encryption_key_32_bytes_long_min_len!'),
 
   // Admin seed
   ADMIN_EMAIL: z.string().email().default('admin@hydrauliccourse.com'),

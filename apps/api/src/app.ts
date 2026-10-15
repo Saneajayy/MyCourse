@@ -10,6 +10,8 @@ import { requestIdMiddleware } from './common/middleware/request-id.js';
 import { errorHandler } from './common/middleware/error-handler.js';
 import { NotFoundError } from './common/errors/app-error.js';
 import { healthRouter } from './modules/health/health.routes.js';
+import { authRouter } from './modules/auth/auth.routes.js';
+import { sessionsRouter } from './modules/sessions/sessions.routes.js';
 
 export function createApp(): Express {
   const app = express();
@@ -83,7 +85,7 @@ export function createApp(): Express {
   app.use(healthRouter);
   app.use('/api/v1', healthRouter);
 
-  // 9. API Version 1 Router Placeholder
+  // 9. API Version 1 Router
   const v1Router = express.Router();
   v1Router.get('/', (_req, res) => {
     res.json({
@@ -94,6 +96,8 @@ export function createApp(): Express {
       },
     });
   });
+  v1Router.use('/auth', authRouter);
+  v1Router.use('/sessions', sessionsRouter);
   app.use('/api/v1', v1Router);
 
   // 10. 404 Handler for undefined routes

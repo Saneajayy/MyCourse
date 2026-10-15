@@ -97,6 +97,53 @@ async function main() {
     },
   });
 
+  // Seed first-run application settings if not already present
+  const defaultSettings = [
+    {
+      key: 'business_profile',
+      value: {
+        businessName: process.env.BUSINESS_NAME || 'Hydraulic Engineering Academy',
+        businessAddress:
+          process.env.BUSINESS_ADDRESS || '123 Industrial Area, Phase 2, New Delhi, India',
+        supportEmail: process.env.EMAIL_FROM || 'support@hydrauliccourse.com',
+      },
+      description: 'Business name, address, and contact details for invoices and receipts',
+    },
+    {
+      key: 'tax_config',
+      value: {
+        gstin: process.env.GSTIN || '',
+        gstRatePercent: Number(process.env.GST_RATE_PERCENT || 0),
+        pricesTaxInclusive: process.env.PRICES_TAX_INCLUSIVE !== 'false',
+      },
+      description: 'GST taxation configuration and tax-inclusive pricing display mode',
+    },
+    {
+      key: 'invoice_config',
+      value: {
+        invoicePrefix: 'INV',
+        financialYearFormat: 'YYYY-YYYY',
+        currentSequence: 1,
+      },
+      description: 'Sequential invoice numbering and financial year configuration',
+    },
+  ];
+
+  for (const setting of defaultSettings) {
+    const existing = await prisma.appSetting.findUnique({ where: { key: setting.key } });
+    if (!existing) {
+      await prisma.appSetting.create({
+        data: {
+          id: uuidv7(),
+          key: setting.key,
+          value: setting.value,
+          description: setting.description,
+        },
+      });
+      console.log(`Seeded default app setting: ${setting.key}`);
+    }
+  }
+
   // CRITICAL REQUIREMENT: Sample products must NEVER be seeded in production
   if (nodeEnv === 'production') {
     console.log('Production mode detected. Skipping sample product/course seeding.');
