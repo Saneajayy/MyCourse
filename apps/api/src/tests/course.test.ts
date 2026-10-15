@@ -109,7 +109,9 @@ describe('Phase 3 Course Management & Bunny Stream Video Pipeline Suite', () => 
     if (testProductId) {
       await prisma.product.deleteMany({ where: { id: testProductId } });
     }
-    const cleanupUserIds = [studentId, unenrolledAdminId, enrolledAdminId].filter((id) => Boolean(id));
+    const cleanupUserIds = [studentId, unenrolledAdminId, enrolledAdminId].filter((id) =>
+      Boolean(id),
+    );
     if (cleanupUserIds.length > 0) {
       await prisma.user.deleteMany({
         where: {
@@ -144,7 +146,9 @@ describe('Phase 3 Course Management & Bunny Stream Video Pipeline Suite', () => 
         .set('Authorization', `Bearer ${unenrolledAdminToken}`);
 
       expect(res.status).toBe(403);
-      expect(res.body.error.message).toContain('Mandatory two-factor authentication setup is required');
+      expect(res.body.error.message).toContain(
+        'Mandatory two-factor authentication setup is required',
+      );
     });
 
     it('allows 2FA-enrolled admin to access /api/v1/admin/products with 200 OK', async () => {
@@ -368,11 +372,44 @@ describe('Phase 3 Course Management & Bunny Stream Video Pipeline Suite', () => 
 
       const res = await request(app)
         .post('/api/v1/webhooks/bunny')
-        .set('x-bunnystream-signature', 'invalid_hex_signature_3234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef')
+        .set(
+          'x-bunnystream-signature',
+          'invalid_hex_signature_3234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+        )
         .send(payload);
 
       expect(res.status).toBe(401);
       expect(res.body.error.message).toContain('Invalid webhook signature');
+    });
+
+    it('rejects webhook with invalid signature version or algorithm', async () => {
+      const payload = {
+        VideoLibraryId: 12345,
+        VideoGuid: paidLessonVideoGuid,
+        Status: 3,
+      };
+      const rawPayload = JSON.stringify(payload);
+      const signature = fakeProvider.signWebhookPayload(rawPayload);
+
+      // Rejects unsupported version
+      const resVersion = await request(app)
+        .post('/api/v1/webhooks/bunny')
+        .set('x-bunnystream-signature', signature)
+        .set('x-bunnystream-signature-version', 'v2')
+        .send(payload);
+
+      expect(resVersion.status).toBe(401);
+      expect(resVersion.body.error.message).toContain('Unsupported webhook signature version');
+
+      // Rejects unsupported algorithm
+      const resAlgo = await request(app)
+        .post('/api/v1/webhooks/bunny')
+        .set('x-bunnystream-signature', signature)
+        .set('x-bunnystream-signature-algorithm', 'md5')
+        .send(payload);
+
+      expect(resAlgo.status).toBe(401);
+      expect(resAlgo.body.error.message).toContain('Unsupported webhook signature algorithm');
     });
 
     it('processes valid webhook: transitions video from PROCESSING to READY and updates duration', async () => {
@@ -392,6 +429,8 @@ describe('Phase 3 Course Management & Bunny Stream Video Pipeline Suite', () => 
         .post('/api/v1/webhooks/bunny')
         .set('Content-Type', 'application/json')
         .set('x-bunnystream-signature', signature)
+        .set('x-bunnystream-signature-version', 'v1')
+        .set('x-bunnystream-signature-algorithm', 'hmac-sha256')
         .send(payload);
 
       expect(res.status).toBe(200);
@@ -511,7 +550,7 @@ describe('Phase 3 Course Management & Bunny Stream Video Pipeline Suite', () => 
       expect(found.totalDurationSeconds).toBe(840 + 450); // 1290s
     });
 
-    it('CRITICAL ZERO-LEAKAGE: ensures public curriculum never leaks paid video IDs, URLs, or library IDs', async () => {
+    it('CRITICAL ZERO-LEAKAGE: ensures public curriculum never leaks paid video IDs and does not embed expiring preview tokens (cacheable)', async () => {
       const res = await request(app).get(`/api/v1/courses/${testProductSlug}`);
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
@@ -526,10 +565,9 @@ describe('Phase 3 Course Management & Bunny Stream Video Pipeline Suite', () => 
       const freeLesson = section1.lessons.find((l: any) => l.id === freeLessonId);
       const paidLesson = section1.lessons.find((l: any) => l.id === paidLessonId);
 
-      // 1. Free lesson validation
+      // 1. Free lesson validation (P6: tokens are NOT embedded in catalog to ensure responses are 100% cacheable)
       expect(freeLesson.isFreePreview).toBe(true);
-      expect(freeLesson.freePreviewEmbedUrl).toBeDefined();
-      expect(freeLesson.freePreviewEmbedUrl).toContain('https://player.mediadelivery.net/embed/');
+      expect(freeLesson.freePreviewEmbedUrl).toBeUndefined();
 
       // 2. Paid lesson validation: MUST NOT CONTAIN ANY VIDEO IDENTIFIERS
       expect(paidLesson.isFreePreview).toBe(false);
@@ -549,6 +587,79 @@ describe('Phase 3 Course Management & Bunny Stream Video Pipeline Suite', () => 
       const responseJsonString = JSON.stringify(res.body);
       expect(responseJsonString).not.toContain(paidLessonVideoGuid);
     });
+
+    it('P6: delivers free-preview playback tokens via dedicated rate-limited endpoint', async () => {
+      // 1. Free preview lesson token generation succeeds
+      const freeRes = await request(app).get(
+        `/api/v1/courses/${testProductSlug}/lessons/${freeLessonId}/preview-token`,
+      );
+      expect(freeRes.status).toBe(200);
+      expect(freeRes.body.success).toBe(true);
+      expect(freeRes.body.data.lessonId).toBe(freeLessonId);
+      expect(freeRes.body.data.embedUrl).toContain('https://player.mediadelivery.net/embed/');
+      expect(freeRes.body.data.token).toBeDefined();
+      expect(freeRes.body.data.expiresAt).toBeGreaterThan(Math.floor(Date.now() / 1000));
+
+      // 2. Paid lesson token generation is strictly forbidden (403)
+      const paidRes = await request(app).get(
+        `/api/v1/courses/${testProductSlug}/lessons/${paidLessonId}/preview-token`,
+      );
+      expect(paidRes.status).toBe(403);
+      expect(paidRes.body.error.message).toContain('not available for free preview');
+
+      // 3. Non-existent lesson returns 404
+      const notFoundRes = await request(app).get(
+        `/api/v1/courses/${testProductSlug}/lessons/00000000-0000-0000-0000-000000000000/preview-token`,
+      );
+      expect(notFoundRes.status).toBe(404);
+    });
+
+    it('P6: handles admin thumbnail upload with strict file type and size validation', async () => {
+      // 1. Valid image upload (JPEG)
+      const validBuffer = Buffer.from('fake-jpeg-image-bytes-header-content');
+      const uploadRes = await request(app)
+        .post(`/api/v1/admin/products/${testProductId}/thumbnail`)
+        .set('Authorization', `Bearer ${enrolledAdminToken}`)
+        .attach('thumbnail', validBuffer, {
+          filename: 'course-thumb.jpg',
+          contentType: 'image/jpeg',
+        });
+
+      expect(uploadRes.status).toBe(200);
+      expect(uploadRes.body.success).toBe(true);
+      expect(uploadRes.body.data.thumbnailUrl).toMatch(/^\/uploads\/thumbnails\/thumbnail-/);
+      expect(uploadRes.body.data.thumbnailUrl).toMatch(/\.jpg$/);
+
+      // Verify product in database has updated thumbnail
+      const dbProduct = await prisma.product.findUnique({ where: { id: testProductId } });
+      expect(dbProduct?.thumbnailUrl).toBe(uploadRes.body.data.thumbnailUrl);
+
+      // 2. Invalid MIME type (text/plain) rejected with 400
+      const textBuffer = Buffer.from('plain-text-file-content');
+      const invalidMimeRes = await request(app)
+        .post(`/api/v1/admin/products/${testProductId}/thumbnail`)
+        .set('Authorization', `Bearer ${enrolledAdminToken}`)
+        .attach('thumbnail', textBuffer, {
+          filename: 'malicious.txt',
+          contentType: 'text/plain',
+        });
+
+      expect(invalidMimeRes.status).toBe(400);
+      expect(invalidMimeRes.body.error.message).toContain('Invalid image type');
+
+      // 3. Oversized file (> 5MB) rejected with 400
+      const oversizedBuffer = Buffer.alloc(5.5 * 1024 * 1024);
+      const oversizedRes = await request(app)
+        .post(`/api/v1/admin/products/${testProductId}/thumbnail`)
+        .set('Authorization', `Bearer ${enrolledAdminToken}`)
+        .attach('thumbnail', oversizedBuffer, {
+          filename: 'giant.jpg',
+          contentType: 'image/jpeg',
+        });
+
+      expect(oversizedRes.status).toBe(400);
+      expect(oversizedRes.body.error.message).toContain('limit of 5MB');
+    });
   });
 
   // ---------------------------------------------------------------------------
@@ -562,8 +673,14 @@ describe('Phase 3 Course Management & Bunny Stream Video Pipeline Suite', () => 
       expect(res.body.openapi).toBe('3.0.3');
       expect(res.body.info.title).toContain('Hydraulic Engineering Academy API');
       expect(res.body.paths['/courses/{slug}']).toBeDefined();
+      expect(res.body.paths['/courses/{slug}/lessons/{lessonId}/preview-token']).toBeDefined();
+      expect(res.body.paths['/admin/products/{id}/thumbnail']).toBeDefined();
       expect(res.body.paths['/admin/lessons/{id}/upload-ticket']).toBeDefined();
       expect(res.body.paths['/webhooks/bunny']).toBeDefined();
+
+      // P7: Verify spec is dynamically generated with zero placeholders
+      const rawSpecString = JSON.stringify(res.body);
+      expect(rawSpecString).not.toContain('{ ... }');
     });
 
     it('serves interactive Swagger UI HTML at /docs', async () => {

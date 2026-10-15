@@ -9,6 +9,7 @@ import {
   updateLessonSchema,
   reorderSchema,
 } from '@course/shared';
+import { BadRequestError } from '../../common/errors/app-error.js';
 
 export class CourseController {
   // ===========================================================================
@@ -24,11 +25,7 @@ export class CourseController {
     }
   }
 
-  public async getAdminProductById(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  public async getAdminProductById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const product = await courseService.getAdminProductById(req.params.id as string);
       res.status(200).json({ success: true, data: product });
@@ -181,11 +178,7 @@ export class CourseController {
     try {
       const input = updateLessonSchema.parse(req.body);
       const actorUserId = req.user!.id;
-      const lesson = await courseService.updateLesson(
-        req.params.id as string,
-        input,
-        actorUserId,
-      );
+      const lesson = await courseService.updateLesson(req.params.id as string, input, actorUserId);
       res.status(200).json({ success: true, data: lesson });
     } catch (err) {
       next(err);
@@ -270,6 +263,39 @@ export class CourseController {
     try {
       const course = await courseService.getPublicCourseBySlug(req.params.slug as string);
       res.status(200).json({ success: true, data: course });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public async getLessonPreviewToken(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    try {
+      const playback = await courseService.getLessonPreviewToken(
+        req.params.slug as string,
+        req.params.lessonId as string,
+      );
+      res.status(200).json({ success: true, data: playback });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public async uploadThumbnail(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.file) {
+        throw new BadRequestError('No image file provided');
+      }
+      const actorUserId = req.user!.id;
+      const result = await courseService.uploadProductThumbnail(
+        req.params.id as string,
+        req.file,
+        actorUserId,
+      );
+      res.status(200).json({ success: true, data: result });
     } catch (err) {
       next(err);
     }

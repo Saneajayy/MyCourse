@@ -1,7 +1,30 @@
 import { Router } from 'express';
+import multer from 'multer';
 import { courseController } from './course.controller.js';
 import { requireAuth, requireRole, requireAdmin2FA } from '../../common/middleware/auth.js';
 import { UserRole } from '@course/shared';
+import { BadRequestError } from '../../common/errors/app-error.js';
+import { createRateLimiter } from '../../common/middleware/rate-limiter.js';
+
+// Multer memory storage configured with 5MB max size and MIME type filter
+const thumbnailUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (_req, file, cb) => {
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new BadRequestError(
+          `Invalid image type "${file.mimetype}". Allowed types: image/jpeg, image/png, image/webp`,
+        ),
+      );
+    }
+  },
+});
 
 // ---------------------------------------------------------------------------
 // ADMIN COURSE MANAGEMENT ROUTES
@@ -23,6 +46,11 @@ adminCourseRouter.get('/products/:id', (req, res, next) =>
 );
 adminCourseRouter.patch('/products/:id', (req, res, next) =>
   courseController.updateProduct(req, res, next),
+);
+adminCourseRouter.post(
+  '/products/:id/thumbnail',
+  thumbnailUpload.single('thumbnail'),
+  (req, res, next) => courseController.uploadThumbnail(req, res, next),
 );
 adminCourseRouter.post('/products/:id/publish', (req, res, next) =>
   courseController.publishProduct(req, res, next),
@@ -77,4 +105,13 @@ export const publicCourseRouter = Router();
 publicCourseRouter.get('/', (req, res, next) => courseController.listPublicCourses(req, res, next));
 publicCourseRouter.get('/:slug', (req, res, next) =>
   courseController.getPublicCourseBySlug(req, res, next),
+);
+publicCourseRouter.get(
+  '/:slug/lessons/:lessonId/preview-token',
+  createRateLimiter({
+    points: 15,
+    duration: 60,
+    keyPrefix: 'rl:preview_token',
+  }),
+  (req, res, next) => courseController.getLessonPreviewToken(req, res, next),
 );

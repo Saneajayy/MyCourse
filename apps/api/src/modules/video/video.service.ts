@@ -18,6 +18,7 @@ if ((env.VIDEO_PROVIDER === 'bunny' || hasRealBunnyCredentials) && env.VIDEO_PRO
     libraryId: env.BUNNY_STREAM_LIBRARY_ID,
     apiKey: env.BUNNY_STREAM_API_KEY,
     tokenSecurityKey: env.BUNNY_STREAM_TOKEN_AUTH_KEY,
+    readOnlyApiKey: env.BUNNY_STREAM_READ_ONLY_API_KEY || env.BUNNY_STREAM_WEBHOOK_SECRET,
     webhookSecret: env.BUNNY_STREAM_WEBHOOK_SECRET,
     cdnHostname: env.BUNNY_STREAM_CDN_HOSTNAME,
   });
@@ -34,6 +35,6 @@ export function setVideoProviderForTesting(provider: VideoProvider): void {
   activeVideoProvider = provider;
 }
 
-export { VideoProvider } from './video-provider.interface.js';
+export type { VideoProvider } from './video-provider.interface.js';
 export { BunnyStreamProvider } from './bunny-stream.provider.js';
 export { FakeVideoProvider } from './fake-video.provider.js';

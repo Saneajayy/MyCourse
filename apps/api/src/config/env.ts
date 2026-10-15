@@ -41,6 +41,7 @@ const envSchema = z.object({
 
   // Video delivery (Bunny Stream)
   BUNNY_STREAM_API_KEY: z.string().default('placeholder_bunny_api_key'),
+  BUNNY_STREAM_READ_ONLY_API_KEY: z.string().optional(),
   BUNNY_STREAM_LIBRARY_ID: z.string().default('placeholder_bunny_library_id'),
   BUNNY_STREAM_TOKEN_AUTH_KEY: z.string().default('placeholder_bunny_token_auth_key'),
   BUNNY_STREAM_WEBHOOK_SECRET: z.string().optional(),

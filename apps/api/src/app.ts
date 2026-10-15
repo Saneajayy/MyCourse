@@ -1,3 +1,4 @@
+import path from 'path';
 import express, { Express, Request, Response, NextFunction } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -110,6 +111,9 @@ export function createApp(): Express {
   );
   app.use(express.urlencoded({ extended: true, limit: '2mb' }));
   app.use(cookieParser());
+
+  // Static uploads (thumbnails and public media)
+  app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 
   // 8. Health and Readiness probes (available at both root and /api/v1)
   app.use(healthRouter);

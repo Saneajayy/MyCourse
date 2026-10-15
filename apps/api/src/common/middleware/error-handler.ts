@@ -50,6 +50,20 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
     return;
   }
 
+  // Multer upload errors (e.g. file size exceeded or upload format issues)
+  if (err.name === 'MulterError' || (err as any).code === 'LIMIT_FILE_SIZE') {
+    const isLimitSize = (err as any).code === 'LIMIT_FILE_SIZE';
+    res.status(400).json({
+      success: false,
+      error: {
+        code: 'FILE_UPLOAD_ERROR',
+        message: isLimitSize ? 'File size exceeds maximum allowed limit of 5MB' : err.message,
+        requestId,
+      },
+    });
+    return;
+  }
+
   // Unexpected unhandled errors
   logger.error(
     {

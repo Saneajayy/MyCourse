@@ -9,6 +9,7 @@ export interface UploadTicket {
 export interface PlaybackInfo {
   embedUrl: string;
   expiresAt: number;
+  token?: string;
 }
 
 export interface VideoDetails {

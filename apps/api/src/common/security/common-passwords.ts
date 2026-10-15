@@ -1,67 +1,11 @@
 import { BadRequestError } from '../errors/app-error.js';
+import { COMMON_PASSWORDS_10K } from './common-passwords-data.js';
 
-// Top common password roots compiled from SecLists / OWASP Top Passwords datasets
-export const COMMON_PASSWORD_LIST: string[] = [
-  'password',
-  'password123',
-  'password123!',
-  '123456',
-  '12345678',
-  '123456789',
-  '1234567890',
-  '12345',
-  'qwerty',
-  'qwertyuiop',
-  'qwerty123',
-  'welcome',
-  'welcome123',
-  'welcome123!',
-  'admin',
-  'admin123',
-  'admin1234',
-  'admin12345',
-  'admin123456',
-  'administrator',
-  'changeme',
-  'changeme123',
-  'letmein',
-  'letmein123',
-  'sunshine',
-  'princess',
-  'football',
-  'baseball',
-  'monkey',
-  'shadow',
-  'master',
-  'dragon',
-  'superman',
-  'batman',
-  'trustno1',
-  'iloveyou',
-  'michael',
-  'jessica',
-  'charlie',
-  'daniel',
-  'thomas',
-  'mustang',
-  'harley',
-  'computer',
-  'internet',
-  'secret',
-  'access',
-  'system',
-  'database',
-  'company',
-  'service',
-  'course',
-  'engineering',
-  'hydraulic',
-  'hydraulics',
-  'academy',
-];
+// SecLists top 10,000 common passwords dataset
+export const COMMON_PASSWORD_LIST: readonly string[] = COMMON_PASSWORDS_10K;
 
 // Pre-populate HashSet for O(1) lookup
-export const COMMON_PASSWORDS_SET = new Set<string>(COMMON_PASSWORD_LIST.map((p) => p.toLowerCase()));
+export const COMMON_PASSWORDS_SET = new Set<string>(COMMON_PASSWORDS_10K);
 
 /**
  * Checks if a given password is too common or follows trivial predictable patterns
@@ -70,15 +14,15 @@ export const COMMON_PASSWORDS_SET = new Set<string>(COMMON_PASSWORD_LIST.map((p)
 export function isCommonPassword(password: string): boolean {
   const normalized = password.trim().toLowerCase();
 
-  // 1. Exact match in common dictionary
+  // 1. Exact match in top-10k dictionary
   if (COMMON_PASSWORDS_SET.has(normalized)) {
     return true;
   }
 
   // 2. Strip leading/trailing digits, spaces, and punctuation to check root word
-  // e.g. "Password123!" -> "password", "Admin@2026" -> "admin"
+  // e.g. "Password123!" -> "password", "Admin@2026" -> "admin", "Secret12345" -> "secret"
   const stripped = normalized.replace(/^[^a-z]+|[^a-z]+$/gi, '');
-  if (stripped.length >= 4 && COMMON_PASSWORDS_SET.has(stripped)) {
+  if (stripped.length >= 3 && COMMON_PASSWORDS_SET.has(stripped)) {
     return true;
   }
 
@@ -99,11 +43,6 @@ export function isCommonPassword(password: string): boolean {
   return false;
 }
 
-/**
- * Validates password policy:
- * - Length: 10-128 characters
- * - Not a commonly used or easily guessable password
- */
 export function validatePasswordStrength(password: string): void {
   if (password.length < 10) {
     throw new BadRequestError('Password must be at least 10 characters long');
@@ -115,7 +54,7 @@ export function validatePasswordStrength(password: string): void {
 
   if (isCommonPassword(password)) {
     throw new BadRequestError(
-      'Password is too common or easily guessable. Please choose a more secure password.',
+      'Password is too common or easily guessable. Please choose a stronger, more unique password.',
     );
   }
 }

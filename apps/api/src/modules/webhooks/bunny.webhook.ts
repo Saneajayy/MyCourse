@@ -9,10 +9,31 @@ import { UnauthorizedError } from '../../common/errors/app-error.js';
 export class BunnyWebhookController {
   public async handleWebhook(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const sigVersion = req.headers['x-bunnystream-signature-version'];
+      const sigAlgorithm = req.headers['x-bunnystream-signature-algorithm'];
       const signature =
         (req.headers['x-bunnystream-signature'] as string) ||
         (req.headers['bunny-signature'] as string) ||
         '';
+
+      if (!signature) {
+        logger.warn({ ip: req.ip }, 'Rejected Bunny webhook: missing signature header');
+        throw new UnauthorizedError('Missing webhook signature header');
+      }
+
+      // Official Bunny Stream Webhook validation (v1): version must be 'v1', algorithm must be 'hmac-sha256'
+      // Docs: https://docs.bunny.net/docs/stream-webhooks
+      if (sigVersion && sigVersion !== 'v1') {
+        logger.warn({ sigVersion }, 'Rejected Bunny webhook with invalid signature version');
+        throw new UnauthorizedError('Unsupported webhook signature version. Expected v1');
+      }
+
+      if (sigAlgorithm && (sigAlgorithm as string).toLowerCase() !== 'hmac-sha256') {
+        logger.warn({ sigAlgorithm }, 'Rejected Bunny webhook with invalid signature algorithm');
+        throw new UnauthorizedError(
+          'Unsupported webhook signature algorithm. Expected hmac-sha256',
+        );
+      }
 
       const rawBody = (req as any).rawBody || JSON.stringify(req.body);
       const provider = getVideoProvider();
@@ -155,8 +176,7 @@ export class BunnyWebhookController {
       try {
         const details = await provider.getVideoDetails(lesson.videoProviderId);
         if (details.status !== 'PROCESSING') {
-          const newStatus =
-            details.status === 'READY' ? LessonStatus.READY : LessonStatus.FAILED;
+          const newStatus = details.status === 'READY' ? LessonStatus.READY : LessonStatus.FAILED;
 
           await prisma.lesson.update({
             where: { id: lesson.id },

@@ -67,6 +67,7 @@ export class FakeVideoProvider implements VideoProvider {
     return {
       embedUrl: `https://player.mediadelivery.net/embed/${this.libraryId}/${videoId}?token=${token}&expires=${expirationTimestamp}`,
       expiresAt: expirationTimestamp,
+      token,
     };
   }
 
@@ -99,7 +100,10 @@ export class FakeVideoProvider implements VideoProvider {
     if (cleanSig.length !== cleanExpected.length) return false;
 
     try {
-      return crypto.timingSafeEqual(Buffer.from(cleanSig, 'hex'), Buffer.from(cleanExpected, 'hex'));
+      return crypto.timingSafeEqual(
+        Buffer.from(cleanSig, 'hex'),
+        Buffer.from(cleanExpected, 'hex'),
+      );
     } catch {
       return false;
     }

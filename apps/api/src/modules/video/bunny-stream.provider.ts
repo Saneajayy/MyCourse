@@ -10,8 +10,9 @@ import { AppError } from '../../common/errors/app-error.js';
 
 export interface BunnyStreamConfig {
   libraryId: string;
-  apiKey: string;
+  apiKey: string; // Full-access Library API key for management operations
   tokenSecurityKey: string;
+  readOnlyApiKey?: string; // Video Library Read-Only API key for webhook signing verification
   webhookSecret?: string;
   cdnHostname?: string;
 }
@@ -20,14 +21,14 @@ export class BunnyStreamProvider implements VideoProvider {
   private libraryId: string;
   private apiKey: string;
   private tokenSecurityKey: string;
-  private webhookSecret?: string;
+  private readOnlyApiKey?: string;
   private baseUrl: string;
 
   constructor(config: BunnyStreamConfig) {
     this.libraryId = config.libraryId;
     this.apiKey = config.apiKey;
     this.tokenSecurityKey = config.tokenSecurityKey;
-    this.webhookSecret = config.webhookSecret;
+    this.readOnlyApiKey = config.readOnlyApiKey || config.webhookSecret;
     this.baseUrl = 'https://video.bunnycdn.com';
   }
 
@@ -53,7 +54,11 @@ export class BunnyStreamProvider implements VideoProvider {
       if (!res.ok) {
         const errorText = await res.text();
         logger.error({ status: res.status, errorText }, 'Bunny Stream CreateVideo API failed');
-        throw new AppError(502, 'BUNNY_STREAM_ERROR', `Failed to create video on Bunny Stream: HTTP ${res.status}`);
+        throw new AppError(
+          502,
+          'BUNNY_STREAM_ERROR',
+          `Failed to create video on Bunny Stream: HTTP ${res.status}`,
+        );
       }
 
       const data = (await res.json()) as { guid: string };
@@ -107,6 +112,7 @@ export class BunnyStreamProvider implements VideoProvider {
     return {
       embedUrl,
       expiresAt: expirationTimestamp,
+      token,
     };
   }
 
@@ -125,7 +131,11 @@ export class BunnyStreamProvider implements VideoProvider {
       });
 
       if (!res.ok) {
-        throw new AppError(502, 'BUNNY_STREAM_ERROR', `Failed to fetch video details from Bunny Stream: HTTP ${res.status}`);
+        throw new AppError(
+          502,
+          'BUNNY_STREAM_ERROR',
+          `Failed to fetch video details from Bunny Stream: HTTP ${res.status}`,
+        );
       }
 
       const data = (await res.json()) as {
@@ -159,14 +169,21 @@ export class BunnyStreamProvider implements VideoProvider {
 
   /**
    * Cryptographically verifies incoming webhook signature in constant time.
-   * Header: X-BunnyStream-Signature = HMAC-SHA256(rawBody, secret)
+   * Header: X-BunnyStream-Signature = HMAC-SHA256(rawBody, readOnlyApiKey)
+   * Official doc: https://docs.bunny.net/docs/stream-webhooks
+   * NEVER uses the full-access library API key as a signing secret.
    */
   public verifyWebhookSignature(rawBody: Buffer | string, signature: string): boolean {
     if (!signature || signature.trim().length === 0) {
       return false;
     }
 
-    const secret = this.webhookSecret || this.apiKey;
+    const secret = this.readOnlyApiKey;
+    if (!secret) {
+      logger.error('Cannot verify Bunny webhook: BUNNY_STREAM_READ_ONLY_API_KEY is not configured');
+      return false;
+    }
+
     const bodyStr = Buffer.isBuffer(rawBody) ? rawBody.toString('utf-8') : rawBody;
     const expected = crypto.createHmac('sha256', secret).update(bodyStr).digest('hex');
 

@@ -41,3 +41,9 @@ coverage
 .turbo
 tmp
 temp
+
+# Uploaded assets
+uploads/*
+!uploads/**/.gitkeep
+apps/api/uploads/*
+!apps/api/uploads/**/.gitkeep

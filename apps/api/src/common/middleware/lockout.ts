@@ -75,7 +75,10 @@ export class LockoutService {
 
       // 3. Check per-account global key across all IPs (F2)
       const accGlobalAttempts = await redisClient.get(accGlobalKey);
-      if (accGlobalAttempts && parseInt(accGlobalAttempts, 10) >= MAX_ACCOUNT_GLOBAL_FAILED_ATTEMPTS) {
+      if (
+        accGlobalAttempts &&
+        parseInt(accGlobalAttempts, 10) >= MAX_ACCOUNT_GLOBAL_FAILED_ATTEMPTS
+      ) {
         const ttl = await redisClient.ttl(accGlobalKey);
         logger.warn(
           { email, ip, remainingTtl: ttl },

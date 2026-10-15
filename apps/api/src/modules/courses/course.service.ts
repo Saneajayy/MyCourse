@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { prisma } from '../../common/db/prisma.js';
 import { uuidv7 } from 'uuidv7';
 import {
@@ -10,7 +12,7 @@ import {
   ProductStatus,
   LessonStatus,
 } from '@course/shared';
-import { NotFoundError, BadRequestError } from '../../common/errors/app-error.js';
+import { NotFoundError, BadRequestError, ForbiddenError } from '../../common/errors/app-error.js';
 import { auditService } from '../audit/audit.service.js';
 import { getVideoProvider } from '../video/video.service.js';
 import { UploadTicket } from '../video/video-provider.interface.js';
@@ -586,50 +588,23 @@ export class CourseService {
       throw new NotFoundError('Course not found');
     }
 
-    const provider = getVideoProvider();
-
     // Map curriculum with strict redaction of paid video identifiers
-    const sanitizedSections = await Promise.all(
-      product.sections.map(async (section) => {
-        const sanitizedLessons = await Promise.all(
-          section.lessons.map(async (lesson) => {
-            let freePreviewEmbedUrl: string | null = null;
-
-            if (
-              lesson.isFreePreview &&
-              lesson.videoProviderId &&
-              lesson.status === LessonStatus.READY
-            ) {
-              try {
-                const playback = await provider.generatePlaybackToken(lesson.videoProviderId, 3600);
-                freePreviewEmbedUrl = playback.embedUrl;
-              } catch {
-                freePreviewEmbedUrl = null;
-              }
-            }
-
-            // Sanitized lesson object: NEVER exposes videoProviderId or libraryId for paid lessons
-            return {
-              id: lesson.id,
-              title: lesson.title,
-              description: lesson.description,
-              position: lesson.position,
-              durationSeconds: lesson.durationSeconds,
-              isFreePreview: lesson.isFreePreview,
-              status: lesson.status,
-              ...(lesson.isFreePreview ? { freePreviewEmbedUrl } : {}),
-            };
-          }),
-        );
-
-        return {
-          id: section.id,
-          title: section.title,
-          position: section.position,
-          lessons: sanitizedLessons,
-        };
-      }),
-    );
+    // Note: Free preview playback tokens are NOT embedded here to ensure the public catalog is 100% cacheable.
+    // Callers retrieve free preview playback tokens via the rate-limited /lessons/:id/preview-token endpoint.
+    const sanitizedSections = product.sections.map((section) => ({
+      id: section.id,
+      title: section.title,
+      position: section.position,
+      lessons: section.lessons.map((lesson) => ({
+        id: lesson.id,
+        title: lesson.title,
+        description: lesson.description,
+        position: lesson.position,
+        durationSeconds: lesson.durationSeconds,
+        isFreePreview: lesson.isFreePreview,
+        status: lesson.status,
+      })),
+    }));
 
     let totalLessons = 0;
     let totalDurationSeconds = 0;
@@ -655,6 +630,131 @@ export class CourseService {
       totalDurationSeconds,
       sections: sanitizedSections,
     };
+  }
+
+  /**
+   * Generates a signed playback token for a free preview lesson.
+   * Isolated from the public catalog response to keep catalog caching fast and edge-compatible.
+   */
+  public async getLessonPreviewToken(slug: string, lessonId: string) {
+    const product = await prisma.product.findFirst({
+      where: {
+        slug,
+        status: ProductStatus.PUBLISHED,
+        deletedAt: null,
+      },
+      include: {
+        sections: {
+          where: { isPublished: true },
+          include: {
+            lessons: {
+              where: { id: lessonId, isPublished: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundError('Course not found');
+    }
+
+    let foundLesson: (typeof product.sections)[0]['lessons'][0] | null = null;
+    for (const section of product.sections) {
+      if (section.lessons.length > 0 && section.lessons[0]) {
+        foundLesson = section.lessons[0];
+        break;
+      }
+    }
+
+    if (!foundLesson) {
+      throw new NotFoundError('Lesson not found in this course');
+    }
+
+    if (!foundLesson.isFreePreview) {
+      throw new ForbiddenError('This lesson is not available for free preview');
+    }
+
+    if (foundLesson.status !== LessonStatus.READY || !foundLesson.videoProviderId) {
+      throw new BadRequestError('Video is still processing and is not ready for preview');
+    }
+
+    const provider = getVideoProvider();
+    const playback = await provider.generatePlaybackToken(foundLesson.videoProviderId, 3600);
+
+    return {
+      lessonId: foundLesson.id,
+      title: foundLesson.title,
+      token: playback.token,
+      expiresAt: playback.expiresAt,
+      embedUrl: playback.embedUrl,
+    };
+  }
+
+  /**
+   * Validates and saves an uploaded thumbnail image for a course product.
+   * Validates MIME type (JPEG, PNG, WebP) and size (max 5MB).
+   */
+  public async uploadProductThumbnail(
+    productId: string,
+    file: { originalname: string; mimetype: string; size: number; buffer: Buffer },
+    actorUserId: string,
+  ) {
+    const product = await prisma.product.findFirst({
+      where: { id: productId, deletedAt: null },
+    });
+
+    if (!product) {
+      throw new NotFoundError('Course product not found');
+    }
+
+    if (!file || !file.buffer) {
+      throw new BadRequestError('No image file provided');
+    }
+
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestError(
+        `Invalid image type "${file.mimetype}". Allowed types: image/jpeg, image/png, image/webp`,
+      );
+    }
+
+    const maxSizeBytes = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSizeBytes) {
+      throw new BadRequestError(
+        `File size (${(file.size / (1024 * 1024)).toFixed(2)}MB) exceeds maximum allowed limit of 5MB`,
+      );
+    }
+
+    const mimeToExt: Record<string, string> = {
+      'image/jpeg': '.jpg',
+      'image/png': '.png',
+      'image/webp': '.webp',
+    };
+    const ext = mimeToExt[file.mimetype] || path.extname(file.originalname) || '.jpg';
+    const filename = `thumbnail-${productId}-${Date.now()}${ext}`;
+
+    const uploadDir = path.resolve(process.cwd(), 'uploads/thumbnails');
+    await fs.promises.mkdir(uploadDir, { recursive: true });
+    const targetFilePath = path.join(uploadDir, filename);
+
+    await fs.promises.writeFile(targetFilePath, file.buffer);
+    const thumbnailUrl = `/uploads/thumbnails/${filename}`;
+
+    const updated = await prisma.product.update({
+      where: { id: productId },
+      data: { thumbnailUrl },
+    });
+
+    await auditService.log({
+      actorUserId,
+      action: 'COURSE_PRODUCT_THUMBNAIL_UPLOADED',
+      entityType: 'Product',
+      entityId: productId,
+      afterState: { thumbnailUrl },
+    });
+
+    return { product: updated, thumbnailUrl };
   }
 }
 

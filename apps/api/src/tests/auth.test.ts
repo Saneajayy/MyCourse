@@ -4,7 +4,11 @@ import { createApp } from '../app.js';
 import { prisma } from '../common/db/prisma.js';
 import { redisClient } from '../common/redis/redis.js';
 import { uuidv7 } from 'uuidv7';
-import { hashPassword, _configureArgon2CapacityForTesting, _resetArgon2CapacityForTesting } from '../common/crypto/argon2.js';
+import {
+  hashPassword,
+  _configureArgon2CapacityForTesting,
+  _resetArgon2CapacityForTesting,
+} from '../common/crypto/argon2.js';
 import {
   generateRandomToken,
   hashToken,
@@ -17,7 +21,11 @@ import { generate as generateTOTP } from 'otplib';
 import { env } from '../config/env.js';
 import { lockoutService } from '../common/middleware/lockout.js';
 import { UserRole, UserStatus } from '@course/shared';
-import { COMMON_PASSWORD_LIST, COMMON_PASSWORDS_SET } from '../common/security/common-passwords.js';
+import {
+  COMMON_PASSWORD_LIST,
+  COMMON_PASSWORDS_SET,
+  isCommonPassword,
+} from '../common/security/common-passwords.js';
 import { getRefreshTokenCookieOptions } from '../common/utils/cookie.js';
 import crypto from 'crypto';
 import fs from 'fs';
@@ -855,9 +863,8 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
   // ---------------------------------------------------------------------------
   describe('Phase 2 Follow-Ups Verification (F1 - F5)', () => {
     // F1: Registration timing & identical response
-    it('F1: ensures existing-email and new-email paths take comparable time and return identical body & status', async () => {
+    it('F1: ensures existing-email and new-email paths take comparable time and return identical body & status (median comparison)', async () => {
       const existingEmail = `f1_existing_${Date.now()}@testcourse.com`;
-      const newEmail = `f1_new_${Date.now()}@testcourse.com`;
       const password = 'StrongPassword#2026!Equalize';
 
       // 1. Create the existing user first
@@ -867,52 +874,81 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
         name: 'Existing User',
       });
 
-      // Warm up JIT/threads
-      await request(app).post('/api/v1/auth/register').send({
-        email: `warmup_${Date.now()}@testcourse.com`,
-        password,
-        name: 'Warmup User',
-      });
+      // Warm up JIT, database connection, and thread pool
+      for (let w = 0; w < 2; w++) {
+        await request(app)
+          .post('/api/v1/auth/register')
+          .send({
+            email: `warmup_${w}_${Date.now()}@testcourse.com`,
+            password,
+            name: 'Warmup User',
+          });
+      }
 
-      // 2. Measure new-user registration time
-      const startNew = Date.now();
-      const resNew = await request(app).post('/api/v1/auth/register').send({
-        email: newEmail,
-        password,
-        name: 'Brand New User',
-      });
-      const timeNew = Date.now() - startNew;
+      // Helper function to calculate median of durations
+      const getMedian = (values: number[]): number => {
+        const sorted = [...values].sort((a, b) => a - b);
+        const mid = Math.floor(sorted.length / 2);
+        return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+      };
 
-      // 3. Measure existing-user registration time
-      const startExisting = Date.now();
-      const resExisting = await request(app).post('/api/v1/auth/register').send({
-        email: existingEmail,
-        password,
-        name: 'Existing User Again',
-      });
-      const timeExisting = Date.now() - startExisting;
+      const newDurations: number[] = [];
+      const existingDurations: number[] = [];
+      const createdEmails: string[] = [existingEmail];
+      const runs = 5;
 
-      // Status codes MUST be identical (201 Created)
-      expect(resNew.status).toBe(201);
-      expect(resExisting.status).toBe(201);
+      // Interleave measurements to balance system load fluctuations
+      for (let i = 0; i < runs; i++) {
+        const currentNewEmail = `f1_median_${i}_${Date.now()}@testcourse.com`;
+        createdEmails.push(currentNewEmail);
 
-      // Response bodies MUST be completely identical
-      expect(resExisting.body).toEqual(resNew.body);
-      expect(resExisting.body).toEqual({
-        success: true,
-        data: {
-          message:
-            'If this email is not already registered, a verification link has been sent. Please check your inbox.',
-        },
-      });
+        // 2. Measure new-user registration time
+        const startNew = performance.now();
+        const resNew = await request(app)
+          .post('/api/v1/auth/register')
+          .send({
+            email: currentNewEmail,
+            password,
+            name: `Brand New User ${i}`,
+          });
+        const timeNew = performance.now() - startNew;
+        newDurations.push(timeNew);
 
-      // Timing difference should be within realistic execution tolerance (< 350ms)
-      const timingDelta = Math.abs(timeNew - timeExisting);
-      expect(timingDelta).toBeLessThan(350);
+        // 3. Measure existing-user registration time
+        const startExisting = performance.now();
+        const resExisting = await request(app).post('/api/v1/auth/register').send({
+          email: existingEmail,
+          password,
+          name: 'Existing User Again',
+        });
+        const timeExisting = performance.now() - startExisting;
+        existingDurations.push(timeExisting);
+
+        // Status codes MUST be identical (201 Created)
+        expect(resNew.status).toBe(201);
+        expect(resExisting.status).toBe(201);
+
+        // Response bodies MUST be completely identical
+        expect(resExisting.body).toEqual(resNew.body);
+        expect(resExisting.body).toEqual({
+          success: true,
+          data: {
+            message:
+              'If this email is not already registered, a verification link has been sent. Please check your inbox.',
+          },
+        });
+      }
+
+      const medianNew = getMedian(newDurations);
+      const medianExisting = getMedian(existingDurations);
+      const timingDelta = Math.abs(medianNew - medianExisting);
+
+      // P5: Timing tolerance is tightened to be close to the single hash time (< 60ms, not 350ms)
+      expect(timingDelta).toBeLessThan(60);
 
       // Clean up test emails
       await prisma.user.deleteMany({
-        where: { email: { in: [existingEmail, newEmail] } },
+        where: { email: { in: createdEmails } },
       });
     });
 
@@ -926,9 +962,9 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
       }
 
       // Check lockout from a brand new IP address (IP #21)
-      await expect(
-        lockoutService.checkLockout(targetEmail, '198.51.100.21'),
-      ).rejects.toThrow('Account temporarily locked due to excessive failed attempts');
+      await expect(lockoutService.checkLockout(targetEmail, '198.51.100.21')).rejects.toThrow(
+        'Account temporarily locked due to excessive failed attempts',
+      );
 
       // Clear lockout for cleanup
       await lockoutService.clearFailedAttempts(targetEmail, '198.51.100.21');
@@ -1013,10 +1049,13 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
     });
 
     // F5: Argon2 queue saturation returns 503 Retry-After, common passwords count, Secure cookie in prod
-    it('F5: verifies Argon2 saturation 503 with Retry-After, 56 common passwords, and Secure cookie flag', async () => {
-      // 1. Verify common password dataset entry count (56 curated root entries)
-      expect(COMMON_PASSWORD_LIST).toHaveLength(56);
-      expect(COMMON_PASSWORDS_SET.size).toBe(56);
+    it('F5: verifies Argon2 saturation 503 with Retry-After, 10k common passwords, and Secure cookie flag', async () => {
+      // 1. Verify SecLists top 10,000 common password dataset entry count (10,001 unique entries)
+      expect(COMMON_PASSWORD_LIST).toHaveLength(10001);
+      expect(COMMON_PASSWORDS_SET.size).toBe(10001);
+      expect(isCommonPassword('Password123!')).toBe(true);
+      expect(isCommonPassword('welcome123')).toBe(true);
+      expect(isCommonPassword('admin1234')).toBe(true);
 
       // 2. Test Secure cookie flag under NODE_ENV=production
       const originalEnv = env.NODE_ENV;
@@ -1038,12 +1077,10 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
         const firstHashPromise = hashPassword('heavy_password_occupying_slot_1');
 
         // Immediately attempt login endpoint via Supertest while slot is occupied
-        const saturatedRes = await request(app)
-          .post('/api/v1/auth/login')
-          .send({
-            email: 'anyuser@test.com',
-            password: 'SomePassword123!',
-          });
+        const saturatedRes = await request(app).post('/api/v1/auth/login').send({
+          email: 'anyuser@test.com',
+          password: 'SomePassword123!',
+        });
 
         await firstHashPromise;
 
@@ -1057,4 +1094,3 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
     });
   });
 });
-
