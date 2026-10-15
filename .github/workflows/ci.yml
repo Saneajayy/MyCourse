@@ -78,6 +78,8 @@ jobs:
           REDIS_URL: redis://localhost:6379
           JWT_ACCESS_SECRET: test_jwt_access_secret_must_be_at_least_32_characters_long_for_security!
           TOTP_ENCRYPTION_KEY: dev_totp_encryption_key_32_bytes_long_min_len!
+          GOOGLE_CLIENT_ID: mock-google-client-id-for-ci
+          GOOGLE_CLIENT_SECRET: mock-google-client-secret-for-ci
 
       - name: Build all packages (Shared, API, Next.js Web)
         run: pnpm build
