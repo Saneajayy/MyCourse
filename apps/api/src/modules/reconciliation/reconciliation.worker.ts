@@ -1,6 +1,7 @@
 import { Queue, Worker } from 'bullmq';
 import { redisClient } from '../../common/redis/redis.js';
 import { orderService } from '../orders/order.service.js';
+import { sweepStuckWebhookEvents } from '../webhooks/webhook.queue.js';
 import { logger } from '../../common/logger/logger.js';
 import { env } from '../../config/env.js';
 
@@ -29,8 +30,12 @@ export function initializeReconciliationWorker(): { queue: Queue; worker: Worker
     async (job) => {
       logger.info({ jobId: job.id }, 'Starting stuck orders reconciliation job');
       const result = await orderService.reconcileStuckOrders();
-      logger.info({ result }, 'Completed stuck orders reconciliation job');
-      return result;
+      const sweepResult = await sweepStuckWebhookEvents();
+      logger.info(
+        { result, sweepResult },
+        'Completed stuck orders and webhook events reconciliation job',
+      );
+      return { orders: result, webhooks: sweepResult };
     },
     { connection, concurrency: 1 },
   );

@@ -80,6 +80,7 @@ export class RazorpayPaymentGateway implements PaymentGateway {
       currency: params.currency,
       receipt: params.receipt,
       notes: params.notes,
+      payment_capture: 1, // Explicit auto-capture
     };
 
     const res = await this.request<any>('/orders', {

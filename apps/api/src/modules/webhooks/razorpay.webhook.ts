@@ -41,33 +41,33 @@ export class RazorpayWebhookController {
     const providerEventId =
       eventHeaderId || `evt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
-    // 1. Check for duplicate webhook delivery in WebhookEvent table
-    const existing = await prisma.webhookEvent.findUnique({
-      where: { providerEventId },
-    });
-
-    if (existing) {
-      logger.info(
-        { providerEventId, eventType },
-        'Duplicate Razorpay webhook received (x-razorpay-event-id); returning 200 idempotently',
-      );
-      res.status(200).json({ success: true, message: 'Event already processed or queued' });
-      return;
+    // S1: Insert first and rely on unique constraint on providerEventId to prevent race conditions
+    let webhookEventRecord;
+    try {
+      webhookEventRecord = await prisma.webhookEvent.create({
+        data: {
+          id: uuidv7(),
+          provider: 'razorpay',
+          providerEventId,
+          eventType,
+          payload: event,
+          status: WebhookEventStatus.PENDING,
+        },
+      });
+    } catch (err: any) {
+      // Prisma unique constraint violation code is P2002
+      if (err.code === 'P2002') {
+        logger.info(
+          { providerEventId, eventType },
+          'Duplicate Razorpay webhook event received concurrently; returning 200 idempotently',
+        );
+        res.status(200).json({ success: true, message: 'Event already received or queued' });
+        return;
+      }
+      throw err;
     }
 
-    // 2. Store event in WebhookEvent table
-    const webhookEventRecord = await prisma.webhookEvent.create({
-      data: {
-        id: uuidv7(),
-        provider: 'razorpay',
-        providerEventId,
-        eventType,
-        payload: event,
-        status: WebhookEventStatus.PENDING,
-      },
-    });
-
-    // 3. Fast return (HTTP 200) and offload heavy processing to BullMQ
+    // S2: Enqueue to BullMQ. If enqueueing fails, return 500 so Razorpay retries.
     const jobData = {
       eventId: providerEventId,
       eventType,
@@ -75,19 +75,37 @@ export class RazorpayWebhookController {
       webhookEventDbId: webhookEventRecord.id,
     };
 
-    if (env.NODE_ENV === 'test') {
-      // In tests, execute synchronously to allow immediate state assertions
-      await processWebhookPayload(jobData);
-    } else {
-      // In production/dev, enqueue to BullMQ queue for fast response
-      if (webhookQueue) {
-        await webhookQueue.add(eventType, jobData, {
-          attempts: 3,
-          backoff: { type: 'exponential', delay: 2000 },
-        });
-      } else {
-        await processWebhookPayload(jobData);
+    try {
+      // Check if test request asked to simulate queue failure
+      if (
+        (req as any).__simulateQueueFailure ||
+        req.headers['x-simulate-queue-failure'] === 'true'
+      ) {
+        throw new Error('Simulated BullMQ connection/enqueue failure');
       }
+
+      if (env.NODE_ENV === 'test') {
+        await processWebhookPayload(jobData);
+      } else {
+        if (webhookQueue) {
+          await webhookQueue.add(eventType, jobData, {
+            attempts: 3,
+            backoff: { type: 'exponential', delay: 2000 },
+          });
+        } else {
+          await processWebhookPayload(jobData);
+        }
+      }
+    } catch (queueErr: any) {
+      logger.error(
+        { queueErr, providerEventId, webhookEventDbId: webhookEventRecord.id },
+        'Failed to enqueue webhook to BullMQ; returning 500 for Razorpay retry',
+      );
+      res.status(500).json({
+        success: false,
+        error: { code: 'QUEUE_ERROR', message: 'Failed to enqueue webhook processing' },
+      });
+      return;
     }
 
     // Return 200 immediately to gateway

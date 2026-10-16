@@ -147,8 +147,29 @@ All three payment confirmation pathways delegate to a single core function `mark
 
 ## 4. Sequential Invoice Numbering
 
-- Format: `INV/{YYYY}-{YYYY}/{00000}` (e.g. `INV/2026-2027/00001`).
+- Format: `INV/{YY}-{YY}/{00000}` (e.g. `INV/26-27/00001` <= 16 characters).
 - Financial Year resets every April 1st:
   - If month is Jan-Mar (months 0-2): FY is `(year - 1)-(year)`
   - If month is Apr-Dec (months 3-11): FY is `(year)-(year + 1)`
 - Guaranteed zero gaps and unique under high concurrency via row locking `AppSetting`.
+
+---
+
+## 5. Razorpay Auto-Capture Requirement & 15-Minute Authorized Alerting
+
+> [!IMPORTANT]
+> **Auto-Capture Clarification:** Razorpay **does NOT** automatically emit `payment.captured` unless **Auto-Capture** is explicitly enabled. If auto-capture is disabled on your Razorpay merchant account, payments will transition to `authorized` and remain there until captured manually or voided after the authorization window.
+> 
+> 1. **Merchant Setting:** You must enable Auto-Capture in the Razorpay Dashboard under **Settings $\rightarrow$ Payment Capture $\rightarrow$ Automatically capture all payments**.
+> 2. **Order Creation Directive:** When creating orders via the Razorpay API, our backend also explicitly sets `payment_capture: 1` as a belt-and-suspenders measure.
+> 3. **Critical Alert Monitoring:** Payments sitting in the `authorized` (or `PENDING`) state for **more than 15 minutes** trigger an error-level alert (`CRITICAL ALERT`) in the reconciliation worker (`orderService.reconcileStuckOrders`), alerting the engineering and operations team to either enable auto-capture or manually capture the transaction.
+
+---
+
+## 6. Webhook Processing Architecture, Deduplication, & Sweeper Job
+
+1. **Insert-First Deduplication:** Webhooks are ingested by inserting the `WebhookEvent` row first. Any concurrent or duplicate webhook delivery violates the unique constraint on `providerEventId` (Prisma error `P2002`) and returns **HTTP 200** idempotently without re-processing.
+2. **Fast Return & BullMQ Offload:** The HTTP handler returns **HTTP 200** within milliseconds and delegates heavy processing to the `razorpay-webhooks` BullMQ queue.
+3. **Queue Failure Resilience:** If inserting the event succeeds but enqueueing to BullMQ fails (e.g. Redis connection timeout), the HTTP handler returns **HTTP 500** so Razorpay schedules an exponential retry.
+4. **Stuck Event Sweeper:** The background reconciliation worker runs `sweepStuckWebhookEvents()`, which queries for any `WebhookEvent` rows in `PENDING` status for more than 5 minutes and automatically re-enqueues them.
+5. **Strict Field Validation:** The webhook processing path validates `orderId`, payment `amount` in integer paise, and `currency` (`INR`) against the database order before calling `markOrderPaid`. Mismatches immediately mark the `WebhookEvent` as `FAILED` and reject fulfillment.

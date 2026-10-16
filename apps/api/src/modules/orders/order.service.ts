@@ -979,6 +979,8 @@ export class OrderService {
     const gateway = getPaymentGateway();
     let reconciled = 0;
     let expired = 0;
+    let authorizedAlerts = 0;
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
 
     for (const order of stuckOrders) {
       try {
@@ -986,6 +988,23 @@ export class OrderService {
 
         const payments = await gateway.fetchOrderPayments(order.razorpayOrderId);
         const captured = payments.find((p) => p.status === 'captured');
+        const authorized = payments.filter((p) => p.status === 'authorized');
+
+        // S5: Log an error-level alert for payments sitting in "authorized" for more than 15 minutes
+        for (const authPay of authorized) {
+          if (order.createdAt <= fifteenMinutesAgo) {
+            authorizedAlerts++;
+            logger.error(
+              {
+                orderId: order.id,
+                razorpayOrderId: order.razorpayOrderId,
+                paymentId: authPay.id,
+                orderCreatedAt: order.createdAt,
+              },
+              'CRITICAL ALERT: Payment has been sitting in "authorized" state for more than 15 minutes without capture. Verify that Razorpay Auto-Capture is ENABLED in your Razorpay Dashboard Settings, or manually capture this payment.',
+            );
+          }
+        }
 
         if (captured) {
           logger.info(
@@ -1023,10 +1042,32 @@ export class OrderService {
       }
     }
 
+    // S5: Also check local DB for any Payment records stuck in PENDING status for > 15 minutes
+    const stuckAuthorizedDbPayments = await prisma.payment.findMany({
+      where: {
+        status: PaymentStatus.PENDING,
+        createdAt: { lte: fifteenMinutesAgo },
+      },
+    });
+
+    for (const p of stuckAuthorizedDbPayments) {
+      authorizedAlerts++;
+      logger.error(
+        {
+          paymentId: p.id,
+          razorpayPaymentId: p.razorpayPaymentId,
+          orderId: p.orderId,
+          createdAt: p.createdAt,
+        },
+        'CRITICAL ALERT: Payment has been sitting in "authorized" (PENDING) status for more than 15 minutes without capture. Verify that Razorpay Auto-Capture is ENABLED in Razorpay Dashboard Settings.',
+      );
+    }
+
     return {
       checked: stuckOrders.length,
       reconciled,
       expired,
+      authorizedAlerts,
     };
   }
 }

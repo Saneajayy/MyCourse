@@ -14,12 +14,14 @@ import {
   RefundStatus,
   EntitlementStatus,
   CouponType,
+  WebhookEventStatus,
 } from '@course/shared';
 import { setPaymentGateway } from '../modules/payments/payment.service.js';
 import { FakePaymentGateway } from '../modules/payments/fake-payment.gateway.js';
 import { orderService } from '../modules/orders/order.service.js';
 import { invoiceService, getFinancialYear } from '../modules/invoices/invoice.service.js';
 import { env, validateProductionSafety } from '../config/env.js';
+import { sweepStuckWebhookEvents } from '../modules/webhooks/webhook.queue.js';
 
 describe('Phase 4 Orders, Payments, Invoicing, and Entitlements Suite', () => {
   const app = createApp();
@@ -1363,7 +1365,7 @@ describe('Phase 4 Orders, Payments, Invoicing, and Entitlements Suite', () => {
         .send(payload);
 
       expect(dupRes.status).toBe(200);
-      expect(dupRes.body.message).toContain('already processed');
+      expect(dupRes.body.message).toMatch(/already (received|processed)/i);
     });
 
     it('webhook for unknown order does not return 500 error preventing Razorpay infinite retries', async () => {
@@ -1452,6 +1454,449 @@ describe('Phase 4 Orders, Payments, Invoicing, and Entitlements Suite', () => {
           value: { ...currentConfig, includeZeroValueInvoices: true },
         },
       });
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // S1 & S2: WEBHOOK INSERT-FIRST DEDUPE RACE, QUEUE ERROR & SWEEPER JOB
+  // ---------------------------------------------------------------------------
+  describe('S1 & S2: Webhook Deduplication Race, Queue Failure Resilience & Sweeper Job', () => {
+    it('S1: sends the same webhook event concurrently, all return 200 and exactly 1 DB row is created', async () => {
+      const eventId = `evt_race_${Date.now()}`;
+      const payload = {
+        event: 'order.paid',
+        payload: {
+          order: {
+            entity: {
+              id: `order_race_${Date.now()}`,
+              amount: coursePricePaise,
+              status: 'paid',
+            },
+          },
+        },
+      };
+      const sig = fakeGateway.signWebhook(JSON.stringify(payload));
+
+      const concurrentRequests = Array.from({ length: 5 }, () =>
+        request(app)
+          .post('/api/v1/webhooks/razorpay')
+          .set('Content-Type', 'application/json')
+          .set('x-razorpay-signature', sig)
+          .set('x-razorpay-event-id', eventId)
+          .send(payload),
+      );
+
+      const responses = await Promise.all(concurrentRequests);
+      for (const res of responses) {
+        expect(res.status).toBe(200);
+      }
+
+      const eventRecords = await prisma.webhookEvent.findMany({
+        where: { providerEventId: eventId },
+      });
+      expect(eventRecords.length).toBe(1);
+    });
+
+    it('S2: returns non-200 (500) if saving event succeeds but BullMQ enqueueing fails', async () => {
+      const eventId = `evt_q_fail_${Date.now()}`;
+      const payload = {
+        event: 'order.paid',
+        payload: {
+          order: {
+            entity: {
+              id: `order_fail_${Date.now()}`,
+              amount: coursePricePaise,
+              status: 'paid',
+            },
+          },
+        },
+      };
+      const sig = fakeGateway.signWebhook(JSON.stringify(payload));
+
+      const res = await request(app)
+        .post('/api/v1/webhooks/razorpay')
+        .set('Content-Type', 'application/json')
+        .set('x-razorpay-signature', sig)
+        .set('x-razorpay-event-id', eventId)
+        .set('x-simulate-queue-failure', 'true')
+        .send(payload);
+
+      expect(res.status).toBe(500);
+      expect(res.body.error.code).toBe('QUEUE_ERROR');
+    });
+
+    it('S2: sweeper job re-queues and processes WebhookEvent rows stuck in PENDING for > 5 minutes', async () => {
+      const stuckProduct = await createTestProduct('Sweeper Stuck Product');
+      const orderRes = await request(app)
+        .post('/api/v1/orders')
+        .set('Authorization', `Bearer ${verifiedStudentToken}`)
+        .set('Idempotency-Key', uuidv7())
+        .send({ productId: stuckProduct.id });
+
+      const rzpOrderId = orderRes.body.data.razorpayOrderId;
+      const payId = `pay_sweep_${Date.now()}`;
+      const eventId = `evt_stuck_${Date.now()}`;
+
+      await prisma.webhookEvent.create({
+        data: {
+          id: uuidv7(),
+          provider: 'razorpay',
+          providerEventId: eventId,
+          eventType: 'payment.captured',
+          payload: {
+            event: 'payment.captured',
+            payload: {
+              payment: {
+                entity: {
+                  id: payId,
+                  order_id: rzpOrderId,
+                  amount: coursePricePaise,
+                  currency: 'INR',
+                  status: 'captured',
+                  method: 'card',
+                },
+              },
+            },
+          },
+          status: WebhookEventStatus.PENDING,
+          createdAt: new Date(Date.now() - 10 * 60 * 1000), // 10 mins ago
+        },
+      });
+
+      const sweepResult = await sweepStuckWebhookEvents(5);
+      expect(sweepResult.swept).toBeGreaterThanOrEqual(1);
+
+      const processedEvent = await prisma.webhookEvent.findUnique({
+        where: { providerEventId: eventId },
+      });
+      expect(processedEvent?.status).toBe(WebhookEventStatus.PROCESSED);
+
+      const paidOrder = await prisma.order.findUnique({
+        where: { id: orderRes.body.data.order.id },
+      });
+      expect(paidOrder?.status).toBe(OrderStatus.PAID);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // S3: WEBHOOK PAYLOAD ORDER, AMOUNT AND CURRENCY VALIDATION
+  // ---------------------------------------------------------------------------
+  describe('S3: Webhook Payload Order, Amount and Currency Validation', () => {
+    it('rejects payment.captured webhook if payment amount in paise does not match order total', async () => {
+      const mismatchProduct = await createTestProduct('Amount Mismatch Course');
+      const orderRes = await request(app)
+        .post('/api/v1/orders')
+        .set('Authorization', `Bearer ${verifiedStudentToken}`)
+        .set('Idempotency-Key', uuidv7())
+        .send({ productId: mismatchProduct.id });
+
+      const rzpOrderId = orderRes.body.data.razorpayOrderId;
+      const payId = `pay_bad_amt_${Date.now()}`;
+
+      const tamperedPayload = {
+        event: 'payment.captured',
+        payload: {
+          payment: {
+            entity: {
+              id: payId,
+              order_id: rzpOrderId,
+              amount: 10000, // ₹100 instead of ₹4,999
+              currency: 'INR',
+              status: 'captured',
+              method: 'card',
+            },
+          },
+        },
+      };
+
+      const sig = fakeGateway.signWebhook(JSON.stringify(tamperedPayload));
+      const eventId = `evt_bad_amt_${Date.now()}`;
+      const res = await request(app)
+        .post('/api/v1/webhooks/razorpay')
+        .set('Content-Type', 'application/json')
+        .set('x-razorpay-signature', sig)
+        .set('x-razorpay-event-id', eventId)
+        .send(tamperedPayload);
+
+      expect(res.status).toBe(200);
+
+      const failedEvent = await prisma.webhookEvent.findUnique({
+        where: { providerEventId: eventId },
+      });
+      expect(failedEvent?.status).toBe(WebhookEventStatus.FAILED);
+      expect(failedEvent?.error).toContain('Payment amount mismatch');
+
+      const order = await prisma.order.findUnique({ where: { id: orderRes.body.data.order.id } });
+      expect(order?.status).toBe(OrderStatus.CREATED);
+
+      const entitlement = await prisma.entitlement.findFirst({
+        where: { userId: verifiedStudentId, productId: mismatchProduct.id },
+      });
+      expect(entitlement).toBeNull();
+    });
+
+    it('rejects payment.captured webhook if currency does not match order currency', async () => {
+      const mismatchProduct = await createTestProduct('Currency Mismatch Course');
+      const orderRes = await request(app)
+        .post('/api/v1/orders')
+        .set('Authorization', `Bearer ${verifiedStudentToken}`)
+        .set('Idempotency-Key', uuidv7())
+        .send({ productId: mismatchProduct.id });
+
+      const rzpOrderId = orderRes.body.data.razorpayOrderId;
+      const payId = `pay_bad_curr_${Date.now()}`;
+
+      const tamperedPayload = {
+        event: 'payment.captured',
+        payload: {
+          payment: {
+            entity: {
+              id: payId,
+              order_id: rzpOrderId,
+              amount: coursePricePaise,
+              currency: 'USD', // USD instead of INR
+              status: 'captured',
+              method: 'card',
+            },
+          },
+        },
+      };
+
+      const sig = fakeGateway.signWebhook(JSON.stringify(tamperedPayload));
+      const eventId = `evt_bad_curr_${Date.now()}`;
+      const res = await request(app)
+        .post('/api/v1/webhooks/razorpay')
+        .set('Content-Type', 'application/json')
+        .set('x-razorpay-signature', sig)
+        .set('x-razorpay-event-id', eventId)
+        .send(tamperedPayload);
+
+      expect(res.status).toBe(200);
+
+      const failedEvent = await prisma.webhookEvent.findUnique({
+        where: { providerEventId: eventId },
+      });
+      expect(failedEvent?.status).toBe(WebhookEventStatus.FAILED);
+      expect(failedEvent?.error).toContain('Payment currency mismatch');
+
+      const order = await prisma.order.findUnique({ where: { id: orderRes.body.data.order.id } });
+      expect(order?.status).toBe(OrderStatus.CREATED);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // S5: 15-MINUTE AUTHORIZED PAYMENT ALERT IN RECONCILIATION
+  // ---------------------------------------------------------------------------
+  describe('S5: 15-Minute Authorized Payment Alerting in Reconciliation', () => {
+    it('logs error-level alert for payments sitting in authorized status for > 15 minutes', async () => {
+      const authAlertProduct = await createTestProduct('Authorized Alert Course');
+      const rzpOrderId = `order_auth_alert_${Date.now()}`;
+      const payId = `pay_auth_alert_${Date.now()}`;
+
+      await prisma.order.create({
+        data: {
+          id: uuidv7(),
+          userId: verifiedStudentId,
+          productId: authAlertProduct.id,
+          idempotencyKey: uuidv7(),
+          status: OrderStatus.PENDING,
+          subtotalPaise: coursePricePaise,
+          totalPaise: coursePricePaise,
+          razorpayOrderId: rzpOrderId,
+          createdAt: new Date(Date.now() - 20 * 60 * 1000),
+        },
+      });
+
+      fakeGateway.registerPayment({
+        id: payId,
+        orderId: rzpOrderId,
+        amountPaise: coursePricePaise,
+        currency: 'INR',
+        status: 'authorized',
+      });
+
+      const reconcileRes = await orderService.reconcileStuckOrders();
+      expect(reconcileRes.authorizedAlerts).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // S4: MANDATORY PHASE 4 CRITICAL INTERLEAVING & RECONCILIATION TESTS
+  // ---------------------------------------------------------------------------
+  describe('S4 Mandatory Test Suite', () => {
+    it('(c) webhook before verify and verify before webhook both end with exactly one grant and one invoice', async () => {
+      // 1. Webhook arrives before verify
+      const prod1 = await createTestProduct('Interleaved System A');
+      const ord1Res = await request(app)
+        .post('/api/v1/orders')
+        .set('Authorization', `Bearer ${verifiedStudentToken}`)
+        .set('Idempotency-Key', uuidv7())
+        .send({ productId: prod1.id });
+      const ord1Id = ord1Res.body.data.order.id;
+      const rzpOrd1 = ord1Res.body.data.razorpayOrderId;
+      const pay1Id = `pay_wbv_${Date.now()}`;
+
+      const whPayload1 = {
+        event: 'payment.captured',
+        payload: {
+          payment: {
+            entity: {
+              id: pay1Id,
+              order_id: rzpOrd1,
+              amount: coursePricePaise,
+              currency: 'INR',
+              status: 'captured',
+              method: 'upi',
+            },
+          },
+        },
+      };
+      const sig1 = fakeGateway.signWebhook(JSON.stringify(whPayload1));
+      await request(app)
+        .post('/api/v1/webhooks/razorpay')
+        .set('Content-Type', 'application/json')
+        .set('x-razorpay-signature', sig1)
+        .set('x-razorpay-event-id', `evt_wbv_${Date.now()}`)
+        .send(whPayload1);
+
+      fakeGateway.registerPayment({
+        id: pay1Id,
+        orderId: rzpOrd1,
+        amountPaise: coursePricePaise,
+        currency: 'INR',
+        status: 'captured',
+      });
+      const browserSig1 = fakeGateway.signPayment(rzpOrd1, pay1Id);
+      const verify1Res = await request(app)
+        .post('/api/v1/payments/verify')
+        .set('Authorization', `Bearer ${verifiedStudentToken}`)
+        .send({
+          razorpayOrderId: rzpOrd1,
+          razorpayPaymentId: pay1Id,
+          razorpaySignature: browserSig1,
+        });
+      expect(verify1Res.status).toBe(200);
+
+      const entitlementsCount1 = await prisma.entitlement.count({ where: { orderId: ord1Id } });
+      const invoicesCount1 = await prisma.invoice.count({ where: { orderId: ord1Id } });
+      expect(entitlementsCount1).toBe(1);
+      expect(invoicesCount1).toBe(1);
+
+      // 2. Verify arrives before webhook
+      const prod2 = await createTestProduct('Interleaved System B');
+      const ord2Res = await request(app)
+        .post('/api/v1/orders')
+        .set('Authorization', `Bearer ${verifiedStudentToken}`)
+        .set('Idempotency-Key', uuidv7())
+        .send({ productId: prod2.id });
+      const ord2Id = ord2Res.body.data.order.id;
+      const rzpOrd2 = ord2Res.body.data.razorpayOrderId;
+      const pay2Id = `pay_vbw_${Date.now()}`;
+
+      fakeGateway.registerPayment({
+        id: pay2Id,
+        orderId: rzpOrd2,
+        amountPaise: coursePricePaise,
+        currency: 'INR',
+        status: 'captured',
+      });
+      const browserSig2 = fakeGateway.signPayment(rzpOrd2, pay2Id);
+      const verify2Res = await request(app)
+        .post('/api/v1/payments/verify')
+        .set('Authorization', `Bearer ${verifiedStudentToken}`)
+        .send({
+          razorpayOrderId: rzpOrd2,
+          razorpayPaymentId: pay2Id,
+          razorpaySignature: browserSig2,
+        });
+      expect(verify2Res.status).toBe(200);
+
+      const whPayload2 = {
+        event: 'payment.captured',
+        payload: {
+          payment: {
+            entity: {
+              id: pay2Id,
+              order_id: rzpOrd2,
+              amount: coursePricePaise,
+              currency: 'INR',
+              status: 'captured',
+              method: 'card',
+            },
+          },
+        },
+      };
+      const sig2 = fakeGateway.signWebhook(JSON.stringify(whPayload2));
+      await request(app)
+        .post('/api/v1/webhooks/razorpay')
+        .set('Content-Type', 'application/json')
+        .set('x-razorpay-signature', sig2)
+        .set('x-razorpay-event-id', `evt_vbw_${Date.now()}`)
+        .send(whPayload2);
+
+      const entitlementsCount2 = await prisma.entitlement.count({ where: { orderId: ord2Id } });
+      const invoicesCount2 = await prisma.invoice.count({ where: { orderId: ord2Id } });
+      expect(entitlementsCount2).toBe(1);
+      expect(invoicesCount2).toBe(1);
+    });
+
+    it('(e) the reconciliation worker finds a stuck order that was actually paid at the gateway and fixes it', async () => {
+      const stuckRzpId = `order_stuck_recon_${Date.now()}`;
+      const stuckOrderId = uuidv7();
+
+      await prisma.order.create({
+        data: {
+          id: stuckOrderId,
+          userId: verifiedStudentId,
+          productId: testProductId,
+          idempotencyKey: uuidv7(),
+          status: OrderStatus.CREATED,
+          subtotalPaise: coursePricePaise,
+          totalPaise: coursePricePaise,
+          razorpayOrderId: stuckRzpId,
+          createdAt: new Date(Date.now() - 20 * 60 * 1000),
+        },
+      });
+
+      const stuckPayId = `pay_stuck_recon_${Date.now()}`;
+      fakeGateway.registerPayment({
+        id: stuckPayId,
+        orderId: stuckRzpId,
+        amountPaise: coursePricePaise,
+        currency: 'INR',
+        status: 'captured',
+      });
+
+      const reconcileResult = await orderService.reconcileStuckOrders();
+      expect(reconcileResult.reconciled).toBeGreaterThanOrEqual(1);
+
+      const fixedOrder = await prisma.order.findUnique({ where: { id: stuckOrderId } });
+      expect(fixedOrder?.status).toBe(OrderStatus.PAID);
+      expect(fixedOrder?.paidAt).not.toBeNull();
+    });
+
+    it('(f) concurrent payments produce unique, sequential, gap-free invoice numbers', async () => {
+      const generatedInvoices = await Promise.all(
+        Array.from({ length: 5 }, () =>
+          prisma.$transaction((tx) =>
+            invoiceService.generateInvoiceNumberUnderLock(tx, new Date()),
+          ),
+        ),
+      );
+
+      const sequences = generatedInvoices.map((i) => i.sequenceNumber);
+      const invoiceNumbers = generatedInvoices.map((i) => i.invoiceNumber);
+
+      const uniqueSeq = new Set(sequences);
+      expect(uniqueSeq.size).toBe(5);
+
+      const uniqueNumbers = new Set(invoiceNumbers);
+      expect(uniqueNumbers.size).toBe(5);
+
+      const sortedSeq = [...sequences].sort((a, b) => a - b);
+      for (let i = 0; i < sortedSeq.length - 1; i++) {
+        expect(sortedSeq[i + 1] - sortedSeq[i]).toBe(1);
+      }
     });
   });
 });
