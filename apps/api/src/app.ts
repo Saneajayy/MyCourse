@@ -81,6 +81,20 @@ export function createApp(): Express {
 
   // 5. CORS Allow-List with Credentials
   const allowedOrigins = env.CORS_ORIGINS.split(',').map((o) => o.trim());
+  try {
+    const apiOrigin = new URL(env.API_URL).origin;
+    if (!allowedOrigins.includes(apiOrigin)) {
+      allowedOrigins.push(apiOrigin);
+    }
+  } catch {
+    // ignore invalid URL
+  }
+  if (env.NODE_ENV !== 'production') {
+    const localDevOrigin = `http://localhost:${env.PORT}`;
+    if (!allowedOrigins.includes(localDevOrigin)) {
+      allowedOrigins.push(localDevOrigin);
+    }
+  }
   app.use(
     cors({
       origin: (origin, callback) => {
