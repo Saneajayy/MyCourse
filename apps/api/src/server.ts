@@ -3,9 +3,18 @@ import { env } from './config/env.js';
 import { logger } from './common/logger/logger.js';
 import { prisma, checkDatabaseHealth } from './common/db/prisma.js';
 import { redisClient, checkRedisHealth } from './common/redis/redis.js';
+import { initializePaymentGateway } from './modules/payments/payment.service.js';
+import {
+  initializeReconciliationWorker,
+  stopReconciliationWorker,
+} from './modules/reconciliation/reconciliation.worker.js';
 
 async function startServer(): Promise<void> {
   const app = createApp();
+
+  // Initialize Payment Gateway and BullMQ Reconciliation Worker
+  initializePaymentGateway();
+  initializeReconciliationWorker();
 
   // Pre-flight boot readiness check
   const [dbHealthy, redisHealthy] = await Promise.all([checkDatabaseHealth(), checkRedisHealth()]);
@@ -39,6 +48,13 @@ async function startServer(): Promise<void> {
 
     server.close(async () => {
       logger.info('HTTP server closed');
+
+      try {
+        await stopReconciliationWorker();
+        logger.info('Reconciliation worker stopped');
+      } catch (err) {
+        logger.error({ err }, 'Error stopping reconciliation worker');
+      }
 
       try {
         await prisma.$disconnect();

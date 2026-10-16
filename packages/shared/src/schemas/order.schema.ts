@@ -28,6 +28,9 @@ export const createOrderSchema = z.object({
   productId: z.string().uuid(),
   couponCode: z.string().trim().toUpperCase().optional().nullable(),
   billingDetails: billingDetailsSchema.optional().nullable(),
+  utmSource: z.string().trim().max(100).optional().nullable(),
+  utmMedium: z.string().trim().max(100).optional().nullable(),
+  utmCampaign: z.string().trim().max(100).optional().nullable(),
 });
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
@@ -39,3 +42,10 @@ export const verifyPaymentSchema = z.object({
 });
 
 export type VerifyPaymentInput = z.infer<typeof verifyPaymentSchema>;
+
+export const createRefundSchema = z.object({
+  amountPaise: z.number().int().positive().optional().nullable(),
+  reason: z.string().trim().max(255).optional().nullable(),
+});
+
+export type CreateRefundInput = z.infer<typeof createRefundSchema>;

@@ -38,6 +38,7 @@ const envSchema = z.object({
   RAZORPAY_KEY_ID: z.string().default('rzp_test_placeholder_key_id'),
   RAZORPAY_KEY_SECRET: z.string().default('placeholder_razorpay_secret'),
   RAZORPAY_WEBHOOK_SECRET: z.string().default('placeholder_razorpay_webhook_secret_hex'),
+  PAYMENT_PROVIDER: z.enum(['razorpay', 'fake']).default('fake'),
 
   // Video delivery (Bunny Stream)
   BUNNY_STREAM_API_KEY: z.string().default('placeholder_bunny_api_key'),
@@ -79,4 +80,20 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data;
+
+// Safety check: Refuse to boot in production with test keys, and in test mode with live keys
+if (env.NODE_ENV === 'production' && env.RAZORPAY_KEY_ID.startsWith('rzp_test_')) {
+  console.error(
+    'FATAL SAFETY VIOLATION: Cannot boot in production mode with Razorpay test keys (rzp_test_*)',
+  );
+  process.exit(1);
+}
+
+if (env.NODE_ENV === 'test' && env.RAZORPAY_KEY_ID.startsWith('rzp_live_')) {
+  console.error(
+    'FATAL SAFETY VIOLATION: Cannot boot in test mode with Razorpay live keys (rzp_live_*)',
+  );
+  process.exit(1);
+}
+
 export type Env = typeof env;

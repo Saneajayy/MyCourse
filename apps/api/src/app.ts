@@ -14,7 +14,11 @@ import { healthRouter } from './modules/health/health.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
 import { sessionsRouter } from './modules/sessions/sessions.routes.js';
 import { adminCourseRouter, publicCourseRouter } from './modules/courses/course.routes.js';
+import { orderRouter, adminOrderRouter } from './modules/orders/order.routes.js';
+import { couponRouter, adminCouponRouter } from './modules/coupons/coupon.routes.js';
+import { invoiceRouter } from './modules/invoices/invoice.routes.js';
 import { bunnyWebhookController } from './modules/webhooks/bunny.webhook.js';
+import { razorpayWebhookController } from './modules/webhooks/razorpay.webhook.js';
 import { docsRouter } from './docs/openapi.js';
 
 declare global {
@@ -143,12 +147,22 @@ export function createApp(): Express {
   // Public Course Catalog routes (zero-leakage of paid video IDs)
   v1Router.use('/courses', publicCourseRouter);
 
+  // Student orders, payments, coupons, invoices
+  v1Router.use(orderRouter);
+  v1Router.use(couponRouter);
+  v1Router.use(invoiceRouter);
+
   // Admin Management routes (Protected by Auth + Admin Role + Mandatory 2FA)
   v1Router.use('/admin', adminCourseRouter);
+  v1Router.use('/admin', adminOrderRouter);
+  v1Router.use('/admin', adminCouponRouter);
 
-  // Bunny Webhook endpoint (Signature-verified, exempt from CORS/CSRF)
+  // Webhook endpoints (Signature-verified, exempt from CORS/CSRF)
   v1Router.post('/webhooks/bunny', (req, res, next) =>
     bunnyWebhookController.handleWebhook(req, res, next),
+  );
+  v1Router.post('/webhooks/razorpay', (req, res, next) =>
+    razorpayWebhookController.handleWebhook(req, res, next),
   );
 
   app.use('/api/v1', v1Router);

@@ -234,6 +234,9 @@ model Order {
   currency         String            @default("INR")
   razorpayOrderId  String?           @unique
   billingDetails   Json?
+  utmSource        String?
+  utmMedium        String?
+  utmCampaign      String?
   paidAt           DateTime?         @db.Timestamptz
   createdAt        DateTime          @default(now()) @db.Timestamptz
   updatedAt        DateTime          @updatedAt @db.Timestamptz

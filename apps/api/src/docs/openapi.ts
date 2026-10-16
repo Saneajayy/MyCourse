@@ -21,6 +21,11 @@ import {
   updateLessonSchema,
   reorderSchema,
   bunnyWebhookPayloadSchema,
+  createOrderSchema,
+  verifyPaymentSchema,
+  createRefundSchema,
+  createCouponSchema,
+  billingDetailsSchema,
 } from '@course/shared';
 
 // Extend Zod prototypes with .openapi(...)
@@ -69,6 +74,13 @@ const SuccessMessageResponseSchema = registry.register(
     }),
   }),
 );
+
+function SuccessResponse<T extends z.ZodTypeAny>(dataSchema: T) {
+  return z.object({
+    success: z.literal(true),
+    data: dataSchema,
+  });
+}
 
 const HealthResponseSchema = registry.register(
   'HealthResponse',
@@ -772,6 +784,222 @@ registry.registerPath({
       description: 'Invalid signature',
       content: { 'application/json': { schema: ErrorResponseSchema } },
     },
+  },
+});
+
+// Phase 4: Orders & Payments
+registry.register('BillingDetails', billingDetailsSchema);
+const CreateOrderInputSchema = registry.register('CreateOrderInput', createOrderSchema);
+const VerifyPaymentInputSchema = registry.register('VerifyPaymentInput', verifyPaymentSchema);
+const CreateRefundInputSchema = registry.register('CreateRefundInput', createRefundSchema);
+const CreateCouponInputSchema = registry.register('CreateCouponInput', createCouponSchema);
+
+registry.registerPath({
+  method: 'post',
+  path: '/orders',
+  summary: 'Create a new course purchase order with Idempotency-Key',
+  tags: ['Orders & Checkout'],
+  security: [{ BearerAuth: [] }],
+  parameters: [
+    {
+      name: 'Idempotency-Key',
+      in: 'header',
+      required: true,
+      schema: { type: 'string' },
+      description: 'Unique client-generated idempotency key preventing duplicate orders',
+    },
+  ],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: CreateOrderInputSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: 'Order created successfully',
+      content: {
+        'application/json': {
+          schema: SuccessResponse(
+            z.object({ order: z.any(), razorpayOrderId: z.string().nullable() }),
+          ),
+        },
+      },
+    },
+    400: {
+      description: 'Bad request or unverified email',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+    409: {
+      description: 'Idempotency key conflict',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/payments/verify',
+  summary: 'Verify Razorpay payment signature from browser checkout callback',
+  tags: ['Orders & Checkout'],
+  security: [{ BearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: VerifyPaymentInputSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Payment verified and entitlement granted',
+      content: {
+        'application/json': {
+          schema: SuccessResponse(
+            z.object({ order: z.any(), entitlement: z.any(), invoice: z.any() }),
+          ),
+        },
+      },
+    },
+    400: {
+      description: 'Invalid signature or amount mismatch',
+      content: { 'application/json': { schema: ErrorResponseSchema } },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/webhooks/razorpay',
+  summary: 'Razorpay webhook callback for captured payments and order events',
+  tags: ['Webhooks'],
+  parameters: [
+    {
+      name: 'X-Razorpay-Signature',
+      in: 'header',
+      required: true,
+      schema: { type: 'string' },
+      description: 'HMAC-SHA256 signature calculated over raw body using webhook secret',
+    },
+  ],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            event: z.string(),
+            payload: z.any(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Webhook received and processed idempotently',
+      content: {
+        'application/json': {
+          schema: z.object({ success: z.boolean(), message: z.string() }),
+        },
+      },
+    },
+    401: { description: 'Invalid webhook signature' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/admin/payments/{paymentId}/refund',
+  summary: 'Initiate full or partial refund via Razorpay Refund API',
+  tags: ['Admin Management'],
+  security: [{ BearerAuth: [] }],
+  parameters: [
+    {
+      name: 'paymentId',
+      in: 'path',
+      required: true,
+      schema: { type: 'string', format: 'uuid' },
+    },
+  ],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: CreateRefundInputSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Refund processed successfully',
+      content: {
+        'application/json': {
+          schema: SuccessResponse(z.object({ refund: z.any(), isFullRefund: z.boolean() })),
+        },
+      },
+    },
+    400: { description: 'Invalid refund amount or already refunded' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/invoices/{id}/download',
+  summary: 'Download generated PDF Tax Invoice',
+  tags: ['Invoices'],
+  security: [{ BearerAuth: [] }],
+  parameters: [
+    {
+      name: 'id',
+      in: 'path',
+      required: true,
+      schema: { type: 'string', format: 'uuid' },
+    },
+  ],
+  responses: {
+    200: {
+      description: 'PDF binary stream',
+      content: {
+        'application/pdf': {
+          schema: { type: 'string', format: 'binary' },
+        },
+      },
+    },
+    404: { description: 'Invoice not found' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/admin/coupons',
+  summary: 'Create discount coupon (Admin)',
+  tags: ['Admin Management'],
+  security: [{ BearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: CreateCouponInputSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: 'Coupon created successfully',
+      content: {
+        'application/json': {
+          schema: SuccessResponse(z.any()),
+        },
+      },
+    },
+    400: { description: 'Bad request or code already exists' },
   },
 });
 
