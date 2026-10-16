@@ -35,11 +35,11 @@ devRouter.get('/checkout', (_req, res) => {
 
   <div class="instructions">
     <strong>Razorpay Test Payment Instruments (INR Domestic):</strong><br>
-    &bull; <strong>Recommended (Fastest): UPI ID:</strong> <code>success@razorpay</code><br>
-    &bull; <strong>Domestic Visa Card:</strong> <code>4012 0000 0000 0002</code>, Exp: <code>12/28</code>, CVV: <code>123</code>, OTP: <code>123456</code><br>
-    &bull; <strong>Domestic Mastercard:</strong> <code>5123 4500 0000 0008</code>, Exp: <code>12/28</code>, CVV: <code>123</code>, OTP: <code>123456</code><br>
-    &bull; <strong>Netbanking:</strong> Select <strong>HDFC</strong> or <strong>ICICI</strong> and click <strong>Success</strong> on the Razorpay screen.<br>
-    &bull; <em>Note: <code>4111 1111 1111 1111</code> is an international Visa card and is blocked by Razorpay if international payments are disabled on your account.</em>
+    &bull; <strong>RuPay Domestic Card (Recommended):</strong> <code>6527 6589 0000 1005</code>, Exp: <code>12/28</code>, CVV: <code>123</code>, OTP: <code>123456</code><br>
+    &bull; <strong>Visa Domestic Debit:</strong> <code>4100 2800 0000 1007</code>, Exp: <code>12/28</code>, CVV: <code>123</code>, OTP: <code>123456</code><br>
+    &bull; <strong>Mastercard Domestic:</strong> <code>5555 5100 0008 1006</code>, Exp: <code>12/28</code>, CVV: <code>123</code>, OTP: <code>123456</code><br>
+    &bull; <strong>Wallet:</strong> Select <strong>Wallet</strong> (e.g. Mobikwik or Freecharge) and click <strong>Success</strong> on the test screen.<br>
+    &bull; <em>Note: If testing Netbanking, ensure your browser does not block popups from localhost.</em>
   </div>
 
   <div class="card">
