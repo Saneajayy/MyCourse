@@ -20,6 +20,7 @@ import { invoiceRouter } from './modules/invoices/invoice.routes.js';
 import { bunnyWebhookController } from './modules/webhooks/bunny.webhook.js';
 import { razorpayWebhookController } from './modules/webhooks/razorpay.webhook.js';
 import { docsRouter } from './docs/openapi.js';
+import { devRouter } from './modules/dev/checkout.routes.js';
 
 declare global {
   namespace Express {
@@ -123,9 +124,10 @@ export function createApp(): Express {
   app.use(healthRouter);
   app.use('/api/v1', healthRouter);
 
-  // 9. Interactive API Documentation (served at /docs in non-production)
+  // 9. Interactive API Documentation & Dev Checkout Test Page (served only in non-production)
   if (env.NODE_ENV !== 'production') {
     app.use('/docs', docsRouter);
+    app.use('/dev', devRouter);
   }
 
   // 10. API Version 1 Router

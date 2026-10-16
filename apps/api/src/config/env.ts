@@ -81,18 +81,40 @@ if (!parsed.success) {
 
 export const env = parsed.data;
 
-// Safety check: Refuse to boot in production with test keys, and in test mode with live keys
-if (env.NODE_ENV === 'production' && env.RAZORPAY_KEY_ID.startsWith('rzp_test_')) {
-  console.error(
-    'FATAL SAFETY VIOLATION: Cannot boot in production mode with Razorpay test keys (rzp_test_*)',
-  );
-  process.exit(1);
+export function validateProductionSafety(config: {
+  nodeEnv: string;
+  paymentProvider: string;
+  razorpayKeyId: string;
+}): void {
+  if (config.nodeEnv === 'production') {
+    if (config.paymentProvider === 'fake') {
+      throw new Error(
+        'FATAL SAFETY VIOLATION: PAYMENT_PROVIDER cannot be "fake" in production mode.',
+      );
+    }
+    if (config.razorpayKeyId.startsWith('rzp_test_')) {
+      throw new Error(
+        'FATAL SAFETY VIOLATION: Cannot boot in production mode with Razorpay test keys (rzp_test_*)',
+      );
+    }
+  }
+
+  if (config.nodeEnv === 'test' && config.razorpayKeyId.startsWith('rzp_live_')) {
+    throw new Error(
+      'FATAL SAFETY VIOLATION: Cannot boot in test mode with Razorpay live keys (rzp_live_*)',
+    );
+  }
 }
 
-if (env.NODE_ENV === 'test' && env.RAZORPAY_KEY_ID.startsWith('rzp_live_')) {
-  console.error(
-    'FATAL SAFETY VIOLATION: Cannot boot in test mode with Razorpay live keys (rzp_live_*)',
-  );
+// Safety check: Refuse to boot in production with fake gateway or test keys, and in test mode with live keys
+try {
+  validateProductionSafety({
+    nodeEnv: env.NODE_ENV,
+    paymentProvider: env.PAYMENT_PROVIDER,
+    razorpayKeyId: env.RAZORPAY_KEY_ID,
+  });
+} catch (err: any) {
+  console.error(err.message);
   process.exit(1);
 }
 

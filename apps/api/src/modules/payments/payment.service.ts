@@ -7,6 +7,10 @@ import { logger } from '../../common/logger/logger.js';
 let activeGateway: PaymentGateway | null = null;
 
 export function initializePaymentGateway(): PaymentGateway {
+  if (env.NODE_ENV === 'production' && env.PAYMENT_PROVIDER === 'fake') {
+    throw new Error('FATAL: Cannot initialize FakePaymentGateway in production mode.');
+  }
+
   if (env.PAYMENT_PROVIDER === 'razorpay' && env.NODE_ENV !== 'test') {
     logger.info({ keyId: env.RAZORPAY_KEY_ID }, 'Initializing RazorpayPaymentGateway');
     activeGateway = new RazorpayPaymentGateway({
@@ -29,5 +33,8 @@ export function getPaymentGateway(): PaymentGateway {
 }
 
 export function setPaymentGateway(gateway: PaymentGateway): void {
+  if (env.NODE_ENV === 'production' && gateway instanceof FakePaymentGateway) {
+    throw new Error('FATAL: Cannot set FakePaymentGateway in production mode.');
+  }
   activeGateway = gateway;
 }

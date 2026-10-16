@@ -28,7 +28,7 @@ export class OrderService {
   /**
    * Creates an order with strict server-side price computation from the database,
    * Idempotency-Key header support, double-purchase/renewal window validation,
-   * coupon application, and UTM parameter capture.
+   * coupon application (with atomic reservation under lock), and UTM parameter capture.
    */
   public async createOrder(input: CreateOrderInput, userId: string, idempotencyKey: string) {
     if (!idempotencyKey) {
@@ -59,7 +59,6 @@ export class OrderService {
     });
 
     if (existingOrder) {
-      // Check if parameters match
       const sameUser = existingOrder.userId === userId;
       const sameProduct = existingOrder.productId === input.productId;
       const sameCoupon = (existingOrder.coupon?.code ?? null) === (input.couponCode ?? null);
@@ -90,7 +89,6 @@ export class OrderService {
     // 4. Double-purchase prevention & Renewal window check
     const existingEntitlement = await entitlementService.getActiveEntitlement(userId, product.id);
     if (existingEntitlement) {
-      // Lifetime access
       if (product.validityDays === null || existingEntitlement.expiresAt === null) {
         throw new ForbiddenError('You already have lifetime access to this course.');
       }
@@ -113,7 +111,7 @@ export class OrderService {
       }
     }
 
-    // 5. Calculate pricing, discounts, and taxes atomically
+    // 5. Calculate pricing, discounts, and taxes atomically under transaction
     return prisma.$transaction(async (tx) => {
       let discountPaise = 0;
       let appliedCouponId: string | null = null;
@@ -140,7 +138,7 @@ export class OrderService {
       const orderId = uuidv7();
       let razorpayOrderId: string | null = null;
 
-      // 6. If total is 0 (100% coupon), skip payment gateway
+      // 6. If total is 0 (100% coupon), skip payment gateway and fulfill immediately
       if (is100PercentCoupon || totalPaise === 0) {
         const paidOrder = await tx.order.create({
           data: {
@@ -187,22 +185,27 @@ export class OrderService {
           });
         }
 
-        // Generate sequential invoice
-        const invMeta = await invoiceService.generateInvoiceNumberUnderLock(tx, new Date());
-        const invoice = await tx.invoice.create({
-          data: {
-            id: uuidv7(),
-            orderId,
-            invoiceNumber: invMeta.invoiceNumber,
-            financialYear: invMeta.financialYear,
-            sequenceNumber: invMeta.sequenceNumber,
-            subtotalPaise: 0,
-            taxPaise: 0,
-            totalPaise: 0,
-            billingDetails: (input.billingDetails as any) ?? {},
-            issuedAt: new Date(),
-          },
-        });
+        // Check if zero-value invoices are enabled in AppSetting (R9)
+        const shouldGenZeroInvoice = await invoiceService.shouldGenerateZeroValueInvoice();
+        let invoice = null;
+
+        if (shouldGenZeroInvoice) {
+          const invMeta = await invoiceService.generateInvoiceNumberUnderLock(tx, new Date());
+          invoice = await tx.invoice.create({
+            data: {
+              id: uuidv7(),
+              orderId,
+              invoiceNumber: invMeta.invoiceNumber,
+              financialYear: invMeta.financialYear,
+              sequenceNumber: invMeta.sequenceNumber,
+              subtotalPaise: 0,
+              taxPaise: 0,
+              totalPaise: 0,
+              billingDetails: (input.billingDetails as any) ?? {},
+              issuedAt: new Date(),
+            },
+          });
+        }
 
         await auditService.log({
           actorUserId: userId,
@@ -257,6 +260,19 @@ export class OrderService {
         },
         include: { product: true, coupon: true },
       });
+
+      // R5: Count redemption at order creation under row lock
+      if (appliedCouponId) {
+        await tx.couponRedemption.create({
+          data: {
+            id: uuidv7(),
+            couponId: appliedCouponId,
+            userId,
+            orderId,
+            discountPaise,
+          },
+        });
+      }
 
       await auditService.log({
         actorUserId: userId,
@@ -317,7 +333,7 @@ export class OrderService {
         throw new NotFoundError(`Order not found for identifier "${orderIdentifier}".`);
       }
 
-      // Idempotency: If already paid, return existing state immediately without repeating grants or invoice generation
+      // Idempotency: If already paid, return existing state immediately
       if (order.status === OrderStatus.PAID) {
         logger.info(
           { orderId: order.id },
@@ -337,11 +353,20 @@ export class OrderService {
         };
       }
 
-      // Validate payment status
-      if (paymentDetails.status !== 'captured' && paymentDetails.status !== 'authorized') {
+      // R1: Payment status must strictly be captured
+      if (paymentDetails.status !== 'captured') {
         throw new BadRequestError(
           `Cannot mark order paid for non-captured payment status "${paymentDetails.status}".`,
         );
+      }
+
+      // R2: If order was previously expired/cancelled by job, late payment is permitted and granted access
+      if (
+        order.status !== OrderStatus.CREATED &&
+        order.status !== OrderStatus.PENDING &&
+        order.status !== OrderStatus.CANCELLED
+      ) {
+        throw new BadRequestError(`Cannot mark order paid from status "${order.status}".`);
       }
 
       // Validate payment amount in paise against order total
@@ -362,20 +387,38 @@ export class OrderService {
         );
       }
 
-      // Record Payment record
-      const paymentId = uuidv7();
-      await tx.payment.create({
-        data: {
-          id: paymentId,
-          orderId: order.id,
-          razorpayPaymentId: paymentDetails.paymentId,
-          amountPaise: paymentDetails.amountPaise,
-          method: paymentDetails.method ?? 'gateway',
-          status: PaymentStatus.CAPTURED,
-          rawGatewayPayload: paymentDetails.rawGatewayPayload ?? {},
-          capturedAt: new Date(),
-        },
+      // Record or update Payment record
+      const existingPayment = await tx.payment.findUnique({
+        where: { razorpayPaymentId: paymentDetails.paymentId },
       });
+
+      let paymentId: string;
+      if (existingPayment) {
+        paymentId = existingPayment.id;
+        await tx.payment.update({
+          where: { id: existingPayment.id },
+          data: {
+            status: PaymentStatus.CAPTURED,
+            capturedAt: new Date(),
+            rawGatewayPayload:
+              paymentDetails.rawGatewayPayload ?? existingPayment.rawGatewayPayload,
+          },
+        });
+      } else {
+        paymentId = uuidv7();
+        await tx.payment.create({
+          data: {
+            id: paymentId,
+            orderId: order.id,
+            razorpayPaymentId: paymentDetails.paymentId,
+            amountPaise: paymentDetails.amountPaise,
+            method: paymentDetails.method ?? 'gateway',
+            status: PaymentStatus.CAPTURED,
+            rawGatewayPayload: paymentDetails.rawGatewayPayload ?? {},
+            capturedAt: new Date(),
+          },
+        });
+      }
 
       // Update Order to PAID
       const paidOrder = await tx.order.update({
@@ -396,20 +439,25 @@ export class OrderService {
         source: EntitlementSource.PURCHASE,
       });
 
-      // Record coupon redemption if coupon was attached
+      // Ensure coupon redemption is recorded (e.g. if order was expired and coupon was released)
       if (order.couponId) {
-        await tx.couponRedemption.create({
-          data: {
-            id: uuidv7(),
-            couponId: order.couponId,
-            userId: order.userId,
-            orderId: order.id,
-            discountPaise: order.discountPaise,
-          },
+        const existingRedemption = await tx.couponRedemption.findUnique({
+          where: { orderId: order.id },
         });
+        if (!existingRedemption) {
+          await tx.couponRedemption.create({
+            data: {
+              id: uuidv7(),
+              couponId: order.couponId,
+              userId: order.userId,
+              orderId: order.id,
+              discountPaise: order.discountPaise,
+            },
+          });
+        }
       }
 
-      // Generate sequential invoice number per financial year with no gaps under row lock
+      // Generate sequential invoice number per financial year with no gaps under row lock (R9: <= 16 chars)
       const invMeta = await invoiceService.generateInvoiceNumberUnderLock(tx, new Date());
       const invoice = await tx.invoice.create({
         data: {
@@ -489,13 +537,36 @@ export class OrderService {
   }
 
   /**
-   * Browser Verify Endpoint: Verifies HMAC signature, validates payment details from gateway,
-   * and delegates to markOrderPaid.
+   * Browser Verify Endpoint:
+   * 1. Validates ownership (R6: IDOR protection).
+   * 2. Verifies HMAC signature.
+   * 3. Fetches authoritative payment from gateway.
+   * 4. R1: If "authorized", keeps order PENDING (no entitlement/invoice).
+   * 5. If "captured", calls markOrderPaid.
    */
-  public async verifyBrowserPayment(input: VerifyPaymentInput, _userId?: string) {
+  public async verifyBrowserPayment(input: VerifyPaymentInput, userId: string) {
     const gateway = getPaymentGateway();
 
-    // 1. Verify HMAC SHA-256 signature in constant time
+    // 1. Fetch order and enforce ownership (R6)
+    const order = await prisma.order.findUnique({
+      where: { razorpayOrderId: input.razorpayOrderId },
+      include: { user: true },
+    });
+
+    if (!order) {
+      throw new NotFoundError(`Order with gateway ID "${input.razorpayOrderId}" not found.`);
+    }
+
+    const requestingUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, role: true },
+    });
+
+    if (order.userId !== userId && requestingUser?.role !== 'ADMIN') {
+      throw new ForbiddenError('You do not have permission to verify payment for this order.');
+    }
+
+    // 2. Verify HMAC SHA-256 signature in constant time
     const isValidSignature = gateway.verifyPaymentSignature({
       razorpayOrderId: input.razorpayOrderId,
       razorpayPaymentId: input.razorpayPaymentId,
@@ -510,132 +581,389 @@ export class OrderService {
       throw new BadRequestError('Invalid payment signature verification failed.');
     }
 
-    // 2. Fetch authoritative payment status directly from Gateway API
+    // 3. Fetch authoritative payment status directly from Gateway API
     const gatewayPayment = await gateway.fetchPayment(input.razorpayPaymentId);
 
-    // 3. Confirm order ID matches
+    // 4. Confirm order ID matches
     if (gatewayPayment.orderId !== input.razorpayOrderId) {
       throw new BadRequestError('Gateway payment does not match the specified order.');
     }
 
-    // 4. Call idempotent markOrderPaid
+    // R1: If payment is authorized, keep order PENDING and do NOT grant entitlement/invoice
+    if (gatewayPayment.status === 'authorized') {
+      logger.info(
+        { orderId: order.id, paymentId: gatewayPayment.id },
+        'Payment status is authorized; keeping order PENDING and deferring fulfillment to capture.',
+      );
+
+      const updatedOrder = await prisma.order.update({
+        where: { id: order.id },
+        data: { status: OrderStatus.PENDING },
+      });
+
+      const existingPayment = await prisma.payment.findUnique({
+        where: { razorpayPaymentId: gatewayPayment.id },
+      });
+
+      if (!existingPayment) {
+        await prisma.payment.create({
+          data: {
+            id: uuidv7(),
+            orderId: order.id,
+            razorpayPaymentId: gatewayPayment.id,
+            amountPaise: gatewayPayment.amountPaise,
+            method: gatewayPayment.method ?? 'gateway',
+            status: PaymentStatus.PENDING,
+            rawGatewayPayload: gatewayPayment as any,
+          },
+        });
+      }
+
+      return {
+        order: updatedOrder,
+        status: 'authorized',
+        message:
+          'Payment is authorized and pending capture. Entitlement will be activated upon capture confirmation.',
+        entitlement: null,
+        invoice: null,
+      };
+    }
+
+    // If payment failed at gateway
+    if (gatewayPayment.status === 'failed') {
+      await this.handlePaymentFailed(input.razorpayOrderId, {
+        paymentId: gatewayPayment.id,
+        amountPaise: gatewayPayment.amountPaise,
+        currency: gatewayPayment.currency,
+        errorMessage: (gatewayPayment as any).error_description,
+        rawGatewayPayload: gatewayPayment,
+      });
+
+      return {
+        order,
+        status: 'failed',
+        message: 'Payment attempt failed. Order remains open for retry.',
+        entitlement: null,
+        invoice: null,
+      };
+    }
+
+    // If captured: fulfill order
     return this.markOrderPaid(input.razorpayOrderId, {
       paymentId: gatewayPayment.id,
       amountPaise: gatewayPayment.amountPaise,
       currency: gatewayPayment.currency,
-      status: gatewayPayment.status,
+      status: 'captured',
       method: gatewayPayment.method,
       rawGatewayPayload: gatewayPayment,
     });
   }
 
   /**
-   * Processes admin-initiated full or partial refund via Razorpay Refund API
+   * Handles payment.failed: records the failure in Payment table, but keeps the
+   * Order in CREATED/PENDING so the customer can retry without creating a new order (R2).
    */
-  public async processRefund(paymentId: string, input: CreateRefundInput, adminUserId: string) {
-    const payment = await prisma.payment.findUnique({
-      where: { id: paymentId },
-      include: {
-        order: {
-          include: {
-            product: true,
-          },
-        },
-        refunds: true,
-      },
-    });
+  public async handlePaymentFailed(
+    orderIdentifier: string,
+    details: {
+      paymentId: string;
+      amountPaise: number;
+      currency: string;
+      errorMessage?: string;
+      rawGatewayPayload?: any;
+    },
+  ) {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      orderIdentifier,
+    );
+    const order = isUuid
+      ? await prisma.order.findUnique({ where: { id: orderIdentifier } })
+      : await prisma.order.findUnique({ where: { razorpayOrderId: orderIdentifier } });
 
-    if (!payment) {
-      throw new NotFoundError('Payment not found');
-    }
-
-    if (payment.status === PaymentStatus.REFUNDED) {
-      throw new BadRequestError('Payment has already been fully refunded.');
-    }
-
-    const previousRefundsTotal = payment.refunds
-      .filter((r) => r.status === RefundStatus.PROCESSED)
-      .reduce((acc, r) => acc + r.amountPaise, 0);
-
-    const availableForRefund = payment.amountPaise - previousRefundsTotal;
-    const requestedRefundAmount = input.amountPaise ?? availableForRefund;
-
-    if (requestedRefundAmount <= 0 || requestedRefundAmount > availableForRefund) {
-      throw new BadRequestError(
-        `Invalid refund amount. Available for refund: ${availableForRefund} paise, requested: ${requestedRefundAmount} paise.`,
+    if (!order) {
+      logger.warn(
+        { orderIdentifier },
+        'Order not found for payment.failed webhook; ignoring gracefully to prevent infinite retry',
       );
+      return { success: false, reason: 'ORDER_NOT_FOUND' };
     }
 
-    const isFullRefund = previousRefundsTotal + requestedRefundAmount >= payment.amountPaise;
-
-    // Call Razorpay Gateway
-    const gateway = getPaymentGateway();
-    const gatewayRefund = await gateway.createRefund({
-      paymentId: payment.razorpayPaymentId,
-      amountPaise: requestedRefundAmount,
-      reason: input.reason ?? 'Customer requested refund',
+    const existingPayment = await prisma.payment.findUnique({
+      where: { razorpayPaymentId: details.paymentId },
     });
 
+    if (existingPayment) {
+      await prisma.payment.update({
+        where: { id: existingPayment.id },
+        data: {
+          status: PaymentStatus.FAILED,
+          rawGatewayPayload: details.rawGatewayPayload ?? existingPayment.rawGatewayPayload,
+        },
+      });
+    } else {
+      await prisma.payment.create({
+        data: {
+          id: uuidv7(),
+          orderId: order.id,
+          razorpayPaymentId: details.paymentId,
+          amountPaise: details.amountPaise,
+          method: details.rawGatewayPayload?.method ?? 'gateway',
+          status: PaymentStatus.FAILED,
+          rawGatewayPayload: details.rawGatewayPayload ?? {},
+        },
+      });
+    }
+
+    logger.info(
+      { orderId: order.id, paymentId: details.paymentId, error: details.errorMessage },
+      'Payment failure recorded. Order kept open for retries.',
+    );
+
+    return { success: true, orderId: order.id };
+  }
+
+  /**
+   * R4: Initiates admin refund.
+   * Row-locks Payment under FOR UPDATE, validates that requested refund does not exceed
+   * (captured - already refunded/pending), calls gateway, and saves Refund as PENDING.
+   * Does NOT alter order or revoke entitlement until refund.processed webhook confirms it.
+   */
+  public async initiateRefund(paymentId: string, input: CreateRefundInput, adminUserId: string) {
     return prisma.$transaction(async (tx) => {
+      // Row lock Payment FOR UPDATE
+      const lockedPayments = await tx.$queryRaw<
+        Array<{
+          id: string;
+          amountPaise: number;
+          status: string;
+          razorpayPaymentId: string;
+          orderId: string;
+        }>
+      >`
+        SELECT id, "amountPaise", status, "razorpayPaymentId", "orderId"
+        FROM "Payment"
+        WHERE id = ${paymentId}::uuid
+        FOR UPDATE
+      `;
+
+      const payment = lockedPayments[0];
+      if (!payment) {
+        throw new NotFoundError('Payment not found');
+      }
+
+      if (payment.status !== PaymentStatus.CAPTURED) {
+        throw new BadRequestError(`Cannot refund payment with status "${payment.status}".`);
+      }
+
+      // Check existing refunds under lock (both PROCESSED and PENDING) to prevent concurrent over-refunds
+      const existingRefunds = await tx.refund.findMany({
+        where: {
+          paymentId: payment.id,
+          status: { in: [RefundStatus.PROCESSED, RefundStatus.PENDING] },
+        },
+      });
+
+      const alreadyRefundedPaise = existingRefunds.reduce((sum, r) => sum + r.amountPaise, 0);
+      const remainingRefundablePaise = payment.amountPaise - alreadyRefundedPaise;
+
+      const requestedPaise = input.amountPaise ?? remainingRefundablePaise;
+
+      if (requestedPaise <= 0) {
+        throw new BadRequestError('Refund amount must be greater than 0 paise.');
+      }
+
+      if (requestedPaise > remainingRefundablePaise) {
+        throw new BadRequestError(
+          `Invalid refund amount. Available for refund: ${remainingRefundablePaise} paise, requested: ${requestedPaise} paise.`,
+        );
+      }
+
+      // Call Gateway API
+      const gateway = getPaymentGateway();
+      const gatewayRefund = await gateway.createRefund({
+        paymentId: payment.razorpayPaymentId,
+        amountPaise: requestedPaise,
+        reason: input.reason ?? 'Customer requested refund',
+      });
+
+      // Save Refund record with status PENDING
       const refundRecord = await tx.refund.create({
         data: {
           id: uuidv7(),
           paymentId: payment.id,
           razorpayRefundId: gatewayRefund.id,
-          amountPaise: requestedRefundAmount,
+          amountPaise: requestedPaise,
           reason: input.reason,
-          status: RefundStatus.PROCESSED,
+          status: RefundStatus.PENDING,
           initiatedByAdminId: adminUserId,
         },
       });
 
-      // Update Payment status
-      if (isFullRefund) {
-        await tx.payment.update({
-          where: { id: payment.id },
-          data: { status: PaymentStatus.REFUNDED },
-        });
-
-        await tx.order.update({
-          where: { id: payment.orderId },
-          data: { status: OrderStatus.REFUNDED },
-        });
-
-        // Revoke entitlement on full refund
-        await entitlementService.revokeEntitlement(
-          tx,
-          payment.order.userId,
-          payment.order.productId,
-          input.reason ?? 'Full refund processed',
-        );
-      } else {
-        await tx.order.update({
-          where: { id: payment.orderId },
-          data: { status: OrderStatus.PARTIALLY_REFUNDED },
-        });
-      }
-
       await auditService.log({
         actorUserId: adminUserId,
-        action: isFullRefund ? 'PAYMENT_REFUNDED_FULL' : 'PAYMENT_REFUNDED_PARTIAL',
-        entityType: 'Payment',
-        entityId: payment.id,
+        action: 'PAYMENT_REFUND_INITIATED',
+        entityType: 'Refund',
+        entityId: refundRecord.id,
         afterState: {
-          refundId: refundRecord.id,
-          amountPaise: requestedRefundAmount,
-          isFullRefund,
+          paymentId: payment.id,
+          amountPaise: requestedPaise,
+          status: RefundStatus.PENDING,
         },
       });
 
       return {
         refund: refundRecord,
-        isFullRefund,
+        status: RefundStatus.PENDING,
+        message:
+          'Refund initiated with payment gateway. Status will update once confirmed via webhook.',
       };
     });
   }
 
   /**
-   * Reconciles stuck CREATED/PENDING orders by checking gateway status
+   * R4: Handles refund.processed webhook from Razorpay.
+   * Updates Refund to PROCESSED, sums all processed refunds on the payment,
+   * transitions Order/Payment to REFUNDED or PARTIALLY_REFUNDED, and revokes entitlement on full refund.
+   */
+  public async handleRefundProcessed(gatewayRefund: any) {
+    const refundId = gatewayRefund.id;
+    logger.info({ refundId }, 'Handling refund.processed webhook');
+
+    return prisma.$transaction(async (tx) => {
+      let refund = await tx.refund.findUnique({
+        where: { razorpayRefundId: refundId },
+        include: { payment: { include: { order: true } } },
+      });
+
+      if (!refund) {
+        const payment = await tx.payment.findUnique({
+          where: { razorpayPaymentId: gatewayRefund.payment_id },
+          include: { order: true },
+        });
+
+        if (!payment) {
+          logger.warn(
+            { gatewayRefund },
+            'Refund processed for unknown payment; skipping gracefully to prevent retry loops',
+          );
+          return { success: false, reason: 'PAYMENT_NOT_FOUND' };
+        }
+
+        refund = await tx.refund.create({
+          data: {
+            id: uuidv7(),
+            paymentId: payment.id,
+            razorpayRefundId: refundId,
+            amountPaise: gatewayRefund.amount,
+            status: RefundStatus.PENDING,
+          },
+          include: { payment: { include: { order: true } } },
+        });
+      }
+
+      if (refund.status === RefundStatus.PROCESSED) {
+        logger.info({ refundId }, 'Refund already marked PROCESSED; returning idempotently');
+        return { success: true, alreadyProcessed: true };
+      }
+
+      // Mark Refund as PROCESSED
+      await tx.refund.update({
+        where: { id: refund.id },
+        data: {
+          status: RefundStatus.PROCESSED,
+        },
+      });
+
+      // Row-lock Payment to atomically calculate total refunds
+      const paymentRows = await tx.$queryRaw<
+        Array<{ id: string; amountPaise: number; orderId: string }>
+      >`
+        SELECT id, "amountPaise", "orderId"
+        FROM "Payment"
+        WHERE id = ${refund.paymentId}::uuid
+        FOR UPDATE
+      `;
+      const lockedPayment = paymentRows[0];
+      if (!lockedPayment) {
+        throw new NotFoundError(`Payment ${refund.paymentId} not found under lock`);
+      }
+
+      const allProcessed = await tx.refund.findMany({
+        where: { paymentId: refund.paymentId, status: RefundStatus.PROCESSED },
+      });
+      const totalRefundedPaise = allProcessed.reduce((acc, r) => acc + r.amountPaise, 0);
+
+      const isFullRefund = totalRefundedPaise >= lockedPayment.amountPaise;
+
+      if (isFullRefund) {
+        await tx.payment.update({
+          where: { id: lockedPayment.id },
+          data: { status: PaymentStatus.REFUNDED },
+        });
+        await tx.order.update({
+          where: { id: lockedPayment.orderId },
+          data: { status: OrderStatus.REFUNDED },
+        });
+        // Revoke entitlement on full refund
+        await entitlementService.revokeEntitlement(
+          tx,
+          refund.payment.order.userId,
+          refund.payment.order.productId,
+          refund.reason ?? 'Full refund processed via gateway webhook',
+        );
+      } else {
+        await tx.order.update({
+          where: { id: lockedPayment.orderId },
+          data: { status: OrderStatus.PARTIALLY_REFUNDED },
+        });
+      }
+
+      await auditService.log({
+        actorUserId: refund.initiatedByAdminId || 'GATEWAY_WEBHOOK',
+        action: isFullRefund ? 'PAYMENT_REFUNDED_FULL' : 'PAYMENT_REFUNDED_PARTIAL',
+        entityType: 'Refund',
+        entityId: refund.id,
+        afterState: { totalRefundedPaise, isFullRefund },
+      });
+
+      return { success: true, isFullRefund, totalRefundedPaise };
+    });
+  }
+
+  /**
+   * R4: Handles refund.failed webhook from Razorpay.
+   * Updates Refund status to FAILED and preserves original order/entitlement.
+   */
+  public async handleRefundFailed(gatewayRefund: any) {
+    const refundId = gatewayRefund.id;
+    logger.warn({ refundId }, 'Handling refund.failed webhook');
+
+    const refund = await prisma.refund.findUnique({
+      where: { razorpayRefundId: refundId },
+    });
+
+    if (refund) {
+      await prisma.refund.update({
+        where: { id: refund.id },
+        data: { status: RefundStatus.FAILED },
+      });
+
+      await auditService.log({
+        actorUserId: 'GATEWAY_WEBHOOK',
+        action: 'PAYMENT_REFUND_FAILED',
+        entityType: 'Refund',
+        entityId: refund.id,
+        afterState: { refundId, error: gatewayRefund.error_description },
+      });
+    }
+
+    return { success: true };
+  }
+
+  /**
+   * Reconciles stuck CREATED/PENDING orders by checking gateway status.
+   * If captured: marks PAID.
+   * If stuck > 30 minutes with no payment: marks CANCELLED and releases coupon redemption (R5).
    */
   public async reconcileStuckOrders() {
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
@@ -674,12 +1002,18 @@ export class OrderService {
           });
           reconciled++;
         } else {
-          // If order is older than 2 hours with no captured payment, mark expired
-          const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
-          if (order.createdAt <= twoHoursAgo) {
-            await prisma.order.update({
-              where: { id: order.id },
-              data: { status: OrderStatus.CANCELLED },
+          // If order is older than 30 minutes with no captured payment, cancel order and release coupon
+          const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+          if (order.createdAt <= thirtyMinutesAgo) {
+            await prisma.$transaction(async (tx) => {
+              await tx.order.update({
+                where: { id: order.id },
+                data: { status: OrderStatus.CANCELLED },
+              });
+              // Release reserved coupon redemption (R5)
+              await tx.couponRedemption.deleteMany({
+                where: { orderId: order.id },
+              });
             });
             expired++;
           }

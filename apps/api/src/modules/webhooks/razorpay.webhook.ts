@@ -2,9 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import { uuidv7 } from 'uuidv7';
 import { prisma } from '../../common/db/prisma.js';
 import { getPaymentGateway } from '../payments/payment.service.js';
-import { orderService } from '../orders/order.service.js';
 import { logger } from '../../common/logger/logger.js';
 import { WebhookEventStatus } from '@course/shared';
+import { processWebhookPayload, webhookQueue } from './webhook.queue.js';
+import { env } from '../../config/env.js';
 
 export class RazorpayWebhookController {
   public async handleWebhook(req: Request, res: Response, _next: NextFunction): Promise<void> {
@@ -34,13 +35,11 @@ export class RazorpayWebhookController {
 
     const event = req.body;
     const eventType = event.event;
-    const paymentEntity = event.payload?.payment?.entity;
-    const orderEntity = event.payload?.order?.entity;
 
-    // Use specific entity ID or event ID as providerEventId for strict deduplication
-    const providerEventId = paymentEntity?.id
-      ? `${eventType}:${paymentEntity.id}`
-      : event.id || `evt_${Date.now()}_${Math.random()}`;
+    // R7: Dedupe using x-razorpay-event-id header
+    const eventHeaderId = (req.headers['x-razorpay-event-id'] as string) || event.id;
+    const providerEventId =
+      eventHeaderId || `evt_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
 
     // 1. Check for duplicate webhook delivery in WebhookEvent table
     const existing = await prisma.webhookEvent.findUnique({
@@ -50,9 +49,9 @@ export class RazorpayWebhookController {
     if (existing) {
       logger.info(
         { providerEventId, eventType },
-        'Duplicate Razorpay webhook received; returning 200 idempotently',
+        'Duplicate Razorpay webhook received (x-razorpay-event-id); returning 200 idempotently',
       );
-      res.status(200).json({ success: true, message: 'Event already processed' });
+      res.status(200).json({ success: true, message: 'Event already processed or queued' });
       return;
     }
 
@@ -68,45 +67,31 @@ export class RazorpayWebhookController {
       },
     });
 
-    try {
-      // 3. Process supported events
-      if (eventType === 'payment.captured' || eventType === 'order.paid') {
-        if (paymentEntity) {
-          const razorpayOrderId = paymentEntity.order_id || orderEntity?.id;
-          if (razorpayOrderId) {
-            await orderService.markOrderPaid(razorpayOrderId, {
-              paymentId: paymentEntity.id,
-              amountPaise: paymentEntity.amount,
-              currency: paymentEntity.currency,
-              status: paymentEntity.status,
-              method: paymentEntity.method,
-              rawGatewayPayload: paymentEntity,
-            });
-          }
-        }
+    // 3. Fast return (HTTP 200) and offload heavy processing to BullMQ
+    const jobData = {
+      eventId: providerEventId,
+      eventType,
+      payload: event.payload,
+      webhookEventDbId: webhookEventRecord.id,
+    };
+
+    if (env.NODE_ENV === 'test') {
+      // In tests, execute synchronously to allow immediate state assertions
+      await processWebhookPayload(jobData);
+    } else {
+      // In production/dev, enqueue to BullMQ queue for fast response
+      if (webhookQueue) {
+        await webhookQueue.add(eventType, jobData, {
+          attempts: 3,
+          backoff: { type: 'exponential', delay: 2000 },
+        });
+      } else {
+        await processWebhookPayload(jobData);
       }
-
-      await prisma.webhookEvent.update({
-        where: { id: webhookEventRecord.id },
-        data: {
-          status: WebhookEventStatus.PROCESSED,
-          processedAt: new Date(),
-        },
-      });
-
-      res.status(200).json({ success: true, message: 'Webhook processed successfully' });
-    } catch (err: any) {
-      logger.error({ err, providerEventId, eventType }, 'Failed to process Razorpay webhook');
-      await prisma.webhookEvent.update({
-        where: { id: webhookEventRecord.id },
-        data: {
-          status: WebhookEventStatus.FAILED,
-          error: err.message,
-        },
-      });
-      // Respond 200 so gateway does not infinitely spam for logical errors, or 500 for retryable
-      res.status(200).json({ success: false, error: err.message });
     }
+
+    // Return 200 immediately to gateway
+    res.status(200).json({ success: true, message: 'Webhook received and queued successfully' });
   }
 }
 

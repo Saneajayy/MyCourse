@@ -77,7 +77,7 @@ export class OrderController {
       const input = createRefundSchema.parse(req.body);
       const adminUserId = req.user!.id;
 
-      const result = await orderService.processRefund(paymentId, input, adminUserId);
+      const result = await orderService.initiateRefund(paymentId, input, adminUserId);
       res.status(200).json({
         success: true,
         data: result,

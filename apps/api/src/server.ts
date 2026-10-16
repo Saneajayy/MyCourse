@@ -8,13 +8,15 @@ import {
   initializeReconciliationWorker,
   stopReconciliationWorker,
 } from './modules/reconciliation/reconciliation.worker.js';
+import { initializeWebhookQueue, stopWebhookQueue } from './modules/webhooks/webhook.queue.js';
 
 async function startServer(): Promise<void> {
   const app = createApp();
 
-  // Initialize Payment Gateway and BullMQ Reconciliation Worker
+  // Initialize Payment Gateway and BullMQ Workers
   initializePaymentGateway();
   initializeReconciliationWorker();
+  initializeWebhookQueue();
 
   // Pre-flight boot readiness check
   const [dbHealthy, redisHealthy] = await Promise.all([checkDatabaseHealth(), checkRedisHealth()]);
@@ -54,6 +56,13 @@ async function startServer(): Promise<void> {
         logger.info('Reconciliation worker stopped');
       } catch (err) {
         logger.error({ err }, 'Error stopping reconciliation worker');
+      }
+
+      try {
+        await stopWebhookQueue();
+        logger.info('Webhook queue worker stopped');
+      } catch (err) {
+        logger.error({ err }, 'Error stopping webhook queue worker');
       }
 
       try {

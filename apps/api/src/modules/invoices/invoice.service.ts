@@ -29,10 +29,12 @@ export interface BusinessProfile {
 }
 
 export interface InvoiceConfig {
-  invoicePrefix: string;
-  financialYearFormat?: string;
-  currentSequence: number;
+  invoicePrefix?: string;
+  yearFormat?: 'short' | 'long';
+  sequencePadding?: number;
+  currentSequence?: number;
   financialYear?: string;
+  includeZeroValueInvoices?: boolean;
 }
 
 export interface TaxCalculationResult {
@@ -45,16 +47,21 @@ export interface TaxCalculationResult {
 }
 
 /**
- * Returns Indian Financial Year string (April 1 to March 31), e.g. "2026-2027"
+ * Returns Indian Financial Year string (April 1 to March 31).
+ * Default format is 'short' (e.g. "26-27") to ensure invoice numbers remain <= 16 characters.
  */
-export function getFinancialYear(date = new Date()): string {
+export function getFinancialYear(date = new Date(), format: 'short' | 'long' = 'short'): string {
   const year = date.getFullYear();
   const month = date.getMonth(); // 0 = Jan, 3 = April
-  if (month >= 3) {
-    return `${year}-${year + 1}`;
-  } else {
-    return `${year - 1}-${year}`;
+  const startYear = month >= 3 ? year : year - 1;
+  const endYear = startYear + 1;
+
+  if (format === 'short') {
+    const startYY = String(startYear).slice(-2);
+    const endYY = String(endYear).slice(-2);
+    return `${startYY}-${endYY}`;
   }
+  return `${startYear}-${endYear}`;
 }
 
 /**
@@ -118,23 +125,27 @@ export class InvoiceService {
   /**
    * Generates a sequential invoice number per financial year with no gaps,
    * safe under concurrent transactions using PostgreSQL row locking (FOR UPDATE).
+   * Shortens format to <= 16 characters (e.g. INV/26-27/00001).
    */
   public async generateInvoiceNumberUnderLock(
     tx: Prisma.TransactionClient,
     date = new Date(),
   ): Promise<{ invoiceNumber: string; financialYear: string; sequenceNumber: number }> {
-    const fy = getFinancialYear(date);
-
     // Lock the AppSetting row for 'invoice_config'
     const lockedRows = await tx.$queryRaw<Array<{ id: string; key: string; value: any }>>`
       SELECT id, key, value FROM "AppSetting" WHERE key = 'invoice_config' FOR UPDATE
     `;
 
-    let config: InvoiceConfig = lockedRows[0]?.value || {
+    const config: InvoiceConfig = lockedRows[0]?.value || {
       invoicePrefix: 'INV',
+      yearFormat: 'short',
+      sequencePadding: 5,
       currentSequence: 0,
-      financialYear: fy,
+      includeZeroValueInvoices: true,
     };
+
+    const yearFormat = config.yearFormat || 'short';
+    const fy = getFinancialYear(date, yearFormat);
 
     let nextSequence = 1;
     if (config.financialYear === fy) {
@@ -155,14 +166,29 @@ export class InvoiceService {
     });
 
     const prefix = config.invoicePrefix || 'INV';
-    const seqPadded = String(nextSequence).padStart(5, '0');
+    const padding = config.sequencePadding ?? 5;
+    const seqPadded = String(nextSequence).padStart(padding, '0');
     const invoiceNumber = `${prefix}/${fy}/${seqPadded}`;
+
+    if (invoiceNumber.length > 16 || !/^[A-Za-z0-9\-\/]{1,16}$/.test(invoiceNumber)) {
+      throw new Error(
+        `Generated invoice number "${invoiceNumber}" violates constraints (max 16 chars, allowed letters/digits/hyphen/slash).`,
+      );
+    }
 
     return {
       invoiceNumber,
       financialYear: fy,
       sequenceNumber: nextSequence,
     };
+  }
+
+  public async shouldGenerateZeroValueInvoice(): Promise<boolean> {
+    const setting = await prisma.appSetting.findUnique({
+      where: { key: 'invoice_config' },
+    });
+    const config = (setting?.value as unknown as InvoiceConfig) || {};
+    return config.includeZeroValueInvoices !== false;
   }
 
   /**
