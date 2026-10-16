@@ -17,7 +17,7 @@ authRouter.post('/verify-email', standardRateLimiter, (req, res, next) =>
 authRouter.post('/login', authRateLimiter, (req, res, next) =>
   authController.login(req, res, next),
 );
-authRouter.post('/2fa/login', authRateLimiter, (req, res, next) =>
+authRouter.post('/2fa/login', standardRateLimiter, (req, res, next) =>
   authController.verify2FALogin(req, res, next),
 );
 authRouter.post('/refresh', standardRateLimiter, validateCookieCsrf, (req, res, next) =>

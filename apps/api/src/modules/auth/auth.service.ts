@@ -334,18 +334,36 @@ export class AuthService {
 
     // 1. Try TOTP 6-digit code with anti-replay timestep tracking
     if (/^\d{6}$/.test(cleanInput)) {
+      const codeUsedKey = `totp:used_code:${userId}:${cleanInput}`;
+      const lastStepKey = `totp:last_timestep:${userId}`;
+
+      let codeAlreadyUsed = false;
+      let lastStep: string | null = null;
+      try {
+        const [usedVal, stepVal] = await Promise.all([
+          redisClient.get(codeUsedKey),
+          redisClient.get(lastStepKey),
+        ]);
+        codeAlreadyUsed = Boolean(usedVal);
+        lastStep = stepVal;
+      } catch {
+        // ignore cache error
+      }
+
+      if (codeAlreadyUsed) {
+        throw new UnauthorizedError(
+          'This two-factor authentication code has already been used within this time window. Please wait for the next 30-second code.',
+        );
+      }
+
       const secret = decryptData(user.twoFactorSecretEncrypted, env.TOTP_ENCRYPTION_KEY);
-      const res = await verifyTOTP({ token: cleanInput, secret });
+      const res = await verifyTOTP({ token: cleanInput, secret, epochTolerance: 30 });
 
       if (res.valid === true) {
-        const currentStep = Math.floor(Date.now() / 1000 / 30);
-        const lastStepKey = `totp:last_timestep:${userId}`;
-        let lastStep: string | null = null;
-        try {
-          lastStep = await redisClient.get(lastStepKey);
-        } catch {
-          lastStep = null;
-        }
+        const currentStep =
+          'timeStep' in res && typeof res.timeStep === 'number'
+            ? res.timeStep
+            : Math.floor(Date.now() / 1000 / 30);
 
         // B3: Reject reuse of a TOTP code within its time window by checking last used timestep
         if (lastStep && parseInt(lastStep, 10) === currentStep) {
@@ -355,7 +373,10 @@ export class AuthService {
         }
 
         try {
-          await redisClient.set(lastStepKey, currentStep.toString(), 'EX', 90);
+          await Promise.all([
+            redisClient.set(codeUsedKey, '1', 'EX', 90),
+            redisClient.set(lastStepKey, currentStep.toString(), 'EX', 90),
+          ]);
         } catch {
           // ignore cache error
         }

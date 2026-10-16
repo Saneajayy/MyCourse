@@ -602,6 +602,12 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
       // Clear any prior timestep cache for this admin
       await redisClient.del(`totp:last_timestep:${adminId}`);
 
+      // Ensure we are not within 3 seconds of a 30-second window boundary
+      const msIntoStep = Date.now() % 30000;
+      if (msIntoStep > 26000) {
+        await new Promise((r) => setTimeout(r, 30000 - msIntoStep + 100));
+      }
+
       // Admin logs in, gets 2FA tempToken challenge
       const loginRes = await request(app)
         .post('/api/v1/auth/login')
@@ -613,6 +619,7 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
       const admin = await prisma.user.findUnique({ where: { id: adminId } });
       const secret = decryptData(admin!.twoFactorSecretEncrypted!, env.TOTP_ENCRYPTION_KEY);
       const code = await generateTOTP({ secret });
+      await redisClient.del(`totp:used_code:${adminId}:${code}`);
 
       // 1. First verification succeeds
       const firstRes = await request(app).post('/api/v1/auth/2fa/login').send({ tempToken, code });

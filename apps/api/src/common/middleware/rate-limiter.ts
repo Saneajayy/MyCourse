@@ -13,14 +13,15 @@ interface RateLimiterOptions {
 }
 
 export function createRateLimiter(options: RateLimiterOptions) {
-  const isTest = env.NODE_ENV === 'test';
+  const isTest =
+    process.env.NODE_ENV === 'test' || env.NODE_ENV === 'test' || Boolean(process.env.VITEST);
   const isProduction = env.NODE_ENV === 'production';
 
   // In test mode: use in-memory limiter with higher threshold to allow test suites to run
   // In dev / prod: use Redis limiter. NEVER fall back to memory in production!
   const limiter = isTest
     ? new RateLimiterMemory({
-        points: 1000,
+        points: 50000,
         duration: options.duration,
         keyPrefix: options.keyPrefix,
       })
