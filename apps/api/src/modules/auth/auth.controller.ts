@@ -317,6 +317,43 @@ export class AuthController {
       next(err);
     }
   }
+
+  public async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new UnauthorizedError('Authentication required');
+      }
+
+      const { name, phone } = req.body;
+      const updatedUser = await authService.updateProfile(req.user.id, { name, phone });
+
+      res.status(200).json({
+        success: true,
+        data: {
+          user: updatedUser,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public async resendVerification(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        throw new UnauthorizedError('Authentication required');
+      }
+
+      const result = await authService.resendVerification(req.user.id);
+
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export const authController = new AuthController();

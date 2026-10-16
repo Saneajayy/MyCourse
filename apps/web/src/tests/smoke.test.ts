@@ -3,7 +3,7 @@ import { metadata } from '../app/layout.js';
 
 describe('Web Application Baseline Tests', () => {
   it('Configures SEO metadata for course landing page', () => {
-    expect(metadata.title).toContain('Hydraulic Engineering Masterclass');
+    expect(metadata.title).toContain('Hydraulic Engineering Academy');
     expect(metadata.description).toContain('hydraulic systems');
   });
 

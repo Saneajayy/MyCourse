@@ -23,6 +23,7 @@ import {
   UnauthorizedError,
   ForbiddenError,
   RateLimitError,
+  NotFoundError,
 } from '../../common/errors/app-error.js';
 import { RegisterInput, LoginInput, UserRole, UserStatus, AuditAction } from '@course/shared';
 
@@ -894,6 +895,52 @@ export class AuthService {
     });
 
     return { accessToken, refreshToken: rawRefreshToken };
+  }
+
+  public async updateProfile(
+    userId: string,
+    input: { name?: string; phone?: string },
+  ): Promise<UserSummary> {
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(input.name !== undefined && input.name.trim().length > 0
+          ? { name: input.name.trim() }
+          : {}),
+        ...(input.phone !== undefined ? { phone: input.phone?.trim() || null } : {}),
+      },
+    });
+
+    return sanitizeUser(user);
+  }
+
+  public async resendVerification(userId: string): Promise<{ message: string }> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+    if (user.emailVerifiedAt) {
+      return { message: 'Email is already verified.' };
+    }
+
+    const rawVerificationToken = generateRandomToken(32);
+    const verificationTokenHash = hashToken(rawVerificationToken);
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    await prisma.emailVerificationToken.create({
+      data: {
+        id: uuidv7(),
+        userId: user.id,
+        tokenHash: verificationTokenHash,
+        expiresAt,
+      },
+    });
+
+    await emailService.sendVerificationEmail(user.email, user.name, rawVerificationToken);
+
+    return { message: 'A new verification link has been sent to your email.' };
   }
 }
 

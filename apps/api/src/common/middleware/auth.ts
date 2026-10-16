@@ -8,6 +8,7 @@ export interface AuthenticatedUser {
   id: string;
   email: string;
   name: string;
+  phone?: string | null;
   role: UserRole;
   status: UserStatus;
   emailVerifiedAt: Date | null;
@@ -41,6 +42,7 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
         id: true,
         email: true,
         name: true,
+        phone: true,
         role: true,
         status: true,
         emailVerifiedAt: true,

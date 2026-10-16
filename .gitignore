@@ -41,6 +41,9 @@ coverage
 .turbo
 tmp
 temp
+test-results/
+playwright-report/
+*-report.json
 
 # Uploaded assets
 uploads/*

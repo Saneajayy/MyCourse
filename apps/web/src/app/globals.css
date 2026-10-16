@@ -11,49 +11,150 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Enforce thin black borders on buttons and tabs without shadows or gradients */
-.btn-primary {
-  background-color: #e05305;
-  color: #ffffff;
-  border: 1px solid #000000;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
-  transition: background-color 0.15s ease-in-out;
+/* Accessibility: Visible Focus States */
+:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
 }
 
-.btn-primary:hover {
+/* Accessible Skip Link */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  background: #000000;
+  color: #ffffff;
+  padding: 0.75rem 1.25rem;
+  z-index: 9999;
+  font-weight: 700;
+  border: 2px solid #e05305;
+  transition: top 0.2s ease-in-out;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* Enforce 44px minimum touch targets and thin 1px black borders on buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  background-color: #e05305;
+  color: #0a192f;
+  border: 1px solid #000000;
+  font-weight: 800;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  transition: background-color 0.15s ease-in-out;
+  cursor: pointer;
+}
+
+.btn-primary:hover:not(:disabled) {
   background-color: #c44500;
 }
 
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
   background-color: #ffffff;
   color: #0a192f;
   border: 1px solid #000000;
-  font-weight: 600;
-  padding: 0.5rem 1rem;
+  font-weight: 700;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
   transition: background-color 0.15s ease-in-out;
+  cursor: pointer;
 }
 
-.btn-outline:hover {
+.btn-outline:hover:not(:disabled) {
   background-color: #fff7ed;
 }
 
-.tab-item {
+.btn-outline:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 44px;
+  background-color: #0a192f;
+  color: #ffffff;
   border: 1px solid #000000;
-  padding: 0.5rem 1rem;
+  font-weight: 700;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  transition: background-color 0.15s ease-in-out;
+  cursor: pointer;
+}
+
+.btn-dark:hover:not(:disabled) {
+  background-color: #1e293b;
+}
+
+/* Tabs */
+.tab-item {
+  min-height: 44px;
+  border: 1px solid #000000;
+  padding: 0.5rem 1.25rem;
   background-color: #ffffff;
   color: #0a192f;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tab-item.active {
   background-color: #0a192f;
   color: #ffffff;
+}
+
+/* Form Inputs */
+.input-base {
+  min-height: 44px;
+  width: 100%;
+  border: 1px solid #000000;
+  padding: 0.625rem 0.875rem;
+  background-color: #ffffff;
+  color: #0a192f;
+  font-size: 0.9375rem;
+}
+
+.input-base:focus {
+  outline: 2px solid #000000;
+  outline-offset: 1px;
 }

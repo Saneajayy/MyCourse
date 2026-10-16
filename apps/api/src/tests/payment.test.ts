@@ -1324,6 +1324,18 @@ describe('Phase 4 Orders, Payments, Invoicing, and Entitlements Suite', () => {
       expect(invoiceDownload.status).toBe(200);
       expect(invoiceDownload.headers['content-type']).toBe('application/pdf');
     });
+
+    it('allows student to list their order history via GET /api/v1/orders', async () => {
+      const res = await request(app)
+        .get('/api/v1/orders')
+        .set('Authorization', `Bearer ${verifiedStudentToken}`);
+
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body.data)).toBe(true);
+      const studentAOrders = res.body.data.find((o: any) => o.id === studentAOrderId);
+      expect(studentAOrders).toBeDefined();
+      expect(studentAOrders.product).toBeDefined();
+    });
   });
 
   // ---------------------------------------------------------------------------

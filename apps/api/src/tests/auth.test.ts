@@ -1099,5 +1099,63 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
         _resetArgon2CapacityForTesting();
       }
     });
+
+    it('updates student name and phone via PATCH /api/v1/auth/me', async () => {
+      const email = `profile_update_${Date.now()}@test.com`;
+      const registerRes = await request(app).post('/api/v1/auth/register').send({
+        name: 'Original Student Name',
+        email,
+        password: 'RobustHydraulics#2026!Key',
+      });
+      expect(registerRes.status).toBe(201);
+
+      const loginRes = await request(app).post('/api/v1/auth/login').send({
+        email,
+        password: 'RobustHydraulics#2026!Key',
+      });
+      expect(loginRes.status).toBe(200);
+      const token = loginRes.body.data.accessToken;
+
+      const patchRes = await request(app)
+        .patch('/api/v1/auth/me')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          name: 'Updated Industrial Engineer',
+          phone: '+91 99887 76655',
+        });
+
+      expect(patchRes.status).toBe(200);
+      expect(patchRes.body.data.user.name).toBe('Updated Industrial Engineer');
+
+      // Verify GET /me returns the updated profile
+      const getMeRes = await request(app)
+        .get('/api/v1/auth/me')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(getMeRes.status).toBe(200);
+      expect(getMeRes.body.data.user.name).toBe('Updated Industrial Engineer');
+    });
+
+    it('resends verification email via POST /api/v1/auth/resend-verification', async () => {
+      const email = `resend_verify_${Date.now()}@test.com`;
+      await request(app).post('/api/v1/auth/register').send({
+        name: 'Unverified Student',
+        email,
+        password: 'RobustHydraulics#2026!Key',
+      });
+
+      const loginRes = await request(app).post('/api/v1/auth/login').send({
+        email,
+        password: 'RobustHydraulics#2026!Key',
+      });
+      const token = loginRes.body.data.accessToken;
+
+      const resendRes = await request(app)
+        .post('/api/v1/auth/resend-verification')
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(resendRes.status).toBe(200);
+      expect(resendRes.body.data.message).toContain('verification link has been sent');
+    });
   });
 });

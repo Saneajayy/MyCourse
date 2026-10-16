@@ -71,6 +71,37 @@ export class OrderController {
     }
   }
 
+  public async listUserOrders(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const orders = await prisma.order.findMany({
+        where: { userId },
+        include: {
+          product: {
+            select: { id: true, title: true, slug: true, thumbnailUrl: true },
+          },
+          coupon: {
+            select: { id: true, code: true, type: true, value: true },
+          },
+          invoice: {
+            select: { id: true, invoiceNumber: true, issuedAt: true, totalPaise: true },
+          },
+          payments: {
+            select: { id: true, status: true, amountPaise: true, method: true, capturedAt: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      res.status(200).json({
+        success: true,
+        data: orders,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   public async processRefund(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const paymentId = req.params.paymentId as string;

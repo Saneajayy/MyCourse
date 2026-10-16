@@ -9,6 +9,9 @@ export const orderRouter = Router();
 orderRouter.post('/orders', requireAuth, (req, res, next) =>
   orderController.createOrder(req, res, next),
 );
+orderRouter.get('/orders', requireAuth, (req, res, next) =>
+  orderController.listUserOrders(req, res, next),
+);
 orderRouter.get('/orders/:id', requireAuth, (req, res, next) =>
   orderController.getOrderById(req, res, next),
 );

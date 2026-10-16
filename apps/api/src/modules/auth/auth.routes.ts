@@ -45,6 +45,12 @@ authRouter.get('/google/callback', standardRateLimiter, (req, res, next) =>
 authRouter.get('/me', standardRateLimiter, requireAuth, (req, res, next) =>
   authController.getMe(req, res, next),
 );
+authRouter.patch('/me', standardRateLimiter, requireAuth, (req, res, next) =>
+  authController.updateProfile(req, res, next),
+);
+authRouter.post('/resend-verification', standardRateLimiter, requireAuth, (req, res, next) =>
+  authController.resendVerification(req, res, next),
+);
 authRouter.post(
   '/logout-all',
   standardRateLimiter,

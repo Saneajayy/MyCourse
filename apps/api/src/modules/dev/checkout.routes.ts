@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { env } from '../../config/env.js';
+import { prisma } from '../../common/db/prisma.js';
+import { uuidv7 } from 'uuidv7';
 
 export const devRouter = Router();
 
@@ -609,4 +611,43 @@ devRouter.get('/player', (_req, res) => {
 
   res.setHeader('Content-Type', 'text/html');
   res.send(html);
+});
+
+devRouter.post('/verify-student', async (req, res) => {
+  if (env.NODE_ENV === 'production') {
+    res.status(404).send('Not Found');
+    return;
+  }
+  const { email } = req.body;
+  if (!email) {
+    res.status(400).json({ success: false, error: 'Email required' });
+    return;
+  }
+  await prisma.user.update({
+    where: { email },
+    data: { emailVerifiedAt: new Date() },
+  });
+  res.json({ success: true, message: 'Student email verified for test' });
+});
+
+devRouter.post('/ensure-test-coupon', async (_req, res) => {
+  if (env.NODE_ENV === 'production') {
+    res.status(404).send('Not Found');
+    return;
+  }
+  const existing = await prisma.coupon.findUnique({ where: { code: 'FREE100' } });
+  if (!existing) {
+    await prisma.coupon.create({
+      data: {
+        id: uuidv7(),
+        code: 'FREE100',
+        type: 'PERCENT',
+        value: 100,
+        maxRedemptions: 1000,
+        perUserLimit: 10,
+        isActive: true,
+      },
+    });
+  }
+  res.json({ success: true, message: 'Coupon FREE100 ready' });
 });

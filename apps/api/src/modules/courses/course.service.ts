@@ -688,6 +688,7 @@ export class CourseService {
       token: playback.token,
       expiresAt: playback.expiresAt,
       embedUrl: playback.embedUrl,
+      playbackUrl: playback.playbackUrl,
     };
   }
 

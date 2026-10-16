@@ -38,6 +38,11 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
       code: issue.code,
     }));
 
+    logger.warn(
+      { details: formattedDetails, requestId, path: req.path, method: req.method },
+      'Request payload validation error',
+    );
+
     res.status(400).json({
       success: false,
       error: {
