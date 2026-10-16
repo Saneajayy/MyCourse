@@ -72,7 +72,10 @@ export class FakePaymentGateway implements PaymentGateway {
     if (!payment) {
       let matchedOrderId = 'order_unknown';
       if (paymentId.includes('_for_')) {
-        matchedOrderId = paymentId.split('_for_')[1];
+        const extracted = paymentId.split('_for_')[1];
+        if (extracted) {
+          matchedOrderId = extracted;
+        }
       }
       return {
         id: paymentId,
