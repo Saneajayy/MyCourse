@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 if (process.env.NODE_ENV === 'test') {
   dotenv.config({ path: path.resolve(__dirname, '../../../../.env.test'), override: true });
 }
-dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../../../.env'), override: true });
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),

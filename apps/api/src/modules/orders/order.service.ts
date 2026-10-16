@@ -112,67 +112,157 @@ export class OrderService {
     }
 
     // 5. Calculate pricing, discounts, and taxes atomically under transaction
-    return prisma.$transaction(async (tx) => {
-      let discountPaise = 0;
-      let appliedCouponId: string | null = null;
-      let is100PercentCoupon = false;
+    return prisma.$transaction(
+      async (tx) => {
+        let discountPaise = 0;
+        let appliedCouponId: string | null = null;
+        let is100PercentCoupon = false;
 
-      if (input.couponCode) {
-        const couponResult = await couponService.validateAndCalculateDiscount(
-          tx,
-          input.couponCode,
-          userId,
-          product.id,
-          product.pricePaise,
-        );
-        discountPaise = couponResult.discountPaise;
-        appliedCouponId = couponResult.couponId;
-        is100PercentCoupon = couponResult.is100Percent;
-      }
+        if (input.couponCode) {
+          const couponResult = await couponService.validateAndCalculateDiscount(
+            tx,
+            input.couponCode,
+            userId,
+            product.id,
+            product.pricePaise,
+          );
+          discountPaise = couponResult.discountPaise;
+          appliedCouponId = couponResult.couponId;
+          is100PercentCoupon = couponResult.is100Percent;
+        }
 
-      const taxCalculation = await calculateTaxAndTotals(product.pricePaise, discountPaise);
-      const totalPaise = taxCalculation.totalPaise;
-      const subtotalPaise = taxCalculation.subtotalPaise;
-      const taxPaise = taxCalculation.taxPaise;
+        const taxCalculation = await calculateTaxAndTotals(product.pricePaise, discountPaise);
+        const totalPaise = taxCalculation.totalPaise;
+        const subtotalPaise = taxCalculation.subtotalPaise;
+        const taxPaise = taxCalculation.taxPaise;
 
-      const orderId = uuidv7();
-      let razorpayOrderId: string | null = null;
+        const orderId = uuidv7();
+        let razorpayOrderId: string | null = null;
 
-      // 6. If total is 0 (100% coupon), skip payment gateway and fulfill immediately
-      if (is100PercentCoupon || totalPaise === 0) {
-        const paidOrder = await tx.order.create({
+        // 6. If total is 0 (100% coupon), skip payment gateway and fulfill immediately
+        if (is100PercentCoupon || totalPaise === 0) {
+          const paidOrder = await tx.order.create({
+            data: {
+              id: orderId,
+              userId,
+              productId: product.id,
+              couponId: appliedCouponId,
+              idempotencyKey,
+              status: OrderStatus.PAID,
+              subtotalPaise,
+              discountPaise,
+              taxPaise: 0,
+              totalPaise: 0,
+              currency: product.currency,
+              razorpayOrderId: null,
+              billingDetails: (input.billingDetails as any) ?? null,
+              utmSource: input.utmSource,
+              utmMedium: input.utmMedium,
+              utmCampaign: input.utmCampaign,
+              paidAt: new Date(),
+            },
+            include: { product: true, coupon: true },
+          });
+
+          // Grant entitlement immediately
+          await entitlementService.grantOrExtendEntitlement(tx, {
+            userId,
+            productId: product.id,
+            orderId,
+            validityDays: product.validityDays,
+            source: EntitlementSource.COUPON_100,
+          });
+
+          // Record coupon redemption
+          if (appliedCouponId) {
+            await tx.couponRedemption.create({
+              data: {
+                id: uuidv7(),
+                couponId: appliedCouponId,
+                userId,
+                orderId,
+                discountPaise,
+              },
+            });
+          }
+
+          // Check if zero-value invoices are enabled in AppSetting (R9)
+          const shouldGenZeroInvoice = await invoiceService.shouldGenerateZeroValueInvoice();
+          let invoice = null;
+
+          if (shouldGenZeroInvoice) {
+            const invMeta = await invoiceService.generateInvoiceNumberUnderLock(tx, new Date());
+            invoice = await tx.invoice.create({
+              data: {
+                id: uuidv7(),
+                orderId,
+                invoiceNumber: invMeta.invoiceNumber,
+                financialYear: invMeta.financialYear,
+                sequenceNumber: invMeta.sequenceNumber,
+                subtotalPaise: 0,
+                taxPaise: 0,
+                totalPaise: 0,
+                billingDetails: (input.billingDetails as any) ?? {},
+                issuedAt: new Date(),
+              },
+            });
+          }
+
+          await auditService.log({
+            actorUserId: userId,
+            action: 'ORDER_PAID_FREE_COUPON',
+            entityType: 'Order',
+            entityId: orderId,
+            afterState: paidOrder,
+          });
+
+          return {
+            order: paidOrder,
+            invoice,
+            razorpayOrderId: null,
+            razorpayKeyId: env.RAZORPAY_KEY_ID,
+            isReplay: false,
+          };
+        }
+
+        // 7. Create order on Razorpay Gateway
+        const gateway = getPaymentGateway();
+        const gatewayOrder = await gateway.createOrder({
+          amountPaise: totalPaise,
+          currency: product.currency,
+          receipt: `ord_${orderId.replace(/-/g, '').substring(0, 14)}`,
+          notes: {
+            orderId,
+            userId,
+            productId: product.id,
+          },
+        });
+
+        razorpayOrderId = gatewayOrder.id;
+
+        const order = await tx.order.create({
           data: {
             id: orderId,
             userId,
             productId: product.id,
             couponId: appliedCouponId,
             idempotencyKey,
-            status: OrderStatus.PAID,
+            status: OrderStatus.CREATED,
             subtotalPaise,
             discountPaise,
-            taxPaise: 0,
-            totalPaise: 0,
+            taxPaise,
+            totalPaise,
             currency: product.currency,
-            razorpayOrderId: null,
+            razorpayOrderId,
             billingDetails: (input.billingDetails as any) ?? null,
             utmSource: input.utmSource,
             utmMedium: input.utmMedium,
             utmCampaign: input.utmCampaign,
-            paidAt: new Date(),
           },
           include: { product: true, coupon: true },
         });
 
-        // Grant entitlement immediately
-        await entitlementService.grantOrExtendEntitlement(tx, {
-          userId,
-          productId: product.id,
-          orderId,
-          validityDays: product.validityDays,
-          source: EntitlementSource.COUPON_100,
-        });
-
-        // Record coupon redemption
+        // R5: Count redemption at order creation under row lock
         if (appliedCouponId) {
           await tx.couponRedemption.create({
             data: {
@@ -185,110 +275,23 @@ export class OrderService {
           });
         }
 
-        // Check if zero-value invoices are enabled in AppSetting (R9)
-        const shouldGenZeroInvoice = await invoiceService.shouldGenerateZeroValueInvoice();
-        let invoice = null;
-
-        if (shouldGenZeroInvoice) {
-          const invMeta = await invoiceService.generateInvoiceNumberUnderLock(tx, new Date());
-          invoice = await tx.invoice.create({
-            data: {
-              id: uuidv7(),
-              orderId,
-              invoiceNumber: invMeta.invoiceNumber,
-              financialYear: invMeta.financialYear,
-              sequenceNumber: invMeta.sequenceNumber,
-              subtotalPaise: 0,
-              taxPaise: 0,
-              totalPaise: 0,
-              billingDetails: (input.billingDetails as any) ?? {},
-              issuedAt: new Date(),
-            },
-          });
-        }
-
         await auditService.log({
           actorUserId: userId,
-          action: 'ORDER_PAID_FREE_COUPON',
+          action: 'ORDER_CREATED',
           entityType: 'Order',
           entityId: orderId,
-          afterState: paidOrder,
+          afterState: order,
         });
 
         return {
-          order: paidOrder,
-          invoice,
-          razorpayOrderId: null,
+          order,
+          razorpayOrderId,
           razorpayKeyId: env.RAZORPAY_KEY_ID,
           isReplay: false,
         };
-      }
-
-      // 7. Create order on Razorpay Gateway
-      const gateway = getPaymentGateway();
-      const gatewayOrder = await gateway.createOrder({
-        amountPaise: totalPaise,
-        currency: product.currency,
-        receipt: `ord_${orderId.replace(/-/g, '').substring(0, 14)}`,
-        notes: {
-          orderId,
-          userId,
-          productId: product.id,
-        },
-      });
-
-      razorpayOrderId = gatewayOrder.id;
-
-      const order = await tx.order.create({
-        data: {
-          id: orderId,
-          userId,
-          productId: product.id,
-          couponId: appliedCouponId,
-          idempotencyKey,
-          status: OrderStatus.CREATED,
-          subtotalPaise,
-          discountPaise,
-          taxPaise,
-          totalPaise,
-          currency: product.currency,
-          razorpayOrderId,
-          billingDetails: (input.billingDetails as any) ?? null,
-          utmSource: input.utmSource,
-          utmMedium: input.utmMedium,
-          utmCampaign: input.utmCampaign,
-        },
-        include: { product: true, coupon: true },
-      });
-
-      // R5: Count redemption at order creation under row lock
-      if (appliedCouponId) {
-        await tx.couponRedemption.create({
-          data: {
-            id: uuidv7(),
-            couponId: appliedCouponId,
-            userId,
-            orderId,
-            discountPaise,
-          },
-        });
-      }
-
-      await auditService.log({
-        actorUserId: userId,
-        action: 'ORDER_CREATED',
-        entityType: 'Order',
-        entityId: orderId,
-        afterState: order,
-      });
-
-      return {
-        order,
-        razorpayOrderId,
-        razorpayKeyId: env.RAZORPAY_KEY_ID,
-        isReplay: false,
-      };
-    });
+      },
+      { timeout: 25000, maxWait: 10000 },
+    );
   }
 
   /**
