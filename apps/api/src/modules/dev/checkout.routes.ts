@@ -225,11 +225,15 @@ devRouter.get('/player', (_req, res) => {
     return;
   }
 
+  // Ensure browser sends Referer header (http://localhost:4000) so Bunny Stream CDN allows video playback
+  res.setHeader('Referrer-Policy', 'no-referrer-when-downgrade');
+
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="no-referrer-when-downgrade">
   <title>Secure Player Test - Hydraulic Engineering Academy</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
   <style>
@@ -437,18 +441,61 @@ devRouter.get('/player', (_req, res) => {
           embedFrame.style.display = 'none';
           videoEl.style.display = 'block';
 
+          // Extract token query parameters from master playlist URL
+          const sourceUrl = new URL(info.playbackUrl);
+          const tokenSearch = sourceUrl.search;
+
           if (Hls.isSupported()) {
             if (hls) hls.destroy();
-            hls = new Hls();
-            hls.loadSource(info.playbackUrl);
-            hls.attachMedia(videoEl);
+            hls = new Hls({
+              debug: false,
+              enableWorker: true,
+              lowLatencyMode: true,
+              xhrSetup: function (xhr, url) {
+                // Ensure auth token and expiration are propagated to variant playlists and segment chunks
+                if (tokenSearch && !url.includes('token=')) {
+                  const sep = url.includes('?') ? '&' : '?';
+                  xhr.open('GET', url + sep + tokenSearch.substring(1), true);
+                }
+              }
+            });
+
+            hls.on(Hls.Events.ERROR, function (event, data) {
+              log({
+                hlsError: data.type,
+                details: data.details,
+                fatal: data.fatal,
+                response: data.response ? { code: data.response.code, status: data.response.text } : null
+              });
+              if (data.fatal) {
+                switch (data.type) {
+                  case Hls.ErrorTypes.NETWORK_ERROR:
+                    log('Network error loading stream, retrying...');
+                    hls.startLoad();
+                    break;
+                  case Hls.ErrorTypes.MEDIA_ERROR:
+                    log('Media decode error, attempting recovery...');
+                    hls.recoverMediaError();
+                    break;
+                  default:
+                    hls.destroy();
+                    break;
+                }
+              }
+            });
+
             hls.on(Hls.Events.MANIFEST_PARSED, function () {
               log('HLS manifest parsed. Resuming from ' + info.progress.lastPositionSeconds + 's...');
               if (info.progress.lastPositionSeconds > 0) {
                 videoEl.currentTime = info.progress.lastPositionSeconds;
               }
-              videoEl.play().catch(e => log('Autoplay note: ' + e.message));
+              videoEl.play().catch(e => {
+                log('Autoplay notice: ' + e.message + ' (Click Play on the video controls to start)');
+              });
             });
+
+            hls.loadSource(info.playbackUrl);
+            hls.attachMedia(videoEl);
           } else if (videoEl.canPlayType('application/vnd.apple.mpegurl')) {
             // Native HLS for Safari / iOS
             videoEl.src = info.playbackUrl;
@@ -457,6 +504,12 @@ devRouter.get('/player', (_req, res) => {
             }
             videoEl.play().catch(e => log('Autoplay note: ' + e.message));
           }
+
+          videoEl.onplay = () => log('Video playback started.');
+          videoEl.onplaying = () => log('Video playing active stream.');
+          videoEl.onwaiting = () => log('Video buffering...');
+          videoEl.onerror = () => log({ videoTagError: videoEl.error ? { code: videoEl.error.code, message: videoEl.error.message } : 'Unknown video error' });
+
         } else {
           // Bunny embed iframe fallback
           videoEl.style.display = 'none';
@@ -506,7 +559,11 @@ devRouter.get('/player', (_req, res) => {
       // Heartbeat every 15 seconds
       heartbeatTimer = setInterval(async () => {
         const pos = Math.floor(videoEl.currentTime);
-        watchedSecondsCounter += 15;
+
+        // Only increment watched time when the video is actively playing
+        if (!videoEl.paused && !videoEl.ended && pos > 0) {
+          watchedSecondsCounter += 15;
+        }
         document.getElementById('displayWatched').textContent = watchedSecondsCounter + 's';
 
         log('Sending heartbeat: pos=' + pos + 's, watched=' + watchedSecondsCounter + 's...');
