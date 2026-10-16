@@ -167,7 +167,8 @@ devRouter.get('/checkout', (_req, res) => {
           order_id: rzpOrderId,
           prefill: {
             email: document.getElementById('email').value,
-            name: 'Dev Tester'
+            name: 'Dev Tester',
+            contact: '9876543210'
           },
           theme: { color: '#0284c7' },
           handler: async function (response) {
