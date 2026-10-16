@@ -70,10 +70,13 @@ export class FakePaymentGateway implements PaymentGateway {
   public async fetchPayment(paymentId: string): Promise<GatewayPayment> {
     const payment = this.payments.get(paymentId);
     if (!payment) {
-      // Default to captured payment matching order if simulated
+      let matchedOrderId = 'order_unknown';
+      if (paymentId.includes('_for_')) {
+        matchedOrderId = paymentId.split('_for_')[1];
+      }
       return {
         id: paymentId,
-        orderId: 'order_unknown',
+        orderId: matchedOrderId,
         amountPaise: 499900,
         currency: 'INR',
         status: 'captured',
