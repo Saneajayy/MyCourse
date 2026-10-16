@@ -9,6 +9,10 @@ import {
   stopReconciliationWorker,
 } from './modules/reconciliation/reconciliation.worker.js';
 import { initializeWebhookQueue, stopWebhookQueue } from './modules/webhooks/webhook.queue.js';
+import {
+  initializeExpiryWorker,
+  stopExpiryWorker,
+} from './modules/entitlements/entitlement-expiry.worker.js';
 
 async function startServer(): Promise<void> {
   const app = createApp();
@@ -17,6 +21,7 @@ async function startServer(): Promise<void> {
   initializePaymentGateway();
   initializeReconciliationWorker();
   initializeWebhookQueue();
+  initializeExpiryWorker();
 
   // Pre-flight boot readiness check
   const [dbHealthy, redisHealthy] = await Promise.all([checkDatabaseHealth(), checkRedisHealth()]);
@@ -63,6 +68,13 @@ async function startServer(): Promise<void> {
         logger.info('Webhook queue worker stopped');
       } catch (err) {
         logger.error({ err }, 'Error stopping webhook queue worker');
+      }
+
+      try {
+        await stopExpiryWorker();
+        logger.info('Entitlement expiry worker stopped');
+      } catch (err) {
+        logger.error({ err }, 'Error stopping entitlement expiry worker');
       }
 
       try {

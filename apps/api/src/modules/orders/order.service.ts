@@ -21,6 +21,7 @@ import { couponService } from '../coupons/coupon.service.js';
 import { entitlementService } from '../entitlements/entitlement.service.js';
 import { calculateTaxAndTotals, invoiceService } from '../invoices/invoice.service.js';
 import { auditService } from '../audit/audit.service.js';
+import { streamService } from '../video/stream.service.js';
 import { logger } from '../../common/logger/logger.js';
 import { env } from '../../config/env.js';
 
@@ -832,7 +833,7 @@ export class OrderService {
     const refundId = gatewayRefund.id;
     logger.info({ refundId }, 'Handling refund.processed webhook');
 
-    return prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       let refund = await tx.refund.findUnique({
         where: { razorpayRefundId: refundId },
         include: { payment: { include: { order: true } } },
@@ -929,8 +930,19 @@ export class OrderService {
         afterState: { totalRefundedPaise, isFullRefund },
       });
 
-      return { success: true, isFullRefund, totalRefundedPaise };
+      return {
+        success: true,
+        isFullRefund,
+        totalRefundedPaise,
+        userId: refund.payment.order.userId,
+      };
     });
+
+    if (result.isFullRefund && result.userId) {
+      await streamService.clearUserSessions(result.userId).catch(() => {});
+    }
+
+    return result;
   }
 
   /**

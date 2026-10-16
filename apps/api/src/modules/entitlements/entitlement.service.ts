@@ -12,11 +12,21 @@ export interface GrantEntitlementParams {
 }
 
 export class EntitlementService {
+  private getNow: () => Date = () => new Date();
+
+  public setClock(clockFn: () => Date): void {
+    this.getNow = clockFn;
+  }
+
+  public resetClock(): void {
+    this.getNow = () => new Date();
+  }
+
   /**
    * Checks if user currently has valid active access to a product
    */
   public async hasActiveAccess(userId: string, productId: string): Promise<boolean> {
-    const now = new Date();
+    const now = this.getNow();
     const entitlement = await prisma.entitlement.findFirst({
       where: {
         userId,
@@ -32,7 +42,7 @@ export class EntitlementService {
    * Retrieves active entitlement details if exists
    */
   public async getActiveEntitlement(userId: string, productId: string) {
-    const now = new Date();
+    const now = this.getNow();
     return prisma.entitlement.findFirst({
       where: {
         userId,
@@ -54,7 +64,7 @@ export class EntitlementService {
     tx: Prisma.TransactionClient,
     params: GrantEntitlementParams,
   ) {
-    const now = new Date();
+    const now = this.getNow();
 
     const existing = await tx.entitlement.findFirst({
       where: {

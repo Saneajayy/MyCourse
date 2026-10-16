@@ -19,6 +19,8 @@ import { couponRouter, adminCouponRouter } from './modules/coupons/coupon.routes
 import { invoiceRouter } from './modules/invoices/invoice.routes.js';
 import { bunnyWebhookController } from './modules/webhooks/bunny.webhook.js';
 import { razorpayWebhookController } from './modules/webhooks/razorpay.webhook.js';
+import { playbackRouter, studentCourseRouter } from './modules/video/playback.routes.js';
+import { adminEntitlementRouter } from './modules/entitlements/admin-entitlement.routes.js';
 import { docsRouter } from './docs/openapi.js';
 import { devRouter } from './modules/dev/checkout.routes.js';
 
@@ -168,10 +170,15 @@ export function createApp(): Express {
   v1Router.use(couponRouter);
   v1Router.use(invoiceRouter);
 
+  // Student video playback, heartbeat, and course progress
+  v1Router.use(playbackRouter);
+  v1Router.use(studentCourseRouter);
+
   // Admin Management routes (Protected by Auth + Admin Role + Mandatory 2FA)
   v1Router.use('/admin', adminCourseRouter);
   v1Router.use('/admin', adminOrderRouter);
   v1Router.use('/admin', adminCouponRouter);
+  v1Router.use('/admin', adminEntitlementRouter);
 
   // Webhook endpoints (Signature-verified, exempt from CORS/CSRF)
   v1Router.post('/webhooks/bunny', (req, res, next) =>

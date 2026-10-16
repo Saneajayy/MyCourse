@@ -4,3 +4,4 @@ export * from './schemas/auth.schema.js';
 export * from './schemas/product.schema.js';
 export * from './schemas/order.schema.js';
 export * from './schemas/coupon.schema.js';
+export * from './schemas/playback.schema.js';

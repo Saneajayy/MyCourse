@@ -22,6 +22,7 @@ export class BunnyStreamProvider implements VideoProvider {
   private apiKey: string;
   private tokenSecurityKey: string;
   private readOnlyApiKey?: string;
+  private cdnHostname?: string;
   private baseUrl: string;
 
   constructor(config: BunnyStreamConfig) {
@@ -29,6 +30,7 @@ export class BunnyStreamProvider implements VideoProvider {
     this.apiKey = config.apiKey;
     this.tokenSecurityKey = config.tokenSecurityKey;
     this.readOnlyApiKey = config.readOnlyApiKey || config.webhookSecret;
+    this.cdnHostname = config.cdnHostname;
     this.baseUrl = 'https://video.bunnycdn.com';
   }
 
@@ -109,8 +111,16 @@ export class BunnyStreamProvider implements VideoProvider {
 
     const embedUrl = `https://player.mediadelivery.net/embed/${this.libraryId}/${videoId}?token=${token}&expires=${expirationTimestamp}`;
 
+    // Direct HLS stream URL with directory token authentication (token_path)
+    const tokenPath = `/${videoId}/`;
+    const hlsHashString = `${this.tokenSecurityKey}${tokenPath}${expirationTimestamp}`;
+    const hlsToken = crypto.createHash('sha256').update(hlsHashString).digest('hex');
+    const cdnHostname = this.cdnHostname || `vz-${this.libraryId}.b-cdn.net`;
+    const playbackUrl = `https://${cdnHostname}/${videoId}/playlist.m3u8?token=${hlsToken}&expires=${expirationTimestamp}&token_path=${encodeURIComponent(tokenPath)}`;
+
     return {
       embedUrl,
+      playbackUrl,
       expiresAt: expirationTimestamp,
       token,
     };

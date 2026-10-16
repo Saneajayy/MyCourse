@@ -66,6 +66,7 @@ export class FakeVideoProvider implements VideoProvider {
 
     return {
       embedUrl: `https://player.mediadelivery.net/embed/${this.libraryId}/${videoId}?token=${token}&expires=${expirationTimestamp}`,
+      playbackUrl: `https://video.fake-cdn.local/${this.libraryId}/${videoId}/playlist.m3u8?token=${token}&expires=${expirationTimestamp}`,
       expiresAt: expirationTimestamp,
       token,
     };
