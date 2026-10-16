@@ -34,10 +34,12 @@ devRouter.get('/checkout', (_req, res) => {
   <div class="badge">DEVELOPMENT ONLY &bull; TEST MODE</div>
 
   <div class="instructions">
-    <strong>Razorpay Test Cards & Instruments:</strong><br>
-    &bull; <strong>Success Card:</strong> <code>4111 1111 1111 1111</code>, Exp: <code>12/28</code>, CVV: <code>123</code>, OTP: <code>123456</code><br>
-    &bull; <strong>Failure Card:</strong> <code>4000 0000 0000 1002</code> (Simulates Bank Card Declined)<br>
-    &bull; <strong>Success UPI:</strong> <code>success@razorpay</code> &bull; <strong>Failure UPI:</strong> <code>failure@razorpay</code>
+    <strong>Razorpay Test Payment Instruments (INR Domestic):</strong><br>
+    &bull; <strong>Recommended (Fastest): UPI ID:</strong> <code>success@razorpay</code><br>
+    &bull; <strong>Domestic Visa Card:</strong> <code>4012 0000 0000 0002</code>, Exp: <code>12/28</code>, CVV: <code>123</code>, OTP: <code>123456</code><br>
+    &bull; <strong>Domestic Mastercard:</strong> <code>5123 4500 0000 0008</code>, Exp: <code>12/28</code>, CVV: <code>123</code>, OTP: <code>123456</code><br>
+    &bull; <strong>Netbanking:</strong> Select <strong>HDFC</strong> or <strong>ICICI</strong> and click <strong>Success</strong> on the Razorpay screen.<br>
+    &bull; <em>Note: <code>4111 1111 1111 1111</code> is an international Visa card and is blocked by Razorpay if international payments are disabled on your account.</em>
   </div>
 
   <div class="card">
