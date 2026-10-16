@@ -39,8 +39,9 @@ export async function processWebhookPayload(
         }
 
         // S3: Validate order ID, amount in paise, and currency against our database order
-        const isUuid =
-          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId);
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          orderId,
+        );
         const dbOrder = isUuid
           ? await prisma.order.findUnique({ where: { id: orderId } })
           : await prisma.order.findUnique({ where: { razorpayOrderId: orderId } });
@@ -102,8 +103,9 @@ export async function processWebhookPayload(
         const orderId = order?.id || payment?.order_id;
         if (orderId && payment) {
           // S3: Validate order ID, amount in paise, and currency against our database order
-          const isUuid =
-            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId);
+          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            orderId,
+          );
           const dbOrder = isUuid
             ? await prisma.order.findUnique({ where: { id: orderId } })
             : await prisma.order.findUnique({ where: { razorpayOrderId: orderId } });

@@ -159,7 +159,7 @@ All three payment confirmation pathways delegate to a single core function `mark
 
 > [!IMPORTANT]
 > **Auto-Capture Clarification:** Razorpay **does NOT** automatically emit `payment.captured` unless **Auto-Capture** is explicitly enabled. If auto-capture is disabled on your Razorpay merchant account, payments will transition to `authorized` and remain there until captured manually or voided after the authorization window.
-> 
+>
 > 1. **Merchant Setting:** You must enable Auto-Capture in the Razorpay Dashboard under **Settings $\rightarrow$ Payment Capture $\rightarrow$ Automatically capture all payments**.
 > 2. **Order Creation Directive:** When creating orders via the Razorpay API, our backend also explicitly sets `payment_capture: 1` as a belt-and-suspenders measure.
 > 3. **Critical Alert Monitoring:** Payments sitting in the `authorized` (or `PENDING`) state for **more than 15 minutes** trigger an error-level alert (`CRITICAL ALERT`) in the reconciliation worker (`orderService.reconcileStuckOrders`), alerting the engineering and operations team to either enable auto-capture or manually capture the transaction.
