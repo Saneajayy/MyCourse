@@ -11,6 +11,8 @@ import {
   EntitlementStatus,
 } from '@course/shared';
 import { NotFoundError, BadRequestError } from '../../common/errors/app-error.js';
+import { emailService } from '../../common/email/email.service.js';
+import { logger } from '../../common/logger/logger.js';
 
 export class AdminEntitlementController {
   /**
@@ -64,6 +66,24 @@ export class AdminEntitlementController {
         ipAddress: req.ip,
         userAgent: req.headers['user-agent'],
       });
+
+      // Send email notification to user
+      try {
+        await emailService.sendAdminAccessGrantedEmail({
+          to: targetUser.email,
+          name: targetUser.name,
+          courseTitle: product.title,
+          slug: product.slug,
+          entitlementId: entitlement.id,
+          expiresAt: entitlement.expiresAt,
+          userId: targetUser.id,
+        });
+      } catch (emailErr) {
+        logger.error(
+          { emailErr, targetUserId, entitlementId: entitlement.id },
+          'Failed to dispatch admin access granted email',
+        );
+      }
 
       res.status(201).json({
         success: true,

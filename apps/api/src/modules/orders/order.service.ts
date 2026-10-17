@@ -22,6 +22,7 @@ import { entitlementService } from '../entitlements/entitlement.service.js';
 import { calculateTaxAndTotals, invoiceService } from '../invoices/invoice.service.js';
 import { auditService } from '../audit/audit.service.js';
 import { streamService } from '../video/stream.service.js';
+import { emailService } from '../../common/email/email.service.js';
 import { logger } from '../../common/logger/logger.js';
 import { env } from '../../config/env.js';
 
@@ -528,6 +529,9 @@ export class OrderService {
           result.userDetails.courseTitle,
           result.order.totalPaise,
           pdfUrl,
+          result.order.id,
+          result.order.userId,
+          (result as any).entitlement?.expiresAt,
         );
       } catch (err) {
         logger.error(
@@ -935,11 +939,48 @@ export class OrderService {
         isFullRefund,
         totalRefundedPaise,
         userId: refund.payment.order.userId,
+        refundId: refund.id,
       };
     });
 
     if (result.isFullRefund && result.userId) {
       await streamService.clearUserSessions(result.userId).catch(() => {});
+    }
+
+    if (result.success && !result.alreadyProcessed && (result as any).refundId) {
+      try {
+        const fullRefund = await prisma.refund.findUnique({
+          where: { id: (result as any).refundId },
+          include: {
+            payment: {
+              include: {
+                order: {
+                  include: {
+                    user: true,
+                    product: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        if (fullRefund?.payment?.order?.user) {
+          const ord = fullRefund.payment.order;
+          await emailService.sendRefundConfirmationEmail({
+            to: ord.user.email,
+            name: ord.user.name,
+            courseTitle: ord.product.title,
+            orderId: ord.id,
+            refundId: fullRefund.id,
+            amountPaise: fullRefund.amountPaise,
+            reason: fullRefund.reason ?? undefined,
+            userId: ord.userId,
+          });
+        }
+      } catch (err) {
+        logger.error({ err, refundId }, 'Failed to dispatch refund confirmation email');
+      }
     }
 
     return result;

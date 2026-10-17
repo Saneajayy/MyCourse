@@ -355,14 +355,32 @@ export class InvoiceService {
     invoiceNumber: string,
     courseTitle: string,
     amountPaise: number,
-    _pdfPath: string,
+    pdfPath: string,
+    orderId?: string,
+    userId?: string,
+    expiresAt?: Date | null,
   ): Promise<void> {
     try {
-      await emailService.dispatchEmail({
+      let pdfBuffer: Buffer | undefined;
+      if (pdfPath) {
+        const fullPath = path.isAbsolute(pdfPath)
+          ? pdfPath
+          : path.join(__dirname, '../../../uploads/invoices', path.basename(pdfPath));
+        if (fs.existsSync(fullPath)) {
+          pdfBuffer = fs.readFileSync(fullPath);
+        }
+      }
+
+      await emailService.sendOrderReceiptEmail({
         to: userEmail,
-        subject: `Payment Receipt & Invoice: ${invoiceNumber} - ${courseTitle}`,
-        text: `Dear ${userName},\n\nThank you for enrolling in "${courseTitle}". Your payment of ₹${(amountPaise / 100).toFixed(2)} was received successfully.\n\nYour official Tax Invoice Number is ${invoiceNumber}.\nYou can download your PDF invoice from your student dashboard anytime.\n\nHappy Learning,\nHydraulic Engineering Academy Team`,
-        html: `<p>Dear <strong>${userName}</strong>,</p><p>Thank you for enrolling in <strong>${courseTitle}</strong>. Your payment of <strong>₹${(amountPaise / 100).toFixed(2)}</strong> was received successfully.</p><p>Your official Tax Invoice Number is: <code>${invoiceNumber}</code></p><p>You can access your course materials and download your PDF invoice from your student account dashboard.</p>`,
+        name: userName,
+        courseTitle,
+        invoiceNumber,
+        amountPaise,
+        orderId: orderId || invoiceNumber,
+        userId,
+        expiresAt,
+        pdfBuffer,
       });
     } catch (err) {
       logger.error({ err, userEmail, invoiceNumber }, 'Failed to send invoice email');

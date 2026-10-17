@@ -336,8 +336,8 @@ export class AdminController {
         throw new NotFoundError('Student not found');
       }
 
-      // Fetch student entitlements, orders, active sessions, progress, and audit trail in parallel
-      const [entitlements, orders, progressItems, auditLogs] = await Promise.all([
+      // Fetch student entitlements, orders, active sessions, progress, audit trail, and email history in parallel
+      const [entitlements, orders, progressItems, auditLogs, emailLogs] = await Promise.all([
         prisma.entitlement.findMany({
           where: { userId: id },
           include: {
@@ -372,6 +372,13 @@ export class AdminController {
           orderBy: { createdAt: 'desc' },
           take: 50,
         }),
+        prisma.emailLog.findMany({
+          where: {
+            OR: [{ userId: id }, { recipient: student.email.toLowerCase() }],
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 50,
+        }),
       ]);
 
       // Calculate progress summary
@@ -397,7 +404,39 @@ export class AdminController {
             totalWatchedMinutes: Math.round(totalWatchedSeconds / 60),
           },
           auditLogs,
+          emails: emailLogs,
         },
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * 3b. Get Student Email History
+   */
+  public async getStudentEmails(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const student = await prisma.user.findUnique({
+        where: { id, deletedAt: null },
+        select: { id: true, email: true },
+      });
+      if (!student) {
+        throw new NotFoundError('Student not found');
+      }
+
+      const emails = await prisma.emailLog.findMany({
+        where: {
+          OR: [{ userId: id }, { recipient: student.email.toLowerCase() }],
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: emails,
       });
     } catch (err) {
       next(err);

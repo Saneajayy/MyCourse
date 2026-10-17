@@ -344,7 +344,9 @@ export class AuthController {
         throw new UnauthorizedError('Authentication required');
       }
 
-      const result = await authService.resendVerification(req.user.id);
+      const clientIp =
+        (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || '127.0.0.1';
+      const result = await authService.resendVerification(req.user.id, clientIp);
 
       res.status(200).json({
         success: true,

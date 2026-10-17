@@ -17,6 +17,7 @@ import {
   ShoppingBag,
   Laptop,
   CheckCircle2,
+  Mail,
 } from 'lucide-react';
 
 interface StudentDetailResponse {
@@ -77,6 +78,16 @@ interface StudentDetailResponse {
     action: string;
     createdAt: string;
     actorUserId: string | null;
+  }>;
+  emails?: Array<{
+    id: string;
+    template: string;
+    subject: string;
+    status: 'QUEUED' | 'SENT' | 'FAILED' | 'BOUNCED' | 'COMPLAINED';
+    attempts: number;
+    sentAt: string | null;
+    createdAt: string;
+    errorMessage: string | null;
   }>;
 }
 
@@ -306,6 +317,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
     totalWatchedMinutes: Math.round(((data as any).progress?.totalWatchedSeconds || 0) / 60),
   };
   const auditLogs = data.auditLogs || [];
+  const emails = (data as any).emails || [];
 
   return (
     <div className="space-y-6">
@@ -724,6 +736,83 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
               </div>
             ))
           )}
+        </div>
+      </Card>
+
+      {/* SECTION 5: Recent Emails Sent */}
+      <Card
+        variant="default"
+        padding="none"
+        className="border border-black overflow-hidden space-y-0"
+      >
+        <div className="p-3.5 bg-neutral-100 border-b border-black flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Mail className="w-4 h-4 text-course-orange" />
+            <h2 className="text-xs font-black text-course-darkBlue uppercase tracking-wider">
+              Recent Emails Sent ({emails.length})
+            </h2>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-neutral-50 border-b border-black">
+                <th className="p-3 font-bold text-course-darkBlue">Template</th>
+                <th className="p-3 font-bold text-course-darkBlue">Subject</th>
+                <th className="p-3 font-bold text-course-darkBlue">Status</th>
+                <th className="p-3 font-bold text-course-darkBlue text-center">Attempts</th>
+                <th className="p-3 font-bold text-course-darkBlue text-right">Sent At</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-black bg-white">
+              {emails.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="p-6 text-center text-course-navySubtle italic">
+                    No transactional emails logged for this student yet.
+                  </td>
+                </tr>
+              ) : (
+                emails.map((item: any) => {
+                  let badgeBg = 'bg-neutral-100 text-neutral-800';
+                  if (item.status === 'SENT') badgeBg = 'bg-emerald-100 text-emerald-950';
+                  else if (item.status === 'BOUNCED' || item.status === 'COMPLAINED')
+                    badgeBg = 'bg-rose-100 text-rose-950';
+                  else if (item.status === 'FAILED') badgeBg = 'bg-amber-100 text-amber-950';
+                  else if (item.status === 'QUEUED') badgeBg = 'bg-blue-100 text-blue-950';
+
+                  return (
+                    <tr key={item.id} className="hover:bg-neutral-50">
+                      <td className="p-3 font-mono font-bold text-course-darkBlue text-[11px]">
+                        {item.template}
+                      </td>
+                      <td
+                        className="p-3 text-course-darkBlue font-medium max-w-xs truncate"
+                        title={item.subject}
+                      >
+                        {item.subject}
+                      </td>
+                      <td className="p-3">
+                        <span
+                          className={`px-2 py-0.5 border border-black text-[9px] font-black uppercase ${badgeBg}`}
+                        >
+                          {item.status}
+                        </span>
+                      </td>
+                      <td className="p-3 font-mono text-center text-course-navySubtle">
+                        {item.attempts}
+                      </td>
+                      <td className="p-3 font-mono text-right text-course-navySubtle text-[11px]">
+                        {item.sentAt
+                          ? new Date(item.sentAt).toLocaleString()
+                          : new Date(item.createdAt).toLocaleString()}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
       </Card>
 

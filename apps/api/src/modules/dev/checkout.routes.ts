@@ -6,6 +6,7 @@ import { hashPassword } from '../../common/crypto/argon2.js';
 import { encryptData, hmacRecoveryCode } from '../../common/crypto/tokens.js';
 import { redisClient } from '../../common/redis/redis.js';
 import { UserRole, UserStatus, OrderStatus, RefundStatus, LessonStatus } from '@course/shared';
+import { emailPreviewsRouter } from './email-previews.routes.js';
 
 export const devRouter = Router();
 
@@ -17,6 +18,9 @@ devRouter.use((_req, res, next) => {
   }
   next();
 });
+
+// Email previews for local development testing
+devRouter.use('/email-previews', emailPreviewsRouter);
 
 // Only accessible in non-production environments
 devRouter.get('/checkout', (_req, res) => {

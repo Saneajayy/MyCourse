@@ -24,6 +24,9 @@ import { adminEntitlementRouter } from './modules/entitlements/admin-entitlement
 import { docsRouter } from './docs/openapi.js';
 import { devRouter } from './modules/dev/checkout.routes.js';
 import { adminRouter } from './modules/admin/admin.routes.js';
+import { resendWebhookController } from './modules/webhooks/resend.webhook.js';
+import { contactController } from './modules/contact/contact.controller.js';
+import { contactFormRateLimiter } from './common/middleware/email-rate-limiter.js';
 
 declare global {
   namespace Express {
@@ -192,6 +195,14 @@ export function createApp(): Express {
   );
   v1Router.post('/webhooks/razorpay', (req, res, next) =>
     razorpayWebhookController.handleWebhook(req, res, next),
+  );
+  v1Router.post('/webhooks/resend', (req, res, next) =>
+    resendWebhookController.handleWebhook(req, res, next),
+  );
+
+  // Public Contact submission route
+  v1Router.post('/contact', contactFormRateLimiter, (req, res, next) =>
+    contactController.submitContactForm(req, res, next),
   );
 
   app.use('/api/v1', v1Router);

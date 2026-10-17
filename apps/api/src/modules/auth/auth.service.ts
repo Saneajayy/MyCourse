@@ -15,9 +15,11 @@ import {
 } from '../../common/crypto/tokens.js';
 import { signAccessToken, signTemp2FAToken, verifyTemp2FAToken } from '../../common/crypto/jwt.js';
 import { emailService } from '../../common/email/email.service.js';
+import { assertEmailRateLimit } from '../../common/middleware/email-rate-limiter.js';
 import { auditService } from '../audit/audit.service.js';
 import { lockoutService } from '../../common/middleware/lockout.js';
 import { validatePasswordStrength } from '../../common/security/common-passwords.js';
+import { logger } from '../../common/logger/logger.js';
 import {
   BadRequestError,
   UnauthorizedError,
@@ -669,6 +671,22 @@ export class AuthService {
     userAgent?: string,
   ): Promise<{ message: string }> {
     const normalizedEmail = email.trim().toLowerCase();
+
+    // Rate-limit per account, per IP, globally
+    await assertEmailRateLimit(normalizedEmail, ip || '127.0.0.1', 'forgot_password');
+
+    // Check suppression list before sending
+    const isSuppressed = await prisma.emailSuppression.findUnique({
+      where: { email: normalizedEmail },
+    });
+    if (isSuppressed) {
+      // Return zero enumeration response immediately without sending
+      return {
+        message:
+          'If an account exists with that email address, password reset instructions have been sent.',
+      };
+    }
+
     const user = await prisma.user.findUnique({
       where: { email: normalizedEmail },
     });
@@ -687,7 +705,7 @@ export class AuthService {
         },
       });
 
-      await emailService.sendPasswordResetEmail(user.email, user.name, rawToken);
+      await emailService.sendPasswordResetEmail(user.email, user.name, rawToken, user.id);
 
       await auditService.log({
         actorUserId: user.id,
@@ -762,6 +780,20 @@ export class AuthService {
       afterState: { step: 'COMPLETED' },
     });
 
+    // Send security notification: password was reset
+    try {
+      await emailService.sendPasswordChangedNotice(
+        tokenRecord.user.email,
+        tokenRecord.user.name,
+        tokenRecord.user.id,
+      );
+    } catch (emailErr) {
+      logger.error(
+        { emailErr, userId: tokenRecord.userId },
+        'Failed to dispatch password changed security notice',
+      );
+    }
+
     return {
       message: 'Your password has been reset successfully. Please log in with your new password.',
     };
@@ -818,6 +850,13 @@ export class AuthService {
       ipAddress: ip,
       userAgent,
     });
+
+    // Send security notification: password was changed
+    try {
+      await emailService.sendPasswordChangedNotice(user.email, user.name, user.id);
+    } catch (emailErr) {
+      logger.error({ emailErr, userId }, 'Failed to dispatch password changed security notice');
+    }
 
     return {
       message: 'Password changed successfully. All other active sessions have been signed out.',
@@ -987,7 +1026,7 @@ export class AuthService {
     return sanitizeUser(user);
   }
 
-  public async resendVerification(userId: string): Promise<{ message: string }> {
+  public async resendVerification(userId: string, ip?: string): Promise<{ message: string }> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -996,6 +1035,17 @@ export class AuthService {
     }
     if (user.emailVerifiedAt) {
       return { message: 'Email is already verified.' };
+    }
+
+    // Rate-limit resend verification per account, per IP, globally
+    await assertEmailRateLimit(user.email, ip || '127.0.0.1', 'resend_verification');
+
+    // Suppression check: skip if recipient has bounced or complained
+    const isSuppressed = await prisma.emailSuppression.findUnique({
+      where: { email: user.email.toLowerCase() },
+    });
+    if (isSuppressed) {
+      return { message: 'A new verification link has been sent to your email.' };
     }
 
     const rawVerificationToken = generateRandomToken(32);
@@ -1011,7 +1061,7 @@ export class AuthService {
       },
     });
 
-    await emailService.sendVerificationEmail(user.email, user.name, rawVerificationToken);
+    await emailService.sendVerificationEmail(user.email, user.name, rawVerificationToken, user.id);
 
     return { message: 'A new verification link has been sent to your email.' };
   }

@@ -3,30 +3,50 @@
 import React, { useState } from 'react';
 import { siteConfig } from '../../config/site';
 import { Card, Button, Input, useToast } from '../../components/ui';
-import { Mail, MapPin, Clock, Phone, Send, CheckCircle2 } from 'lucide-react';
+import { Mail, MapPin, Clock, Phone, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { apiClient } from '../../lib/api-client';
 
 export default function ContactPage() {
-  const { success: toastSuccess } = useToast();
+  const { success: toastSuccess, error: toastError } = useToast();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [website, setWebsite] = useState(''); // Honeypot field (hidden from real users)
   const [isSent, setIsSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage(null);
 
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await apiClient('/contact', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+          subject: subject.trim(),
+          message: message.trim(),
+          website: website.trim(), // Honeypot trap for automated spam bots
+        }),
+      });
+
       setIsSent(true);
       toastSuccess(
         'Message Received',
         'Our support team will get back to you within 24 business hours.',
       );
-    }, 600);
+    } catch (err: any) {
+      const msg = err.message || 'Unable to submit contact message. Please try again.';
+      setErrorMessage(msg);
+      toastError('Submission Failed', msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -129,6 +149,7 @@ export default function ContactPage() {
                   setIsSent(false);
                   setSubject('');
                   setMessage('');
+                  setErrorMessage(null);
                 }}
               >
                 Send Another Message
@@ -140,7 +161,37 @@ export default function ContactPage() {
                 Send Us a Message
               </h2>
 
+              {errorMessage && (
+                <div className="p-3 mb-4 bg-red-50 border border-red-500 text-red-900 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Honeypot field: invisible to human users, traps spam bots */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: '-9999px',
+                    opacity: 0,
+                    height: 0,
+                    width: 0,
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <label htmlFor="website-field">Leave this empty</label>
+                  <input
+                    id="website-field"
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                  />
+                </div>
+
                 <Input
                   label="Your Name"
                   placeholder="Ramesh Kumar"

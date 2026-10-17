@@ -104,6 +104,7 @@ model User {
   lessonProgresses       LessonProgress[]
   couponRedemptions      CouponRedemption[]
   auditLogs              AuditLog[]
+  emailLogs              EmailLog[]
 
   @@index([role, status])
   @@index([email])
@@ -248,6 +249,7 @@ model Order {
   entitlements     Entitlement[]
   invoice          Invoice?
   couponRedemption CouponRedemption?
+  emailLogs        EmailLog[]
 
   @@index([userId])
   @@index([productId])
@@ -430,5 +432,68 @@ model AppSetting {
   createdAt   DateTime @default(now()) @db.Timestamptz
 
   @@index([key])
+}
+
+enum EmailLogStatus {
+  QUEUED
+  SENT
+  FAILED
+  BOUNCED
+  COMPLAINED
+}
+
+model EmailLog {
+  id                String         @id @db.Uuid
+  template          String
+  recipient         String
+  subject           String
+  status            EmailLogStatus @default(QUEUED)
+  providerMessageId String?
+  attempts          Int            @default(0)
+  idempotencyKey    String?        @unique
+  userId            String?        @db.Uuid
+  orderId           String?        @db.Uuid
+  metadata          Json?
+  errorMessage      String?        @db.Text
+  lastAttemptAt     DateTime?      @db.Timestamptz
+  sentAt            DateTime?      @db.Timestamptz
+  failedAt          DateTime?      @db.Timestamptz
+  createdAt         DateTime       @default(now()) @db.Timestamptz
+  updatedAt         DateTime       @updatedAt @db.Timestamptz
+
+  user              User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  order             Order?         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([recipient])
+  @@index([status])
+  @@index([userId])
+  @@index([orderId])
+  @@index([providerMessageId])
+  @@index([createdAt])
+}
+
+model EmailSuppression {
+  id        String   @id @db.Uuid
+  email     String   @unique
+  reason    String
+  source    String?
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  @@index([email])
+}
+
+model ContactSubmission {
+  id        String   @id @db.Uuid
+  name      String
+  email     String
+  subject   String
+  message   String   @db.Text
+  ipAddress String?
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
 }
 

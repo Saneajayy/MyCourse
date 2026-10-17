@@ -105,3 +105,12 @@ export const AuditAction = {
   SETTING_UPDATED: 'SETTING_UPDATED',
 } as const;
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];
+
+export const EmailLogStatus = {
+  QUEUED: 'QUEUED',
+  SENT: 'SENT',
+  FAILED: 'FAILED',
+  BOUNCED: 'BOUNCED',
+  COMPLAINED: 'COMPLAINED',
+} as const;
+export type EmailLogStatus = (typeof EmailLogStatus)[keyof typeof EmailLogStatus];

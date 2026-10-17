@@ -21,6 +21,9 @@ adminRouter.get('/students', (req, res, next) => adminController.getStudents(req
 adminRouter.get('/students/:id', (req, res, next) =>
   adminController.getStudentDetail(req, res, next),
 );
+adminRouter.get('/students/:id/emails', (req, res, next) =>
+  adminController.getStudentEmails(req, res, next),
+);
 adminRouter.post('/students/:id/ban', (req, res, next) =>
   adminController.setStudentBan(req, res, next),
 );
