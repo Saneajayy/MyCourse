@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../app.js';
 import { prisma } from '../common/db/prisma.js';
@@ -31,9 +31,14 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
   let studentToken: string;
 
   beforeEach(async () => {
+    authService.resetClock();
     if (adminWith2FA?.id) {
       await authService.recordAdminActivity(adminWith2FA.id);
     }
+  });
+
+  afterEach(async () => {
+    authService.resetClock();
   });
 
   beforeAll(async () => {
