@@ -212,4 +212,28 @@ export class BunnyStreamProvider implements VideoProvider {
       return false;
     }
   }
+
+  /**
+   * Deletes a video from Bunny Stream library:
+   * DELETE https://video.bunnycdn.com/library/{libraryId}/videos/{videoId}
+   */
+  public async deleteVideo(videoId: string): Promise<boolean> {
+    try {
+      const res = await fetch(`${this.baseUrl}/library/${this.libraryId}/videos/${videoId}`, {
+        method: 'DELETE',
+        headers: {
+          AccessKey: this.apiKey,
+        },
+      });
+
+      if (!res.ok && res.status !== 404) {
+        logger.warn({ status: res.status, videoId }, 'Bunny Stream DeleteVideo returned non-OK');
+        return false;
+      }
+      return true;
+    } catch (err) {
+      logger.error({ err, videoId }, 'Failed to call Bunny Stream DeleteVideo API');
+      return false;
+    }
+  }
 }

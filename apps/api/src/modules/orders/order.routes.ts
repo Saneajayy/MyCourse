@@ -17,6 +17,29 @@ orderRouter.get('/orders/tax-config', (req, res, next) =>
   orderController.getTaxConfig(req, res, next),
 );
 
+import { createRateLimiter } from '../../common/middleware/rate-limiter.js';
+
+export const quoteRateLimiter = createRateLimiter({
+  points: 20,
+  duration: 60,
+  keyPrefix: 'rl_quote',
+  isSensitive: true,
+});
+
+// Price quote endpoint (POST only to prevent coupon code exposure in URLs/logs; rate-limited against enumeration)
+orderRouter.post('/orders/quote', quoteRateLimiter, (req, res, next) =>
+  orderController.getPriceQuote(req, res, next),
+);
+orderRouter.get('/orders/quote', (_req, res) => {
+  res.status(405).json({
+    success: false,
+    error: {
+      code: 'METHOD_NOT_ALLOWED',
+      message: 'GET /orders/quote is not supported. Use POST /orders/quote with a JSON request body.',
+    },
+  });
+});
+
 orderRouter.get('/orders/:id', requireAuth, (req, res, next) =>
   orderController.getOrderById(req, res, next),
 );

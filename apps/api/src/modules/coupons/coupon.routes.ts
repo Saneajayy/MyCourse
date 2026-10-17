@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { couponController } from './coupon.controller.js';
-import { requireAuth, requireRole } from '../../common/middleware/auth.js';
+import { requireAuth, requireRole, requireAdmin2FA } from '../../common/middleware/auth.js';
 import { UserRole } from '@course/shared';
 
 export const couponRouter = Router();
@@ -10,13 +10,19 @@ couponRouter.get('/coupons/:code', requireAuth, (req, res, next) =>
   couponController.getCouponByCode(req, res, next),
 );
 
-// Admin coupon management
+// Admin coupon management (Auth + Admin Role + Mandatory 2FA)
 export const adminCouponRouter = Router();
 
-adminCouponRouter.post('/coupons', requireAuth, requireRole(UserRole.ADMIN), (req, res, next) =>
+adminCouponRouter.use(requireAuth, requireRole(UserRole.ADMIN), requireAdmin2FA);
+
+adminCouponRouter.post('/coupons', (req, res, next) =>
   couponController.createCoupon(req, res, next),
 );
 
-adminCouponRouter.get('/coupons', requireAuth, requireRole(UserRole.ADMIN), (req, res, next) =>
+adminCouponRouter.get('/coupons', (req, res, next) =>
   couponController.listCoupons(req, res, next),
+);
+
+adminCouponRouter.patch('/coupons/:id', (req, res, next) =>
+  couponController.updateCoupon(req, res, next),
 );

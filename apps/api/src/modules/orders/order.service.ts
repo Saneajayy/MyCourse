@@ -1085,6 +1085,110 @@ export class OrderService {
       authorizedAlerts,
     };
   }
+
+  /**
+   * Calculates a price quote (subtotal, discount, tax, total) for checkout.
+   * Can be queried before or after login. Zero tax or price computation in browser.
+   */
+  public async calculatePriceQuote(params: {
+    productId?: string;
+    courseSlug?: string;
+    couponCode?: string;
+    userId?: string;
+  }) {
+    const { productId, courseSlug, couponCode, userId } = params;
+
+    let product = null;
+    if (productId) {
+      product = await prisma.product.findUnique({
+        where: { id: productId, deletedAt: null },
+      });
+    } else if (courseSlug) {
+      product = await prisma.product.findFirst({
+        where: { slug: courseSlug, deletedAt: null },
+      });
+    }
+
+    if (!product || product.status !== ProductStatus.PUBLISHED) {
+      throw new NotFoundError('Course product not found or not published.');
+    }
+
+    let discountPaise = 0;
+    let appliedCoupon: any = null;
+
+    if (couponCode && couponCode.trim()) {
+      const code = couponCode.trim().toUpperCase();
+      const coupon = await prisma.coupon.findUnique({
+        where: { code },
+      });
+
+      if (coupon && coupon.isActive) {
+        const now = new Date();
+        const isValidWindow =
+          (!coupon.validFrom || coupon.validFrom <= now) &&
+          (!coupon.validUntil || coupon.validUntil >= now);
+        const matchesCourse = coupon.productId === null || coupon.productId === product.id;
+
+        if (isValidWindow && matchesCourse) {
+          let userEligible = true;
+          if (userId && coupon.perUserLimit) {
+            const userUses = await prisma.couponRedemption.count({
+              where: { couponId: coupon.id, userId },
+            });
+            if (userUses >= coupon.perUserLimit) {
+              userEligible = false;
+            }
+          }
+
+          if (coupon.maxRedemptions) {
+            const totalUses = await prisma.couponRedemption.count({
+              where: { couponId: coupon.id },
+            });
+            if (totalUses >= coupon.maxRedemptions) {
+              userEligible = false;
+            }
+          }
+
+          if (userEligible) {
+            if (coupon.type === 'PERCENT') {
+              discountPaise = Math.round((product.pricePaise * coupon.value) / 100);
+            } else {
+              discountPaise = coupon.value;
+            }
+            discountPaise = Math.min(discountPaise, product.pricePaise);
+            appliedCoupon = {
+              code: coupon.code,
+              type: coupon.type,
+              value: coupon.value,
+              discountPaise,
+            };
+          }
+        }
+      }
+    }
+
+    if (couponCode && couponCode.trim() && !appliedCoupon) {
+      throw new BadRequestError('Invalid or expired coupon code.');
+    }
+
+    const taxCalculation = await calculateTaxAndTotals(product.pricePaise, discountPaise);
+
+    return {
+      productId: product.id,
+      courseTitle: product.title,
+      courseSlug: product.slug,
+      basePricePaise: product.pricePaise,
+      discountPaise,
+      subtotalPaise: taxCalculation.subtotalPaise,
+      taxPaise: taxCalculation.taxPaise,
+      totalPaise: taxCalculation.totalPaise,
+      currency: 'INR',
+      isTaxApplicable: !taxCalculation.isTaxExemptOrZero,
+      taxRatePercent: taxCalculation.gstRatePercent,
+      pricesTaxInclusive: taxCalculation.pricesTaxInclusive,
+      coupon: appliedCoupon,
+    };
+  }
 }
 
 export const orderService = new OrderService();

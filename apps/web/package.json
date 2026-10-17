@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --port 3000",
-    "build": "next build",
+    "check:content": "node scripts/check-content-todos.js",
+    "build": "node scripts/check-content-todos.js && next build",
     "start": "next start --port 3000",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
@@ -19,7 +20,8 @@
     "next": "^15.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.0.1"
+    "tailwind-merge": "^3.0.1",
+    "tus-js-client": "^4.3.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

@@ -3,6 +3,7 @@ import { verifyAccessToken } from '../crypto/jwt.js';
 import { prisma } from '../db/prisma.js';
 import { UnauthorizedError, ForbiddenError } from '../errors/app-error.js';
 import { UserRole, UserStatus } from '@course/shared';
+import { authService, AuthService } from '../../modules/auth/auth.service.js';
 
 export interface AuthenticatedUser {
   id: string;
@@ -64,6 +65,21 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
     if (user.tokenVersion !== payload.tokenVersion) {
       next(new UnauthorizedError('Session has been revoked. Please log in again.'));
       return;
+    }
+
+    // U2: Enforce 30-minute inactivity timeout for admin requests on server
+    if (user.role === UserRole.ADMIN) {
+      const nowMs = authService.getNow().getTime();
+      const lastActivityMs = await authService.getAdminLastActivity(user.id);
+      if (lastActivityMs !== null && nowMs - lastActivityMs > AuthService.ADMIN_INACTIVITY_TIMEOUT_MS) {
+        next(
+          new UnauthorizedError(
+            'Admin session has expired due to 30 minutes of inactivity. Please log in again.',
+          ),
+        );
+        return;
+      }
+      await authService.recordAdminActivity(user.id);
     }
 
     req.user = user as AuthenticatedUser;

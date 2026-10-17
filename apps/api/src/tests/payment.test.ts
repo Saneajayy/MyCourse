@@ -251,7 +251,16 @@ describe('Phase 4 Orders, Payments, Invoicing, and Entitlements Suite', () => {
           includeZeroValueInvoices: true,
         },
       },
-      update: {},
+      update: {
+        value: {
+          invoicePrefix: 'INV',
+          yearFormat: 'short',
+          sequencePadding: 5,
+          currentSequence: 0,
+          financialYear: getFinancialYear(new Date(), 'short'),
+          includeZeroValueInvoices: true,
+        },
+      },
     });
   });
 

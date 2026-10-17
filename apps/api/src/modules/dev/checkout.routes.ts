@@ -2,6 +2,10 @@ import { Router } from 'express';
 import { env } from '../../config/env.js';
 import { prisma } from '../../common/db/prisma.js';
 import { uuidv7 } from 'uuidv7';
+import { hashPassword } from '../../common/crypto/argon2.js';
+import { encryptData, hmacRecoveryCode } from '../../common/crypto/tokens.js';
+import { redisClient } from '../../common/redis/redis.js';
+import { UserRole, UserStatus, OrderStatus, RefundStatus, LessonStatus } from '@course/shared';
 
 export const devRouter = Router();
 
@@ -627,11 +631,16 @@ devRouter.post('/verify-student', async (req, res) => {
     res.status(400).json({ success: false, error: 'Email required' });
     return;
   }
-  await prisma.user.update({
-    where: { email },
-    data: { emailVerifiedAt: new Date() },
-  });
-  res.json({ success: true, message: 'Student email verified for test' });
+  try {
+    const normalizedEmail = email.toLowerCase().trim();
+    await prisma.user.updateMany({
+      where: { email: normalizedEmail },
+      data: { emailVerifiedAt: new Date() },
+    });
+    res.json({ success: true, message: 'Student email verified for test' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: String(err) });
+  }
 });
 
 devRouter.post('/ensure-test-coupon', async (_req, res) => {
@@ -655,3 +664,141 @@ devRouter.post('/ensure-test-coupon', async (_req, res) => {
   }
   res.json({ success: true, message: 'Coupon FREE100 ready' });
 });
+
+devRouter.post('/ensure-admin', async (req, res) => {
+  if (env.NODE_ENV === 'production') {
+    res.status(404).send('Not Found');
+    return;
+  }
+  const email = (req.body?.email || 'admin@hydraulicacademy.com').toLowerCase().trim();
+  const password = req.body?.password || 'AdminMaster#2026!';
+  const name = req.body?.name || 'Academy Admin';
+  const setup2FA = req.body?.setup2FA !== false;
+
+  const passwordHash = await hashPassword(password);
+  const secret = 'XXMMBN73LMJO4OCPC7JU7BFRRFY6TGNE'; // Standard 32-character test base32 secret
+  const encryptedSecret = encryptData(secret, env.TOTP_ENCRYPTION_KEY);
+  const recoveryCodes = ['ABCD-1234', 'EFGH-5678', 'IJKL-9012'];
+  const recoveryCodeHashes = recoveryCodes.map((c) =>
+    hmacRecoveryCode(c, env.TOTP_ENCRYPTION_KEY),
+  );
+
+  const user = await prisma.user.upsert({
+    where: { email },
+    create: {
+      id: uuidv7(),
+      email,
+      name,
+      passwordHash,
+      role: UserRole.ADMIN,
+      status: UserStatus.ACTIVE,
+      emailVerifiedAt: new Date(),
+      twoFactorEnabled: setup2FA,
+      twoFactorSecretEncrypted: setup2FA ? encryptedSecret : null,
+      twoFactorRecoveryCodes: setup2FA ? recoveryCodeHashes : [],
+    },
+    update: {
+      passwordHash,
+      role: UserRole.ADMIN,
+      status: UserStatus.ACTIVE,
+      emailVerifiedAt: new Date(),
+      twoFactorEnabled: setup2FA,
+      twoFactorSecretEncrypted: setup2FA ? encryptedSecret : null,
+      twoFactorRecoveryCodes: setup2FA ? recoveryCodeHashes : [],
+    },
+  });
+
+  try {
+    await redisClient.del(`totp:last_timestep:${user.id}`);
+    const keys = await redisClient.keys(`totp:used_code:${user.id}:*`);
+    if (keys.length > 0) {
+      await redisClient.del(...keys);
+    }
+  } catch {}
+
+  res.json({
+    success: true,
+    user: { id: user.id, email: user.email, role: user.role },
+    secret,
+    recoveryCodes,
+  });
+});
+
+devRouter.post('/clear-totp-cache', async (req, res) => {
+  if (env.NODE_ENV === 'production') {
+    res.status(404).send('Not Found');
+    return;
+  }
+  const email = (req.body?.email || 'admin@hydraulicacademy.com').toLowerCase().trim();
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (user) {
+    try {
+      await redisClient.del(`totp:last_timestep:${user.id}`);
+      const keys = await redisClient.keys(`totp:used_code:${user.id}:*`);
+      if (keys.length > 0) {
+        await redisClient.del(...keys);
+      }
+    } catch {}
+  }
+  res.json({ success: true, message: 'TOTP cache cleared' });
+});
+
+devRouter.post('/simulate-lesson-ready', async (req, res) => {
+  if (env.NODE_ENV === 'production') {
+    res.status(404).send('Not Found');
+    return;
+  }
+  const { lessonId } = req.body;
+  if (!lessonId) {
+    res.status(400).json({ success: false, error: 'lessonId required' });
+    return;
+  }
+  await prisma.lesson.update({
+    where: { id: lessonId },
+    data: {
+      videoProviderId: 'fake-bunny-vid-123',
+      durationSeconds: 180,
+      status: LessonStatus.READY,
+    },
+  });
+  res.json({ success: true, message: 'Lesson video status set to READY' });
+});
+
+devRouter.post('/simulate-refund-processed', async (req, res) => {
+  if (env.NODE_ENV === 'production') {
+    res.status(404).send('Not Found');
+    return;
+  }
+  const { orderId } = req.body;
+  if (!orderId) {
+    res.status(400).json({ success: false, error: 'orderId required' });
+    return;
+  }
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: { payments: { include: { refunds: true } } },
+  });
+  if (!order) {
+    res.status(404).json({ success: false, error: 'Order not found' });
+    return;
+  }
+
+  for (const payment of order.payments) {
+    for (const ref of payment.refunds) {
+      if (ref.status === RefundStatus.PENDING) {
+        await prisma.refund.update({
+          where: { id: ref.id },
+          data: { status: RefundStatus.PROCESSED },
+        });
+      }
+    }
+  }
+
+  await prisma.order.update({
+    where: { id: orderId },
+    data: { status: OrderStatus.PARTIALLY_REFUNDED },
+  });
+
+  res.json({ success: true, message: 'Refund marked PROCESSED, order PARTIALLY_REFUNDED' });
+});
+

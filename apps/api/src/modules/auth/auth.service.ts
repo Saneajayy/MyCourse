@@ -72,6 +72,57 @@ function sanitizeUser(user: {
 }
 
 export class AuthService {
+  public static readonly ADMIN_INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+  private getNow: () => Date = () => new Date();
+  private adminActivityMemory: Map<string, number> = new Map();
+
+  public setClock(clockFn: () => Date): void {
+    this.getNow = clockFn;
+  }
+
+  public resetClock(): void {
+    this.getNow = () => new Date();
+    this.adminActivityMemory.clear();
+  }
+
+  public async clearAdminActivity(userId?: string): Promise<void> {
+    if (userId) {
+      this.adminActivityMemory.delete(userId);
+      try {
+        await redisClient.del(`admin:activity:${userId}`);
+      } catch {
+        // ignore
+      }
+    } else {
+      this.adminActivityMemory.clear();
+    }
+  }
+
+  public async recordAdminActivity(userId: string, timestamp?: Date): Promise<void> {
+    const time = timestamp ? timestamp.getTime() : this.getNow().getTime();
+    this.adminActivityMemory.set(userId, time);
+    try {
+      await redisClient.set(`admin:activity:${userId}`, time.toString(), 'EX', 86400);
+    } catch {
+      // ignore cache failure
+    }
+  }
+
+  public async getAdminLastActivity(userId: string): Promise<number | null> {
+    if (this.adminActivityMemory.has(userId)) {
+      return this.adminActivityMemory.get(userId)!;
+    }
+    try {
+      const val = await redisClient.get(`admin:activity:${userId}`);
+      if (val) {
+        return parseInt(val, 10);
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  }
+
   /**
    * Register a new user, hash password with argon2id, create verification token, dispatch email.
    * Enforces zero-enumeration: if email already exists, notifies the owner and returns generic message.
@@ -499,12 +550,28 @@ export class AuthService {
       throw new UnauthorizedError('Session revoked due to detected token reuse');
     }
 
-    if (tokenRecord.expiresAt < new Date()) {
+    if (tokenRecord.expiresAt < this.getNow()) {
       throw new UnauthorizedError('Refresh token has expired');
     }
 
     if (tokenRecord.user.status === UserStatus.BANNED) {
       throw new ForbiddenError('Your account has been suspended.');
+    }
+
+    // U2: Enforce 30-minute inactivity timeout for admin accounts on token refresh
+    if (tokenRecord.user.role === UserRole.ADMIN) {
+      const nowMs = this.getNow().getTime();
+      const lastActivityMs = await this.getAdminLastActivity(tokenRecord.userId);
+      const effectiveLastActivity =
+        lastActivityMs ??
+        (tokenRecord.lastUsedAt ? tokenRecord.lastUsedAt.getTime() : tokenRecord.createdAt.getTime());
+
+      if (nowMs - effectiveLastActivity > AuthService.ADMIN_INACTIVITY_TIMEOUT_MS) {
+        throw new UnauthorizedError(
+          'Admin session has expired due to 30 minutes of inactivity. Please log in again.',
+        );
+      }
+      await this.recordAdminActivity(tokenRecord.userId);
     }
 
     // Rotate: revoke the current token and create a new one in the same family
@@ -893,6 +960,10 @@ export class AuthService {
       role: user.role,
       tokenVersion: user.tokenVersion,
     });
+
+    if (user.role === UserRole.ADMIN) {
+      await this.recordAdminActivity(user.id);
+    }
 
     return { accessToken, refreshToken: rawRefreshToken };
   }

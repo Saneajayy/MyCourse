@@ -51,4 +51,9 @@ export interface VideoProvider {
    * Cryptographically verifies incoming webhook signature in constant time
    */
   verifyWebhookSignature(rawBody: Buffer | string, signature: string): boolean;
+
+  /**
+   * Deletes a video from the provider CDN
+   */
+  deleteVideo(videoId: string): Promise<boolean>;
 }

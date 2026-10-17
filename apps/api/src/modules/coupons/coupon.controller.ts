@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { couponService } from './coupon.service.js';
-import { createCouponSchema } from '@course/shared';
+import { createCouponSchema, AuditAction } from '@course/shared';
 import { prisma } from '../../common/db/prisma.js';
 import { NotFoundError } from '../../common/errors/app-error.js';
+import { auditService } from '../audit/audit.service.js';
 
 export class CouponController {
   public async createCoupon(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -52,6 +53,74 @@ export class CouponController {
           productId: coupon.productId,
           isActive: coupon.isActive,
         },
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public async updateCoupon(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = req.params.id as string;
+      const {
+        isActive,
+        maxRedemptions,
+        maxUses,
+        perUserLimit,
+        maxUsesPerUser,
+        validFrom,
+        validUntil,
+      } = req.body;
+
+      const existing = await prisma.coupon.findUnique({
+        where: { id },
+      });
+
+      if (!existing) {
+        throw new NotFoundError(`Coupon with ID "${id}" not found.`);
+      }
+
+      const finalMaxRedemptions =
+        maxRedemptions !== undefined
+          ? (maxRedemptions === null ? null : Number(maxRedemptions))
+          : maxUses !== undefined
+          ? (maxUses === null ? null : Number(maxUses))
+          : undefined;
+
+      const finalPerUserLimit =
+        perUserLimit !== undefined
+          ? Number(perUserLimit)
+          : maxUsesPerUser !== undefined
+          ? Number(maxUsesPerUser)
+          : undefined;
+
+      const updated = await prisma.coupon.update({
+        where: { id },
+        data: {
+          ...(typeof isActive === 'boolean' ? { isActive } : {}),
+          ...(finalMaxRedemptions !== undefined ? { maxRedemptions: finalMaxRedemptions } : {}),
+          ...(finalPerUserLimit !== undefined ? { perUserLimit: finalPerUserLimit } : {}),
+          ...(validFrom !== undefined ? { validFrom: validFrom ? new Date(validFrom) : undefined } : {}),
+          ...(validUntil !== undefined
+            ? { validUntil: validUntil ? new Date(validUntil) : null }
+            : {}),
+        },
+      });
+
+      await auditService.log({
+        actorUserId: req.user?.id,
+        action: AuditAction.COUPON_UPDATED,
+        entityType: 'Coupon',
+        entityId: id,
+        beforeState: existing,
+        afterState: updated,
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+      });
+
+      res.status(200).json({
+        success: true,
+        data: updated,
       });
     } catch (err) {
       next(err);

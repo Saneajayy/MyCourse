@@ -40,6 +40,10 @@ describe('Dev Routes Production & Feature Flag Isolation (T3)', () => {
       // Test 4: POST /dev/ensure-test-coupon
       const resCoupon = await request(prodApp).post('/dev/ensure-test-coupon');
       expect(resCoupon.status).toBe(404);
+
+      // Test 5: POST /dev/ensure-admin
+      const resAdmin = await request(prodApp).post('/dev/ensure-admin');
+      expect(resAdmin.status).toBe(404);
     });
 
     it('proves devRouter internal middleware guard strictly returns 404 if directly mounted in production', async () => {

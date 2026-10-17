@@ -96,4 +96,30 @@ describe('Order & Tax Configuration Integration Tests', () => {
     expect(result.subtotalPaise + result.taxPaise).toBe(basePricePaise);
     expect(result.totalPaise).toBe(basePricePaise);
   });
+
+  it('POST /api/v1/orders/quote returns price quote with server computed subtotal, tax, and total', async () => {
+    // Find published course
+    const product = await prisma.product.findFirst({
+      where: { deletedAt: null },
+    });
+
+    if (product) {
+      const res = await request(app)
+        .post('/api/v1/orders/quote')
+        .send({
+          courseSlug: product.slug,
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toBeDefined();
+      expect(res.body.data.productId).toBe(product.id);
+      expect(res.body.data.basePricePaise).toBe(product.pricePaise);
+      expect(res.body.data.totalPaise).toBeDefined();
+      expect(typeof res.body.data.taxPaise).toBe('number');
+      expect(typeof res.body.data.subtotalPaise).toBe('number');
+      // Subtotal + Tax = Total
+      expect(res.body.data.subtotalPaise + res.body.data.taxPaise).toBe(res.body.data.totalPaise);
+    }
+  });
 });

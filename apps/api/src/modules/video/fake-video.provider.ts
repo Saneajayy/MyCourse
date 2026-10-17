@@ -140,4 +140,9 @@ export class FakeVideoProvider implements VideoProvider {
     const raw = typeof payload === 'string' ? payload : JSON.stringify(payload);
     return crypto.createHmac('sha256', this.webhookSecret).update(raw).digest('hex');
   }
+
+  public async deleteVideo(videoId: string): Promise<boolean> {
+    this.videos.delete(videoId);
+    return true;
+  }
 }

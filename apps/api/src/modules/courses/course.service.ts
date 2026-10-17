@@ -16,14 +16,31 @@ import { NotFoundError, BadRequestError, ForbiddenError } from '../../common/err
 import { auditService } from '../audit/audit.service.js';
 import { getVideoProvider } from '../video/video.service.js';
 import { UploadTicket } from '../video/video-provider.interface.js';
+import { redisClient } from '../../common/redis/redis.js';
+import { logger } from '../../common/logger/logger.js';
 
 export class CourseService {
+  /**
+   * Invalidates cached public course catalog entries in Redis whenever course content is edited.
+   */
+  public async invalidateCatalogCache(): Promise<void> {
+    try {
+      await redisClient.del('catalog:courses:public');
+      const keys = await redisClient.keys('catalog:course:*');
+      if (keys.length > 0) {
+        await redisClient.del(...keys);
+      }
+    } catch (err) {
+      logger.warn({ err }, 'Failed to clear public catalog cache in Redis');
+    }
+  }
+
   // ===========================================================================
   // ADMIN PRODUCT OPERATIONS
   // ===========================================================================
 
   public async listAdminProducts() {
-    return prisma.product.findMany({
+    const products = await prisma.product.findMany({
       where: { deletedAt: null },
       include: {
         _count: {
@@ -33,8 +50,30 @@ export class CourseService {
             orders: true,
           },
         },
+        lessons: {
+          select: {
+            id: true,
+            title: true,
+            videoProviderId: true,
+            status: true,
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
+    });
+
+    return products.map((product) => {
+      const missingVideosCount = product.lessons.filter(
+        (l) => !l.videoProviderId || l.status !== LessonStatus.READY,
+      ).length;
+      const hasMissingVideosWarning =
+        product.status === ProductStatus.PUBLISHED && missingVideosCount > 0;
+
+      return {
+        ...product,
+        missingVideosCount,
+        hasMissingVideosWarning,
+      };
     });
   }
 
@@ -57,7 +96,18 @@ export class CourseService {
       throw new NotFoundError('Course product not found');
     }
 
-    return product;
+    const allLessons = product.sections.flatMap((s) => s.lessons);
+    const missingVideosCount = allLessons.filter(
+      (l) => !l.videoProviderId || l.status !== LessonStatus.READY,
+    ).length;
+    const hasMissingVideosWarning =
+      product.status === ProductStatus.PUBLISHED && missingVideosCount > 0;
+
+    return {
+      ...product,
+      missingVideosCount,
+      hasMissingVideosWarning,
+    };
   }
 
   public async createProduct(input: CreateProductInput, actorUserId: string) {
@@ -94,6 +144,8 @@ export class CourseService {
       entityId: productId,
       afterState: product,
     });
+
+    await this.invalidateCatalogCache();
 
     return product;
   }
@@ -146,6 +198,8 @@ export class CourseService {
       afterState: updated,
     });
 
+    await this.invalidateCatalogCache();
+
     return updated;
   }
 
@@ -182,6 +236,8 @@ export class CourseService {
       beforeState: current,
       afterState: updated,
     });
+
+    await this.invalidateCatalogCache();
 
     return { message: 'Course product archived successfully' };
   }
@@ -227,6 +283,8 @@ export class CourseService {
       afterState: section,
     });
 
+    await this.invalidateCatalogCache();
+
     return section;
   }
 
@@ -254,13 +312,57 @@ export class CourseService {
       afterState: updated,
     });
 
+    await this.invalidateCatalogCache();
+
     return updated;
   }
 
-  public async deleteSection(id: string, actorUserId: string) {
-    const current = await prisma.section.findUnique({ where: { id } });
+  public async deleteSection(
+    id: string,
+    actorUserId: string,
+    options?: { confirmDeleteVideo?: boolean; force?: boolean },
+  ) {
+    const current = await prisma.section.findUnique({
+      where: { id },
+      include: {
+        lessons: true,
+      },
+    });
     if (!current) {
       throw new NotFoundError('Section not found');
+    }
+
+    const lessonIds = current.lessons.map((l) => l.id);
+    if (lessonIds.length > 0) {
+      const progressCount = await prisma.lessonProgress.count({
+        where: { lessonId: { in: lessonIds } },
+      });
+      if (progressCount > 0 && !options?.force) {
+        throw new BadRequestError(
+          'Cannot delete section: students have recorded progress for lessons in this section. Please confirm force deletion to proceed.',
+        );
+      }
+
+      const videoIds = current.lessons
+        .filter((l) => !!l.videoProviderId)
+        .map((l) => l.videoProviderId!);
+
+      if (videoIds.length > 0 && !options?.confirmDeleteVideo) {
+        throw new BadRequestError(
+          `Section contains ${videoIds.length} lesson(s) with videos on Bunny Stream. Please confirm video deletion to proceed.`,
+        );
+      }
+
+      if (videoIds.length > 0 && options?.confirmDeleteVideo) {
+        const provider = getVideoProvider();
+        for (const vId of videoIds) {
+          try {
+            await provider.deleteVideo(vId);
+          } catch (err) {
+            logger.warn({ err, vId }, 'Failed to delete section lesson video from provider');
+          }
+        }
+      }
     }
 
     await prisma.section.delete({ where: { id } });
@@ -272,6 +374,8 @@ export class CourseService {
       entityId: id,
       beforeState: current,
     });
+
+    await this.invalidateCatalogCache();
 
     return { message: 'Section deleted successfully' };
   }
@@ -305,6 +409,8 @@ export class CourseService {
       entityId: productId,
       afterState: { orderedIds },
     });
+
+    await this.invalidateCatalogCache();
 
     return prisma.section.findMany({
       where: { productId },
@@ -359,6 +465,8 @@ export class CourseService {
       afterState: lesson,
     });
 
+    await this.invalidateCatalogCache();
+
     return lesson;
   }
 
@@ -391,13 +499,49 @@ export class CourseService {
       afterState: updated,
     });
 
+    await this.invalidateCatalogCache();
+
     return updated;
   }
 
-  public async deleteLesson(id: string, actorUserId: string) {
-    const current = await prisma.lesson.findUnique({ where: { id } });
+  public async deleteLesson(
+    id: string,
+    actorUserId: string,
+    options?: { confirmDeleteVideo?: boolean; force?: boolean },
+  ) {
+    const current = await prisma.lesson.findUnique({
+      where: { id },
+      include: { product: true },
+    });
     if (!current) {
       throw new NotFoundError('Lesson not found');
+    }
+
+    const progressCount = await prisma.lessonProgress.count({
+      where: { lessonId: id },
+    });
+    if (progressCount > 0 && !options?.force) {
+      throw new BadRequestError(
+        'Cannot delete lesson: students have recorded progress for this lesson. Archiving or unpublishing is recommended. Confirm force deletion to proceed.',
+      );
+    }
+
+    if (current.videoProviderId && !options?.confirmDeleteVideo) {
+      throw new BadRequestError(
+        'This lesson contains an uploaded video on Bunny Stream. Confirm video deletion to proceed.',
+      );
+    }
+
+    if (current.videoProviderId && options?.confirmDeleteVideo) {
+      const provider = getVideoProvider();
+      try {
+        await provider.deleteVideo(current.videoProviderId);
+      } catch (err) {
+        logger.warn(
+          { err, videoId: current.videoProviderId },
+          'Failed to delete video from video provider',
+        );
+      }
     }
 
     await prisma.lesson.delete({ where: { id } });
@@ -409,6 +553,8 @@ export class CourseService {
       entityId: id,
       beforeState: current,
     });
+
+    await this.invalidateCatalogCache();
 
     return { message: 'Lesson deleted successfully' };
   }
@@ -442,6 +588,8 @@ export class CourseService {
       entityId: sectionId,
       afterState: { orderedIds },
     });
+
+    await this.invalidateCatalogCache();
 
     return prisma.lesson.findMany({
       where: { sectionId },
@@ -498,6 +646,15 @@ export class CourseService {
   // ===========================================================================
 
   public async listPublicCourses() {
+    try {
+      const cached = await redisClient.get('catalog:courses:public');
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    } catch (err) {
+      logger.warn({ err }, 'Failed reading public courses cache from Redis');
+    }
+
     const products = await prisma.product.findMany({
       where: {
         status: ProductStatus.PUBLISHED,
@@ -530,7 +687,7 @@ export class CourseService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return products.map((p) => {
+    const result = products.map((p) => {
       let totalLessons = 0;
       let totalDurationSeconds = 0;
 
@@ -556,6 +713,14 @@ export class CourseService {
         totalDurationSeconds,
       };
     });
+
+    try {
+      await redisClient.set('catalog:courses:public', JSON.stringify(result), 'EX', 300);
+    } catch (err) {
+      logger.warn({ err }, 'Failed writing public courses cache to Redis');
+    }
+
+    return result;
   }
 
   /**
@@ -564,6 +729,16 @@ export class CourseService {
    * URLs, or library IDs of paid lessons!
    */
   public async getPublicCourseBySlug(slug: string) {
+    const cacheKey = `catalog:course:${slug}`;
+    try {
+      const cached = await redisClient.get(cacheKey);
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    } catch (err) {
+      logger.warn({ err }, 'Failed reading public course slug cache from Redis');
+    }
+
     const product = await prisma.product.findFirst({
       where: {
         slug,
@@ -615,7 +790,7 @@ export class CourseService {
       }
     }
 
-    return {
+    const response = {
       id: product.id,
       slug: product.slug,
       title: product.title,
@@ -630,6 +805,14 @@ export class CourseService {
       totalDurationSeconds,
       sections: sanitizedSections,
     };
+
+    try {
+      await redisClient.set(cacheKey, JSON.stringify(response), 'EX', 300);
+    } catch (err) {
+      logger.warn({ err }, 'Failed writing public course slug cache to Redis');
+    }
+
+    return response;
   }
 
   /**
@@ -754,6 +937,8 @@ export class CourseService {
       entityId: productId,
       afterState: { thumbnailUrl },
     });
+
+    await this.invalidateCatalogCache();
 
     return { product: updated, thumbnailUrl };
   }

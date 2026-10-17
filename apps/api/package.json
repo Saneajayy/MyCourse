@@ -7,7 +7,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "prisma generate && tsc -p tsconfig.json",
     "start": "node dist/server.js",
-    "test": "vitest run",
+    "test": "vitest run --fileParallelism false",
     "typecheck": "prisma generate && tsc --noEmit",
     "lint": "prisma generate && tsc --noEmit",
     "prisma:generate": "prisma generate",

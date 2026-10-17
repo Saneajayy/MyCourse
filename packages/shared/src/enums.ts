@@ -100,6 +100,8 @@ export const AuditAction = {
   ACCESS_EXTENDED: 'ACCESS_EXTENDED',
   ACCESS_REVOKED: 'ACCESS_REVOKED',
   COUPON_CREATED: 'COUPON_CREATED',
+  COUPON_UPDATED: 'COUPON_UPDATED',
   COUPON_REDEEMED: 'COUPON_REDEEMED',
+  SETTING_UPDATED: 'SETTING_UPDATED',
 } as const;
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];

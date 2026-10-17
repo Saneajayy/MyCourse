@@ -26,6 +26,27 @@ interface CouponData {
   isActive: boolean;
 }
 
+export interface ServerPriceQuote {
+  productId: string;
+  courseTitle: string;
+  courseSlug: string;
+  basePricePaise: number;
+  discountPaise: number;
+  subtotalPaise: number;
+  taxPaise: number;
+  totalPaise: number;
+  currency: string;
+  isTaxApplicable: boolean;
+  taxRatePercent: number;
+  pricesTaxInclusive: boolean;
+  coupon: {
+    code: string;
+    discountPaise: number;
+    type: string;
+    value: number;
+  } | null;
+}
+
 declare global {
   interface Window {
     Razorpay?: unknown;
@@ -178,18 +199,89 @@ function CheckoutContent() {
     setCouponError(null);
   };
 
-  // Price computation with coupon & dynamic server tax config
-  const basePricePaise = course?.pricePaise || 499900;
-  let discountPaise = 0;
-  if (appliedCoupon) {
-    if (appliedCoupon.type === 'PERCENT') {
-      discountPaise = Math.round((basePricePaise * appliedCoupon.value) / 100);
-    } else {
-      discountPaise = appliedCoupon.value * 100;
+  // Server Price Quote State (C3: subtotal, discount, tax, total returned directly from server quote)
+  const [quote, setQuote] = useState<ServerPriceQuote | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
+
+  // Fetch Server Quote whenever course or applied coupon changes
+  useEffect(() => {
+    if (!course) return;
+
+    let isMounted = true;
+    setQuoteLoading(true);
+
+    async function fetchQuote() {
+      try {
+        const res = await fetch(`${siteConfig.urls.api}/api/v1/orders/quote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            courseSlug: course?.slug,
+            couponCode: appliedCoupon?.code,
+          }),
+        });
+        const data = await res.json();
+        if (data.success && data.data && isMounted) {
+          setQuote(data.data);
+        }
+      } catch {
+        // Fallback to local computation if server quote endpoint unreachable
+        if (isMounted) {
+          const base = course?.pricePaise || 499900;
+          let disc = 0;
+          if (appliedCoupon) {
+            disc =
+              appliedCoupon.type === 'PERCENT'
+                ? Math.round((base * appliedCoupon.value) / 100)
+                : appliedCoupon.value * 100;
+          }
+          const t = computeOrderTotals(base, disc, taxConfig);
+          setQuote({
+            productId: course?.id || '',
+            courseTitle: course?.title || '',
+            courseSlug: course?.slug || '',
+            basePricePaise: base,
+            discountPaise: disc,
+            subtotalPaise: t.subtotalPaise,
+            taxPaise: t.taxPaise,
+            totalPaise: t.totalPaise,
+            currency: 'INR',
+            isTaxApplicable: t.isTaxApplicable,
+            taxRatePercent: t.gstRatePercent,
+            pricesTaxInclusive: taxConfig?.pricesTaxInclusive !== false,
+            coupon: appliedCoupon
+              ? {
+                  code: appliedCoupon.code,
+                  discountPaise: disc,
+                  type: appliedCoupon.type,
+                  value: appliedCoupon.value,
+                }
+              : null,
+          });
+        }
+      } finally {
+        if (isMounted) {
+          setQuoteLoading(false);
+        }
+      }
     }
-  }
-  const totals = computeOrderTotals(basePricePaise, discountPaise, taxConfig);
-  const finalPricePaise = totals.totalPaise;
+
+    fetchQuote();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [course, appliedCoupon, taxConfig]);
+
+  // Read price and tax breakdown verbatim from the server quote
+  const basePricePaise = quote?.basePricePaise ?? course?.pricePaise ?? 499900;
+  const discountPaise = quote?.discountPaise ?? 0;
+  const subtotalPaise = quote?.subtotalPaise ?? basePricePaise;
+  const taxPaise = quote?.taxPaise ?? 0;
+  const finalPricePaise = quote?.totalPaise ?? basePricePaise;
+  const isTaxApplicable = quote?.isTaxApplicable ?? false;
+  const taxRatePercent = quote?.taxRatePercent ?? 0;
+  const pricesTaxInclusive = quote?.pricesTaxInclusive ?? (taxConfig?.pricesTaxInclusive !== false);
 
   // Resend verification email
   const handleResendVerification = async () => {
@@ -558,26 +650,26 @@ function CheckoutContent() {
                 </form>
               )}
 
-              {/* GST Tax Breakdown: Shown ONLY when server tax config applies (GSTIN set and gstRate > 0) */}
-              {totals.isTaxApplicable && totals.taxPaise > 0 && (
+              {/* GST Tax Breakdown: Shown ONLY when server quote reports applicable tax and taxPaise > 0 */}
+              {isTaxApplicable && taxPaise > 0 && (
                 <div className="border-t border-black/20 pt-3 space-y-1.5 text-xs text-course-navyMuted">
                   <div className="flex justify-between">
                     <span>Net Taxable Value</span>
                     <span className="font-mono">
                       ₹
-                      {(totals.subtotalPaise / 100).toLocaleString('en-IN', {
+                      {(subtotalPaise / 100).toLocaleString('en-IN', {
                         minimumFractionDigits: 2,
                       })}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>
-                      IGST / CGST+SGST ({totals.gstRatePercent}%{' '}
-                      {taxConfig?.pricesTaxInclusive !== false ? 'Inclusive' : 'Exclusive'})
+                      IGST / CGST+SGST ({taxRatePercent}%{' '}
+                      {pricesTaxInclusive ? 'Inclusive' : 'Exclusive'})
                     </span>
                     <span className="font-mono">
                       ₹
-                      {(totals.taxPaise / 100).toLocaleString('en-IN', {
+                      {(taxPaise / 100).toLocaleString('en-IN', {
                         minimumFractionDigits: 2,
                       })}
                     </span>
@@ -616,7 +708,8 @@ function CheckoutContent() {
                   variant="primary"
                   className="w-full text-xs uppercase tracking-wide py-4 font-black"
                   onClick={handleProceedToPayment}
-                  isLoading={isSubmitting}
+                  disabled={quoteLoading}
+                  isLoading={isSubmitting || quoteLoading}
                 >
                   <Lock className="w-4 h-4 mr-2" />
                   Pay ₹{(finalPricePaise / 100).toLocaleString('en-IN')} With Razorpay

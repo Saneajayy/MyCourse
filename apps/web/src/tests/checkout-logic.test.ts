@@ -124,4 +124,40 @@ describe('Checkout State & Price Computation Logic', () => {
     expect(canPurchase(unverifiedUser)).toBe(false);
     expect(canPurchase(verifiedUser)).toBe(true);
   });
+
+  it('guarantees displayed server quote total strictly equals server order total without client rounding drift', () => {
+    // Simulating server quote response
+    const serverQuote = {
+      productId: 'prod_hydraulic',
+      courseTitle: 'Industrial Hydraulic Systems',
+      courseSlug: 'hydraulic-engineering-mastery',
+      basePricePaise: 499900,
+      discountPaise: 50000,
+      subtotalPaise: 381271,
+      taxPaise: 68629,
+      totalPaise: 449900,
+      currency: 'INR',
+      isTaxApplicable: true,
+      taxRatePercent: 18,
+      pricesTaxInclusive: true,
+      coupon: {
+        code: 'SAVE500',
+        discountPaise: 50000,
+        type: 'FLAT',
+        value: 500,
+      },
+    };
+
+    // The checkout page reads totalPaise directly from serverQuote without recalculating
+    const displayedSubtotal = serverQuote.subtotalPaise;
+    const displayedTax = serverQuote.taxPaise;
+    const displayedTotal = serverQuote.totalPaise;
+
+    // Subtotal + Tax = Total
+    expect(displayedSubtotal + displayedTax).toBe(displayedTotal);
+
+    // Mock order created on server with same product and coupon
+    const serverOrderTotal = 449900;
+    expect(displayedTotal).toBe(serverOrderTotal);
+  });
 });

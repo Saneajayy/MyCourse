@@ -23,6 +23,7 @@ import { playbackRouter, studentCourseRouter } from './modules/video/playback.ro
 import { adminEntitlementRouter } from './modules/entitlements/admin-entitlement.routes.js';
 import { docsRouter } from './docs/openapi.js';
 import { devRouter } from './modules/dev/checkout.routes.js';
+import { adminRouter } from './modules/admin/admin.routes.js';
 
 declare global {
   namespace Express {
@@ -183,6 +184,7 @@ export function createApp(): Express {
   v1Router.use('/admin', adminOrderRouter);
   v1Router.use('/admin', adminCouponRouter);
   v1Router.use('/admin', adminEntitlementRouter);
+  v1Router.use('/admin', adminRouter);
 
   // Webhook endpoints (Signature-verified, exempt from CORS/CSRF)
   v1Router.post('/webhooks/bunny', (req, res, next) =>

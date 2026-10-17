@@ -49,6 +49,9 @@ export class AdminEntitlementController {
         });
       });
 
+      // Clear any active stream sessions so new entitlement permissions take effect immediately
+      await streamService.clearUserSessions(targetUserId);
+
       await auditService.log({
         actorUserId: adminUserId,
         action: 'ADMIN_ENTITLEMENT_GRANT',
@@ -108,6 +111,9 @@ export class AdminEntitlementController {
         },
       });
 
+      // Clear any active stream sessions so extension takes effect immediately
+      await streamService.clearUserSessions(existing.userId);
+
       await auditService.log({
         actorUserId: adminUserId,
         action: 'ADMIN_ENTITLEMENT_EXTEND',
@@ -155,6 +161,18 @@ export class AdminEntitlementController {
           status: EntitlementStatus.REVOKED,
           revokedAt: new Date(),
           revokedReason: input.reason,
+        },
+      });
+
+      // (a) Revoke refresh tokens, (b) bump tokenVersion, (c) clear Redis stream sessions
+      await prisma.refreshToken.deleteMany({
+        where: { userId: existing.userId },
+      });
+
+      await prisma.user.update({
+        where: { id: existing.userId },
+        data: {
+          tokenVersion: { increment: 1 },
         },
       });
 

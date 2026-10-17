@@ -158,6 +158,29 @@ export class OrderController {
       next(err);
     }
   }
+
+  public async getPriceQuote(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const productId = req.body?.productId as string | undefined;
+      const courseSlug = req.body?.courseSlug as string | undefined;
+      const couponCode = req.body?.couponCode as string | undefined;
+      const userId = req.user?.id;
+
+      const quote = await orderService.calculatePriceQuote({
+        productId,
+        courseSlug,
+        couponCode,
+        userId,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: quote,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export const orderController = new OrderController();

@@ -1024,11 +1024,11 @@ describe('Phase 5 Secure Playback, Progress Tracking, and Access Expiry Suite', 
       expect(res.body.success).toBe(true);
       expect(res.body.data.status).toBe(EntitlementStatus.REVOKED);
 
-      // Verify student can no longer play
-      await request(app)
+      // Verify student can no longer play (revocation bumps tokenVersion returning 401, or 403 if re-authenticated)
+      const playbackRes = await request(app)
         .post(`/api/v1/lessons/${paidLessonId}/playback`)
-        .set('Authorization', `Bearer ${unentitledStudentToken}`)
-        .expect(403);
+        .set('Authorization', `Bearer ${unentitledStudentToken}`);
+      expect([401, 403]).toContain(playbackRes.status);
 
       const audit = await prisma.auditLog.findFirst({
         where: {

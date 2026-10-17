@@ -10,6 +10,7 @@ import {
   reorderSchema,
 } from '@course/shared';
 import { BadRequestError } from '../../common/errors/app-error.js';
+import { prisma } from '../../common/db/prisma.js';
 
 export class CourseController {
   // ===========================================================================
@@ -130,7 +131,13 @@ export class CourseController {
   public async deleteSection(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const actorUserId = req.user!.id;
-      const result = await courseService.deleteSection(req.params.id as string, actorUserId);
+      const confirmDeleteVideo =
+        req.query.confirmDeleteVideo === 'true' || req.body?.confirmDeleteVideo === true;
+      const force = req.query.force === 'true' || req.body?.force === true;
+      const result = await courseService.deleteSection(req.params.id as string, actorUserId, {
+        confirmDeleteVideo,
+        force,
+      });
       res.status(200).json({ success: true, data: result });
     } catch (err) {
       next(err);
@@ -158,13 +165,26 @@ export class CourseController {
 
   public async createLesson(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const sectionId = (req.params.sectionId || req.body.sectionId) as string;
+      let productId = req.body.productId;
+      if (!productId && sectionId) {
+        const section = await prisma.section.findUnique({
+          where: { id: sectionId },
+          select: { productId: true },
+        });
+        if (section) {
+          productId = section.productId;
+        }
+      }
+
       const input = createLessonSchema.parse({
         ...req.body,
-        sectionId: req.params.sectionId ?? req.body.sectionId,
+        sectionId,
+        productId,
       });
       const actorUserId = req.user!.id;
       const lesson = await courseService.createLesson(
-        req.params.sectionId as string,
+        sectionId,
         input,
         actorUserId,
       );
@@ -188,7 +208,13 @@ export class CourseController {
   public async deleteLesson(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const actorUserId = req.user!.id;
-      const result = await courseService.deleteLesson(req.params.id as string, actorUserId);
+      const confirmDeleteVideo =
+        req.query.confirmDeleteVideo === 'true' || req.body?.confirmDeleteVideo === true;
+      const force = req.query.force === 'true' || req.body?.force === true;
+      const result = await courseService.deleteLesson(req.params.id as string, actorUserId, {
+        confirmDeleteVideo,
+        force,
+      });
       res.status(200).json({ success: true, data: result });
     } catch (err) {
       next(err);
