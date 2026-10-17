@@ -133,6 +133,31 @@ export class OrderController {
       next(err);
     }
   }
+
+  public async getTaxConfig(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const taxSetting = await prisma.appSetting.findUnique({
+        where: { key: 'tax_config' },
+      });
+
+      const config = (taxSetting?.value as any) || {
+        gstin: '',
+        gstRatePercent: 0,
+        pricesTaxInclusive: true,
+      };
+
+      res.status(200).json({
+        success: true,
+        data: {
+          gstin: config.gstin || '',
+          gstRatePercent: Number(config.gstRatePercent) || 0,
+          pricesTaxInclusive: config.pricesTaxInclusive !== false,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export const orderController = new OrderController();

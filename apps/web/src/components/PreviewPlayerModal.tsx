@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import Hls from 'hls.js';
+import type Hls from 'hls.js';
 import { Modal, Button } from './ui';
 import { siteConfig } from '../config/site';
 import { Play, Pause, Volume2, VolumeX, Maximize, AlertCircle, Loader2 } from 'lucide-react';
@@ -88,59 +88,76 @@ export function PreviewPlayerModal({
     };
   }, [isOpen, courseSlug, lessonId]);
 
-  // Initialize HLS
+  // Initialize HLS dynamically on demand
   useEffect(() => {
     if (!playbackUrl || !videoRef.current) return;
 
     const video = videoRef.current;
+    let hlsInstance: Hls | null = null;
+    let isCancelled = false;
 
-    if (Hls.isSupported() && playbackUrl.endsWith('.m3u8')) {
-      const hls = new Hls({
-        enableWorker: true,
-        lowLatencyMode: false,
-      });
+    async function initHls() {
+      try {
+        const { default: HlsClass } = await import('hls.js');
+        if (isCancelled || !videoRef.current) return;
 
-      hlsRef.current = hls;
-      hls.loadSource(playbackUrl);
-      hls.attachMedia(video);
+        if (HlsClass.isSupported() && playbackUrl && playbackUrl.endsWith('.m3u8')) {
+          const hls = new HlsClass({
+            enableWorker: true,
+            lowLatencyMode: false,
+          });
 
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play().catch(() => {
-          // Autoplay may be blocked by browser policy; user can click play
-          setIsPlaying(false);
-        });
-      });
+          hlsRef.current = hls;
+          hlsInstance = hls;
+          hls.loadSource(playbackUrl);
+          hls.attachMedia(video);
 
-      hls.on(Hls.Events.ERROR, (_event, data) => {
-        if (data.fatal) {
-          switch (data.type) {
-            case Hls.ErrorTypes.NETWORK_ERROR:
-              hls.startLoad();
-              break;
-            case Hls.ErrorTypes.MEDIA_ERROR:
-              hls.recoverMediaError();
-              break;
-            default:
-              hls.destroy();
-              setErrorMsg('Playback error encountered. Please try again.');
-              break;
-          }
+          hls.on(HlsClass.Events.MANIFEST_PARSED, () => {
+            video.play().catch(() => {
+              // Autoplay may be blocked by browser policy; user can click play
+              setIsPlaying(false);
+            });
+          });
+
+          hls.on(HlsClass.Events.ERROR, (_event, data) => {
+            if (data.fatal) {
+              switch (data.type) {
+                case HlsClass.ErrorTypes.NETWORK_ERROR:
+                  hls.startLoad();
+                  break;
+                case HlsClass.ErrorTypes.MEDIA_ERROR:
+                  hls.recoverMediaError();
+                  break;
+                default:
+                  hls.destroy();
+                  setErrorMsg('Playback error encountered. Please try again.');
+                  break;
+              }
+            }
+          });
+        } else if (playbackUrl && video.canPlayType('application/vnd.apple.mpegurl')) {
+          // Native Safari HLS
+          video.src = playbackUrl;
+          video.play().catch(() => setIsPlaying(false));
         }
-      });
-
-      return () => {
-        hls.destroy();
-        hlsRef.current = null;
-      };
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      // Native Safari HLS
-      video.src = playbackUrl;
-      video.play().catch(() => setIsPlaying(false));
-      return () => {
-        video.src = '';
-      };
+      } catch (err) {
+        console.error('Failed to load video streaming engine', err);
+        setErrorMsg('Failed to initialize video player.');
+      }
     }
-    return undefined;
+
+    initHls();
+
+    return () => {
+      isCancelled = true;
+      if (hlsInstance) {
+        hlsInstance.destroy();
+        hlsRef.current = null;
+      }
+      if (video) {
+        video.src = '';
+      }
+    };
   }, [playbackUrl]);
 
   const togglePlay = useCallback(() => {

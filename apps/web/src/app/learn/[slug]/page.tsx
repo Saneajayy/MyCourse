@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Hls from 'hls.js';
+import type Hls from 'hls.js';
 import { useAuth } from '../../../context/auth-context';
 import { apiClient, ApiError } from '../../../lib/api-client';
 import { siteConfig } from '../../../config/site';
@@ -185,79 +185,94 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     }
   }, [selectedLessonId, loadLessonStream]);
 
-  // 4. Initialize Hls.js on video element
+  // 4. Initialize Hls.js dynamically on video element
   useEffect(() => {
     if (!playbackData || !videoRef.current) return;
 
     const video = videoRef.current;
     const url = playbackData.playbackUrl;
+    let hlsInstance: Hls | null = null;
+    let isCancelled = false;
 
-    if (Hls.isSupported() && url.endsWith('.m3u8')) {
-      const hls = new Hls({
-        enableWorker: true,
-        lowLatencyMode: false,
-        backBufferLength: 90,
-      });
+    async function initPlayer() {
+      try {
+        const { default: HlsClass } = await import('hls.js');
+        if (isCancelled || !videoRef.current) return;
 
-      hlsRef.current = hls;
-      hls.loadSource(url);
-      hls.attachMedia(video);
+        if (HlsClass.isSupported() && url.endsWith('.m3u8')) {
+          const hls = new HlsClass({
+            enableWorker: true,
+            lowLatencyMode: false,
+            backBufferLength: 90,
+          });
 
-      hls.on(Hls.Events.MANIFEST_PARSED, (_event, data) => {
-        // Extract available quality levels
-        const levels = data.levels.map((lvl, index) => ({
-          id: index,
-          label: `${lvl.height}p`,
-        }));
-        setQualityLevels(levels);
+          hlsRef.current = hls;
+          hlsInstance = hls;
+          hls.loadSource(url);
+          hls.attachMedia(video);
 
-        // Resume from saved position if > 5 seconds
-        const resumePos = playbackData.progress.lastPositionSeconds;
-        if (resumePos > 5 && resumePos < (video.duration || 99999)) {
-          video.currentTime = resumePos;
-        }
+          hls.on(HlsClass.Events.MANIFEST_PARSED, (_event, data) => {
+            // Extract available quality levels
+            const levels = data.levels.map((lvl, index) => ({
+              id: index,
+              label: `${lvl.height}p`,
+            }));
+            setQualityLevels(levels);
 
-        video.play().catch(() => setIsPlaying(false));
-      });
+            // Resume from saved position if > 5 seconds
+            const resumePos = playbackData?.progress?.lastPositionSeconds ?? 0;
+            if (resumePos > 5 && resumePos < (video.duration || 99999)) {
+              video.currentTime = resumePos;
+            }
 
-      hls.on(Hls.Events.ERROR, (_event, errData) => {
-        if (errData.fatal) {
-          switch (errData.type) {
-            case Hls.ErrorTypes.NETWORK_ERROR:
-              // Quiet token refresh on 403 or network failure
-              if (selectedLessonId) {
-                loadLessonStream(selectedLessonId);
+            video.play().catch(() => setIsPlaying(false));
+          });
+
+          hls.on(HlsClass.Events.ERROR, (_event, errData) => {
+            if (errData.fatal) {
+              switch (errData.type) {
+                case HlsClass.ErrorTypes.NETWORK_ERROR:
+                  // Quiet token refresh on 403 or network failure
+                  if (selectedLessonId) {
+                    loadLessonStream(selectedLessonId);
+                  }
+                  break;
+                case HlsClass.ErrorTypes.MEDIA_ERROR:
+                  hls.recoverMediaError();
+                  break;
+                default:
+                  hls.destroy();
+                  setStreamError('Media playback error. Re-acquiring stream...');
+                  break;
               }
-              break;
-            case Hls.ErrorTypes.MEDIA_ERROR:
-              hls.recoverMediaError();
-              break;
-            default:
-              hls.destroy();
-              setStreamError('Media playback error. Re-acquiring stream...');
-              break;
+            }
+          });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = url;
+          const resumePos = playbackData?.progress?.lastPositionSeconds ?? 0;
+          if (resumePos > 5) {
+            video.currentTime = resumePos;
           }
+          video.play().catch(() => setIsPlaying(false));
         }
-      });
-
-      return () => {
-        hls.destroy();
-        hlsRef.current = null;
-      };
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = url;
-      const resumePos = playbackData.progress.lastPositionSeconds;
-      if (resumePos > 5) {
-        video.currentTime = resumePos;
+      } catch (err) {
+        console.error('Failed to load HLS playback library', err);
+        setStreamError('Failed to initialize playback engine.');
       }
-      video.play().catch(() => setIsPlaying(false));
-
-      return () => {
-        video.src = '';
-      };
     }
 
-    return undefined;
+    initPlayer();
+
+    return () => {
+      isCancelled = true;
+      if (hlsInstance) {
+        hlsInstance.destroy();
+        hlsRef.current = null;
+      }
+      if (video) {
+        video.src = '';
+      }
+    };
   }, [playbackData, selectedLessonId, loadLessonStream]);
 
   // 5. Heartbeat loop (every 20s) - keeps session alive in Redis even when paused

@@ -70,6 +70,10 @@ const envSchema = z.object({
   PRICES_TAX_INCLUSIVE: z
     .preprocess((val) => val === 'true' || val === true, z.boolean())
     .default(true),
+  // Development & Testing
+  ENABLE_DEV_ROUTES: z
+    .preprocess((val) => val === 'true' || val === true, z.boolean())
+    .default(false),
 });
 
 const parsed = envSchema.safeParse(process.env);

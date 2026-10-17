@@ -12,6 +12,11 @@ orderRouter.post('/orders', requireAuth, (req, res, next) =>
 orderRouter.get('/orders', requireAuth, (req, res, next) =>
   orderController.listUserOrders(req, res, next),
 );
+// Public tax configuration endpoint for checkout tax display
+orderRouter.get('/orders/tax-config', (req, res, next) =>
+  orderController.getTaxConfig(req, res, next),
+);
+
 orderRouter.get('/orders/:id', requireAuth, (req, res, next) =>
   orderController.getOrderById(req, res, next),
 );

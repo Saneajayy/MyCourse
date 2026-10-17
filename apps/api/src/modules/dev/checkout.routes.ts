@@ -5,13 +5,17 @@ import { uuidv7 } from 'uuidv7';
 
 export const devRouter = Router();
 
-// Only accessible in non-production environments
-devRouter.get('/checkout', (_req, res) => {
-  if (env.NODE_ENV === 'production') {
+// Top-level guard: strictly refuse access in production or when dev routes are disabled
+devRouter.use((_req, res, next) => {
+  if (env.NODE_ENV === 'production' || !env.ENABLE_DEV_ROUTES) {
     res.status(404).send('Not Found');
     return;
   }
+  next();
+});
 
+// Only accessible in non-production environments
+devRouter.get('/checkout', (_req, res) => {
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>

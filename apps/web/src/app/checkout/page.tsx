@@ -8,6 +8,7 @@ import { apiClient } from '../../lib/api-client';
 import { siteConfig } from '../../config/site';
 import { Button, Input, Card, useToast } from '../../components/ui';
 import { ShieldCheck, Tag, AlertTriangle, Lock, MailCheck, RefreshCw, Loader2 } from 'lucide-react';
+import { computeOrderTotals, TaxConfig } from '../../lib/tax';
 
 interface CourseProduct {
   id: string;
@@ -80,6 +81,26 @@ function CheckoutContent() {
     if (utmMedium) sessionStorage.setItem('utm_medium', utmMedium);
     if (utmCampaign) sessionStorage.setItem('utm_campaign', utmCampaign);
   }, [searchParams]);
+
+  // Tax Configuration State (Loaded from server AppSetting)
+  const [taxConfig, setTaxConfig] = useState<TaxConfig | null>(null);
+
+  // Fetch Public Tax Configuration
+  useEffect(() => {
+    async function fetchTaxConfig() {
+      try {
+        const res = await fetch(`${siteConfig.urls.api}/api/v1/orders/tax-config`);
+        const data = await res.json();
+        if (data.success && data.data) {
+          setTaxConfig(data.data);
+        }
+      } catch {
+        // Fallback default: zero tax if unreachable
+        setTaxConfig({ gstin: '', gstRatePercent: 0, pricesTaxInclusive: true });
+      }
+    }
+    fetchTaxConfig();
+  }, []);
 
   // Fetch Course details
   useEffect(() => {
@@ -157,7 +178,7 @@ function CheckoutContent() {
     setCouponError(null);
   };
 
-  // Price computation with coupon
+  // Price computation with coupon & dynamic server tax config
   const basePricePaise = course?.pricePaise || 499900;
   let discountPaise = 0;
   if (appliedCoupon) {
@@ -167,9 +188,8 @@ function CheckoutContent() {
       discountPaise = appliedCoupon.value * 100;
     }
   }
-  const finalPricePaise = Math.max(0, basePricePaise - discountPaise);
-  const gstPaise = Math.round((finalPricePaise * 18) / 118); // Inclusive 18% GST calculation
-  const netAmountPaise = finalPricePaise - gstPaise;
+  const totals = computeOrderTotals(basePricePaise, discountPaise, taxConfig);
+  const finalPricePaise = totals.totalPaise;
 
   // Resend verification email
   const handleResendVerification = async () => {
@@ -538,21 +558,32 @@ function CheckoutContent() {
                 </form>
               )}
 
-              {/* GST Tax Breakdown */}
-              <div className="border-t border-black/20 pt-3 space-y-1.5 text-xs text-course-navyMuted">
-                <div className="flex justify-between">
-                  <span>Net Taxable Value</span>
-                  <span className="font-mono">
-                    ₹{(netAmountPaise / 100).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                  </span>
+              {/* GST Tax Breakdown: Shown ONLY when server tax config applies (GSTIN set and gstRate > 0) */}
+              {totals.isTaxApplicable && totals.taxPaise > 0 && (
+                <div className="border-t border-black/20 pt-3 space-y-1.5 text-xs text-course-navyMuted">
+                  <div className="flex justify-between">
+                    <span>Net Taxable Value</span>
+                    <span className="font-mono">
+                      ₹
+                      {(totals.subtotalPaise / 100).toLocaleString('en-IN', {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>
+                      IGST / CGST+SGST ({totals.gstRatePercent}%{' '}
+                      {taxConfig?.pricesTaxInclusive !== false ? 'Inclusive' : 'Exclusive'})
+                    </span>
+                    <span className="font-mono">
+                      ₹
+                      {(totals.taxPaise / 100).toLocaleString('en-IN', {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>IGST / CGST+SGST (18% Inclusive)</span>
-                  <span className="font-mono">
-                    ₹{(gstPaise / 100).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-              </div>
+              )}
 
               {/* Total Row */}
               <div className="border-t-2 border-black pt-3 flex justify-between items-center text-base font-black text-course-darkBlue">

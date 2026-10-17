@@ -29,7 +29,8 @@ export default function TermsPage() {
           Terms &amp; Conditions
         </h1>
         <p className="text-xs font-mono text-course-navySubtle mt-2">
-          Last Updated: October 2026 • Governing Law: Jurisdiction of New Delhi, India
+          Last Updated: October 2026 • Governing Law: Jurisdiction of{' '}
+          {siteConfig.contact.jurisdiction}
         </p>
       </div>
 

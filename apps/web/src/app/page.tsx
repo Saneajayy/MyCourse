@@ -427,9 +427,8 @@ export default async function HomePage() {
                 </p>
 
                 <p className="text-xs md:text-sm text-course-navyMuted leading-relaxed">
-                  Having consulted for hundreds of industrial plants and commissioned heavy
-                  hydraulic presses across manufacturing units, his teaching focus is 100% on
-                  schematic clarity, practical diagnostics, and preventing costly plant downtime.
+                  Focused on practical schematic clarity, hydraulic system diagnostics, and
+                  preventing costly plant downtime based on hands-on industrial field experience.
                 </p>
 
                 <div className="pt-2">
@@ -557,7 +556,7 @@ export default async function HomePage() {
             </h2>
 
             <p className="text-sm md:text-base text-course-navyMuted max-w-xl mx-auto mb-8 leading-relaxed">
-              Join thousands of engineers who rely on practical, blueprint-accurate field knowledge.
+              Master practical, blueprint-accurate field engineering and industrial circuit design.
               Instant access upon enrollment with UPI, Credit/Debit cards, or Netbanking.
             </p>
 

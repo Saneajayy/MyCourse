@@ -140,9 +140,13 @@ export function createApp(): Express {
   app.use(healthRouter);
   app.use('/api/v1', healthRouter);
 
-  // 9. Interactive API Documentation & Dev Checkout Test Page (served only in non-production)
+  // 9. Interactive API Documentation (non-production only)
   if (env.NODE_ENV !== 'production') {
     app.use('/docs', docsRouter);
+  }
+
+  // Dev Routes (mounted ONLY when ENABLE_DEV_ROUTES=true and NODE_ENV is not production)
+  if (env.NODE_ENV !== 'production' && env.ENABLE_DEV_ROUTES) {
     app.use('/dev', devRouter);
   }
 

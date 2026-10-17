@@ -1,16 +1,69 @@
 import { describe, it, expect } from 'vitest';
+import { computeOrderTotals } from '../lib/tax';
 
 describe('Checkout State & Price Computation Logic', () => {
   const basePricePaise = 499900; // ₹4,999.00
 
-  it('calculates standard inclusive 18% GST correctly', () => {
-    // Formula: GST = Round(Total * 18 / 118)
-    const gstPaise = Math.round((basePricePaise * 18) / 118);
-    const netAmountPaise = basePricePaise - gstPaise;
+  it('calculates order totals when tax rate is 0 (or no GSTIN configured)', () => {
+    // Zero-rate tax config (or unconfigured GSTIN)
+    const taxConfigZero = {
+      gstin: '',
+      gstRatePercent: 0,
+      pricesTaxInclusive: true,
+    };
 
-    expect(gstPaise).toBe(76256); // ₹762.56
-    expect(netAmountPaise).toBe(423644); // ₹4,236.44
-    expect(netAmountPaise + gstPaise).toBe(basePricePaise);
+    const totals = computeOrderTotals(basePricePaise, 0, taxConfigZero);
+
+    expect(totals.isTaxApplicable).toBe(false);
+    expect(totals.taxPaise).toBe(0);
+    expect(totals.subtotalPaise).toBe(basePricePaise);
+    expect(totals.totalPaise).toBe(basePricePaise);
+    // Displayed total always strictly equals server order total
+    expect(totals.totalPaise).toBe(499900);
+  });
+
+  it('calculates order totals when tax rate is 18 (with valid GSTIN)', () => {
+    const taxConfig18 = {
+      gstin: '07AAAAA0000A1Z5',
+      gstRatePercent: 18,
+      pricesTaxInclusive: true,
+    };
+
+    const totals = computeOrderTotals(basePricePaise, 0, taxConfig18);
+
+    expect(totals.isTaxApplicable).toBe(true);
+    expect(totals.gstRatePercent).toBe(18);
+    expect(totals.taxPaise).toBe(76256); // ₹762.56
+    expect(totals.subtotalPaise).toBe(423644); // ₹4,236.44
+    // Subtotal + Tax = Total
+    expect(totals.subtotalPaise + totals.taxPaise).toBe(basePricePaise);
+    // Displayed total always strictly equals server order total
+    expect(totals.totalPaise).toBe(499900);
+  });
+
+  it('calculates order totals with discount under rate 18 and rate 0', () => {
+    const discountPaise = 100000; // ₹1,000 discount
+
+    // Case 1: Tax rate 0
+    const totalsZero = computeOrderTotals(basePricePaise, discountPaise, {
+      gstin: '07AAAAA0000A1Z5',
+      gstRatePercent: 0,
+      pricesTaxInclusive: true,
+    });
+    expect(totalsZero.isTaxApplicable).toBe(false);
+    expect(totalsZero.taxPaise).toBe(0);
+    expect(totalsZero.totalPaise).toBe(399900);
+    expect(totalsZero.subtotalPaise).toBe(399900);
+
+    // Case 2: Tax rate 18
+    const totals18 = computeOrderTotals(basePricePaise, discountPaise, {
+      gstin: '07AAAAA0000A1Z5',
+      gstRatePercent: 18,
+      pricesTaxInclusive: true,
+    });
+    expect(totals18.isTaxApplicable).toBe(true);
+    expect(totals18.totalPaise).toBe(399900);
+    expect(totals18.subtotalPaise + totals18.taxPaise).toBe(399900);
   });
 
   it('applies percentage coupon correctly', () => {
@@ -39,11 +92,15 @@ describe('Checkout State & Price Computation Logic', () => {
   it('identifies 100% discount for instant activation bypass', () => {
     const coupon100 = { type: 'PERCENT' as const, value: 100 };
     const discountPaise = Math.round((basePricePaise * coupon100.value) / 100);
-    const finalPricePaise = Math.max(0, basePricePaise - discountPaise);
+    const totals = computeOrderTotals(basePricePaise, discountPaise, {
+      gstin: '07AAAAA0000A1Z5',
+      gstRatePercent: 18,
+      pricesTaxInclusive: true,
+    });
 
-    expect(finalPricePaise).toBe(0);
-    const isInstantActivation = finalPricePaise === 0;
-    expect(isInstantActivation).toBe(true);
+    expect(totals.totalPaise).toBe(0);
+    expect(totals.taxPaise).toBe(0);
+    expect(totals.isTaxApplicable).toBe(false);
   });
 
   it('enforces email verification barrier before purchase', () => {
