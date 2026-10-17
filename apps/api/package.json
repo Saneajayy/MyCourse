@@ -18,7 +18,7 @@
     "generate:email-previews": "tsx src/scripts/generate-email-previews.ts"
   },
   "dependencies": {
-    "@asteasolutions/zod-to-openapi": "^7.3.4",
+    "@asteasolutions/zod-to-openapi": "^9.1.0",
     "@course/shared": "workspace:*",
     "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "7.10.0",
