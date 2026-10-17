@@ -13,6 +13,9 @@ import {
   initializeExpiryWorker,
   stopExpiryWorker,
 } from './modules/entitlements/entitlement-expiry.worker.js';
+import { checkTurnstileConfiguration } from './modules/contact/contact.controller.js';
+
+export { checkTurnstileConfiguration };
 
 async function startServer(): Promise<void> {
   const app = createApp();
@@ -25,6 +28,8 @@ async function startServer(): Promise<void> {
 
   // Pre-flight boot readiness check
   const [dbHealthy, redisHealthy] = await Promise.all([checkDatabaseHealth(), checkRedisHealth()]);
+
+  checkTurnstileConfiguration();
 
   if (env.NODE_ENV === 'production') {
     if (!dbHealthy || !redisHealthy) {

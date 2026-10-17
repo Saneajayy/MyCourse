@@ -420,10 +420,10 @@ export function getRefundConfirmationTemplate(data: {
   const amountRupees = (data.amountPaise / 100).toFixed(2);
   const subject = `Refund Processed for Order #${data.orderId.slice(0, 8)} - ${brandName}`;
 
-  // Razorpay standard refund timeline per official Razorpay documentation:
-  // UPI: instant to 24 hours. Netbanking / Credit Card / Debit Card: 5-7 working days.
+  // Razorpay standard refund timeline per official documentation (https://razorpay.com/docs/payments/refunds/):
+  // "The refund will be credited to your original payment method usually within 5-7 working days, depending on your bank."
   const timelineNotice =
-    'Per payment gateway standards (Razorpay), UPI refunds are credited within instant to 24 hours. Credit/Debit card and net banking refunds reflect in your bank statement within 5–7 business days depending on your issuing bank.';
+    'The refund will be credited to your original payment method usually within 5-7 working days, depending on your bank.';
 
   const text = `Hello ${data.name},
 
@@ -437,7 +437,7 @@ ${data.reason ? `- Reason: ${data.reason}\n` : ''}
 Expected Timeline:
 ${timelineNotice}
 
-If you do not see the credit in your account after 7 business days, please reply to this email with your Razorpay payment ID and our support desk will assist you immediately.
+If you do not see the credit in your account after 7 working days, please reply to this email with your Razorpay payment ID and our support desk will assist you immediately.
 
 Best regards,
 ${brandName} Team

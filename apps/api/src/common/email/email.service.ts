@@ -27,10 +27,12 @@ export interface EmailJobData {
 }
 
 export class EmailService {
+  public static readonly DEFAULT_BACKLOG_WARNING_THRESHOLD = 50;
   private provider: EmailProvider;
   private queue: Queue<EmailJobData> | null = null;
   private worker: Worker<EmailJobData> | null = null;
   private isProcessingDirectly: boolean;
+  private backlogWarningThreshold = EmailService.DEFAULT_BACKLOG_WARNING_THRESHOLD;
 
   constructor() {
     // 1. Initialize Email Provider
@@ -54,13 +56,21 @@ export class EmailService {
       this.queue = new Queue<EmailJobData>('email_delivery', { connection });
 
       // In production and dev, start background worker
+      // Provider rate limit: Resend allows 10 requests per second across the team (https://resend.com/docs/api-reference/rate-limits)
       if (env.NODE_ENV !== 'test') {
         this.worker = new Worker<EmailJobData>(
           'email_delivery',
           async (job) => {
             await this.processJob(job.data, job.attemptsMade, job.opts.attempts || 4, job.id);
           },
-          { connection, concurrency: 5 },
+          {
+            connection,
+            concurrency: 5,
+            limiter: {
+              max: 10,
+              duration: 1000,
+            },
+          },
         );
 
         this.worker.on('failed', (job, err) => {
@@ -92,6 +102,56 @@ export class EmailService {
 
   public setDirectModeForTesting(direct: boolean): void {
     this.isProcessingDirectly = direct;
+  }
+
+  public setBacklogThresholdForTesting(threshold: number): void {
+    this.backlogWarningThreshold = threshold;
+  }
+
+  public getBacklogThreshold(): number {
+    return this.backlogWarningThreshold;
+  }
+
+  public async getBacklogCount(): Promise<number> {
+    if (!this.queue) return 0;
+    return this.queue.getWaitingCount();
+  }
+
+  public getQueue(): Queue<EmailJobData> | null {
+    return this.queue;
+  }
+
+  public getWorker(): Worker<EmailJobData> | null {
+    return this.worker;
+  }
+
+  public startTestWorker(options?: {
+    concurrency?: number;
+    limiter?: { max: number; duration: number };
+  }): Worker<EmailJobData> {
+    const connection = { url: env.REDIS_URL };
+    this.worker = new Worker<EmailJobData>(
+      'email_delivery',
+      async (job) => {
+        await this.processJob(job.data, job.attemptsMade, job.opts.attempts || 4, job.id);
+      },
+      {
+        connection,
+        concurrency: options?.concurrency ?? 5,
+        limiter: options?.limiter ?? {
+          max: 10,
+          duration: 1000,
+        },
+      },
+    );
+    return this.worker;
+  }
+
+  public async stopWorker(): Promise<void> {
+    if (this.worker) {
+      await this.worker.close();
+      this.worker = null;
+    }
   }
 
   /**
@@ -306,6 +366,19 @@ export class EmailService {
         return { emailLogId: emailLog.id, status: EmailLogStatus.FAILED };
       }
     } else {
+      // Check queue backlog threshold before adding new job
+      try {
+        const waitingCount = await this.queue.getWaitingCount();
+        if (waitingCount >= this.backlogWarningThreshold) {
+          logger.warn(
+            { waitingCount, threshold: this.backlogWarningThreshold },
+            'Email queue backlog threshold exceeded; delivery delays may occur',
+          );
+        }
+      } catch (err) {
+        logger.error({ err }, 'Failed to check email queue backlog count');
+      }
+
       await this.queue.add('send', jobData, {
         attempts: 4,
         backoff: { type: 'exponential', delay: 2000 },

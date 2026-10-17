@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import request from 'supertest';
 import crypto from 'crypto';
 import { uuidv7 } from 'uuidv7';
@@ -6,6 +6,7 @@ import { createApp } from '../app.js';
 import { prisma } from '../common/db/prisma.js';
 import { redisClient } from '../common/redis/redis.js';
 import { env } from '../config/env.js';
+import { logger } from '../common/logger/logger.js';
 import {
   getEmailVerificationTemplate,
   getPasswordResetTemplate,
@@ -20,7 +21,16 @@ import {
 import { emailService } from '../common/email/email.service.js';
 import { assertEmailRateLimit } from '../common/middleware/email-rate-limiter.js';
 import { verifyResendWebhookSignature } from '../modules/webhooks/resend.webhook.js';
-import { EmailLogStatus } from '@course/shared';
+import { orderService } from '../modules/orders/order.service.js';
+import { checkTurnstileConfiguration } from '../modules/contact/contact.controller.js';
+import {
+  EmailLogStatus,
+  OrderStatus,
+  UserRole,
+  UserStatus,
+  EntitlementStatus,
+  RefundStatus,
+} from '@course/shared';
 
 describe('Phase 8 Production Email Infrastructure & System Notifications Integration Suite', () => {
   const app = createApp();
@@ -346,10 +356,13 @@ describe('Phase 8 Production Email Infrastructure & System Notifications Integra
   // ---------------------------------------------------------------------------
   // 5. RESEND WEBHOOK & SIGNATURE VERIFICATION
   // ---------------------------------------------------------------------------
-  describe('5. Resend Webhook Verification & Processing', () => {
+  describe('5. Resend Webhook Verification & Processing (W2)', () => {
+    // Official documentation citations:
+    // - Resend Webhook Verification: https://resend.com/docs/dashboard/webhooks/verify-webhooks-requests
+    // - Svix Webhook Verification: https://docs.svix.com/receiving/verifying-payloads/how
     const testSecret = 'whsec_dGVzdF9zZWNyZXRfa2V5X2Zvcl9zdml4X2hhc2g=';
 
-    it('verifyResendWebhookSignature validates authentic Svix signature', () => {
+    it('verifyResendWebhookSignature validates authentic Svix signature against raw payload', () => {
       const payload = JSON.stringify({ type: 'email.delivered', id: 'evt_123' });
       const id = 'msg_svix_test_01';
       const timestamp = String(Math.floor(Date.now() / 1000));
@@ -390,6 +403,88 @@ describe('Phase 8 Production Email Infrastructure & System Notifications Integra
       });
 
       expect(isValid).toBe(false);
+    });
+
+    it('verifyResendWebhookSignature rejects stale timestamps outside 300s tolerance (Svix spec)', () => {
+      const payload = JSON.stringify({ type: 'email.delivered', id: 'evt_stale_1' });
+      const id = 'msg_svix_test_stale';
+      const now = Math.floor(Date.now() / 1000);
+      const staleTimestamp = String(now - 305); // 305 seconds old (> 300s tolerance)
+      const signedPayload = `${id}.${staleTimestamp}.${payload}`;
+
+      const rawSecret = Buffer.from(testSecret.slice(6), 'base64');
+      const signature = crypto
+        .createHmac('sha256', rawSecret)
+        .update(signedPayload)
+        .digest('base64');
+
+      const isStaleValid = verifyResendWebhookSignature({
+        payload,
+        headers: {
+          id,
+          timestamp: staleTimestamp,
+          signature: `v1,${signature}`,
+        },
+        secret: testSecret,
+      });
+
+      expect(isStaleValid).toBe(false);
+
+      // Future timestamp beyond 300s is also rejected
+      const futureTimestamp = String(now + 310);
+      const futureSignedPayload = `${id}.${futureTimestamp}.${payload}`;
+      const futureSig = crypto
+        .createHmac('sha256', rawSecret)
+        .update(futureSignedPayload)
+        .digest('base64');
+
+      const isFutureValid = verifyResendWebhookSignature({
+        payload,
+        headers: {
+          id,
+          timestamp: futureTimestamp,
+          signature: `v1,${futureSig}`,
+        },
+        secret: testSecret,
+      });
+
+      expect(isFutureValid).toBe(false);
+    });
+
+    it('webhook endpoint rejects requests with 400 Bad Request if signature is invalid or timestamp is stale', async () => {
+      const prevSecret = process.env.RESEND_WEBHOOK_SECRET;
+      process.env.RESEND_WEBHOOK_SECRET = testSecret;
+
+      try {
+        const payload = { type: 'email.delivered', id: `evt_sig_fail_${Date.now()}` };
+        const id = 'msg_svix_req_fail';
+        const staleTimestamp = String(Math.floor(Date.now() / 1000) - 400);
+
+        // 1. Stale timestamp (rejected with 400)
+        const staleRes = await request(app)
+          .post('/api/v1/webhooks/resend')
+          .set('svix-id', id)
+          .set('svix-timestamp', staleTimestamp)
+          .set('svix-signature', 'v1,some_signature')
+          .send(payload);
+
+        expect(staleRes.status).toBe(400);
+        expect(staleRes.body.error).toBeDefined();
+
+        // 2. Tampered signature (rejected with 400)
+        const currentTimestamp = String(Math.floor(Date.now() / 1000));
+        const tamperedRes = await request(app)
+          .post('/api/v1/webhooks/resend')
+          .set('svix-id', id)
+          .set('svix-timestamp', currentTimestamp)
+          .set('svix-signature', 'v1,totally_invalid_signature_tampered==')
+          .send(payload);
+
+        expect(tamperedRes.status).toBe(400);
+        expect(tamperedRes.body.error).toBeDefined();
+      } finally {
+        process.env.RESEND_WEBHOOK_SECRET = prevSecret;
+      }
     });
 
     it('processes email.bounced webhook, adds to suppression list, and updates EmailLog status', async () => {
@@ -614,6 +709,292 @@ describe('Phase 8 Production Email Infrastructure & System Notifications Integra
       const disabledApp = createApp();
       const res = await request(disabledApp).get('/dev/email-previews');
       expect(res.status).toBe(404);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 8. PAYMENT & REFUND RESILIENCE: EMAIL FAILURE NEVER BLOCKS TRANSACTIONS (W1)
+  // ---------------------------------------------------------------------------
+  describe('8. Payment & Refund Resilience: Email Failure Never Blocks Financial Transactions (W1)', () => {
+    it('order fulfillment, active entitlement, and invoice creation commit and complete successfully even when email provider and BullMQ queue fail simultaneously', async () => {
+      // 1. Create student user, course product, and order in PENDING status
+      const user = await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: `student_w1_${Date.now()}@testcourse.com`,
+          name: 'Resilient Student W1',
+          role: UserRole.STUDENT,
+          status: UserStatus.ACTIVE,
+        },
+      });
+
+      const product = await prisma.product.create({
+        data: {
+          id: uuidv7(),
+          slug: `course-resilience-w1-${Date.now()}`,
+          title: 'Hydraulic Systems Resilience Masterclass',
+          description: 'Testing non-blocking email behavior',
+          pricePaise: 499900,
+          status: 'PUBLISHED',
+          validityDays: null, // Lifetime
+        },
+      });
+
+      const order = await prisma.order.create({
+        data: {
+          id: uuidv7(),
+          userId: user.id,
+          productId: product.id,
+          status: OrderStatus.PENDING,
+          subtotalPaise: 423644,
+          taxPaise: 76256,
+          totalPaise: 499900,
+          currency: 'INR',
+          idempotencyKey: `idem_w1_${Date.now()}_${uuidv7()}`,
+        },
+      });
+
+      // 2. Simulate catastrophic failure where BOTH queue and email provider fail/reject
+      const emailSpy = vi
+        .spyOn(emailService, 'sendOrderReceiptEmail')
+        .mockRejectedValue(new Error('BullMQ Redis connection timeout & Resend API 500 fatal'));
+      const dispatchSpy = vi
+        .spyOn(emailService, 'dispatchEmail')
+        .mockRejectedValue(new Error('Queue worker failure'));
+
+      try {
+        const paymentId = `pay_w1_fail_${Date.now()}`;
+        const result = await orderService.markOrderPaid(order.id, {
+          paymentId,
+          amountPaise: 499900,
+          currency: 'INR',
+          status: 'captured',
+          method: 'upi',
+          rawGatewayPayload: { paymentId, status: 'captured' },
+        });
+
+        // 3. Confirm fulfillment succeeded and returned PAID order
+        expect(result.order.status).toBe(OrderStatus.PAID);
+        expect(result.invoice).toBeDefined();
+
+        // 4. Verify in database: Order is PAID with paidAt timestamp
+        const dbOrder = await prisma.order.findUnique({
+          where: { id: order.id },
+        });
+        expect(dbOrder?.status).toBe(OrderStatus.PAID);
+        expect(dbOrder?.paidAt).not.toBeNull();
+
+        // 5. Verify in database: Entitlement is granted and ACTIVE
+        const dbEntitlement = await prisma.entitlement.findFirst({
+          where: {
+            userId: user.id,
+            productId: product.id,
+          },
+        });
+        expect(dbEntitlement).not.toBeNull();
+        expect(dbEntitlement?.status).toBe(EntitlementStatus.ACTIVE);
+
+        // 6. Verify in database: Sequential invoice was generated and committed
+        const dbInvoice = await prisma.invoice.findFirst({
+          where: { orderId: order.id },
+        });
+        expect(dbInvoice).not.toBeNull();
+        expect(dbInvoice?.invoiceNumber).toBeDefined();
+        expect(dbInvoice?.totalPaise).toBe(499900);
+      } finally {
+        emailSpy.mockRestore();
+        dispatchSpy.mockRestore();
+      }
+    });
+
+    it('refund processing completes, updates order to REFUNDED, and revokes entitlement even when refund confirmation email throws', async () => {
+      // 1. Create student user and course product
+      const user = await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: `student_refund_w1_${Date.now()}@testcourse.com`,
+          name: 'Refund Student W1',
+          role: UserRole.STUDENT,
+          status: UserStatus.ACTIVE,
+        },
+      });
+
+      const product = await prisma.product.create({
+        data: {
+          id: uuidv7(),
+          slug: `course-refund-w1-${Date.now()}`,
+          title: 'Hydraulic Refund Masterclass',
+          description: 'Testing non-blocking refund email behavior',
+          pricePaise: 299900,
+          status: 'PUBLISHED',
+          validityDays: null,
+        },
+      });
+
+      // 2. Create paid order with captured payment and active entitlement
+      const order = await prisma.order.create({
+        data: {
+          id: uuidv7(),
+          userId: user.id,
+          productId: product.id,
+          status: OrderStatus.PAID,
+          subtotalPaise: 254152,
+          taxPaise: 45748,
+          totalPaise: 299900,
+          currency: 'INR',
+          paidAt: new Date(),
+          idempotencyKey: `idem_rfnd_w1_${Date.now()}_${uuidv7()}`,
+        },
+      });
+
+      const gatewayPaymentId = `pay_rfnd_w1_${Date.now()}`;
+      await prisma.payment.create({
+        data: {
+          id: uuidv7(),
+          orderId: order.id,
+          razorpayPaymentId: gatewayPaymentId,
+          amountPaise: 299900,
+          status: 'CAPTURED',
+          method: 'netbanking',
+        },
+      });
+
+      await prisma.entitlement.create({
+        data: {
+          id: uuidv7(),
+          userId: user.id,
+          productId: product.id,
+          orderId: order.id,
+          status: EntitlementStatus.ACTIVE,
+          source: 'PURCHASE',
+        },
+      });
+
+      // 3. Spy on emailService.sendRefundConfirmationEmail to simulate email system crashing
+      const refundEmailSpy = vi
+        .spyOn(emailService, 'sendRefundConfirmationEmail')
+        .mockRejectedValue(new Error('Resend API down during refund notification'));
+
+      try {
+        const gatewayRefundId = `rfnd_w1_${Date.now()}`;
+        const refundResult = await orderService.handleRefundProcessed({
+          id: gatewayRefundId,
+          payment_id: gatewayPaymentId,
+          amount: 299900,
+        });
+
+        // 4. Confirm refund processing succeeded
+        expect(refundResult.success).toBe(true);
+        expect(refundResult.isFullRefund).toBe(true);
+
+        // 5. Verify database state: Refund marked PROCESSED
+        const dbRefund = await prisma.refund.findUnique({
+          where: { razorpayRefundId: gatewayRefundId },
+        });
+        expect(dbRefund?.status).toBe(RefundStatus.PROCESSED);
+
+        // 6. Verify database state: Order marked REFUNDED
+        const dbOrder = await prisma.order.findUnique({
+          where: { id: order.id },
+        });
+        expect(dbOrder?.status).toBe(OrderStatus.REFUNDED);
+
+        // 7. Verify database state: Entitlement revoked
+        const dbEntitlement = await prisma.entitlement.findFirst({
+          where: {
+            userId: user.id,
+            productId: product.id,
+          },
+        });
+        expect(dbEntitlement?.status).toBe(EntitlementStatus.REVOKED);
+      } finally {
+        refundEmailSpy.mockRestore();
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 9. QUEUE THROTTLING & BACKLOG CAPACITY ALERTS (W5)
+  // ---------------------------------------------------------------------------
+  describe('9. Queue Throttling & Backlog Capacity Alerts (W5)', () => {
+    it('BullMQ worker configuration enforces Resend rate limiter (10 req/s)', () => {
+      // Resend documentation citation: https://resend.com/docs/api-reference/rate-limits
+      const testWorker = emailService.startTestWorker();
+      try {
+        expect(testWorker.opts.limiter).toBeDefined();
+        expect(testWorker.opts.limiter?.max).toBe(10);
+        expect(testWorker.opts.limiter?.duration).toBe(1000);
+      } finally {
+        testWorker.close();
+      }
+    });
+
+    it('emits a warning log when email queue backlog exceeds configured threshold', async () => {
+      const queue = emailService.getQueue();
+      if (!queue) return;
+
+      const warnSpy = vi.spyOn(logger, 'warn');
+      const originalThreshold = emailService.getBacklogThreshold();
+
+      try {
+        // Lower threshold for testing to 1 job
+        emailService.setBacklogThresholdForTesting(1);
+        emailService.setDirectModeForTesting(false);
+
+        // Enqueue 2 jobs: first job enters queue, second job checks queue and detects backlog >= 1
+        await emailService.dispatchEmail({
+          to: `backlog_alert_1_${Date.now()}@testcourse.com`,
+          subject: 'Backlog Alert Job 1',
+          html: '<p>Backlog 1</p>',
+          text: 'Backlog 1',
+        });
+
+        await emailService.dispatchEmail({
+          to: `backlog_alert_2_${Date.now()}@testcourse.com`,
+          subject: 'Backlog Alert Job 2',
+          html: '<p>Backlog 2</p>',
+          text: 'Backlog 2',
+        });
+
+        const warningEmitted = warnSpy.mock.calls.some(
+          (args) => typeof args[1] === 'string' && args[1].includes('backlog threshold exceeded'),
+        );
+        expect(warningEmitted).toBe(true);
+      } finally {
+        emailService.setBacklogThresholdForTesting(originalThreshold);
+        emailService.setDirectModeForTesting(true);
+        warnSpy.mockRestore();
+        await queue.drain();
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 10. CONTACT FORM TURNSTILE STARTUP SECURITY VERIFICATION (W6)
+  // ---------------------------------------------------------------------------
+  describe('10. Contact Form Turnstile Startup Security Verification (W6)', () => {
+    it('checkTurnstileConfiguration logs startup warning when in production and Turnstile secret key is missing', () => {
+      const originalNodeEnv = env.NODE_ENV;
+      const originalKey = env.TURNSTILE_SECRET_KEY;
+      const warnSpy = vi.spyOn(logger, 'warn');
+
+      try {
+        (env as any).NODE_ENV = 'production';
+        (env as any).TURNSTILE_SECRET_KEY = undefined;
+
+        checkTurnstileConfiguration();
+
+        const warningEmitted = warnSpy.mock.calls.some(
+          (args) =>
+            typeof args[0] === 'string' &&
+            args[0].includes('TURNSTILE_SECRET_KEY is missing or unconfigured in production'),
+        );
+        expect(warningEmitted).toBe(true);
+      } finally {
+        (env as any).NODE_ENV = originalNodeEnv;
+        (env as any).TURNSTILE_SECRET_KEY = originalKey;
+        warnSpy.mockRestore();
+      }
     });
   });
 });

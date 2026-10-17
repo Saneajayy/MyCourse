@@ -31,6 +31,21 @@ export const contactSubmissionSchema = z.object({
 
 export type ContactSubmissionInput = z.infer<typeof contactSubmissionSchema>;
 
+export function checkTurnstileConfiguration(): void {
+  if (env.NODE_ENV === 'production') {
+    const turnstileSecret = env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET_KEY;
+    if (
+      !turnstileSecret ||
+      turnstileSecret.trim().length === 0 ||
+      turnstileSecret.startsWith('dummy_')
+    ) {
+      logger.warn(
+        'WARNING: TURNSTILE_SECRET_KEY is missing or unconfigured in production environment. Contact form CAPTCHA verification is inactive; relying on honeypot and per-IP rate limits.',
+      );
+    }
+  }
+}
+
 export class ContactController {
   public async submitContactForm(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {

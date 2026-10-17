@@ -7,6 +7,18 @@ import { logger } from '../../common/logger/logger.js';
 import { EmailLogStatus, WebhookEventStatus } from '@course/shared';
 import { BadRequestError } from '../../common/errors/app-error.js';
 
+/**
+ * Verifies Resend webhook signature using Svix specification.
+ * Official documentation citations:
+ * - Resend Webhooks: https://resend.com/docs/dashboard/webhooks/verify-webhooks-requests
+ * - Svix Signature Verification: https://docs.svix.com/receiving/verifying-payloads/how
+ *
+ * Headers verified against raw request body:
+ * - svix-id: unique event identifier
+ * - svix-timestamp: seconds since Unix epoch (enforcing ±300s / 5 minute tolerance against replay attacks)
+ * - svix-signature: space-separated list of signatures (e.g. "v1,<base64>")
+ * Secret: Accepts standard "whsec_<base64>" secret format.
+ */
 export function verifyResendWebhookSignature(options: {
   payload: string | Buffer;
   headers: {
