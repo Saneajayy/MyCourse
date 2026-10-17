@@ -1,4 +1,4 @@
-import { Queue, Worker } from 'bullmq';
+import { DelayedError, Queue, Worker } from 'bullmq';
 import { uuidv7 } from 'uuidv7';
 import { env } from '../../config/env.js';
 import { logger } from '../logger/logger.js';
@@ -10,7 +10,7 @@ import {
   SendEmailOptions,
   EmailSendResult,
 } from './email-provider.interface.js';
-import { ResendEmailProvider } from './resend-email.provider.js';
+import { ResendEmailProvider, RateLimitExceededError } from './resend-email.provider.js';
 import {
   getEmailVerificationTemplate,
   getPasswordResetTemplate,
@@ -56,18 +56,36 @@ export class EmailService {
       this.queue = new Queue<EmailJobData>('email_delivery', { connection });
 
       // In production and dev, start background worker
-      // Provider rate limit: Resend allows 10 requests per second across the team (https://resend.com/docs/api-reference/rate-limits)
+      // Provider rate limit: Resend allows 5-10 requests per second across the team; we set limiter to 5 sends/sec
       if (env.NODE_ENV !== 'test') {
         this.worker = new Worker<EmailJobData>(
           'email_delivery',
-          async (job) => {
-            await this.processJob(job.data, job.attemptsMade, job.opts.attempts || 4, job.id);
+          async (job, token) => {
+            try {
+              await this.processJob(job.data, job.attemptsMade, job.opts.attempts || 4, job.id);
+            } catch (err: any) {
+              if (err instanceof RateLimitExceededError || err?.name === 'RateLimitExceededError') {
+                const delayMs = (err.retryAfterSeconds || 1) * 1000;
+                logger.warn(
+                  { jobId: job.id, delayMs, retryAfter: err.retryAfterSeconds },
+                  'Resend returned 429; pausing BullMQ worker and delaying job',
+                );
+                if (this.worker) {
+                  await this.worker.rateLimit(delayMs).catch(() => {});
+                }
+                if (token) {
+                  await job.moveToDelayed(Date.now() + delayMs, token);
+                  throw new DelayedError();
+                }
+              }
+              throw err;
+            }
           },
           {
             connection,
             concurrency: 5,
             limiter: {
-              max: 10,
+              max: 5,
               duration: 1000,
             },
           },
@@ -132,14 +150,28 @@ export class EmailService {
     const connection = { url: env.REDIS_URL };
     this.worker = new Worker<EmailJobData>(
       'email_delivery',
-      async (job) => {
-        await this.processJob(job.data, job.attemptsMade, job.opts.attempts || 4, job.id);
+      async (job, token) => {
+        try {
+          await this.processJob(job.data, job.attemptsMade, job.opts.attempts || 4, job.id);
+        } catch (err: any) {
+          if (err instanceof RateLimitExceededError || err?.name === 'RateLimitExceededError') {
+            const delayMs = (err.retryAfterSeconds || 1) * 1000;
+            if (this.worker) {
+              await this.worker.rateLimit(delayMs).catch(() => {});
+            }
+            if (token) {
+              await job.moveToDelayed(Date.now() + delayMs, token);
+              throw new DelayedError();
+            }
+          }
+          throw err;
+        }
       },
       {
         connection,
         concurrency: options?.concurrency ?? 5,
         limiter: options?.limiter ?? {
-          max: 10,
+          max: 5,
           duration: 1000,
         },
       },
@@ -217,6 +249,20 @@ export class EmailService {
 
       return result;
     } catch (err: unknown) {
+      if (
+        err instanceof RateLimitExceededError ||
+        (err as any)?.name === 'RateLimitExceededError'
+      ) {
+        const retryAfter = (err as any).retryAfterSeconds || 1;
+        await prisma.emailLog.update({
+          where: { id: emailLogId },
+          data: {
+            errorMessage: `RATE_LIMITED_429: Provider rate limit exceeded; retrying in ${retryAfter}s (attempt ${currentAttempt})`,
+          },
+        });
+        throw err;
+      }
+
       const errorMsg = err instanceof Error ? err.message : String(err);
 
       // Check if final attempt has been reached (dead-letter state)

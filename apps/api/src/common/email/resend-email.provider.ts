@@ -7,6 +7,16 @@ export interface ResendProviderConfig {
   timeoutMs?: number;
 }
 
+export class RateLimitExceededError extends Error {
+  public readonly retryAfterSeconds: number;
+  constructor(message: string, retryAfterSeconds = 1) {
+    super(message);
+    this.name = 'RateLimitExceededError';
+    this.retryAfterSeconds = retryAfterSeconds;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
+
 export class ResendEmailProvider implements EmailProvider {
   private readonly apiKey: string;
   private readonly fromAddress: string;
@@ -63,6 +73,31 @@ export class ResendEmailProvider implements EmailProvider {
 
         const errorMessage =
           errorData?.message || `Resend HTTP error ${response.status}: ${response.statusText}`;
+
+        if (response.status === 429) {
+          const retryAfterHeader = response.headers.get('retry-after');
+          let retryAfterSeconds = 1;
+          if (retryAfterHeader) {
+            const parsed = parseInt(retryAfterHeader, 10);
+            if (!isNaN(parsed) && parsed > 0) {
+              retryAfterSeconds = parsed;
+            }
+          }
+          logger.warn(
+            {
+              status: response.status,
+              retryAfterSeconds,
+              to: options.to,
+              template: options.template,
+            },
+            'Resend rate limit (429) encountered; honoring retry-after header',
+          );
+          throw new RateLimitExceededError(
+            `Resend rate limit exceeded (429): ${errorMessage}`,
+            retryAfterSeconds,
+          );
+        }
+
         logger.error(
           {
             status: response.status,

@@ -71,16 +71,19 @@ export class FakePaymentGateway implements PaymentGateway {
     const payment = this.payments.get(paymentId);
     if (!payment) {
       let matchedOrderId = 'order_unknown';
+      let matchedAmount = 499900;
       if (paymentId.includes('_for_')) {
-        const extracted = paymentId.split('_for_')[1];
-        if (extracted) {
-          matchedOrderId = extracted;
+        const parts = paymentId.split('_for_');
+        matchedOrderId = parts[1] || 'order_unknown';
+        if (parts[0]?.includes('_amt_')) {
+          const amtStr = parts[0].split('_amt_')[1];
+          matchedAmount = parseInt(amtStr || '499900', 10);
         }
       }
       return {
         id: paymentId,
         orderId: matchedOrderId,
-        amountPaise: 499900,
+        amountPaise: matchedAmount,
         currency: 'INR',
         status: 'captured',
         method: 'card',

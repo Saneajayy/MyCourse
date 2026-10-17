@@ -237,6 +237,14 @@ describe('Phase 4 Orders, Payments, Invoicing, and Entitlements Suite', () => {
       update: {},
     });
 
+    // Clean up any stale transactional records from prior test runs to prevent sequence collisions
+    await prisma.refund.deleteMany({});
+    await prisma.invoice.deleteMany({});
+    await prisma.couponRedemption.deleteMany({});
+    await prisma.entitlement.deleteMany({});
+    await prisma.payment.deleteMany({});
+    await prisma.order.deleteMany({});
+
     await prisma.appSetting.upsert({
       where: { key: 'invoice_config' },
       create: {

@@ -5,9 +5,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const isProd = process.env.NODE_ENV === 'production';
-const apiOrigin = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'http://localhost:4000';
-const appOrigin = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000';
-const cdnHostname = process.env.NEXT_PUBLIC_BUNNY_CDN_HOSTNAME || process.env.BUNNY_STREAM_CDN_HOSTNAME || 'video.hydrauliccourse.com';
+const rawApiOrigin = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || '';
+const rawAppOrigin = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || '';
+
+// In production, strictly reject or omit localhost/loopback fallbacks
+const apiOrigin = isProd
+  ? rawApiOrigin && !rawApiOrigin.includes('localhost') && !rawApiOrigin.includes('127.0.0.1')
+    ? rawApiOrigin
+    : ''
+  : rawApiOrigin || 'http://localhost:4000';
+
+const appOrigin = isProd
+  ? rawAppOrigin && !rawAppOrigin.includes('localhost') && !rawAppOrigin.includes('127.0.0.1')
+    ? rawAppOrigin
+    : ''
+  : rawAppOrigin || 'http://localhost:3000';
+
+const cdnHostname =
+  process.env.NEXT_PUBLIC_BUNNY_CDN_HOSTNAME ||
+  process.env.BUNNY_STREAM_CDN_HOSTNAME ||
+  'video.hydrauliccourse.com';
 
 function buildContentSecurityPolicy() {
   const defaultSrc = ["'self'"];
@@ -20,7 +37,7 @@ function buildContentSecurityPolicy() {
 
   const styleSrc = ["'self'", "'unsafe-inline'"];
 
-  // img-src restricted to specific origins instead of wildcard https:
+  // img-src restricted strictly to app, api, Bunny CDN, and Razorpay (no Unsplash, no wildcards)
   const imgSrc = [
     "'self'",
     'data:',
@@ -33,7 +50,6 @@ function buildContentSecurityPolicy() {
     'https://*.b-cdn.net',
     'https://*.bunnycdn.com',
     'https://*.mediadelivery.net',
-    'https://images.unsplash.com',
   ];
 
   const fontSrc = ["'self'", 'data:'];
@@ -77,7 +93,10 @@ function buildContentSecurityPolicy() {
     imgSrc.push('http://localhost:*', 'http://127.0.0.1:*');
   }
 
-  const cleanList = (arr) => Array.from(new Set(arr.filter(Boolean))).join(' ');
+  const cleanList = (arr) =>
+    Array.from(new Set(arr.filter(Boolean)))
+      .filter((entry) => !isProd || (!entry.includes('localhost') && !entry.includes('127.0.0.1')))
+      .join(' ');
   const workerSrc = ["'self'", 'blob:'];
 
   return [
@@ -131,8 +150,30 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: cdnHostname,
       },
+      {
+        protocol: 'https',
+        hostname: '*.b-cdn.net',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.bunnycdn.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.mediadelivery.net',
+      },
+      {
+        protocol: 'https',
+        hostname: 'checkout.razorpay.com',
+      },
+      ...(!isProd
+        ? [
+            { protocol: 'http', hostname: 'localhost' },
+            { protocol: 'http', hostname: '127.0.0.1' },
+          ]
+        : []),
     ],
   },
   async headers() {

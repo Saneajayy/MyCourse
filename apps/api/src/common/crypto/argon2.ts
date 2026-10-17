@@ -1,3 +1,4 @@
+import os from 'os';
 import * as argon2 from 'argon2';
 import { ServiceUnavailableError } from '../errors/app-error.js';
 
@@ -21,11 +22,34 @@ export const ARGON2_OPTIONS: argon2.Options & { type: 2 } = {
 const DUMMY_HASH =
   '$argon2id$v=19$m=65536,t=3,p=4$dGVzdHNhbHRmb3JkdW1teXZlcmlmeQ$8pY3V7vH1Q9K9P+5r8s8L0qW3vH1Q9K9P+5r8s8L0qU';
 
-let maxConcurrent = 4;
-let maxQueue = 32;
+function getDefaultConcurrency(): number {
+  const envVal = parseInt(process.env.ARGON2_CONCURRENCY || '', 10);
+  if (!isNaN(envVal) && envVal > 0) return envVal;
+  const cpuCount = os.cpus()?.length || 4;
+  return Math.max(4, Math.min(cpuCount, 8));
+}
+
+function getDefaultQueueSize(): number {
+  const envVal = parseInt(process.env.ARGON2_MAX_QUEUE || '', 10);
+  if (!isNaN(envVal) && envVal >= 0) return envVal;
+  return 256;
+}
+
+let maxConcurrent = getDefaultConcurrency();
+let maxQueue = getDefaultQueueSize();
+const QUEUE_TIMEOUT_MS = parseInt(process.env.ARGON2_QUEUE_TIMEOUT_MS || '', 10) || 20_000;
 
 let activeHashes = 0;
 const waitingQueue: (() => void)[] = [];
+
+export function getArgon2QueueMetrics() {
+  return {
+    activeHashes,
+    waitingQueueDepth: waitingQueue.length,
+    maxConcurrent,
+    maxQueue,
+  };
+}
 
 export function _configureArgon2CapacityForTesting(concurrent: number, queue: number): void {
   maxConcurrent = concurrent;
@@ -33,8 +57,8 @@ export function _configureArgon2CapacityForTesting(concurrent: number, queue: nu
 }
 
 export function _resetArgon2CapacityForTesting(): void {
-  maxConcurrent = 4;
-  maxQueue = 32;
+  maxConcurrent = getDefaultConcurrency();
+  maxQueue = getDefaultQueueSize();
   activeHashes = 0;
   waitingQueue.length = 0;
 }
@@ -49,11 +73,27 @@ async function acquireSlot(): Promise<void> {
       'Authentication server busy: too many concurrent requests. Please retry shortly.',
     );
   }
-  return new Promise<void>((resolve) => {
-    waitingQueue.push(() => {
+  return new Promise<void>((resolve, reject) => {
+    let timer: NodeJS.Timeout | null = null;
+    const task = () => {
+      if (timer) clearTimeout(timer);
       activeHashes++;
       resolve();
-    });
+    };
+
+    timer = setTimeout(() => {
+      const idx = waitingQueue.indexOf(task);
+      if (idx !== -1) {
+        waitingQueue.splice(idx, 1);
+      }
+      reject(
+        new ServiceUnavailableError(
+          'Authentication server busy: request timed out waiting for password hashing capacity.',
+        ),
+      );
+    }, QUEUE_TIMEOUT_MS);
+
+    waitingQueue.push(task);
   });
 }
 

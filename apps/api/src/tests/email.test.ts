@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 import request from 'supertest';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import { uuidv7 } from 'uuidv7';
 import { createApp } from '../app.js';
 import { prisma } from '../common/db/prisma.js';
@@ -19,10 +20,19 @@ import {
   buildEmailHtml,
 } from '../common/email/email.templates.js';
 import { emailService } from '../common/email/email.service.js';
+import { ConsoleEmailProvider } from '../common/email/email-provider.interface.js';
+import {
+  ResendEmailProvider,
+  RateLimitExceededError,
+} from '../common/email/resend-email.provider.js';
 import { assertEmailRateLimit } from '../common/middleware/email-rate-limiter.js';
 import { verifyResendWebhookSignature } from '../modules/webhooks/resend.webhook.js';
+import { signAccessToken } from '../common/crypto/jwt.js';
 import { orderService } from '../modules/orders/order.service.js';
+import { invoiceService, INVOICES_DIR } from '../modules/invoices/invoice.service.js';
 import { checkTurnstileConfiguration } from '../modules/contact/contact.controller.js';
+import fs from 'fs';
+import path from 'path';
 import {
   EmailLogStatus,
   OrderStatus,
@@ -916,16 +926,90 @@ describe('Phase 8 Production Email Infrastructure & System Notifications Integra
   // ---------------------------------------------------------------------------
   // 9. QUEUE THROTTLING & BACKLOG CAPACITY ALERTS (W5)
   // ---------------------------------------------------------------------------
-  describe('9. Queue Throttling & Backlog Capacity Alerts (W5)', () => {
-    it('BullMQ worker configuration enforces Resend rate limiter (10 req/s)', () => {
+  describe('9. Queue Throttling & Backlog Capacity Alerts (Phase 9 A1)', () => {
+    it('BullMQ worker configuration enforces Resend rate limiter (5 req/s) per Phase 9 A1', () => {
       // Resend documentation citation: https://resend.com/docs/api-reference/rate-limits
+      // Limiter set to 5 sends/second per Phase 9 requirement A1
       const testWorker = emailService.startTestWorker();
       try {
         expect(testWorker.opts.limiter).toBeDefined();
-        expect(testWorker.opts.limiter?.max).toBe(10);
+        expect(testWorker.opts.limiter?.max).toBe(5);
         expect(testWorker.opts.limiter?.duration).toBe(1000);
       } finally {
         testWorker.close();
+      }
+    });
+
+    it('honors 429 response retry-after header and backs off gracefully instead of failing (A1)', async () => {
+      const originalFetch = global.fetch;
+      try {
+        global.fetch = vi.fn().mockResolvedValue({
+          ok: false,
+          status: 429,
+          statusText: 'Too Many Requests',
+          headers: new Headers({ 'retry-after': '3' }),
+          json: async () => ({ message: 'Rate limit exceeded' }),
+        }) as any;
+
+        const resendProvider = new ResendEmailProvider({
+          apiKey: 're_test_key_123',
+          fromAddress: 'updates@course.dev',
+        });
+
+        // Verify that RateLimitExceededError carries the parsed retryAfterSeconds
+        try {
+          await resendProvider.sendEmail({
+            to: 'student@example.com',
+            subject: 'Test Rate Limit',
+            html: '<p>Test</p>',
+            text: 'Test',
+            template: 'SYSTEM_NOTIFICATION',
+          });
+          expect.fail('Should have thrown RateLimitExceededError');
+        } catch (err: any) {
+          expect(err).toBeInstanceOf(RateLimitExceededError);
+          expect(err.retryAfterSeconds).toBe(3);
+        }
+
+        // Verify processJob updates EmailLog with RATE_LIMITED message without setting status to FAILED
+        const emailLog = await prisma.emailLog.create({
+          data: {
+            id: uuidv7(),
+            recipient: 'student-rl@example.com',
+            template: 'SYSTEM_NOTIFICATION',
+            subject: 'Rate Limit Test',
+            status: 'QUEUED',
+            attempts: 0,
+            idempotencyKey: `rl_test_${uuidv7()}`,
+          },
+        });
+
+        emailService.setProviderForTesting(resendProvider);
+        await expect(
+          emailService.processJob(
+            {
+              emailLogId: emailLog.id,
+              options: {
+                to: 'student-rl@example.com',
+                subject: 'Rate limit test',
+                html: '<p>Hi</p>',
+                text: 'Hi',
+                template: 'SYSTEM_NOTIFICATION',
+              },
+            },
+            0,
+            4,
+            'job-429-test',
+          ),
+        ).rejects.toThrow(RateLimitExceededError);
+
+        const updatedLog = await prisma.emailLog.findUnique({ where: { id: emailLog.id } });
+        expect(updatedLog?.status).not.toBe('FAILED');
+        expect(updatedLog?.errorMessage).toContain('RATE_LIMITED_429');
+        expect(updatedLog?.errorMessage).toContain('retrying in 3s');
+      } finally {
+        global.fetch = originalFetch;
+        emailService.setProviderForTesting(new ConsoleEmailProvider());
       }
     });
 
@@ -994,6 +1078,200 @@ describe('Phase 8 Production Email Infrastructure & System Notifications Integra
         (env as any).NODE_ENV = originalNodeEnv;
         (env as any).TURNSTILE_SECRET_KEY = originalKey;
         warnSpy.mockRestore();
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // 11. DURABLE RECEIPTS, ASYNC DISPATCH & SWEEPER (PHASE 9 A2)
+  // ---------------------------------------------------------------------------
+  describe('11. Durable Receipts, Async Dispatch & Sweeper (Phase 9 A2)', () => {
+    it('provider down during purchase: commits PAID, access granted, invoice generated, then recovery sweeper sends exactly one receipt', async () => {
+      // 1. Create test user and product
+      const testEmail = `durable-receipt-${Date.now()}@example.com`;
+      const user = await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: testEmail,
+          passwordHash: 'dummy_hash',
+          name: 'Durable Receipt User',
+          role: UserRole.STUDENT,
+          status: UserStatus.ACTIVE,
+        },
+      });
+
+      const product = await prisma.product.create({
+        data: {
+          id: uuidv7(),
+          title: 'Durable Receipts Masterclass',
+          slug: `durable-${Date.now()}`,
+          description: 'Testing durable receipts',
+          pricePaise: 49900,
+          currency: 'INR',
+          status: 'PUBLISHED',
+          validityDays: 365,
+        },
+      });
+
+      const order = await prisma.order.create({
+        data: {
+          id: uuidv7(),
+          userId: user.id,
+          productId: product.id,
+          subtotalPaise: 49900,
+          taxPaise: 0,
+          totalPaise: 49900,
+          currency: 'INR',
+          status: OrderStatus.PENDING,
+          idempotencyKey: `dur_ord_${uuidv7()}`,
+          razorpayOrderId: `order_dur_${uuidv7().substring(0, 14)}`,
+        },
+      });
+
+      // 2. Simulate email provider DOWN during purchase
+      const failingProvider = {
+        sendEmail: vi.fn().mockRejectedValue(new Error('Resend Service Unavailable (503)')),
+      };
+      emailService.setProviderForTesting(failingProvider);
+
+      // 3. Complete payment transaction
+      const paymentResult = await orderService.markOrderPaid(order.id, {
+        paymentId: `pay_dur_${uuidv7().substring(0, 14)}`,
+        amountPaise: 49900,
+        currency: 'INR',
+        status: 'captured',
+        method: 'upi',
+      });
+
+      // Verify order commits PAID, entitlement granted, invoice generated
+      expect(paymentResult.order.status).toBe(OrderStatus.PAID);
+      expect(paymentResult.entitlement).toBeDefined();
+      expect(paymentResult.entitlement?.status).toBe(EntitlementStatus.ACTIVE);
+      expect(paymentResult.invoice).toBeDefined();
+
+      // Check EmailLog: no receipt successfully SENT
+      const receiptKey = `ORDER_RECEIPT:${order.id}`;
+      const logBeforeRecovery = await prisma.emailLog.findUnique({
+        where: { idempotencyKey: receiptKey },
+      });
+      expect(logBeforeRecovery?.status).not.toBe(EmailLogStatus.SENT);
+
+      // 4. Provider RECOVERS
+      const workingProvider = new ConsoleEmailProvider();
+      const sendSpy = vi.spyOn(workingProvider, 'sendEmail');
+      emailService.setProviderForTesting(workingProvider);
+
+      // 5. Run sweeper job
+      const sweptCount = await invoiceService.sweepUnemailedPaidOrders();
+      expect(sweptCount).toBeGreaterThanOrEqual(1);
+
+      // 6. Assert receipt is now SENT
+      const logAfterSweeper = await prisma.emailLog.findUnique({
+        where: { idempotencyKey: receiptKey },
+      });
+      expect(logAfterSweeper?.status).toBe(EmailLogStatus.SENT);
+      const studentReceiptCalls = sendSpy.mock.calls.filter((c) => c[0].to === testEmail);
+      expect(studentReceiptCalls.length).toBe(1);
+
+      // 7. Running sweeper again does not send duplicate
+      sendSpy.mockClear();
+      await invoiceService.sweepUnemailedPaidOrders();
+      const duplicateCalls = sendSpy.mock.calls.filter((c) => c[0].to === testEmail);
+      expect(duplicateCalls.length).toBe(0);
+
+      // Clean up provider
+      emailService.setProviderForTesting(new ConsoleEmailProvider());
+    });
+
+    it('invoice download regenerates PDF on demand if pdfUrl is missing or file is gone from disk', async () => {
+      // 1. Create paid order and invoice
+      const testEmail = `download-pdf-${Date.now()}@example.com`;
+      const user = await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: testEmail,
+          passwordHash: 'dummy_hash',
+          name: 'Download PDF User',
+          role: UserRole.STUDENT,
+          status: UserStatus.ACTIVE,
+        },
+      });
+
+      const product = await prisma.product.create({
+        data: {
+          id: uuidv7(),
+          title: 'PDF On-Demand Course',
+          slug: `pdf-${Date.now()}`,
+          description: 'Testing PDF generation',
+          pricePaise: 19900,
+          currency: 'INR',
+          status: 'PUBLISHED',
+          validityDays: 365,
+        },
+      });
+
+      const order = await prisma.order.create({
+        data: {
+          id: uuidv7(),
+          userId: user.id,
+          productId: product.id,
+          subtotalPaise: 19900,
+          taxPaise: 0,
+          totalPaise: 19900,
+          currency: 'INR',
+          status: OrderStatus.PAID,
+          idempotencyKey: `pdf_ord_${uuidv7()}`,
+          razorpayOrderId: `order_pdf_${uuidv7().substring(0, 14)}`,
+        },
+      });
+
+      const invMeta = await invoiceService.generateInvoiceNumberUnderLock(prisma as any);
+      const invoice = await prisma.invoice.create({
+        data: {
+          id: uuidv7(),
+          orderId: order.id,
+          invoiceNumber: invMeta.invoiceNumber,
+          financialYear: invMeta.financialYear,
+          sequenceNumber: invMeta.sequenceNumber,
+          subtotalPaise: 19900,
+          taxPaise: 0,
+          totalPaise: 19900,
+          billingDetails: {},
+          pdfUrl: null, // Deliberately null
+        },
+      });
+
+      // Ensure file does not exist on disk
+      const safeFileName = `invoice-${invoice.invoiceNumber.replace(/[\/\\]/g, '_')}.pdf`;
+      const diskPath = path.join(INVOICES_DIR, safeFileName);
+      if (fs.existsSync(diskPath)) {
+        fs.unlinkSync(diskPath);
+      }
+
+      // Generate auth token for student
+      const token = signAccessToken({
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+        tokenVersion: 0,
+      });
+
+      // Call download endpoint
+      const res = await request(app)
+        .get(`/api/v1/invoices/${invoice.id}/download`)
+        .set('Authorization', `Bearer ${token}`);
+
+      expect(res.status).toBe(200);
+      expect(res.headers['content-type']).toBe('application/pdf');
+      expect(fs.existsSync(diskPath)).toBe(true);
+
+      // Check DB was updated with pdfUrl
+      const updatedInvoice = await prisma.invoice.findUnique({ where: { id: invoice.id } });
+      expect(updatedInvoice?.pdfUrl).toBeDefined();
+
+      // Clean up file
+      if (fs.existsSync(diskPath)) {
+        fs.unlinkSync(diskPath);
       }
     });
   });

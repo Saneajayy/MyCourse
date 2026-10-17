@@ -2,14 +2,16 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import PDFDocument from 'pdfkit';
+import { Queue, Worker } from 'bullmq';
+import { env } from '../../config/env.js';
 import { prisma } from '../../common/db/prisma.js';
 import { emailService } from '../../common/email/email.service.js';
 import { logger } from '../../common/logger/logger.js';
-import { Prisma } from '@prisma/client';
+import { EmailLogStatus, OrderStatus, Prisma } from '@prisma/client';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const INVOICES_DIR = path.resolve(__dirname, '../../../uploads/invoices');
+export const INVOICES_DIR = path.resolve(__dirname, '../../../uploads/invoices');
 
 // Ensure invoices directory exists
 if (!fs.existsSync(INVOICES_DIR)) {
@@ -71,8 +73,10 @@ export function getFinancialYear(date = new Date(), format: 'short' | 'long' = '
 export async function calculateTaxAndTotals(
   totalOrBasePaise: number,
   discountPaise = 0,
+  tx?: Prisma.TransactionClient,
 ): Promise<TaxCalculationResult> {
-  const taxSetting = await prisma.appSetting.findUnique({
+  const client = tx || prisma;
+  const taxSetting = await client.appSetting.findUnique({
     where: { key: 'tax_config' },
   });
 
@@ -122,6 +126,39 @@ export async function calculateTaxAndTotals(
 }
 
 export class InvoiceService {
+  private receiptQueue: Queue<{ orderId: string }> | null = null;
+  private receiptWorker: Worker<{ orderId: string }> | null = null;
+  private sweeperInterval: NodeJS.Timeout | null = null;
+
+  constructor() {
+    try {
+      const connection = { url: env.REDIS_URL };
+      this.receiptQueue = new Queue<{ orderId: string }>('receipt_delivery', { connection });
+
+      if (env.NODE_ENV !== 'test') {
+        this.receiptWorker = new Worker<{ orderId: string }>(
+          'receipt_delivery',
+          async (job) => {
+            await this.processReceiptJob(job.data.orderId);
+          },
+          {
+            connection,
+            concurrency: 5,
+          },
+        );
+
+        this.receiptWorker.on('failed', (job, err) => {
+          logger.error(
+            { jobId: job?.id, orderId: job?.data?.orderId, error: err.message },
+            'BullMQ receipt job failed attempt',
+          );
+        });
+      }
+    } catch (err) {
+      logger.error({ err }, 'Failed to initialize BullMQ receipt queue');
+    }
+  }
+
   /**
    * Generates a sequential invoice number per financial year with no gaps,
    * safe under concurrent transactions using PostgreSQL row locking (FOR UPDATE).
@@ -183,8 +220,9 @@ export class InvoiceService {
     };
   }
 
-  public async shouldGenerateZeroValueInvoice(): Promise<boolean> {
-    const setting = await prisma.appSetting.findUnique({
+  public async shouldGenerateZeroValueInvoice(tx?: Prisma.TransactionClient): Promise<boolean> {
+    const client = tx || prisma;
+    const setting = await client.appSetting.findUnique({
       where: { key: 'invoice_config' },
     });
     const config = (setting?.value as unknown as InvoiceConfig) || {};
@@ -384,6 +422,155 @@ export class InvoiceService {
       });
     } catch (err) {
       logger.error({ err, userEmail, invoiceNumber }, 'Failed to send invoice email');
+    }
+  }
+
+  public async enqueueReceiptJob(orderId: string): Promise<void> {
+    if (!this.receiptQueue || env.NODE_ENV === 'test') {
+      await this.processReceiptJob(orderId);
+      return;
+    }
+    await this.receiptQueue.add(
+      'process_receipt',
+      { orderId },
+      {
+        jobId: `receipt_${orderId}`,
+        attempts: 4,
+        backoff: {
+          type: 'exponential',
+          delay: 5000,
+        },
+        removeOnComplete: 1000,
+        removeOnFail: 5000,
+      },
+    );
+  }
+
+  public async processReceiptJob(orderId: string): Promise<void> {
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: {
+        product: true,
+        user: true,
+        invoice: true,
+      },
+    });
+
+    if (!order || order.status !== OrderStatus.PAID || !order.invoice) {
+      logger.warn(
+        { orderId },
+        'Cannot process receipt: order not found, not PAID, or missing invoice',
+      );
+      return;
+    }
+
+    // Check if receipt email has already been sent (idempotency key: ORDER_RECEIPT:<orderId>)
+    const receiptKey = `ORDER_RECEIPT:${order.id}`;
+    const existingEmailLog = await prisma.emailLog.findUnique({
+      where: { idempotencyKey: receiptKey },
+    });
+
+    if (existingEmailLog && existingEmailLog.status === EmailLogStatus.SENT) {
+      logger.info({ orderId }, 'Receipt email already successfully sent for order; skipping');
+      return;
+    }
+
+    // 1. Ensure PDF is generated on disk and pdfUrl is populated
+    const safeFileName = `invoice-${order.invoice.invoiceNumber.replace(/[\/\\]/g, '_')}.pdf`;
+    const fullFilePath = path.join(INVOICES_DIR, safeFileName);
+    let pdfBuffer: Buffer | undefined;
+
+    if (!order.invoice.pdfUrl || !fs.existsSync(fullFilePath)) {
+      const businessSetting = await prisma.appSetting.findUnique({
+        where: { key: 'business_profile' },
+      });
+      const taxSetting = await prisma.appSetting.findUnique({ where: { key: 'tax_config' } });
+
+      const pdfUrl = await this.generateInvoicePdf(
+        order.invoice.id,
+        order.invoice.invoiceNumber,
+        order,
+        (businessSetting?.value as any) || {},
+        (taxSetting?.value as any) || {},
+      );
+
+      await prisma.invoice.update({
+        where: { id: order.invoice.id },
+        data: { pdfUrl },
+      });
+    }
+
+    if (fs.existsSync(fullFilePath)) {
+      pdfBuffer = fs.readFileSync(fullFilePath);
+    }
+
+    // Find entitlement if any to get expiresAt
+    const entitlement = await prisma.entitlement.findFirst({
+      where: { orderId: order.id },
+    });
+
+    // 2. Dispatch order receipt email
+    await emailService.sendOrderReceiptEmail({
+      to: order.user.email,
+      name: order.user.name,
+      courseTitle: order.product.title,
+      invoiceNumber: order.invoice.invoiceNumber,
+      amountPaise: order.totalPaise,
+      orderId: order.id,
+      userId: order.userId,
+      expiresAt: entitlement?.expiresAt,
+      pdfBuffer,
+    });
+  }
+
+  public async sweepUnemailedPaidOrders(): Promise<number> {
+    const paidOrders = await prisma.order.findMany({
+      where: {
+        status: OrderStatus.PAID,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    let enqueuedCount = 0;
+    for (const order of paidOrders) {
+      const receiptKey = `ORDER_RECEIPT:${order.id}`;
+      const sentReceipt = await prisma.emailLog.findUnique({
+        where: { idempotencyKey: receiptKey },
+      });
+
+      if (!sentReceipt || sentReceipt.status !== EmailLogStatus.SENT) {
+        await this.enqueueReceiptJob(order.id);
+        enqueuedCount++;
+      }
+    }
+
+    logger.info({ enqueuedCount }, 'Sweeper finished checking PAID orders without receipt email');
+    return enqueuedCount;
+  }
+
+  public startReceiptSweeper(intervalMs = 60000): void {
+    if (this.sweeperInterval) return;
+    this.sweeperInterval = setInterval(() => {
+      this.sweepUnemailedPaidOrders().catch((err) => {
+        logger.error({ err }, 'Error running receipt sweeper job');
+      });
+    }, intervalMs);
+  }
+
+  public stopReceiptSweeper(): void {
+    if (this.sweeperInterval) {
+      clearInterval(this.sweeperInterval);
+      this.sweeperInterval = null;
+    }
+  }
+
+  public async stopWorker(): Promise<void> {
+    this.stopReceiptSweeper();
+    if (this.receiptWorker) {
+      await this.receiptWorker.close();
+      this.receiptWorker = null;
     }
   }
 }

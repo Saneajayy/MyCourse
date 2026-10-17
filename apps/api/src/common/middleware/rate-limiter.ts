@@ -82,23 +82,23 @@ export function createRateLimiter(options: RateLimiterOptions) {
   };
 }
 
-// Pre-configured rate limiters
+// Pre-configured rate limiters (tuned for Indian CGNAT mobile networks where thousands share an IP)
 export const standardRateLimiter = createRateLimiter({
-  points: 100,
+  points: 300,
   duration: 60,
   keyPrefix: 'rl_standard',
   isSensitive: false,
 });
 
 export const authRateLimiter = createRateLimiter({
-  points: 15,
+  points: 60,
   duration: 60,
   keyPrefix: 'rl_auth',
   isSensitive: true,
 });
 
 export const sensitiveActionRateLimiter = createRateLimiter({
-  points: 20,
+  points: 30,
   duration: 60,
   keyPrefix: 'rl_sensitive',
   isSensitive: true,

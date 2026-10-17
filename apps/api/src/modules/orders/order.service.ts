@@ -113,69 +113,153 @@ export class OrderService {
       }
     }
 
-    // 5. Calculate pricing, discounts, and taxes atomically under transaction
-    return prisma.$transaction(
-      async (tx) => {
-        let discountPaise = 0;
-        let appliedCouponId: string | null = null;
-        let is100PercentCoupon = false;
+    // 5. Calculate pricing, discounts, and taxes
+    const orderId = uuidv7();
 
-        if (input.couponCode) {
+    if (input.couponCode) {
+      return prisma.$transaction(
+        async (tx) => {
           const couponResult = await couponService.validateAndCalculateDiscount(
             tx,
-            input.couponCode,
+            input.couponCode!,
             userId,
             product.id,
             product.pricePaise,
           );
-          discountPaise = couponResult.discountPaise;
-          appliedCouponId = couponResult.couponId;
-          is100PercentCoupon = couponResult.is100Percent;
-        }
+          const discountPaise = couponResult.discountPaise;
+          const appliedCouponId = couponResult.couponId;
+          const is100PercentCoupon = couponResult.is100Percent;
 
-        const taxCalculation = await calculateTaxAndTotals(product.pricePaise, discountPaise);
-        const totalPaise = taxCalculation.totalPaise;
-        const subtotalPaise = taxCalculation.subtotalPaise;
-        const taxPaise = taxCalculation.taxPaise;
+          const taxCalculation = await calculateTaxAndTotals(product.pricePaise, discountPaise, tx);
+          const totalPaise = taxCalculation.totalPaise;
+          const subtotalPaise = taxCalculation.subtotalPaise;
+          const taxPaise = taxCalculation.taxPaise;
 
-        const orderId = uuidv7();
-        let razorpayOrderId: string | null = null;
+          // 6. If total is 0 (100% coupon), skip payment gateway and fulfill immediately
+          if (is100PercentCoupon || totalPaise === 0) {
+            const paidOrder = await tx.order.create({
+              data: {
+                id: orderId,
+                userId,
+                productId: product.id,
+                couponId: appliedCouponId,
+                idempotencyKey,
+                status: OrderStatus.PAID,
+                subtotalPaise,
+                discountPaise,
+                taxPaise: 0,
+                totalPaise: 0,
+                currency: product.currency,
+                razorpayOrderId: null,
+                billingDetails: (input.billingDetails as any) ?? null,
+                utmSource: input.utmSource,
+                utmMedium: input.utmMedium,
+                utmCampaign: input.utmCampaign,
+                paidAt: new Date(),
+              },
+              include: { product: true, coupon: true },
+            });
 
-        // 6. If total is 0 (100% coupon), skip payment gateway and fulfill immediately
-        if (is100PercentCoupon || totalPaise === 0) {
-          const paidOrder = await tx.order.create({
+            // Grant entitlement immediately
+            await entitlementService.grantOrExtendEntitlement(tx, {
+              userId,
+              productId: product.id,
+              orderId,
+              validityDays: product.validityDays,
+              source: EntitlementSource.COUPON_100,
+            });
+
+            // Record coupon redemption
+            if (appliedCouponId) {
+              await tx.couponRedemption.create({
+                data: {
+                  id: uuidv7(),
+                  couponId: appliedCouponId,
+                  userId,
+                  orderId,
+                  discountPaise,
+                },
+              });
+            }
+
+            // Check if zero-value invoices are enabled in AppSetting (R9)
+            const shouldGenZeroInvoice = await invoiceService.shouldGenerateZeroValueInvoice(tx);
+            let invoice = null;
+
+            if (shouldGenZeroInvoice) {
+              const invMeta = await invoiceService.generateInvoiceNumberUnderLock(tx, new Date());
+              invoice = await tx.invoice.create({
+                data: {
+                  id: uuidv7(),
+                  orderId,
+                  invoiceNumber: invMeta.invoiceNumber,
+                  financialYear: invMeta.financialYear,
+                  sequenceNumber: invMeta.sequenceNumber,
+                  subtotalPaise: 0,
+                  taxPaise: 0,
+                  totalPaise: 0,
+                  billingDetails: (input.billingDetails as any) ?? {},
+                  issuedAt: new Date(),
+                },
+              });
+            }
+
+            await auditService.log(
+              {
+                actorUserId: userId,
+                action: 'ORDER_PAID_FREE_COUPON',
+                entityType: 'Order',
+                entityId: orderId,
+                afterState: paidOrder,
+              },
+              tx,
+            );
+
+            return {
+              order: paidOrder,
+              invoice,
+              razorpayOrderId: null,
+              razorpayKeyId: env.RAZORPAY_KEY_ID,
+              isReplay: false,
+            };
+          }
+
+          // 7. Create order on Razorpay Gateway
+          const gateway = getPaymentGateway();
+          const gatewayOrder = await gateway.createOrder({
+            amountPaise: totalPaise,
+            currency: product.currency,
+            receipt: `ord_${orderId.replace(/-/g, '').substring(0, 14)}`,
+            notes: {
+              orderId,
+              userId,
+              productId: product.id,
+            },
+          });
+
+          const order = await tx.order.create({
             data: {
               id: orderId,
               userId,
               productId: product.id,
               couponId: appliedCouponId,
               idempotencyKey,
-              status: OrderStatus.PAID,
+              status: OrderStatus.CREATED,
               subtotalPaise,
               discountPaise,
-              taxPaise: 0,
-              totalPaise: 0,
+              taxPaise,
+              totalPaise,
               currency: product.currency,
-              razorpayOrderId: null,
+              razorpayOrderId: gatewayOrder.id,
               billingDetails: (input.billingDetails as any) ?? null,
               utmSource: input.utmSource,
               utmMedium: input.utmMedium,
               utmCampaign: input.utmCampaign,
-              paidAt: new Date(),
             },
             include: { product: true, coupon: true },
           });
 
-          // Grant entitlement immediately
-          await entitlementService.grantOrExtendEntitlement(tx, {
-            userId,
-            productId: product.id,
-            orderId,
-            validityDays: product.validityDays,
-            source: EntitlementSource.COUPON_100,
-          });
-
-          // Record coupon redemption
+          // R5: Count redemption at order creation under row lock
           if (appliedCouponId) {
             await tx.couponRedemption.create({
               data: {
@@ -188,74 +272,63 @@ export class OrderService {
             });
           }
 
-          // Check if zero-value invoices are enabled in AppSetting (R9)
-          const shouldGenZeroInvoice = await invoiceService.shouldGenerateZeroValueInvoice();
-          let invoice = null;
-
-          if (shouldGenZeroInvoice) {
-            const invMeta = await invoiceService.generateInvoiceNumberUnderLock(tx, new Date());
-            invoice = await tx.invoice.create({
-              data: {
-                id: uuidv7(),
-                orderId,
-                invoiceNumber: invMeta.invoiceNumber,
-                financialYear: invMeta.financialYear,
-                sequenceNumber: invMeta.sequenceNumber,
-                subtotalPaise: 0,
-                taxPaise: 0,
-                totalPaise: 0,
-                billingDetails: (input.billingDetails as any) ?? {},
-                issuedAt: new Date(),
-              },
-            });
-          }
-
-          await auditService.log({
-            actorUserId: userId,
-            action: 'ORDER_PAID_FREE_COUPON',
-            entityType: 'Order',
-            entityId: orderId,
-            afterState: paidOrder,
-          });
+          await auditService.log(
+            {
+              actorUserId: userId,
+              action: 'ORDER_CREATED',
+              entityType: 'Order',
+              entityId: orderId,
+              afterState: order,
+            },
+            tx,
+          );
 
           return {
-            order: paidOrder,
-            invoice,
-            razorpayOrderId: null,
+            order,
+            razorpayOrderId: gatewayOrder.id,
             razorpayKeyId: env.RAZORPAY_KEY_ID,
             isReplay: false,
           };
-        }
+        },
+        { timeout: 35000, maxWait: 15000 },
+      );
+    }
 
-        // 7. Create order on Razorpay Gateway
-        const gateway = getPaymentGateway();
-        const gatewayOrder = await gateway.createOrder({
-          amountPaise: totalPaise,
-          currency: product.currency,
-          receipt: `ord_${orderId.replace(/-/g, '').substring(0, 14)}`,
-          notes: {
-            orderId,
-            userId,
-            productId: product.id,
-          },
-        });
+    // Standard order path without coupon:
+    // Performs tax calculation and gateway creation outside DB transaction to prevent pool starvation
+    const taxCalculation = await calculateTaxAndTotals(product.pricePaise, 0);
+    const totalPaise = taxCalculation.totalPaise;
+    const subtotalPaise = taxCalculation.subtotalPaise;
+    const taxPaise = taxCalculation.taxPaise;
 
-        razorpayOrderId = gatewayOrder.id;
+    const gateway = getPaymentGateway();
+    const gatewayOrder = await gateway.createOrder({
+      amountPaise: totalPaise,
+      currency: product.currency,
+      receipt: `ord_${orderId.replace(/-/g, '').substring(0, 14)}`,
+      notes: {
+        orderId,
+        userId,
+        productId: product.id,
+      },
+    });
 
-        const order = await tx.order.create({
+    const order = await prisma.$transaction(
+      async (tx) => {
+        const ord = await tx.order.create({
           data: {
             id: orderId,
             userId,
             productId: product.id,
-            couponId: appliedCouponId,
+            couponId: null,
             idempotencyKey,
             status: OrderStatus.CREATED,
             subtotalPaise,
-            discountPaise,
+            discountPaise: 0,
             taxPaise,
             totalPaise,
             currency: product.currency,
-            razorpayOrderId,
+            razorpayOrderId: gatewayOrder.id,
             billingDetails: (input.billingDetails as any) ?? null,
             utmSource: input.utmSource,
             utmMedium: input.utmMedium,
@@ -264,36 +337,28 @@ export class OrderService {
           include: { product: true, coupon: true },
         });
 
-        // R5: Count redemption at order creation under row lock
-        if (appliedCouponId) {
-          await tx.couponRedemption.create({
-            data: {
-              id: uuidv7(),
-              couponId: appliedCouponId,
-              userId,
-              orderId,
-              discountPaise,
-            },
-          });
-        }
+        await auditService.log(
+          {
+            actorUserId: userId,
+            action: 'ORDER_CREATED',
+            entityType: 'Order',
+            entityId: orderId,
+            afterState: ord,
+          },
+          tx,
+        );
 
-        await auditService.log({
-          actorUserId: userId,
-          action: 'ORDER_CREATED',
-          entityType: 'Order',
-          entityId: orderId,
-          afterState: order,
-        });
-
-        return {
-          order,
-          razorpayOrderId,
-          razorpayKeyId: env.RAZORPAY_KEY_ID,
-          isReplay: false,
-        };
+        return ord;
       },
-      { timeout: 25000, maxWait: 10000 },
+      { timeout: 35000, maxWait: 15000 },
     );
+
+    return {
+      order,
+      razorpayOrderId: gatewayOrder.id,
+      razorpayKeyId: env.RAZORPAY_KEY_ID,
+      isReplay: false,
+    };
   }
 
   /**
@@ -312,233 +377,209 @@ export class OrderService {
       rawGatewayPayload?: any;
     },
   ) {
-    const result = await prisma.$transaction(async (tx) => {
-      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        orderIdentifier,
-      );
-      const lockedRows = isUuid
-        ? await tx.$queryRaw<Array<{ id: string }>>`
+    const result = await prisma.$transaction(
+      async (tx) => {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          orderIdentifier,
+        );
+        const lockedRows = isUuid
+          ? await tx.$queryRaw<Array<{ id: string }>>`
             SELECT id FROM "Order" WHERE id = ${orderIdentifier}::uuid FOR UPDATE
           `
-        : await tx.$queryRaw<Array<{ id: string }>>`
+          : await tx.$queryRaw<Array<{ id: string }>>`
             SELECT id FROM "Order" WHERE "razorpayOrderId" = ${orderIdentifier} FOR UPDATE
           `;
 
-      const firstLocked = lockedRows[0];
-      if (!firstLocked) {
-        throw new NotFoundError(`Order not found for identifier "${orderIdentifier}".`);
-      }
+        const firstLocked = lockedRows[0];
+        if (!firstLocked) {
+          throw new NotFoundError(`Order not found for identifier "${orderIdentifier}".`);
+        }
 
-      const order = await tx.order.findUnique({
-        where: { id: firstLocked.id },
-        include: { product: true, user: true },
-      });
-
-      if (!order) {
-        throw new NotFoundError(`Order not found for identifier "${orderIdentifier}".`);
-      }
-
-      // Idempotency: If already paid, return existing state immediately
-      if (order.status === OrderStatus.PAID) {
-        logger.info(
-          { orderId: order.id },
-          'Order is already marked PAID. Idempotently returning existing state.',
-        );
-        const existingEntitlement = await tx.entitlement.findFirst({
-          where: { orderId: order.id },
+        const order = await tx.order.findUnique({
+          where: { id: firstLocked.id },
+          include: { product: true, user: true },
         });
-        const existingInvoice = await tx.invoice.findUnique({
-          where: { orderId: order.id },
+
+        if (!order) {
+          throw new NotFoundError(`Order not found for identifier "${orderIdentifier}".`);
+        }
+
+        // Idempotency: If already paid, return existing state immediately
+        if (order.status === OrderStatus.PAID) {
+          logger.info(
+            { orderId: order.id },
+            'Order is already marked PAID. Idempotently returning existing state.',
+          );
+          const existingEntitlement = await tx.entitlement.findFirst({
+            where: { orderId: order.id },
+          });
+          const existingInvoice = await tx.invoice.findUnique({
+            where: { orderId: order.id },
+          });
+          return {
+            order,
+            entitlement: existingEntitlement,
+            invoice: existingInvoice,
+            alreadyPaid: true,
+          };
+        }
+
+        // R1: Payment status must strictly be captured
+        if (paymentDetails.status !== 'captured') {
+          throw new BadRequestError(
+            `Cannot mark order paid for non-captured payment status "${paymentDetails.status}".`,
+          );
+        }
+
+        // R2: If order was previously expired/cancelled by job, late payment is permitted and granted access
+        if (
+          order.status !== OrderStatus.CREATED &&
+          order.status !== OrderStatus.PENDING &&
+          order.status !== OrderStatus.CANCELLED
+        ) {
+          throw new BadRequestError(`Cannot mark order paid from status "${order.status}".`);
+        }
+
+        // Validate payment amount in paise against order total
+        if (paymentDetails.amountPaise !== order.totalPaise) {
+          logger.error(
+            { expected: order.totalPaise, received: paymentDetails.amountPaise, orderId: order.id },
+            'Tampered or mismatched payment amount detected!',
+          );
+          throw new BadRequestError(
+            `Payment amount mismatch: expected ${order.totalPaise} paise, received ${paymentDetails.amountPaise} paise.`,
+          );
+        }
+
+        // Validate currency
+        if (paymentDetails.currency.toUpperCase() !== order.currency.toUpperCase()) {
+          throw new BadRequestError(
+            `Payment currency mismatch: expected ${order.currency}, received ${paymentDetails.currency}.`,
+          );
+        }
+
+        // Record or update Payment record
+        const existingPayment = await tx.payment.findUnique({
+          where: { razorpayPaymentId: paymentDetails.paymentId },
         });
-        return {
-          order,
-          entitlement: existingEntitlement,
-          invoice: existingInvoice,
-          alreadyPaid: true,
-        };
-      }
 
-      // R1: Payment status must strictly be captured
-      if (paymentDetails.status !== 'captured') {
-        throw new BadRequestError(
-          `Cannot mark order paid for non-captured payment status "${paymentDetails.status}".`,
-        );
-      }
-
-      // R2: If order was previously expired/cancelled by job, late payment is permitted and granted access
-      if (
-        order.status !== OrderStatus.CREATED &&
-        order.status !== OrderStatus.PENDING &&
-        order.status !== OrderStatus.CANCELLED
-      ) {
-        throw new BadRequestError(`Cannot mark order paid from status "${order.status}".`);
-      }
-
-      // Validate payment amount in paise against order total
-      if (paymentDetails.amountPaise !== order.totalPaise) {
-        logger.error(
-          { expected: order.totalPaise, received: paymentDetails.amountPaise, orderId: order.id },
-          'Tampered or mismatched payment amount detected!',
-        );
-        throw new BadRequestError(
-          `Payment amount mismatch: expected ${order.totalPaise} paise, received ${paymentDetails.amountPaise} paise.`,
-        );
-      }
-
-      // Validate currency
-      if (paymentDetails.currency.toUpperCase() !== order.currency.toUpperCase()) {
-        throw new BadRequestError(
-          `Payment currency mismatch: expected ${order.currency}, received ${paymentDetails.currency}.`,
-        );
-      }
-
-      // Record or update Payment record
-      const existingPayment = await tx.payment.findUnique({
-        where: { razorpayPaymentId: paymentDetails.paymentId },
-      });
-
-      let paymentId: string;
-      if (existingPayment) {
-        paymentId = existingPayment.id;
-        await tx.payment.update({
-          where: { id: existingPayment.id },
-          data: {
-            status: PaymentStatus.CAPTURED,
-            capturedAt: new Date(),
-            rawGatewayPayload:
-              paymentDetails.rawGatewayPayload ?? existingPayment.rawGatewayPayload,
-          },
-        });
-      } else {
-        paymentId = uuidv7();
-        await tx.payment.create({
-          data: {
-            id: paymentId,
-            orderId: order.id,
-            razorpayPaymentId: paymentDetails.paymentId,
-            amountPaise: paymentDetails.amountPaise,
-            method: paymentDetails.method ?? 'gateway',
-            status: PaymentStatus.CAPTURED,
-            rawGatewayPayload: paymentDetails.rawGatewayPayload ?? {},
-            capturedAt: new Date(),
-          },
-        });
-      }
-
-      // Update Order to PAID
-      const paidOrder = await tx.order.update({
-        where: { id: order.id },
-        data: {
-          status: OrderStatus.PAID,
-          paidAt: new Date(),
-        },
-        include: { product: true, user: true },
-      });
-
-      // Grant or extend entitlement
-      const entitlement = await entitlementService.grantOrExtendEntitlement(tx, {
-        userId: order.userId,
-        productId: order.productId,
-        orderId: order.id,
-        validityDays: paidOrder.product.validityDays,
-        source: EntitlementSource.PURCHASE,
-      });
-
-      // Ensure coupon redemption is recorded (e.g. if order was expired and coupon was released)
-      if (order.couponId) {
-        const existingRedemption = await tx.couponRedemption.findUnique({
-          where: { orderId: order.id },
-        });
-        if (!existingRedemption) {
-          await tx.couponRedemption.create({
+        let paymentId: string;
+        if (existingPayment) {
+          paymentId = existingPayment.id;
+          await tx.payment.update({
+            where: { id: existingPayment.id },
             data: {
-              id: uuidv7(),
-              couponId: order.couponId,
-              userId: order.userId,
+              status: PaymentStatus.CAPTURED,
+              capturedAt: new Date(),
+              rawGatewayPayload:
+                paymentDetails.rawGatewayPayload ?? existingPayment.rawGatewayPayload,
+            },
+          });
+        } else {
+          paymentId = uuidv7();
+          await tx.payment.create({
+            data: {
+              id: paymentId,
               orderId: order.id,
-              discountPaise: order.discountPaise,
+              razorpayPaymentId: paymentDetails.paymentId,
+              amountPaise: paymentDetails.amountPaise,
+              method: paymentDetails.method ?? 'gateway',
+              status: PaymentStatus.CAPTURED,
+              rawGatewayPayload: paymentDetails.rawGatewayPayload ?? {},
+              capturedAt: new Date(),
             },
           });
         }
-      }
 
-      // Generate sequential invoice number per financial year with no gaps under row lock (R9: <= 16 chars)
-      const invMeta = await invoiceService.generateInvoiceNumberUnderLock(tx, new Date());
-      const invoice = await tx.invoice.create({
-        data: {
-          id: uuidv7(),
+        // Update Order to PAID
+        const paidOrder = await tx.order.update({
+          where: { id: order.id },
+          data: {
+            status: OrderStatus.PAID,
+            paidAt: new Date(),
+          },
+          include: { product: true, user: true },
+        });
+
+        // Grant or extend entitlement
+        const entitlement = await entitlementService.grantOrExtendEntitlement(tx, {
+          userId: order.userId,
+          productId: order.productId,
           orderId: order.id,
+          validityDays: paidOrder.product.validityDays,
+          source: EntitlementSource.PURCHASE,
+        });
+
+        // Ensure coupon redemption is recorded (e.g. if order was expired and coupon was released)
+        if (order.couponId) {
+          const existingRedemption = await tx.couponRedemption.findUnique({
+            where: { orderId: order.id },
+          });
+          if (!existingRedemption) {
+            await tx.couponRedemption.create({
+              data: {
+                id: uuidv7(),
+                couponId: order.couponId,
+                userId: order.userId,
+                orderId: order.id,
+                discountPaise: order.discountPaise,
+              },
+            });
+          }
+        }
+
+        // Generate sequential invoice number per financial year with no gaps under row lock (R9: <= 16 chars)
+        const invMeta = await invoiceService.generateInvoiceNumberUnderLock(tx, new Date());
+        const invoice = await tx.invoice.create({
+          data: {
+            id: uuidv7(),
+            orderId: order.id,
+            invoiceNumber: invMeta.invoiceNumber,
+            financialYear: invMeta.financialYear,
+            sequenceNumber: invMeta.sequenceNumber,
+            subtotalPaise: order.subtotalPaise,
+            taxPaise: order.taxPaise,
+            totalPaise: order.totalPaise,
+            billingDetails: (order.billingDetails as any) ?? {},
+            issuedAt: new Date(),
+          },
+        });
+
+        await auditService.log(
+          {
+            actorUserId: order.userId,
+            action: 'ORDER_PAID',
+            entityType: 'Order',
+            entityId: order.id,
+            afterState: { orderId: order.id, paymentId, invoiceNumber: invMeta.invoiceNumber },
+          },
+          tx,
+        );
+
+        return {
+          order: paidOrder,
+          entitlement,
+          invoice,
+          alreadyPaid: false,
           invoiceNumber: invMeta.invoiceNumber,
-          financialYear: invMeta.financialYear,
-          sequenceNumber: invMeta.sequenceNumber,
-          subtotalPaise: order.subtotalPaise,
-          taxPaise: order.taxPaise,
-          totalPaise: order.totalPaise,
-          billingDetails: (order.billingDetails as any) ?? {},
-          issuedAt: new Date(),
-        },
-      });
+          userDetails: {
+            email: paidOrder.user.email,
+            name: paidOrder.user.name,
+            courseTitle: paidOrder.product.title,
+          },
+        };
+      },
+      { timeout: 35000, maxWait: 15000 },
+    );
 
-      await auditService.log({
-        actorUserId: order.userId,
-        action: 'ORDER_PAID',
-        entityType: 'Order',
-        entityId: order.id,
-        afterState: { orderId: order.id, paymentId, invoiceNumber: invMeta.invoiceNumber },
-      });
-
-      return {
-        order: paidOrder,
-        entitlement,
-        invoice,
-        alreadyPaid: false,
-        invoiceNumber: invMeta.invoiceNumber,
-        userDetails: {
-          email: paidOrder.user.email,
-          name: paidOrder.user.name,
-          courseTitle: paidOrder.product.title,
-        },
-      };
-    });
-
-    // Post-transaction side-effects (PDF generation & asynchronous email)
-    if (!result.alreadyPaid && result.invoice && result.userDetails && result.invoiceNumber) {
-      try {
-        const businessSetting = await prisma.appSetting.findUnique({
-          where: { key: 'business_profile' },
-        });
-        const taxSetting = await prisma.appSetting.findUnique({ where: { key: 'tax_config' } });
-
-        const pdfUrl = await invoiceService.generateInvoicePdf(
-          result.invoice.id,
-          result.invoiceNumber,
-          result.order,
-          (businessSetting?.value as any) || {},
-          (taxSetting?.value as any) || {},
-        );
-
-        await prisma.invoice.update({
-          where: { id: result.invoice.id },
-          data: { pdfUrl },
-        });
-
-        await invoiceService.sendInvoiceEmail(
-          result.userDetails.email,
-          result.userDetails.name,
-          result.invoiceNumber,
-          result.userDetails.courseTitle,
-          result.order.totalPaise,
-          pdfUrl,
-          result.order.id,
-          result.order.userId,
-          (result as any).entitlement?.expiresAt,
-        );
-      } catch (err) {
+    // Post-transaction side-effects: Enqueue durable receipt job (A2)
+    if (!result.alreadyPaid) {
+      await invoiceService.enqueueReceiptJob(result.order.id).catch((err) => {
         logger.error(
           { err, orderId: result.order.id },
-          'Post-payment invoice PDF/email generation failed',
+          'Failed to enqueue durable receipt job for paid order',
         );
-      }
+      });
     }
 
     return result;
@@ -807,17 +848,20 @@ export class OrderService {
         },
       });
 
-      await auditService.log({
-        actorUserId: adminUserId,
-        action: 'PAYMENT_REFUND_INITIATED',
-        entityType: 'Refund',
-        entityId: refundRecord.id,
-        afterState: {
-          paymentId: payment.id,
-          amountPaise: requestedPaise,
-          status: RefundStatus.PENDING,
+      await auditService.log(
+        {
+          actorUserId: adminUserId,
+          action: 'PAYMENT_REFUND_INITIATED',
+          entityType: 'Refund',
+          entityId: refundRecord.id,
+          afterState: {
+            paymentId: payment.id,
+            amountPaise: requestedPaise,
+            status: RefundStatus.PENDING,
+          },
         },
-      });
+        tx,
+      );
 
       return {
         refund: refundRecord,
@@ -926,13 +970,16 @@ export class OrderService {
         });
       }
 
-      await auditService.log({
-        actorUserId: refund.initiatedByAdminId || 'GATEWAY_WEBHOOK',
-        action: isFullRefund ? 'PAYMENT_REFUNDED_FULL' : 'PAYMENT_REFUNDED_PARTIAL',
-        entityType: 'Refund',
-        entityId: refund.id,
-        afterState: { totalRefundedPaise, isFullRefund },
-      });
+      await auditService.log(
+        {
+          actorUserId: refund.initiatedByAdminId || null,
+          action: isFullRefund ? 'PAYMENT_REFUNDED_FULL' : 'PAYMENT_REFUNDED_PARTIAL',
+          entityType: 'Refund',
+          entityId: refund.id,
+          afterState: { totalRefundedPaise, isFullRefund },
+        },
+        tx,
+      );
 
       return {
         success: true,
@@ -1005,7 +1052,7 @@ export class OrderService {
       });
 
       await auditService.log({
-        actorUserId: 'GATEWAY_WEBHOOK',
+        actorUserId: null,
         action: 'PAYMENT_REFUND_FAILED',
         entityType: 'Refund',
         entityId: refund.id,

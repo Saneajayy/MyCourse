@@ -2,6 +2,7 @@ import { prisma } from '../../common/db/prisma.js';
 import { uuidv7 } from 'uuidv7';
 import { logger } from '../../common/logger/logger.js';
 import { AuditAction } from '@course/shared';
+import { Prisma } from '@prisma/client';
 
 export interface CreateAuditLogParams {
   actorUserId?: string | null;
@@ -14,13 +15,19 @@ export interface CreateAuditLogParams {
   userAgent?: string | null;
 }
 
+const isValidUuid = (val: unknown): val is string =>
+  typeof val === 'string' &&
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
+
 export class AuditService {
-  public async log(params: CreateAuditLogParams): Promise<void> {
+  public async log(params: CreateAuditLogParams, tx?: Prisma.TransactionClient): Promise<void> {
+    const client = tx || prisma;
+    const actorUserId = isValidUuid(params.actorUserId) ? params.actorUserId : null;
     try {
-      await prisma.auditLog.create({
+      await client.auditLog.create({
         data: {
           id: uuidv7(),
-          actorUserId: params.actorUserId ?? null,
+          actorUserId,
           action: params.action,
           entityType: params.entityType,
           entityId: params.entityId,

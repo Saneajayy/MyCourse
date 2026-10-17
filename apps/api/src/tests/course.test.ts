@@ -692,8 +692,11 @@ describe('Phase 3 Course Management & Bunny Stream Video Pipeline Suite', () => 
     });
 
     it('P6: handles admin thumbnail upload with strict file type and size validation', async () => {
-      // 1. Valid image upload (JPEG)
-      const validBuffer = Buffer.from('fake-jpeg-image-bytes-header-content');
+      // 1. Valid image upload (JPEG with FF D8 FF magic bytes)
+      const validBuffer = Buffer.concat([
+        Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01]),
+        Buffer.from('fake-jpeg-image-bytes-header-content'),
+      ]);
       const uploadRes = await request(app)
         .post(`/api/v1/admin/products/${testProductId}/thumbnail`)
         .set('Authorization', `Bearer ${enrolledAdminToken}`)

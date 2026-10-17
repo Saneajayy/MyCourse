@@ -5,6 +5,7 @@ import { logger } from '../logger/logger.js';
 
 const adapter = new PrismaPg({
   connectionString: env.DATABASE_URL,
+  max: env.DATABASE_POOL_SIZE,
 });
 
 export const prisma = new PrismaClient({

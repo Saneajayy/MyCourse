@@ -18,6 +18,7 @@ const envSchema = z.object({
   APP_URL: z.string().url().default('http://localhost:3000'),
   API_URL: z.string().url().default('http://localhost:4000'),
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  DATABASE_POOL_SIZE: z.coerce.number().default(30),
   REDIS_URL: z.string().min(1, 'REDIS_URL is required'),
 
   JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters'),
@@ -90,6 +91,7 @@ export function validateProductionSafety(config: {
   nodeEnv: string;
   paymentProvider: string;
   razorpayKeyId: string;
+  enableDevRoutes?: boolean;
 }): void {
   if (config.nodeEnv === 'production') {
     if (config.paymentProvider === 'fake') {
@@ -102,6 +104,11 @@ export function validateProductionSafety(config: {
         'FATAL SAFETY VIOLATION: Cannot boot in production mode with Razorpay test keys (rzp_test_*)',
       );
     }
+    if (config.enableDevRoutes) {
+      throw new Error(
+        'FATAL SAFETY VIOLATION: ENABLE_DEV_ROUTES cannot be enabled in production mode.',
+      );
+    }
   }
 
   if (config.nodeEnv === 'test' && config.razorpayKeyId.startsWith('rzp_live_')) {
@@ -111,12 +118,13 @@ export function validateProductionSafety(config: {
   }
 }
 
-// Safety check: Refuse to boot in production with fake gateway or test keys, and in test mode with live keys
+// Safety check: Refuse to boot in production with fake gateway, test keys, or dev routes, and in test mode with live keys
 try {
   validateProductionSafety({
     nodeEnv: env.NODE_ENV,
     paymentProvider: env.PAYMENT_PROVIDER,
     razorpayKeyId: env.RAZORPAY_KEY_ID,
+    enableDevRoutes: env.ENABLE_DEV_ROUTES,
   });
 } catch (err: any) {
   console.error(err.message);
