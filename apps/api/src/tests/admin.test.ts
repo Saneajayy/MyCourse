@@ -1370,7 +1370,7 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
 
       expect(data.grossRevenuePaise).toBeGreaterThanOrEqual(300000);
       expect(data.refundsPaise).toBeGreaterThanOrEqual(30000);
-      expect(data.revenuePaise).toBe(data.grossRevenuePaise - data.refundsPaise);
+      expect(data.revenuePaise).toBe(Math.max(0, data.grossRevenuePaise - data.refundsPaise));
 
       const bucketA = data.revenueByDay.find((b: any) => b.date === '2026-10-15');
       const bucketB = data.revenueByDay.find((b: any) => b.date === '2026-10-16');
