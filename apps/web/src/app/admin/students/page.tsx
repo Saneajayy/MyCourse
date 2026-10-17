@@ -7,14 +7,7 @@ import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { useToast } from '../../../components/ui/Toast';
-import {
-  Search,
-  Download,
-  CheckCircle2,
-  XCircle,
-  Ban,
-  ArrowRight,
-} from 'lucide-react';
+import { Search, Download, CheckCircle2, XCircle, Ban, ArrowRight } from 'lucide-react';
 
 interface StudentListItem {
   id: string;
@@ -140,7 +133,12 @@ export default function AdminStudentsPage() {
               />
               <Search className="w-4 h-4 text-course-navySubtle absolute left-2.5 top-2.5" />
             </div>
-            <Button type="submit" variant="primary" size="sm" className="text-xs font-bold uppercase px-4">
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              className="text-xs font-bold uppercase px-4"
+            >
               Search
             </Button>
           </form>
@@ -151,7 +149,9 @@ export default function AdminStudentsPage() {
               type="button"
               onClick={() => setStatusFilter('ALL')}
               className={`px-3 py-1.5 text-xs font-bold uppercase min-h-[36px] ${
-                statusFilter === 'ALL' ? 'bg-course-darkBlue text-white' : 'text-course-darkBlue hover:bg-neutral-100'
+                statusFilter === 'ALL'
+                  ? 'bg-course-darkBlue text-white'
+                  : 'text-course-darkBlue hover:bg-neutral-100'
               }`}
             >
               All ({pagination.total})
@@ -160,7 +160,9 @@ export default function AdminStudentsPage() {
               type="button"
               onClick={() => setStatusFilter('ACTIVE')}
               className={`px-3 py-1.5 text-xs font-bold uppercase border-l border-black min-h-[36px] ${
-                statusFilter === 'ACTIVE' ? 'bg-course-darkBlue text-white' : 'text-course-darkBlue hover:bg-neutral-100'
+                statusFilter === 'ACTIVE'
+                  ? 'bg-course-darkBlue text-white'
+                  : 'text-course-darkBlue hover:bg-neutral-100'
               }`}
             >
               Active
@@ -169,7 +171,9 @@ export default function AdminStudentsPage() {
               type="button"
               onClick={() => setStatusFilter('BANNED')}
               className={`px-3 py-1.5 text-xs font-bold uppercase border-l border-black min-h-[36px] ${
-                statusFilter === 'BANNED' ? 'bg-course-darkBlue text-white' : 'text-course-darkBlue hover:bg-neutral-100'
+                statusFilter === 'BANNED'
+                  ? 'bg-course-darkBlue text-white'
+                  : 'text-course-darkBlue hover:bg-neutral-100'
               }`}
             >
               Banned
@@ -232,13 +236,9 @@ export default function AdminStudentsPage() {
                       </Link>
                     </td>
 
-                    <td className="p-3 font-mono text-course-navyMuted">
-                      {student.email}
-                    </td>
+                    <td className="p-3 font-mono text-course-navyMuted">{student.email}</td>
 
-                    <td className="p-3 font-mono text-course-navySubtle">
-                      {student.phone || '—'}
-                    </td>
+                    <td className="p-3 font-mono text-course-navySubtle">{student.phone || '—'}</td>
 
                     <td className="p-3">
                       {student.emailVerifiedAt ? (

@@ -129,7 +129,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <h2 className="text-sm font-black uppercase tracking-wider text-course-darkBlue">
             Verifying Admin Security
           </h2>
-          <p className="text-xs text-course-navySubtle">Checking role permissions and 2FA status...</p>
+          <p className="text-xs text-course-navySubtle">
+            Checking role permissions and 2FA status...
+          </p>
         </div>
       </div>
     );
@@ -162,11 +164,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <h1 className="text-xl font-black text-course-darkBlue">403 — Admin Access Required</h1>
           <p className="text-xs text-course-navyMuted leading-relaxed">
-            This administration panel is restricted to verified course administrators. Your current account ({user.email}) does not hold the ADMIN role.
+            This administration panel is restricted to verified course administrators. Your current
+            account ({user.email}) does not hold the ADMIN role.
           </p>
           <div className="pt-2">
             <Link href="/my-courses">
-              <Button variant="primary" size="sm" className="w-full text-xs font-bold uppercase tracking-wider">
+              <Button
+                variant="primary"
+                size="sm"
+                className="w-full text-xs font-bold uppercase tracking-wider"
+              >
                 Return to Student Dashboard
               </Button>
             </Link>
@@ -189,7 +196,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
           <h2 className="text-lg font-black text-course-darkBlue">2FA Enrollment Required</h2>
           <p className="text-xs text-course-navyMuted">
-            Admin accounts must have Two-Factor Authentication activated. Redirecting to setup wizard...
+            Admin accounts must have Two-Factor Authentication activated. Redirecting to setup
+            wizard...
           </p>
         </div>
       </div>
@@ -212,7 +220,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {sessionTimedOut && (
         <div className="bg-rose-600 text-white px-4 py-2.5 text-xs font-bold text-center border-b border-black flex items-center justify-center gap-2">
           <Clock className="w-4 h-4 shrink-0" />
-          <span>Your admin session has timed out after 30 minutes of inactivity for security. Redirecting to sign in...</span>
+          <span>
+            Your admin session has timed out after 30 minutes of inactivity for security.
+            Redirecting to sign in...
+          </span>
         </div>
       )}
 
@@ -260,7 +271,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             <div className="hidden sm:block text-right">
               <div className="text-xs font-bold text-course-darkBlue leading-none">{user.name}</div>
-              <div className="text-[10px] text-course-navySubtle font-mono mt-0.5">{user.email}</div>
+              <div className="text-[10px] text-course-navySubtle font-mono mt-0.5">
+                {user.email}
+              </div>
             </div>
 
             <Button
@@ -284,7 +297,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="text-[10px] font-mono uppercase tracking-wider text-course-navySubtle">
               Operating Mode
             </div>
-            <div className="text-xs font-black text-course-darkBlue mt-0.5">Solo Operator Console</div>
+            <div className="text-xs font-black text-course-darkBlue mt-0.5">
+              Solo Operator Console
+            </div>
           </div>
 
           <nav className="flex-1 p-3 space-y-1 overflow-y-auto" aria-label="Admin Navigation">
@@ -301,7 +316,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       : 'border-transparent text-course-darkBlue hover:border-black hover:bg-neutral-50'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-course-orange' : 'text-course-navySubtle'}`} />
+                  <Icon
+                    className={`w-4 h-4 shrink-0 ${active ? 'text-course-orange' : 'text-course-navySubtle'}`}
+                  />
                   <span className="flex-1">{item.label}</span>
                 </Link>
               );
@@ -314,7 +331,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span>Session Inactivity Timer</span>
             </div>
             <p className="text-[10px] leading-tight">
-              Auto-logout triggers after 30 minutes of inactivity to safeguard payment and student records.
+              Auto-logout triggers after 30 minutes of inactivity to safeguard payment and student
+              records.
             </p>
           </div>
         </aside>
@@ -364,7 +382,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                           : 'border-black text-course-darkBlue bg-course-white'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-course-orange' : 'text-course-navySubtle'}`} />
+                      <Icon
+                        className={`w-4 h-4 shrink-0 ${active ? 'text-course-orange' : 'text-course-navySubtle'}`}
+                      />
                       <span>{item.label}</span>
                     </Link>
                   );
@@ -388,9 +408,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Content Viewport */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto space-y-6">
-            {children}
-          </div>
+          <div className="max-w-7xl mx-auto space-y-6">{children}</div>
         </main>
       </div>
     </div>

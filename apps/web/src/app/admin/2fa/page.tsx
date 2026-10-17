@@ -95,7 +95,10 @@ function TwoFactorFlow() {
       toastSuccess('2FA Activated', 'Two-factor authentication is now active on your account.');
       router.push('/admin');
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Invalid verification code. Please check your authenticator app.';
+      const msg =
+        err instanceof Error
+          ? err.message
+          : 'Invalid verification code. Please check your authenticator app.';
       setErrorMsg(msg);
       toastError('2FA Activation Failed', msg);
     } finally {
@@ -161,11 +164,7 @@ function TwoFactorFlow() {
                 {setupData.qrCode ? (
                   <div className="inline-block p-2 bg-white border border-black">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={setupData.qrCode}
-                      alt="2FA QR Code"
-                      className="w-44 h-44 mx-auto"
-                    />
+                    <img src={setupData.qrCode} alt="2FA QR Code" className="w-44 h-44 mx-auto" />
                   </div>
                 ) : (
                   <div className="p-4 text-xs font-mono">Loading QR Code...</div>
@@ -185,7 +184,11 @@ function TwoFactorFlow() {
                     onClick={handleCopySecret}
                     className="text-xs py-1"
                   >
-                    {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    {isCopied ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
                   </Button>
                 </div>
               </div>
@@ -197,7 +200,8 @@ function TwoFactorFlow() {
                   <span>Step 2: Save Backup Recovery Codes</span>
                 </div>
                 <p className="text-[11px] text-course-navyMuted">
-                  If you ever lose your phone, each of these 10 backup codes can be used once to access the admin panel.
+                  If you ever lose your phone, each of these 10 backup codes can be used once to
+                  access the admin panel.
                 </p>
                 <div className="grid grid-cols-2 gap-1.5 p-3 bg-white border border-black font-mono text-[11px] text-center">
                   {setupData.recoveryCodes.map((codeStr, idx) => (
@@ -289,7 +293,9 @@ export default function TwoFactorPage() {
   return (
     <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4 py-12 bg-course-white">
       <div className="w-full max-w-lg">
-        <Suspense fallback={<div className="p-8 text-center text-sm font-bold">Loading 2FA...</div>}>
+        <Suspense
+          fallback={<div className="p-8 text-center text-sm font-bold">Loading 2FA...</div>}
+        >
           <TwoFactorFlow />
         </Suspense>
       </div>

@@ -210,7 +210,10 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
         body: JSON.stringify({
           productId: selectedProductId,
           source: 'ADMIN_GRANT',
-          expiresAt: grantAccessType === 'custom' && grantExpiresAt ? new Date(grantExpiresAt).toISOString() : null,
+          expiresAt:
+            grantAccessType === 'custom' && grantExpiresAt
+              ? new Date(grantExpiresAt).toISOString()
+              : null,
           reason: grantReason.trim(),
         }),
       });
@@ -292,7 +295,8 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
     );
   }
 
-  const student = data.student || (data as any).profile || { name: 'Unknown Student', status: 'ACTIVE', id: studentId };
+  const student = data.student ||
+    (data as any).profile || { name: 'Unknown Student', status: 'ACTIVE', id: studentId };
   const entitlements = data.entitlements || [];
   const orders = data.orders || [];
   const activeSessions = data.activeSessions || [];
@@ -375,17 +379,25 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
       {/* Profile & Progress Highlights Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Profile Card */}
-        <Card variant="default" padding="md" className="border border-black md:col-span-2 space-y-3">
+        <Card
+          variant="default"
+          padding="md"
+          className="border border-black md:col-span-2 space-y-3"
+        >
           <h2 className="text-xs font-black text-course-darkBlue uppercase tracking-wider border-b border-black pb-2">
             Student Profile Details
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div>
-              <div className="text-[10px] uppercase font-bold text-course-navySubtle">Full Name</div>
+              <div className="text-[10px] uppercase font-bold text-course-navySubtle">
+                Full Name
+              </div>
               <div className="font-bold text-course-darkBlue mt-0.5">{student.name}</div>
             </div>
             <div>
-              <div className="text-[10px] uppercase font-bold text-course-navySubtle">Email Address</div>
+              <div className="text-[10px] uppercase font-bold text-course-navySubtle">
+                Email Address
+              </div>
               <div className="font-mono text-course-darkBlue mt-0.5 flex items-center gap-1.5">
                 <span>{student.email}</span>
                 {student.emailVerifiedAt ? (
@@ -405,11 +417,15 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
               </div>
             </div>
             <div>
-              <div className="text-[10px] uppercase font-bold text-course-navySubtle">Phone Number</div>
+              <div className="text-[10px] uppercase font-bold text-course-navySubtle">
+                Phone Number
+              </div>
               <div className="font-mono text-course-darkBlue mt-0.5">{student.phone || '—'}</div>
             </div>
             <div>
-              <div className="text-[10px] uppercase font-bold text-course-navySubtle">Account Created</div>
+              <div className="text-[10px] uppercase font-bold text-course-navySubtle">
+                Account Created
+              </div>
               <div className="font-mono text-course-darkBlue mt-0.5">
                 {new Date(student.createdAt).toLocaleDateString()}
               </div>
@@ -446,7 +462,11 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
       </div>
 
       {/* SECTION 1: Course Entitlements */}
-      <Card variant="default" padding="none" className="border border-black overflow-hidden space-y-0">
+      <Card
+        variant="default"
+        padding="none"
+        className="border border-black overflow-hidden space-y-0"
+      >
         <div className="p-3.5 bg-neutral-100 border-b border-black flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-course-orange" />
@@ -480,15 +500,14 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
               {entitlements.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-6 text-center text-course-navySubtle italic">
-                    This student does not currently hold access to any course. Click &quot;Grant Course&quot; to give access.
+                    This student does not currently hold access to any course. Click &quot;Grant
+                    Course&quot; to give access.
                   </td>
                 </tr>
               ) : (
                 entitlements.map((ent) => (
                   <tr key={ent.id} className="hover:bg-neutral-50">
-                    <td className="p-3 font-bold text-course-darkBlue">
-                      {ent.product.title}
-                    </td>
+                    <td className="p-3 font-bold text-course-darkBlue">{ent.product.title}</td>
                     <td className="p-3 font-mono text-[11px] text-course-navySubtle">
                       {ent.source}
                     </td>
@@ -551,7 +570,11 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
       </Card>
 
       {/* SECTION 2: Orders & Payments */}
-      <Card variant="default" padding="none" className="border border-black overflow-hidden space-y-0">
+      <Card
+        variant="default"
+        padding="none"
+        className="border border-black overflow-hidden space-y-0"
+      >
         <div className="p-3.5 bg-neutral-100 border-b border-black flex items-center justify-between">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-4 h-4 text-course-orange" />
@@ -584,7 +607,10 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                 orders.map((ord) => (
                   <tr key={ord.id} className="hover:bg-neutral-50">
                     <td className="p-3 font-mono text-[11px] font-bold text-course-darkBlue">
-                      <Link href={`/admin/orders/${ord.id}`} className="hover:underline hover:text-course-orange">
+                      <Link
+                        href={`/admin/orders/${ord.id}`}
+                        className="hover:underline hover:text-course-orange"
+                      >
                         {ord.id.slice(0, 13)}...
                       </Link>
                     </td>
@@ -617,7 +643,11 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
       </Card>
 
       {/* SECTION 3: Active Device Sessions */}
-      <Card variant="default" padding="none" className="border border-black overflow-hidden space-y-0">
+      <Card
+        variant="default"
+        padding="none"
+        className="border border-black overflow-hidden space-y-0"
+      >
         <div className="p-3.5 bg-neutral-100 border-b border-black flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Laptop className="w-4 h-4 text-course-orange" />
@@ -651,7 +681,8 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                 <div className="space-y-0.5 min-w-0">
                   <div className="font-bold text-course-darkBlue truncate">{session.userAgent}</div>
                   <div className="font-mono text-[11px] text-course-navySubtle">
-                    IP Address: {session.ipAddress} • Last active: {new Date(session.lastUsedAt).toLocaleString()}
+                    IP Address: {session.ipAddress} • Last active:{' '}
+                    {new Date(session.lastUsedAt).toLocaleString()}
                   </div>
                 </div>
                 <span className="px-2 py-0.5 bg-emerald-100 border border-black text-[9px] font-black text-emerald-950 uppercase shrink-0">
@@ -664,7 +695,11 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
       </Card>
 
       {/* SECTION 4: User Audit Trail */}
-      <Card variant="default" padding="none" className="border border-black overflow-hidden space-y-0">
+      <Card
+        variant="default"
+        padding="none"
+        className="border border-black overflow-hidden space-y-0"
+      >
         <div className="p-3.5 bg-neutral-100 border-b border-black">
           <h2 className="text-xs font-black text-course-darkBlue uppercase tracking-wider">
             Audit Trail for this Student ({auditLogs.length} events)
@@ -678,7 +713,10 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
             </div>
           ) : (
             auditLogs.map((log) => (
-              <div key={log.id} className="p-2 border border-neutral-200 flex items-center justify-between text-xs">
+              <div
+                key={log.id}
+                className="p-2 border border-neutral-200 flex items-center justify-between text-xs"
+              >
                 <span className="font-bold font-mono text-course-darkBlue">{log.action}</span>
                 <span className="font-mono text-[11px] text-course-navySubtle">
                   {new Date(log.createdAt).toLocaleString()}
@@ -691,7 +729,11 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
 
       {/* MODAL: Grant Course Access */}
       {grantModalOpen && (
-        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-course-darkBlue/75">
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-course-darkBlue/75"
+        >
           <div className="w-full max-w-lg bg-course-white border-2 border-black p-6 space-y-4">
             <h2 className="text-sm font-black text-course-darkBlue uppercase tracking-wider border-b border-black pb-2">
               Grant Course Access Manually
@@ -699,7 +741,12 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
 
             <form onSubmit={handleGrantAccess} className="space-y-4">
               <div className="space-y-1">
-                <label htmlFor="grant-course-select" className="block text-xs font-bold uppercase text-course-darkBlue">Select Course</label>
+                <label
+                  htmlFor="grant-course-select"
+                  className="block text-xs font-bold uppercase text-course-darkBlue"
+                >
+                  Select Course
+                </label>
                 <select
                   id="grant-course-select"
                   value={selectedProductId}
@@ -708,13 +755,17 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                   aria-label="Select Course to Grant"
                 >
                   {courses.map((c) => (
-                    <option key={c.id} value={c.id}>{c.title}</option>
+                    <option key={c.id} value={c.id}>
+                      {c.title}
+                    </option>
                   ))}
                 </select>
               </div>
 
               <div className="space-y-2">
-                <label className="block text-xs font-bold uppercase text-course-darkBlue">Access Duration</label>
+                <label className="block text-xs font-bold uppercase text-course-darkBlue">
+                  Access Duration
+                </label>
                 <div className="flex gap-3">
                   <label className="flex items-center gap-1.5 text-xs font-bold cursor-pointer">
                     <input
@@ -760,10 +811,21 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
               />
 
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-black">
-                <Button variant="outline" size="sm" onClick={() => setGrantModalOpen(false)} className="text-xs">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setGrantModalOpen(false)}
+                  className="text-xs"
+                >
                   Cancel
                 </Button>
-                <Button type="submit" variant="primary" size="sm" isLoading={actionLoading} className="text-xs font-black uppercase">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  isLoading={actionLoading}
+                  className="text-xs font-black uppercase"
+                >
                   Grant Access
                 </Button>
               </div>
@@ -835,7 +897,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
           title={student.status === 'BANNED' ? 'Unban Student Account' : 'Ban Student Account'}
           description={
             student.status === 'BANNED'
-              ? 'Unbanning will restore this student\'s ability to sign in to their account.'
+              ? "Unbanning will restore this student's ability to sign in to their account."
               : 'Banning this student will immediately revoke active sessions and block sign-in.'
           }
           confirmText={student.status === 'BANNED' ? 'Reinstate Account' : 'Ban Student'}

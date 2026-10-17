@@ -183,11 +183,7 @@ export class CourseController {
         productId,
       });
       const actorUserId = req.user!.id;
-      const lesson = await courseService.createLesson(
-        sectionId,
-        input,
-        actorUserId,
-      );
+      const lesson = await courseService.createLesson(sectionId, input, actorUserId);
       res.status(201).json({ success: true, data: lesson });
     } catch (err) {
       next(err);

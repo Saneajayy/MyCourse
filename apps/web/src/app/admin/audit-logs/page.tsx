@@ -76,7 +76,8 @@ export default function AdminAuditLogsPage() {
       <div className="bg-white border border-black p-4">
         <h1 className="text-2xl font-black text-[#0A192F]">System Audit Log</h1>
         <p className="text-xs text-gray-600 mt-1">
-          Read-only, tamper-evident security audit trail of every administrative and financial action taken in the academy.
+          Read-only, tamper-evident security audit trail of every administrative and financial
+          action taken in the academy.
         </p>
       </div>
 
@@ -89,7 +90,9 @@ export default function AdminAuditLogsPage() {
       {/* Filter Bar */}
       <div className="bg-white border border-black p-4 grid grid-cols-1 sm:grid-cols-4 gap-4 items-end text-sm">
         <div>
-          <label htmlFor="filter-action" className="block text-xs font-bold uppercase mb-1">Filter by Action</label>
+          <label htmlFor="filter-action" className="block text-xs font-bold uppercase mb-1">
+            Filter by Action
+          </label>
           <select
             id="filter-action"
             value={actionFilter}
@@ -119,7 +122,9 @@ export default function AdminAuditLogsPage() {
         </div>
 
         <div>
-          <label htmlFor="filter-start-date" className="block text-xs font-bold uppercase mb-1">From Date</label>
+          <label htmlFor="filter-start-date" className="block text-xs font-bold uppercase mb-1">
+            From Date
+          </label>
           <input
             id="filter-start-date"
             type="date"
@@ -131,7 +136,9 @@ export default function AdminAuditLogsPage() {
         </div>
 
         <div>
-          <label htmlFor="filter-end-date" className="block text-xs font-bold uppercase mb-1">To Date</label>
+          <label htmlFor="filter-end-date" className="block text-xs font-bold uppercase mb-1">
+            To Date
+          </label>
           <input
             id="filter-end-date"
             type="date"
@@ -213,7 +220,7 @@ export default function AdminAuditLogsPage() {
                       <div>{log.ipAddress || '—'}</div>
                     </td>
                     <td className="p-3 text-right">
-                      {(log.beforeState || log.afterState) ? (
+                      {log.beforeState || log.afterState ? (
                         <button
                           onClick={() => setSelectedLog(log)}
                           className="px-2 py-1 text-xs font-bold border border-black hover:bg-[#0A192F] hover:text-white"
@@ -267,7 +274,8 @@ export default function AdminAuditLogsPage() {
               <div>
                 <h3 className="text-base font-black text-[#0A192F]">Audit Event Details</h3>
                 <div className="text-xs font-mono text-gray-600 mt-0.5">
-                  Action: <strong className="text-black">{selectedLog.action}</strong> | Entity: {selectedLog.entityType} ({selectedLog.entityId})
+                  Action: <strong className="text-black">{selectedLog.action}</strong> | Entity:{' '}
+                  {selectedLog.entityType} ({selectedLog.entityId})
                 </div>
               </div>
               <button

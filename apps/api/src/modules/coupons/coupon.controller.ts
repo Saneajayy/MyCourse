@@ -82,17 +82,21 @@ export class CouponController {
 
       const finalMaxRedemptions =
         maxRedemptions !== undefined
-          ? (maxRedemptions === null ? null : Number(maxRedemptions))
+          ? maxRedemptions === null
+            ? null
+            : Number(maxRedemptions)
           : maxUses !== undefined
-          ? (maxUses === null ? null : Number(maxUses))
-          : undefined;
+            ? maxUses === null
+              ? null
+              : Number(maxUses)
+            : undefined;
 
       const finalPerUserLimit =
         perUserLimit !== undefined
           ? Number(perUserLimit)
           : maxUsesPerUser !== undefined
-          ? Number(maxUsesPerUser)
-          : undefined;
+            ? Number(maxUsesPerUser)
+            : undefined;
 
       const updated = await prisma.coupon.update({
         where: { id },
@@ -100,7 +104,9 @@ export class CouponController {
           ...(typeof isActive === 'boolean' ? { isActive } : {}),
           ...(finalMaxRedemptions !== undefined ? { maxRedemptions: finalMaxRedemptions } : {}),
           ...(finalPerUserLimit !== undefined ? { perUserLimit: finalPerUserLimit } : {}),
-          ...(validFrom !== undefined ? { validFrom: validFrom ? new Date(validFrom) : undefined } : {}),
+          ...(validFrom !== undefined
+            ? { validFrom: validFrom ? new Date(validFrom) : undefined }
+            : {}),
           ...(validUntil !== undefined
             ? { validUntil: validUntil ? new Date(validUntil) : null }
             : {}),

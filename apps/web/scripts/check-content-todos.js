@@ -87,11 +87,15 @@ if (process.argv[1] && process.argv[1].endsWith('check-content-todos.js')) {
   const violations = scanForTodoMarkers([siteConfigPath, appDir]);
 
   if (violations.length > 0) {
-    console.error('\n❌ FATAL: Production build failed due to unreplaced [TODO_REPLACE] content markers:');
+    console.error(
+      '\n❌ FATAL: Production build failed due to unreplaced [TODO_REPLACE] content markers:',
+    );
     violations.forEach((v) => {
       console.error(`  - ${v.file}:${v.line} -> ${v.content}`);
     });
-    console.error('\nPlease update apps/web/src/config/site.ts with live values before deploying to production.\n');
+    console.error(
+      '\nPlease update apps/web/src/config/site.ts with live values before deploying to production.\n',
+    );
     process.exit(1);
   } else {
     console.log('✅ Content Check: Zero [TODO_REPLACE] markers found. Safe for production.');

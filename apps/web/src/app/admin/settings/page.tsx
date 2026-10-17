@@ -154,7 +154,10 @@ export default function AdminSettingsPage() {
       {toast && (
         <div className="bg-[#E6F4EA] border border-[#137333] text-[#137333] p-4 font-bold flex justify-between items-center">
           <span>{toast}</span>
-          <button onClick={() => setToast(null)} className="text-xs uppercase font-black hover:underline">
+          <button
+            onClick={() => setToast(null)}
+            className="text-xs uppercase font-black hover:underline"
+          >
             Dismiss
           </button>
         </div>
@@ -163,7 +166,9 @@ export default function AdminSettingsPage() {
       {error && (
         <div className="bg-[#FCE8E6] border border-[#C5221F] text-[#C5221F] p-4 font-bold">
           <div>{error}</div>
-          {requestId && <div className="text-xs font-mono mt-1 font-normal">Reference ID: {requestId}</div>}
+          {requestId && (
+            <div className="text-xs font-mono mt-1 font-normal">Reference ID: {requestId}</div>
+          )}
         </div>
       )}
 
@@ -232,7 +237,8 @@ export default function AdminSettingsPage() {
               2. Indian GST & Tax Configuration
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
-              Tax rules strictly affect NEW orders. Past orders and existing generated invoices will not be altered.
+              Tax rules strictly affect NEW orders. Past orders and existing generated invoices will
+              not be altered.
             </p>
           </div>
 
@@ -249,7 +255,8 @@ export default function AdminSettingsPage() {
                 className="w-full border border-black p-2 text-sm font-mono uppercase"
               />
               <p className="text-[11px] text-gray-500 mt-0.5">
-                Leave blank if below GST threshold. If empty, tax lines will NOT be displayed at checkout.
+                Leave blank if below GST threshold. If empty, tax lines will NOT be displayed at
+                checkout.
               </p>
             </div>
 
@@ -286,8 +293,8 @@ export default function AdminSettingsPage() {
               </span>
             </label>
             <p className="text-[11px] text-gray-500 mt-1 pl-7">
-              When checked, a ₹2,999 course already includes GST in the ₹2,999 price (subtotal will be backed out on invoice).
-              When unchecked, GST is added on top at checkout.
+              When checked, a ₹2,999 course already includes GST in the ₹2,999 price (subtotal will
+              be backed out on invoice). When unchecked, GST is added on top at checkout.
             </p>
           </div>
         </div>
@@ -313,7 +320,8 @@ export default function AdminSettingsPage() {
                 className="w-full border border-black p-2 text-sm font-mono uppercase"
               />
               <p className="text-[11px] text-gray-500 mt-0.5">
-                1-4 letters/numbers (e.g. <code>INV</code>, <code>HEA</code>). Formats as <code>INV/26-27/00001</code> to comply with Indian GST 16-character limit.
+                1-4 letters/numbers (e.g. <code>INV</code>, <code>HEA</code>). Formats as{' '}
+                <code>INV/26-27/00001</code> to comply with Indian GST 16-character limit.
               </p>
             </div>
 
@@ -353,7 +361,8 @@ export default function AdminSettingsPage() {
               className="w-full border border-black p-2 text-sm font-mono"
             />
             <p className="text-[11px] text-gray-500 mt-0.5">
-              Limits account sharing. Default is 2 (e.g. laptop + mobile). Higher values increase piracy risk.
+              Limits account sharing. Default is 2 (e.g. laptop + mobile). Higher values increase
+              piracy risk.
             </p>
           </div>
         </div>
@@ -376,12 +385,11 @@ export default function AdminSettingsPage() {
         title="Confirm Tax & GST Changes"
         message={
           <div className="space-y-3">
-            <p>
-              You are updating the GST tax rate or tax-inclusivity settings.
-            </p>
+            <p>You are updating the GST tax rate or tax-inclusivity settings.</p>
             <div className="bg-[#FEF7E0] border border-[#B06000] text-[#B06000] p-3 text-xs font-bold">
-              IMPORTANT: This change will affect NEW orders placed after this moment only.
-              Past orders, captured payments, and existing issued tax invoices will remain strictly unchanged.
+              IMPORTANT: This change will affect NEW orders placed after this moment only. Past
+              orders, captured payments, and existing issued tax invoices will remain strictly
+              unchanged.
             </div>
             <p className="text-xs text-gray-600">
               Are you sure you want to apply these tax configuration changes?

@@ -82,7 +82,14 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
     title: string;
     description: string;
     isFreePreview: boolean;
-  }>({ isOpen: false, mode: 'create', sectionId: '', title: '', description: '', isFreePreview: false });
+  }>({
+    isOpen: false,
+    mode: 'create',
+    sectionId: '',
+    title: '',
+    description: '',
+    isFreePreview: false,
+  });
 
   // Video Upload Modal state
   const [videoModal, setVideoModal] = useState<{
@@ -391,9 +398,7 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
               >
                 {course?.status}
               </span>
-              <span className="text-xs font-mono text-course-navySubtle">
-                /{course?.slug}
-              </span>
+              <span className="text-xs font-mono text-course-navySubtle">/{course?.slug}</span>
             </div>
             <h1 className="text-xl font-black text-course-darkBlue leading-tight mt-0.5">
               {course?.title} — Curriculum Editor
@@ -413,7 +418,11 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
           </Button>
 
           <Link href={`/admin/courses/${courseId}/edit`}>
-            <Button variant="outline" size="sm" className="text-xs font-bold uppercase tracking-wider py-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-xs font-bold uppercase tracking-wider py-2"
+            >
               <Edit className="w-3.5 h-3.5 mr-1" />
               Course Settings
             </Button>
@@ -429,7 +438,9 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
             <span>Missing Video Warning</span>
           </div>
           <p className="font-medium">
-            This course is currently <strong>PUBLISHED</strong> to students, but {course.missingVideosCount} lesson(s) are missing a video or are still processing. Ensure all paid lessons have a READY video before advertising.
+            This course is currently <strong>PUBLISHED</strong> to students, but{' '}
+            {course.missingVideosCount} lesson(s) are missing a video or are still processing.
+            Ensure all paid lessons have a READY video before advertising.
           </p>
         </div>
       )}
@@ -449,13 +460,18 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
 
       {/* Empty State */}
       {course?.sections.length === 0 && !errorMessage && (
-        <Card variant="default" padding="lg" className="border-2 border-dashed border-black text-center py-12 space-y-3">
+        <Card
+          variant="default"
+          padding="lg"
+          className="border-2 border-dashed border-black text-center py-12 space-y-3"
+        >
           <div className="w-10 h-10 bg-neutral-100 text-course-darkBlue border border-black flex items-center justify-center mx-auto">
             <Plus className="w-5 h-5" />
           </div>
           <h2 className="text-sm font-black text-course-darkBlue">No Curriculum Sections Yet</h2>
           <p className="text-xs text-course-navySubtle max-w-sm mx-auto">
-            Click &quot;Add Section&quot; to begin building modules (e.g. &quot;Module 1: Hydraulic Fluid Fundamentals&quot;).
+            Click &quot;Add Section&quot; to begin building modules (e.g. &quot;Module 1: Hydraulic
+            Fluid Fundamentals&quot;).
           </p>
           <Button
             variant="primary"
@@ -478,9 +494,7 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                 <span className="w-6 h-6 bg-course-darkBlue text-white font-mono text-xs font-bold border border-black flex items-center justify-center shrink-0">
                   {sIndex + 1}
                 </span>
-                <h2 className="text-sm font-black text-course-darkBlue">
-                  {section.title}
-                </h2>
+                <h2 className="text-sm font-black text-course-darkBlue">{section.title}</h2>
                 <span className="text-[11px] font-mono text-course-navySubtle">
                   ({section.lessons.length} {section.lessons.length === 1 ? 'lesson' : 'lessons'})
                 </span>
@@ -683,10 +697,16 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                             ? 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
                             : 'bg-white text-course-darkBlue hover:bg-neutral-100'
                         }`}
-                        title={lesson.isFreePreview ? 'Click to make Paid Only' : 'Click to make Free Preview'}
+                        title={
+                          lesson.isFreePreview
+                            ? 'Click to make Paid Only'
+                            : 'Click to make Free Preview'
+                        }
                       >
                         <Eye className="w-3 h-3" />
-                        <span className="hidden md:inline">{lesson.isFreePreview ? 'Preview: On' : 'Preview: Off'}</span>
+                        <span className="hidden md:inline">
+                          {lesson.isFreePreview ? 'Preview: On' : 'Preview: Off'}
+                        </span>
                       </button>
 
                       {/* Upload / Replace Video Button */}
@@ -760,7 +780,10 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
         >
           <div className="w-full max-w-md bg-course-white border-2 border-black p-6 space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-black">
-              <h2 id="section-modal-title" className="text-sm font-black text-course-darkBlue uppercase tracking-wider">
+              <h2
+                id="section-modal-title"
+                className="text-sm font-black text-course-darkBlue uppercase tracking-wider"
+              >
                 {sectionModal.mode === 'create' ? 'Add New Section' : 'Rename Section'}
               </h2>
               <button
@@ -818,7 +841,10 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
         >
           <div className="w-full max-w-lg bg-course-white border-2 border-black p-6 space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-black">
-              <h2 id="lesson-modal-title" className="text-sm font-black text-course-darkBlue uppercase tracking-wider">
+              <h2
+                id="lesson-modal-title"
+                className="text-sm font-black text-course-darkBlue uppercase tracking-wider"
+              >
                 {lessonModal.mode === 'create' ? 'Add New Lesson' : 'Edit Lesson Information'}
               </h2>
               <button
@@ -921,7 +947,10 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
           <div className="w-full max-w-xl bg-course-white border-2 border-black p-6 space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-black">
               <div>
-                <h2 id="video-modal-title" className="text-sm font-black text-course-darkBlue uppercase tracking-wider">
+                <h2
+                  id="video-modal-title"
+                  className="text-sm font-black text-course-darkBlue uppercase tracking-wider"
+                >
                   Direct Video Upload
                 </h2>
                 <p className="text-xs text-course-navySubtle mt-0.5">
@@ -1003,7 +1032,8 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                   className="w-4 h-4 accent-rose-600 mt-0.5 shrink-0"
                 />
                 <span>
-                  Confirm video deletion: Permanently delete the uploaded video from Bunny Stream CDN.
+                  Confirm video deletion: Permanently delete the uploaded video from Bunny Stream
+                  CDN.
                 </span>
               </label>
             )}
@@ -1016,7 +1046,8 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                 className="w-4 h-4 accent-rose-600 mt-0.5 shrink-0"
               />
               <span>
-                Force delete even if enrolled students already have watch progress recorded for this item.
+                Force delete even if enrolled students already have watch progress recorded for this
+                item.
               </span>
             </label>
           </div>

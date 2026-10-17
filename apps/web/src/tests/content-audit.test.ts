@@ -15,7 +15,7 @@ describe('Production Content Audit Pre-Build Check (C2)', () => {
     // Confirms the scanner properly identifies markers
     expect(violations.length).toBeGreaterThan(0);
     const hasInstructorMarker = violations.some((v) =>
-      v.content.includes('[TODO_REPLACE: INSTRUCTOR NAME]')
+      v.content.includes('[TODO_REPLACE: INSTRUCTOR NAME]'),
     );
     expect(hasInstructorMarker).toBe(true);
   });

@@ -35,7 +35,8 @@ orderRouter.get('/orders/quote', (_req, res) => {
     success: false,
     error: {
       code: 'METHOD_NOT_ALLOWED',
-      message: 'GET /orders/quote is not supported. Use POST /orders/quote with a JSON request body.',
+      message:
+        'GET /orders/quote is not supported. Use POST /orders/quote with a JSON request body.',
     },
   });
 });

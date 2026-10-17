@@ -564,7 +564,9 @@ export class AuthService {
       const lastActivityMs = await this.getAdminLastActivity(tokenRecord.userId);
       const effectiveLastActivity =
         lastActivityMs ??
-        (tokenRecord.lastUsedAt ? tokenRecord.lastUsedAt.getTime() : tokenRecord.createdAt.getTime());
+        (tokenRecord.lastUsedAt
+          ? tokenRecord.lastUsedAt.getTime()
+          : tokenRecord.createdAt.getTime());
 
       if (nowMs - effectiveLastActivity > AuthService.ADMIN_INACTIVITY_TIMEOUT_MS) {
         throw new UnauthorizedError(

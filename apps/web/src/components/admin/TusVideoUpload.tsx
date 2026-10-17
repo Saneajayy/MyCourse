@@ -338,7 +338,8 @@ export function TusVideoUpload({
           <div className="space-y-1">
             <p className="font-bold">{errorMessage}</p>
             <p className="text-[11px] text-rose-800">
-              Videos are uploaded directly to Bunny Stream CDN. Please ensure your internet connection is stable.
+              Videos are uploaded directly to Bunny Stream CDN. Please ensure your internet
+              connection is stable.
             </p>
           </div>
         </div>
@@ -349,7 +350,9 @@ export function TusVideoUpload({
         <div className="p-3 border border-black bg-neutral-50 space-y-3">
           <div className="flex items-center justify-between text-xs font-bold text-course-darkBlue">
             <span className="truncate max-w-[280px]">{selectedFile.name}</span>
-            <span className="font-mono text-course-navySubtle">{formatFileSize(selectedFile.size)}</span>
+            <span className="font-mono text-course-navySubtle">
+              {formatFileSize(selectedFile.size)}
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Button

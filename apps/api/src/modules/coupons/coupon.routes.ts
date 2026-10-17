@@ -19,9 +19,7 @@ adminCouponRouter.post('/coupons', (req, res, next) =>
   couponController.createCoupon(req, res, next),
 );
 
-adminCouponRouter.get('/coupons', (req, res, next) =>
-  couponController.listCoupons(req, res, next),
-);
+adminCouponRouter.get('/coupons', (req, res, next) => couponController.listCoupons(req, res, next));
 
 adminCouponRouter.patch('/coupons/:id', (req, res, next) =>
   couponController.updateCoupon(req, res, next),

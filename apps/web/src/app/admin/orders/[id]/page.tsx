@@ -78,11 +78,7 @@ interface OrderDetail {
   }>;
 }
 
-export default function OrderDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
 
   const [order, setOrder] = useState<OrderDetail | null>(null);
@@ -169,17 +165,41 @@ export default function OrderDetailPage({
   const getStatusBadge = (status: OrderDetail['status']) => {
     switch (status) {
       case 'PAID':
-        return <span className="bg-[#E6F4EA] text-[#137333] border border-[#137333] px-2.5 py-0.5 text-xs font-bold">PAID</span>;
+        return (
+          <span className="bg-[#E6F4EA] text-[#137333] border border-[#137333] px-2.5 py-0.5 text-xs font-bold">
+            PAID
+          </span>
+        );
       case 'PENDING':
-        return <span className="bg-[#FEF7E0] text-[#B06000] border border-[#B06000] px-2.5 py-0.5 text-xs font-bold">PENDING</span>;
+        return (
+          <span className="bg-[#FEF7E0] text-[#B06000] border border-[#B06000] px-2.5 py-0.5 text-xs font-bold">
+            PENDING
+          </span>
+        );
       case 'PARTIALLY_REFUNDED':
-        return <span className="bg-[#E8F0FE] text-[#1A73E8] border border-[#1A73E8] px-2.5 py-0.5 text-xs font-bold">PARTIALLY REFUNDED</span>;
+        return (
+          <span className="bg-[#E8F0FE] text-[#1A73E8] border border-[#1A73E8] px-2.5 py-0.5 text-xs font-bold">
+            PARTIALLY REFUNDED
+          </span>
+        );
       case 'REFUNDED':
-        return <span className="bg-[#FCE8E6] text-[#C5221F] border border-[#C5221F] px-2.5 py-0.5 text-xs font-bold">REFUNDED</span>;
+        return (
+          <span className="bg-[#FCE8E6] text-[#C5221F] border border-[#C5221F] px-2.5 py-0.5 text-xs font-bold">
+            REFUNDED
+          </span>
+        );
       case 'FAILED':
-        return <span className="bg-[#FCE8E6] text-[#C5221F] border border-[#C5221F] px-2.5 py-0.5 text-xs font-bold">FAILED</span>;
+        return (
+          <span className="bg-[#FCE8E6] text-[#C5221F] border border-[#C5221F] px-2.5 py-0.5 text-xs font-bold">
+            FAILED
+          </span>
+        );
       default:
-        return <span className="bg-gray-100 text-gray-700 border border-black px-2.5 py-0.5 text-xs font-bold">{status}</span>;
+        return (
+          <span className="bg-gray-100 text-gray-700 border border-black px-2.5 py-0.5 text-xs font-bold">
+            {status}
+          </span>
+        );
     }
   };
 
@@ -197,7 +217,10 @@ export default function OrderDetailPage({
         <div className="bg-[#FCE8E6] border border-[#C5221F] text-[#C5221F] p-4 font-bold mb-4">
           Error: {error}
         </div>
-        <Link href="/admin/orders" className="inline-block px-4 py-2 bg-black text-white font-bold border border-black hover:bg-[#E05305]">
+        <Link
+          href="/admin/orders"
+          className="inline-block px-4 py-2 bg-black text-white font-bold border border-black hover:bg-[#E05305]"
+        >
           &larr; Back to Orders Ledger
         </Link>
       </div>
@@ -207,7 +230,8 @@ export default function OrderDetailPage({
   if (!order) return null;
 
   const capturedPayment = order.payments.find((p) => p.status === 'CAPTURED');
-  const canRefund = (order.status === 'PAID' || order.status === 'PARTIALLY_REFUNDED') && Boolean(capturedPayment);
+  const canRefund =
+    (order.status === 'PAID' || order.status === 'PARTIALLY_REFUNDED') && Boolean(capturedPayment);
 
   // Compute total already refunded
   const allRefunds = order.payments.flatMap((p) => p.refunds || []);
@@ -221,7 +245,10 @@ export default function OrderDetailPage({
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-black p-4">
         <div>
           <div className="flex items-center gap-3">
-            <Link href="/admin/orders" className="text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-black">
+            <Link
+              href="/admin/orders"
+              className="text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-black"
+            >
               &larr; Orders
             </Link>
             <span className="text-gray-300">/</span>
@@ -257,7 +284,10 @@ export default function OrderDetailPage({
       {toast && (
         <div className="bg-[#E6F4EA] border border-[#137333] text-[#137333] p-4 font-bold flex justify-between items-center">
           <span>{toast}</span>
-          <button onClick={() => setToast(null)} className="text-xs uppercase font-black hover:underline">
+          <button
+            onClick={() => setToast(null)}
+            className="text-xs uppercase font-black hover:underline"
+          >
             Dismiss
           </button>
         </div>
@@ -266,7 +296,11 @@ export default function OrderDetailPage({
       {error && (
         <div className="bg-[#FCE8E6] border border-[#C5221F] text-[#C5221F] p-4 font-bold">
           <div>{error}</div>
-          {requestId && <div className="text-xs font-mono mt-1 font-normal">Reference Request ID: {requestId}</div>}
+          {requestId && (
+            <div className="text-xs font-mono mt-1 font-normal">
+              Reference Request ID: {requestId}
+            </div>
+          )}
         </div>
       )}
 
@@ -280,7 +314,9 @@ export default function OrderDetailPage({
           <div className="space-y-2">
             <div className="text-base font-black text-[#0A192F]">{order.user.name}</div>
             <div className="text-sm font-mono text-gray-700">{order.user.email}</div>
-            {order.user.phone && <div className="text-sm font-mono text-gray-600">Tel: {order.user.phone}</div>}
+            {order.user.phone && (
+              <div className="text-sm font-mono text-gray-600">Tel: {order.user.phone}</div>
+            )}
             <div className="pt-2">
               <Link
                 href={`/admin/students/${order.user.id}`}
@@ -301,7 +337,10 @@ export default function OrderDetailPage({
             <div className="text-base font-black text-[#0A192F]">{order.product.title}</div>
             <div className="text-xs text-gray-500 font-mono">Slug: {order.product.slug}</div>
             <div className="text-sm text-gray-700">
-              Validity: {order.product.validityDays ? `${order.product.validityDays} Days` : 'Lifetime Access'}
+              Validity:{' '}
+              {order.product.validityDays
+                ? `${order.product.validityDays} Days`
+                : 'Lifetime Access'}
             </div>
             <div className="pt-2">
               <Link
@@ -322,19 +361,27 @@ export default function OrderDetailPage({
           <div className="space-y-1.5 text-xs">
             <div>
               <span className="text-gray-500 font-bold">Razorpay Order ID: </span>
-              <span className="font-mono text-gray-900">{order.razorpayOrderId || 'N/A (Free Order)'}</span>
+              <span className="font-mono text-gray-900">
+                {order.razorpayOrderId || 'N/A (Free Order)'}
+              </span>
             </div>
             <div>
               <span className="text-gray-500 font-bold">UTM Source: </span>
-              <span className="font-mono bg-gray-100 px-1 border border-gray-300">{order.utmSource || 'direct'}</span>
+              <span className="font-mono bg-gray-100 px-1 border border-gray-300">
+                {order.utmSource || 'direct'}
+              </span>
             </div>
             <div>
               <span className="text-gray-500 font-bold">UTM Medium: </span>
-              <span className="font-mono bg-gray-100 px-1 border border-gray-300">{order.utmMedium || 'none'}</span>
+              <span className="font-mono bg-gray-100 px-1 border border-gray-300">
+                {order.utmMedium || 'none'}
+              </span>
             </div>
             <div>
               <span className="text-gray-500 font-bold">UTM Campaign: </span>
-              <span className="font-mono bg-gray-100 px-1 border border-gray-300">{order.utmCampaign || 'none'}</span>
+              <span className="font-mono bg-gray-100 px-1 border border-gray-300">
+                {order.utmCampaign || 'none'}
+              </span>
             </div>
           </div>
         </div>
@@ -358,23 +405,36 @@ export default function OrderDetailPage({
               <tr>
                 <td className="p-3 border-r border-black font-bold">Course Base Subtotal</td>
                 <td className="p-3 border-r border-black text-gray-600">Standard Product Price</td>
-                <td className="p-3 text-right font-mono">₹{(order.subtotalPaise / 100).toFixed(2)}</td>
+                <td className="p-3 text-right font-mono">
+                  ₹{(order.subtotalPaise / 100).toFixed(2)}
+                </td>
               </tr>
               {order.discountPaise > 0 && (
                 <tr className="bg-[#E6F4EA]/40 text-[#137333]">
                   <td className="p-3 border-r border-black font-bold">
-                    Coupon Discount {order.coupon && <span className="font-mono uppercase px-1 border border-[#137333] ml-2">[{order.coupon.code}]</span>}
+                    Coupon Discount{' '}
+                    {order.coupon && (
+                      <span className="font-mono uppercase px-1 border border-[#137333] ml-2">
+                        [{order.coupon.code}]
+                      </span>
+                    )}
                   </td>
                   <td className="p-3 border-r border-black text-xs">
-                    {order.coupon?.type === 'PERCENT' ? `${order.coupon.value}% Off` : 'Flat Discount'}
+                    {order.coupon?.type === 'PERCENT'
+                      ? `${order.coupon.value}% Off`
+                      : 'Flat Discount'}
                   </td>
-                  <td className="p-3 text-right font-mono font-bold">-₹{(order.discountPaise / 100).toFixed(2)}</td>
+                  <td className="p-3 text-right font-mono font-bold">
+                    -₹{(order.discountPaise / 100).toFixed(2)}
+                  </td>
                 </tr>
               )}
               {order.taxPaise > 0 && (
                 <tr>
                   <td className="p-3 border-r border-black">Applicable GST / Taxes</td>
-                  <td className="p-3 border-r border-black text-gray-600 text-xs">Based on Tax Configuration</td>
+                  <td className="p-3 border-r border-black text-gray-600 text-xs">
+                    Based on Tax Configuration
+                  </td>
                   <td className="p-3 text-right font-mono">₹{(order.taxPaise / 100).toFixed(2)}</td>
                 </tr>
               )}
@@ -382,7 +442,9 @@ export default function OrderDetailPage({
                 <td className="p-3 border-r border-black uppercase tracking-wider" colSpan={2}>
                   Total Paid by Student
                 </td>
-                <td className="p-3 text-right font-mono text-[#0A192F]">₹{(order.totalPaise / 100).toFixed(2)}</td>
+                <td className="p-3 text-right font-mono text-[#0A192F]">
+                  ₹{(order.totalPaise / 100).toFixed(2)}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -401,7 +463,9 @@ export default function OrderDetailPage({
         </div>
 
         {order.payments.length === 0 ? (
-          <p className="text-sm text-gray-500 italic py-4">No payment records found (e.g. 100% discount order or abandoned cart).</p>
+          <p className="text-sm text-gray-500 italic py-4">
+            No payment records found (e.g. 100% discount order or abandoned cart).
+          </p>
         ) : (
           <div className="space-y-4">
             {order.payments.map((pmt) => (
@@ -411,20 +475,36 @@ export default function OrderDetailPage({
                     <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 border border-black bg-gray-100">
                       Payment ID
                     </span>
-                    <span className="font-mono text-sm font-bold">{pmt.razorpayPaymentId || pmt.id}</span>
+                    <span className="font-mono text-sm font-bold">
+                      {pmt.razorpayPaymentId || pmt.id}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-xs font-bold px-2 py-0.5 border border-black bg-white">
                       Status: {pmt.status}
                     </span>
-                    <span className="font-mono font-bold text-sm">₹{(pmt.amountPaise / 100).toFixed(2)}</span>
+                    <span className="font-mono font-bold text-sm">
+                      ₹{(pmt.amountPaise / 100).toFixed(2)}
+                    </span>
                   </div>
                 </div>
 
                 <div className="text-xs text-gray-600 flex flex-wrap gap-4 pt-1 border-t border-gray-200">
-                  <div>Method: <strong className="text-black">{pmt.method || 'Online'}</strong></div>
-                  <div>Captured: <strong className="text-black">{pmt.capturedAt ? new Date(pmt.capturedAt).toLocaleString() : 'Pending'}</strong></div>
-                  <div>Initiated: <strong className="text-black">{new Date(pmt.createdAt).toLocaleString()}</strong></div>
+                  <div>
+                    Method: <strong className="text-black">{pmt.method || 'Online'}</strong>
+                  </div>
+                  <div>
+                    Captured:{' '}
+                    <strong className="text-black">
+                      {pmt.capturedAt ? new Date(pmt.capturedAt).toLocaleString() : 'Pending'}
+                    </strong>
+                  </div>
+                  <div>
+                    Initiated:{' '}
+                    <strong className="text-black">
+                      {new Date(pmt.createdAt).toLocaleString()}
+                    </strong>
+                  </div>
                 </div>
 
                 {/* Nested Refunds */}
@@ -434,13 +514,19 @@ export default function OrderDetailPage({
                       Recorded Refunds for this Payment:
                     </div>
                     {pmt.refunds.map((ref) => (
-                      <div key={ref.id} className="text-xs border border-gray-300 bg-white p-2 flex flex-col sm:flex-row justify-between gap-2">
+                      <div
+                        key={ref.id}
+                        className="text-xs border border-gray-300 bg-white p-2 flex flex-col sm:flex-row justify-between gap-2"
+                      >
                         <div>
                           <div className="font-mono font-bold">
                             Refund ID: {ref.razorpayRefundId || ref.id}
                           </div>
                           <div className="text-gray-600 mt-0.5">
-                            Reason: <span className="italic text-gray-900">{ref.reason || 'None provided'}</span>
+                            Reason:{' '}
+                            <span className="italic text-gray-900">
+                              {ref.reason || 'None provided'}
+                            </span>
                           </div>
                         </div>
                         <div className="sm:text-right">
@@ -453,7 +539,9 @@ export default function OrderDetailPage({
                           >
                             {ref.status}
                           </span>
-                          <div className="font-mono font-bold mt-1">₹{(ref.amountPaise / 100).toFixed(2)}</div>
+                          <div className="font-mono font-bold mt-1">
+                            ₹{(ref.amountPaise / 100).toFixed(2)}
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -471,11 +559,16 @@ export default function OrderDetailPage({
           Associated Course Access Entitlement
         </h2>
         {order.entitlements.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">No entitlement issued (Order unpaid or access manually unlinked).</p>
+          <p className="text-sm text-gray-500 italic">
+            No entitlement issued (Order unpaid or access manually unlinked).
+          </p>
         ) : (
           <div className="space-y-2">
             {order.entitlements.map((ent) => (
-              <div key={ent.id} className="flex justify-between items-center text-sm border border-black p-3">
+              <div
+                key={ent.id}
+                className="flex justify-between items-center text-sm border border-black p-3"
+              >
                 <div>
                   <span className="font-bold text-[#0A192F]">Entitlement Status: </span>
                   <span
@@ -490,7 +583,9 @@ export default function OrderDetailPage({
                   <span className="text-xs text-gray-500 ml-3">Source: {ent.source}</span>
                 </div>
                 <div className="text-xs font-mono">
-                  {ent.validUntil ? `Expires: ${new Date(ent.validUntil).toLocaleDateString()}` : 'Lifetime Access'}
+                  {ent.validUntil
+                    ? `Expires: ${new Date(ent.validUntil).toLocaleDateString()}`
+                    : 'Lifetime Access'}
                 </div>
               </div>
             ))}
@@ -505,8 +600,9 @@ export default function OrderDetailPage({
         message={
           <div>
             <div className="bg-[#FEF7E0] border border-[#B06000] text-[#B06000] p-3 text-xs mb-4">
-              <strong>CAUTION:</strong> Issuing a refund sends a live request to Razorpay and immediately writes an entry into the system audit log.
-              The refund will display as <strong>PENDING</strong> until Razorpay confirms settlement via webhook.
+              <strong>CAUTION:</strong> Issuing a refund sends a live request to Razorpay and
+              immediately writes an entry into the system audit log. The refund will display as{' '}
+              <strong>PENDING</strong> until Razorpay confirms settlement via webhook.
             </div>
 
             <div className="space-y-4 text-left">
@@ -552,14 +648,16 @@ export default function OrderDetailPage({
                     className="w-full border border-black p-2 font-mono text-sm"
                   />
                   <p className="text-[11px] text-gray-500 mt-1">
-                    Note: Partial refunds will NOT automatically revoke course access unless manually revoked on the Student page.
+                    Note: Partial refunds will NOT automatically revoke course access unless
+                    manually revoked on the Student page.
                   </p>
                 </div>
               )}
 
               {refundType === 'FULL' && (
                 <div className="p-3 bg-[#FCE8E6] border border-[#C5221F] text-[#C5221F] text-xs font-bold">
-                  Full refund effect: The student will have their course access revoked immediately once the refund settles.
+                  Full refund effect: The student will have their course access revoked immediately
+                  once the refund settles.
                 </div>
               )}
 

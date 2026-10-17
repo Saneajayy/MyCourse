@@ -71,7 +71,10 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
     if (user.role === UserRole.ADMIN) {
       const nowMs = authService.getNow().getTime();
       const lastActivityMs = await authService.getAdminLastActivity(user.id);
-      if (lastActivityMs !== null && nowMs - lastActivityMs > AuthService.ADMIN_INACTIVITY_TIMEOUT_MS) {
+      if (
+        lastActivityMs !== null &&
+        nowMs - lastActivityMs > AuthService.ADMIN_INACTIVITY_TIMEOUT_MS
+      ) {
         next(
           new UnauthorizedError(
             'Admin session has expired due to 30 minutes of inactivity. Please log in again.',

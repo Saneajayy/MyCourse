@@ -17,9 +17,7 @@ adminRouter.get('/dashboard/stats', (req, res, next) =>
 );
 
 // 2. Students Directory & Profile Management
-adminRouter.get('/students', (req, res, next) =>
-  adminController.getStudents(req, res, next),
-);
+adminRouter.get('/students', (req, res, next) => adminController.getStudents(req, res, next));
 adminRouter.get('/students/:id', (req, res, next) =>
   adminController.getStudentDetail(req, res, next),
 );
@@ -34,31 +32,19 @@ adminRouter.post('/students/:id/resend-verification', (req, res, next) =>
 );
 
 // 3. Orders, Payments & Refunds
-adminRouter.get('/orders', (req, res, next) =>
-  adminController.getOrders(req, res, next),
-);
-adminRouter.get('/orders/:id', (req, res, next) =>
-  adminController.getOrderDetail(req, res, next),
-);
+adminRouter.get('/orders', (req, res, next) => adminController.getOrders(req, res, next));
+adminRouter.get('/orders/:id', (req, res, next) => adminController.getOrderDetail(req, res, next));
 adminRouter.post('/orders/:id/refund', (req, res, next) =>
   adminController.refundOrder(req, res, next),
 );
 
 // 4. Application Settings (AppSetting Table)
-adminRouter.get('/settings', (req, res, next) =>
-  adminController.getSettings(req, res, next),
-);
-adminRouter.put('/settings', (req, res, next) =>
-  adminController.updateSettings(req, res, next),
-);
-adminRouter.patch('/settings', (req, res, next) =>
-  adminController.updateSettings(req, res, next),
-);
+adminRouter.get('/settings', (req, res, next) => adminController.getSettings(req, res, next));
+adminRouter.put('/settings', (req, res, next) => adminController.updateSettings(req, res, next));
+adminRouter.patch('/settings', (req, res, next) => adminController.updateSettings(req, res, next));
 
 // 5. System Audit Log Viewer
-adminRouter.get('/audit-logs', (req, res, next) =>
-  adminController.getAuditLogs(req, res, next),
-);
+adminRouter.get('/audit-logs', (req, res, next) => adminController.getAuditLogs(req, res, next));
 
 // 6. Streaming CSV Exports (Formula-Injection Protected)
 adminRouter.get('/export/orders.csv', (req, res, next) =>

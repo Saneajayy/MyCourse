@@ -59,7 +59,9 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
       setSlug(data.slug);
       setDescription(data.description);
       setPriceRupees(String(data.pricePaise / 100));
-      setCompareAtPriceRupees(data.compareAtPricePaise ? String(data.compareAtPricePaise / 100) : '');
+      setCompareAtPriceRupees(
+        data.compareAtPricePaise ? String(data.compareAtPricePaise / 100) : '',
+      );
       setAccessType(data.validityDays ? 'limited' : 'lifetime');
       setValidityDays(data.validityDays ? String(data.validityDays) : '365');
       setAllowRenewals(data.allowRenewals !== false);
@@ -175,14 +177,16 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
             <h1 className="text-xl font-black text-course-darkBlue uppercase tracking-tight">
               Edit Course Details
             </h1>
-            <p className="text-xs text-course-navySubtle mt-0.5">
-              Editing: {course?.title}
-            </p>
+            <p className="text-xs text-course-navySubtle mt-0.5">Editing: {course?.title}</p>
           </div>
         </div>
 
         <Link href={`/admin/courses/${courseId}/curriculum`}>
-          <Button variant="outline" size="sm" className="text-xs font-bold uppercase tracking-wider py-1.5">
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs font-bold uppercase tracking-wider py-1.5"
+          >
             <ListOrdered className="w-3.5 h-3.5 mr-1" />
             Curriculum Editor
           </Button>
@@ -250,7 +254,8 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                 </Button>
               </label>
               <p className="text-[11px] text-course-navySubtle">
-                Note: Thumbnail images are stored locally and will be migrated to persistent object storage in production.
+                Note: Thumbnail images are stored locally and will be migrated to persistent object
+                storage in production.
               </p>
             </div>
           </div>
@@ -394,7 +399,11 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
         {/* Submit */}
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-black">
           <Link href="/admin/courses">
-            <Button type="button" variant="outline" className="text-xs font-bold uppercase tracking-wider py-2.5">
+            <Button
+              type="button"
+              variant="outline"
+              className="text-xs font-bold uppercase tracking-wider py-2.5"
+            >
               Cancel
             </Button>
           </Link>

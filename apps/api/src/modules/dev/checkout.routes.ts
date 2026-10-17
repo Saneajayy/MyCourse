@@ -679,9 +679,7 @@ devRouter.post('/ensure-admin', async (req, res) => {
   const secret = 'XXMMBN73LMJO4OCPC7JU7BFRRFY6TGNE'; // Standard 32-character test base32 secret
   const encryptedSecret = encryptData(secret, env.TOTP_ENCRYPTION_KEY);
   const recoveryCodes = ['ABCD-1234', 'EFGH-5678', 'IJKL-9012'];
-  const recoveryCodeHashes = recoveryCodes.map((c) =>
-    hmacRecoveryCode(c, env.TOTP_ENCRYPTION_KEY),
-  );
+  const recoveryCodeHashes = recoveryCodes.map((c) => hmacRecoveryCode(c, env.TOTP_ENCRYPTION_KEY));
 
   const user = await prisma.user.upsert({
     where: { email },
@@ -801,4 +799,3 @@ devRouter.post('/simulate-refund-processed', async (req, res) => {
 
   res.json({ success: true, message: 'Refund marked PROCESSED, order PARTIALLY_REFUNDED' });
 });
-

@@ -7,11 +7,7 @@ import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { useToast } from '../../../components/ui/Toast';
-import {
-  Search,
-  Download,
-  ArrowRight,
-} from 'lucide-react';
+import { Search, Download, ArrowRight } from 'lucide-react';
 
 interface OrderListItem {
   id: string;
@@ -166,7 +162,12 @@ export default function AdminOrdersPage() {
               />
               <Search className="w-4 h-4 text-course-navySubtle absolute left-2.5 top-2.5" />
             </div>
-            <Button type="submit" variant="primary" size="sm" className="text-xs font-bold uppercase px-4">
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              className="text-xs font-bold uppercase px-4"
+            >
               Search
             </Button>
           </form>
@@ -274,9 +275,7 @@ export default function AdminOrdersPage() {
                       </Link>
                     </td>
 
-                    <td className="p-3 font-mono text-course-navyMuted">
-                      {order.user.email}
-                    </td>
+                    <td className="p-3 font-mono text-course-navyMuted">{order.user.email}</td>
 
                     <td className="p-3 font-bold text-course-darkBlue truncate max-w-[200px]">
                       {order.product.title}
@@ -292,12 +291,12 @@ export default function AdminOrdersPage() {
                           order.status === 'PAID'
                             ? 'bg-emerald-100 text-emerald-950'
                             : order.status === 'PENDING' || order.status === 'CREATED'
-                            ? 'bg-amber-100 text-amber-950'
-                            : order.status === 'PARTIALLY_REFUNDED'
-                            ? 'bg-sky-100 text-sky-950'
-                            : order.status === 'REFUNDED'
-                            ? 'bg-neutral-200 text-neutral-800'
-                            : 'bg-rose-100 text-rose-950'
+                              ? 'bg-amber-100 text-amber-950'
+                              : order.status === 'PARTIALLY_REFUNDED'
+                                ? 'bg-sky-100 text-sky-950'
+                                : order.status === 'REFUNDED'
+                                  ? 'bg-neutral-200 text-neutral-800'
+                                  : 'bg-rose-100 text-rose-950'
                         }`}
                       >
                         {order.status}

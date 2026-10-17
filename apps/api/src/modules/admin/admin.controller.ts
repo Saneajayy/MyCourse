@@ -184,7 +184,10 @@ export class AdminController {
       }));
 
       // Sales by UTM Source/Campaign (YouTube funnel attribution)
-      const utmMap: Record<string, { utmSource: string; utmCampaign: string; ordersCount: number; revenuePaise: number }> = {};
+      const utmMap: Record<
+        string,
+        { utmSource: string; utmCampaign: string; ordersCount: number; revenuePaise: number }
+      > = {};
       for (const order of paidOrders) {
         const src = order.utmSource || 'Direct / Organic';
         const cmp = order.utmCampaign || 'None';
@@ -457,7 +460,9 @@ export class AdminController {
         data: {
           id: updated.id,
           status: updated.status,
-          message: banned ? 'Student account banned and sessions revoked.' : 'Student account unbanned.',
+          message: banned
+            ? 'Student account banned and sessions revoked.'
+            : 'Student account unbanned.',
         },
       });
     } catch (err) {
@@ -522,7 +527,11 @@ export class AdminController {
   /**
    * 6. Resend Student Verification Email
    */
-  public async resendStudentVerification(req: Request, res: Response, next: NextFunction): Promise<void> {
+  public async resendStudentVerification(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       const id = req.params.id as string;
 
@@ -712,7 +721,8 @@ export class AdminController {
         throw new BadRequestError('No captured payment found for this order to refund.');
       }
 
-      const refundAmount = amountPaise ? Number(amountPaise) : payment.amountPaise;
+      const refundAmount =
+        amountPaise !== undefined && amountPaise !== null ? Number(amountPaise) : undefined;
 
       const result = await orderService.initiateRefund(
         payment.id,
@@ -720,7 +730,7 @@ export class AdminController {
           amountPaise: refundAmount,
           reason: reason.trim(),
         },
-        req.user!.id
+        req.user!.id,
       );
 
       res.status(200).json({

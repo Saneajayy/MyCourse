@@ -96,7 +96,7 @@ test.describe('Admin Panel End-to-End Lifecycle (Phase 7)', () => {
     await page.getByLabel(/Selling Price/i).fill('3999');
     await page.getByLabel(/Compare-At/i).fill('7999');
     await page.locator('textarea').fill('Mastering high-pressure hydraulic excavator circuits.');
-    
+
     // Save & continue to curriculum
     await page.getByRole('button', { name: /Save & Continue/i }).click();
     await page.waitForURL('**/curriculum');
@@ -110,12 +110,18 @@ test.describe('Admin Panel End-to-End Lifecycle (Phase 7)', () => {
     // -------------------------------------------------------------------------
     // Step 4: Admin Adds a Section and Lesson
     // -------------------------------------------------------------------------
-    await page.getByRole('button', { name: /Add Section/i }).first().click();
+    await page
+      .getByRole('button', { name: /Add Section/i })
+      .first()
+      .click();
     await page.getByLabel(/Section Title/i).fill('Module 1: Fluid Mechanics');
     await page.getByRole('button', { name: /Save Section/i }).click();
     await expect(page.locator('text=Module 1: Fluid Mechanics').first()).toBeVisible();
 
-    await page.getByRole('button', { name: /Add Lesson/i }).first().click();
+    await page
+      .getByRole('button', { name: /Add Lesson/i })
+      .first()
+      .click();
     await page.getByLabel(/Lesson Title/i).fill('Lesson 1.1: Axial Piston Pumps');
     await page.getByRole('button', { name: /Save Lesson/i }).click();
     await expect(page.locator('text=Lesson 1.1: Axial Piston Pumps').first()).toBeVisible();
@@ -243,12 +249,18 @@ test.describe('Admin Panel End-to-End Lifecycle (Phase 7)', () => {
     await expect(page.locator(`text=${student2Email}`)).toBeVisible();
 
     // Open Student 2 detail page
-    await page.getByRole('link', { name: /Manage|Scholarship Recipient/i }).first().click();
+    await page
+      .getByRole('link', { name: /Manage|Scholarship Recipient/i })
+      .first()
+      .click();
     await page.waitForURL('**/admin/students/**');
     await expect(page.locator('h1')).toContainText('Scholarship Recipient');
 
     // Click Grant Access
-    await page.getByRole('button', { name: /Grant Access/i }).first().click();
+    await page
+      .getByRole('button', { name: /Grant Access/i })
+      .first()
+      .click();
     await page.locator('#grant-course-select').selectOption({ label: courseTitle });
     await page.getByPlaceholder(/scholarship/i).fill('Approved scholarship grant for research');
     await page.locator('button[type="submit"]:has-text("Grant Access")').click();
@@ -260,7 +272,10 @@ test.describe('Admin Panel End-to-End Lifecycle (Phase 7)', () => {
     // Step 10: Admin Issues Refund on Student 1's Order
     // -------------------------------------------------------------------------
     await page.goto('/admin/orders');
-    await page.getByRole('link', { name: /Inspect/i }).first().click();
+    await page
+      .getByRole('link', { name: /Inspect/i })
+      .first()
+      .click();
     await page.waitForURL('**/admin/orders/**');
     await expect(page.locator('h1')).toContainText('Order Details');
 

@@ -161,7 +161,12 @@ export default function AdminDashboardPage() {
             <AlertTriangle className="w-4 h-4 text-rose-700 shrink-0" />
             <span>{errorMessage}</span>
           </div>
-          <Button variant="outline" size="sm" onClick={() => fetchStats(period)} className="text-xs">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchStats(period)}
+            className="text-xs"
+          >
             Retry
           </Button>
         </div>
@@ -241,7 +246,8 @@ export default function AdminDashboardPage() {
             <div className="p-3 border border-black bg-emerald-50 text-emerald-950 text-xs flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
               <span className="font-bold">
-                All systems operating normally. No stuck orders, uncaptured payments, or webhook issues.
+                All systems operating normally. No stuck orders, uncaptured payments, or webhook
+                issues.
               </span>
             </div>
           )}
@@ -280,9 +286,7 @@ export default function AdminDashboardPage() {
               <div className="text-2xl font-black text-course-darkBlue mt-1">
                 {isLoading ? '...' : (data?.ordersCount ?? 0)}
               </div>
-              <p className="text-[11px] text-course-navySubtle mt-1">
-                Successfully paid purchases
-              </p>
+              <p className="text-[11px] text-course-navySubtle mt-1">Successfully paid purchases</p>
             </div>
             <div className="w-10 h-10 bg-neutral-100 text-course-darkBlue border border-black flex items-center justify-center shrink-0">
               <ShoppingBag className="w-5 h-5" />
@@ -300,9 +304,7 @@ export default function AdminDashboardPage() {
               <div className="text-2xl font-black text-course-darkBlue mt-1">
                 {isLoading ? '...' : (data?.newStudentsCount ?? 0)}
               </div>
-              <p className="text-[11px] text-course-navySubtle mt-1">
-                Registered student accounts
-              </p>
+              <p className="text-[11px] text-course-navySubtle mt-1">Registered student accounts</p>
             </div>
             <div className="w-10 h-10 bg-neutral-100 text-course-darkBlue border border-black flex items-center justify-center shrink-0">
               <Users className="w-5 h-5" />
@@ -381,7 +383,8 @@ export default function AdminDashboardPage() {
                 Daily Revenue Trend
               </h2>
               <p className="text-xs text-course-navySubtle">
-                Gross sales per calendar day ({period === 'today' ? 'Today' : period === '7d' ? 'Last 7 Days' : 'Last 30 Days'})
+                Gross sales per calendar day (
+                {period === 'today' ? 'Today' : period === '7d' ? 'Last 7 Days' : 'Last 30 Days'})
               </p>
             </div>
           </div>
@@ -400,18 +403,54 @@ export default function AdminDashboardPage() {
                 aria-label="Revenue by Day Bar Chart"
               >
                 {/* Gridlines */}
-                <line x1="50" y1="20" x2={chartWidth - 20} y2="20" stroke="#E2E8F0" strokeWidth="1" />
-                <line x1="50" y1="80" x2={chartWidth - 20} y2="80" stroke="#E2E8F0" strokeWidth="1" />
-                <line x1="50" y1="140" x2={chartWidth - 20} y2="140" stroke="#000000" strokeWidth="1.5" />
+                <line
+                  x1="50"
+                  y1="20"
+                  x2={chartWidth - 20}
+                  y2="20"
+                  stroke="#E2E8F0"
+                  strokeWidth="1"
+                />
+                <line
+                  x1="50"
+                  y1="80"
+                  x2={chartWidth - 20}
+                  y2="80"
+                  stroke="#E2E8F0"
+                  strokeWidth="1"
+                />
+                <line
+                  x1="50"
+                  y1="140"
+                  x2={chartWidth - 20}
+                  y2="140"
+                  stroke="#000000"
+                  strokeWidth="1.5"
+                />
 
                 {/* Y-Axis Label */}
-                <text x="45" y="24" textAnchor="end" className="text-[10px] font-mono fill-slate-500">
+                <text
+                  x="45"
+                  y="24"
+                  textAnchor="end"
+                  className="text-[10px] font-mono fill-slate-500"
+                >
                   ₹{Math.round(maxRevenue).toLocaleString()}
                 </text>
-                <text x="45" y="84" textAnchor="end" className="text-[10px] font-mono fill-slate-500">
+                <text
+                  x="45"
+                  y="84"
+                  textAnchor="end"
+                  className="text-[10px] font-mono fill-slate-500"
+                >
                   ₹{Math.round(maxRevenue / 2).toLocaleString()}
                 </text>
-                <text x="45" y="144" textAnchor="end" className="text-[10px] font-mono fill-slate-500">
+                <text
+                  x="45"
+                  y="144"
+                  textAnchor="end"
+                  className="text-[10px] font-mono fill-slate-500"
+                >
                   ₹0
                 </text>
 
@@ -473,7 +512,11 @@ export default function AdminDashboardPage() {
 
         {!data?.salesByUtm || data.salesByUtm.length === 0 ? (
           <div className="p-6 border border-black bg-neutral-50 text-center text-xs text-course-navySubtle">
-            No UTM attribution data recorded yet. When you share links on YouTube, append <code className="font-mono bg-white px-1 border border-neutral-300">?utm_source=youtube&amp;utm_campaign=video_title</code> to see video conversion numbers here.
+            No UTM attribution data recorded yet. When you share links on YouTube, append{' '}
+            <code className="font-mono bg-white px-1 border border-neutral-300">
+              ?utm_source=youtube&amp;utm_campaign=video_title
+            </code>{' '}
+            to see video conversion numbers here.
           </div>
         ) : (
           <div className="overflow-x-auto">

@@ -281,7 +281,7 @@ function CheckoutContent() {
   const finalPricePaise = quote?.totalPaise ?? basePricePaise;
   const isTaxApplicable = quote?.isTaxApplicable ?? false;
   const taxRatePercent = quote?.taxRatePercent ?? 0;
-  const pricesTaxInclusive = quote?.pricesTaxInclusive ?? (taxConfig?.pricesTaxInclusive !== false);
+  const pricesTaxInclusive = quote?.pricesTaxInclusive ?? taxConfig?.pricesTaxInclusive !== false;
 
   // Resend verification email
   const handleResendVerification = async () => {

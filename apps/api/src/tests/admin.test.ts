@@ -134,18 +134,16 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
       });
 
       it(`rejects regular student access to ${ep.method.toUpperCase()} ${ep.path} with 403 Forbidden`, async () => {
-        const res = await (request(app) as any)[ep.method](ep.path).set(
-          'Authorization',
-          `Bearer ${studentToken}`
-        );
+        const res = await (request(app) as any)
+          [ep.method](ep.path)
+          .set('Authorization', `Bearer ${studentToken}`);
         expect(res.status).toBe(403);
       });
 
       it(`rejects admin access to ${ep.method.toUpperCase()} ${ep.path} when 2FA is NOT enrolled with 403 Forbidden`, async () => {
-        const res = await (request(app) as any)[ep.method](ep.path).set(
-          'Authorization',
-          `Bearer ${adminWithout2FAToken}`
-        );
+        const res = await (request(app) as any)
+          [ep.method](ep.path)
+          .set('Authorization', `Bearer ${adminWithout2FAToken}`);
         expect(res.status).toBe(403);
         expect(res.body.error?.message).toContain('two-factor');
       });
@@ -557,7 +555,10 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
         },
       });
 
-      const { sessionId } = await streamService.acquireStreamSession(victim.id, { ip: '127.0.0.1', userAgent: 'test' });
+      const { sessionId } = await streamService.acquireStreamSession(victim.id, {
+        ip: '127.0.0.1',
+        userAgent: 'test',
+      });
       expect(await streamService.getActiveSessionCount(victim.id)).toBe(1);
 
       const banRes = await request(app)
@@ -600,7 +601,10 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
         },
       });
 
-      const { sessionId } = await streamService.acquireStreamSession(victim.id, { ip: '127.0.0.1', userAgent: 'test' });
+      const { sessionId } = await streamService.acquireStreamSession(victim.id, {
+        ip: '127.0.0.1',
+        userAgent: 'test',
+      });
       expect(await streamService.getActiveSessionCount(victim.id)).toBe(1);
 
       const logoutRes = await request(app)
@@ -660,7 +664,10 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
         },
       });
 
-      const { sessionId } = await streamService.acquireStreamSession(student.id, { ip: '127.0.0.1', userAgent: 'test' });
+      const { sessionId } = await streamService.acquireStreamSession(student.id, {
+        ip: '127.0.0.1',
+        userAgent: 'test',
+      });
       expect(await streamService.getActiveSessionCount(student.id)).toBe(1);
 
       const revokeRes = await request(app)
@@ -670,7 +677,9 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
 
       expect(revokeRes.status).toBe(200);
 
-      const updatedEntitlement = await prisma.entitlement.findUnique({ where: { id: entitlement.id } });
+      const updatedEntitlement = await prisma.entitlement.findUnique({
+        where: { id: entitlement.id },
+      });
       expect(updatedEntitlement?.status).toBe(EntitlementStatus.REVOKED);
 
       const updatedStudent = await prisma.user.findUnique({ where: { id: student.id } });
@@ -763,6 +772,278 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
 
       expect(overRefundRes.status).toBe(400);
       expect(overRefundRes.body.error.message).toContain('Available for refund: 40000 paise');
+    });
+
+    it('V1: confirms refund cap equals captured payment on a coupon-discounted order and marks order REFUNDED only when processed refunds equal captured amount', async () => {
+      const student = await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: `coupon_refund_${Date.now()}@hydrauliccourse.com`,
+          name: 'Coupon Refund Student',
+          role: UserRole.STUDENT,
+          status: UserStatus.ACTIVE,
+        },
+      });
+
+      const product = await prisma.product.create({
+        data: {
+          id: uuidv7(),
+          slug: `coupon-refund-prod-${Date.now()}`,
+          title: 'Coupon Refund Product',
+          description: 'Course description for testing',
+          pricePaise: 500000, // ₹5,000 list price
+        },
+      });
+
+      // Customer applied 20% coupon: subtotal ₹4,000, 18% GST ₹720, total captured ₹4,720 (472,000 paise)
+      const order = await prisma.order.create({
+        data: {
+          id: uuidv7(),
+          userId: student.id,
+          productId: product.id,
+          idempotencyKey: `coupon-order-${Date.now()}`,
+          status: OrderStatus.PAID,
+          subtotalPaise: 400000, // 400,000 paise
+          taxPaise: 72000, // 72,000 paise
+          totalPaise: 472000, // 472,000 paise (what customer actually paid)
+          paidAt: new Date(),
+        },
+      });
+
+      const payment = await prisma.payment.create({
+        data: {
+          id: uuidv7(),
+          orderId: order.id,
+          razorpayPaymentId: `pay_coupon_${Date.now()}`,
+          amountPaise: 472000, // Amount actually CAPTURED
+          status: PaymentStatus.CAPTURED,
+          capturedAt: new Date(),
+        },
+      });
+
+      // 1. Over-refund test: attempt refund > captured amount (472,001 paise) -> rejected
+      const overRes1 = await request(app)
+        .post(`/api/v1/admin/orders/${order.id}/refund`)
+        .set('Authorization', `Bearer ${adminWith2FAToken}`)
+        .send({ amountPaise: 472001, reason: 'Over refund attempt' });
+      expect(overRes1.status).toBe(400);
+      expect(overRes1.body.error.message).toContain('Available for refund: 472000 paise');
+
+      // Attempt refund of product list price (500,000 paise) -> rejected
+      const overRes2 = await request(app)
+        .post(`/api/v1/admin/orders/${order.id}/refund`)
+        .set('Authorization', `Bearer ${adminWith2FAToken}`)
+        .send({ amountPaise: 500000, reason: 'Attempt refund list price' });
+      expect(overRes2.status).toBe(400);
+      expect(overRes2.body.error.message).toContain('Available for refund: 472000 paise');
+
+      // 2. Partial refund of ₹2,000 (200,000 paise)
+      const partRes = await request(app)
+        .post(`/api/v1/admin/orders/${order.id}/refund`)
+        .set('Authorization', `Bearer ${adminWith2FAToken}`)
+        .send({ amountPaise: 200000, reason: 'Partial refund' });
+      expect(partRes.status).toBe(200);
+
+      const refundRecord1 = partRes.body.data.refund;
+      expect(refundRecord1.status).toBe(RefundStatus.PENDING);
+
+      // Webhook processes first refund
+      await orderService.handleRefundProcessed({
+        id: refundRecord1.razorpayRefundId,
+        payment_id: payment.razorpayPaymentId,
+        amount: 200000,
+      });
+
+      // Order status should be PARTIALLY_REFUNDED (NOT full REFUNDED)
+      const orderAfterPart = await prisma.order.findUnique({ where: { id: order.id } });
+      expect(orderAfterPart?.status).toBe(OrderStatus.PARTIALLY_REFUNDED);
+
+      // Remaining refundable must equal 272,000 paise (472,000 - 200,000)
+      const overRes3 = await request(app)
+        .post(`/api/v1/admin/orders/${order.id}/refund`)
+        .set('Authorization', `Bearer ${adminWith2FAToken}`)
+        .send({ amountPaise: 272001, reason: 'Over remainder' });
+      expect(overRes3.status).toBe(400);
+      expect(overRes3.body.error.message).toContain('Available for refund: 272000 paise');
+
+      // 3. Complete remaining refund of 272,000 paise
+      const fullRes = await request(app)
+        .post(`/api/v1/admin/orders/${order.id}/refund`)
+        .set('Authorization', `Bearer ${adminWith2FAToken}`)
+        .send({ amountPaise: 272000, reason: 'Complete refund' });
+      expect(fullRes.status).toBe(200);
+
+      const refundRecord2 = fullRes.body.data.refund;
+      // Before webhook, order is still not REFUNDED
+      const orderBeforeHook2 = await prisma.order.findUnique({ where: { id: order.id } });
+      expect(orderBeforeHook2?.status).toBe(OrderStatus.PARTIALLY_REFUNDED);
+
+      // Webhook processes second refund
+      await orderService.handleRefundProcessed({
+        id: refundRecord2.razorpayRefundId,
+        payment_id: payment.razorpayPaymentId,
+        amount: 272000,
+      });
+
+      // Now processed refunds equal captured amount (200,000 + 272,000 = 472,000) -> order is REFUNDED
+      const orderFinal = await prisma.order.findUnique({ where: { id: order.id } });
+      expect(orderFinal?.status).toBe(OrderStatus.REFUNDED);
+
+      const paymentFinal = await prisma.payment.findUnique({ where: { id: payment.id } });
+      expect(paymentFinal?.status).toBe(PaymentStatus.REFUNDED);
+    });
+
+    it('V1: confirms refund cap equals captured payment on a tax-inclusive order and marks order REFUNDED only when processed refunds equal captured amount', async () => {
+      const student = await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: `tax_inc_refund_${Date.now()}@hydrauliccourse.com`,
+          name: 'Tax Inc Student',
+          role: UserRole.STUDENT,
+          status: UserStatus.ACTIVE,
+        },
+      });
+
+      const product = await prisma.product.create({
+        data: {
+          id: uuidv7(),
+          slug: `tax-inc-prod-${Date.now()}`,
+          title: 'Tax Inclusive Product',
+          description: 'Course description for testing',
+          pricePaise: 118000,
+        },
+      });
+
+      // Tax-inclusive: Base ₹1,000 (100,000 paise), Tax ₹180 (18,000 paise), Total paid = ₹1,180 (118,000 paise)
+      const order = await prisma.order.create({
+        data: {
+          id: uuidv7(),
+          userId: student.id,
+          productId: product.id,
+          idempotencyKey: `tax-inc-order-${Date.now()}`,
+          status: OrderStatus.PAID,
+          subtotalPaise: 100000,
+          taxPaise: 18000,
+          totalPaise: 118000,
+          paidAt: new Date(),
+        },
+      });
+
+      const payment = await prisma.payment.create({
+        data: {
+          id: uuidv7(),
+          orderId: order.id,
+          razorpayPaymentId: `pay_tax_inc_${Date.now()}`,
+          amountPaise: 118000, // Captured amount
+          status: PaymentStatus.CAPTURED,
+          capturedAt: new Date(),
+        },
+      });
+
+      // Attempt over-refund
+      const overRes = await request(app)
+        .post(`/api/v1/admin/orders/${order.id}/refund`)
+        .set('Authorization', `Bearer ${adminWith2FAToken}`)
+        .send({ amountPaise: 118001, reason: 'Over refund attempt' });
+      expect(overRes.status).toBe(400);
+      expect(overRes.body.error.message).toContain('Available for refund: 118000 paise');
+
+      // Initiate full refund
+      const refundRes = await request(app)
+        .post(`/api/v1/admin/orders/${order.id}/refund`)
+        .set('Authorization', `Bearer ${adminWith2FAToken}`)
+        .send({ amountPaise: 118000, reason: 'Full refund' });
+      expect(refundRes.status).toBe(200);
+
+      // Order is still PAID while refund is PENDING
+      const orderPending = await prisma.order.findUnique({ where: { id: order.id } });
+      expect(orderPending?.status).toBe(OrderStatus.PAID);
+
+      // Webhook processes refund
+      await orderService.handleRefundProcessed({
+        id: refundRes.body.data.refund.razorpayRefundId,
+        payment_id: payment.razorpayPaymentId,
+        amount: 118000,
+      });
+
+      // Order is now REFUNDED
+      const orderDone = await prisma.order.findUnique({ where: { id: order.id } });
+      expect(orderDone?.status).toBe(OrderStatus.REFUNDED);
+    });
+
+    it('V1: confirms refund cap equals captured payment on a tax-exclusive order and marks order REFUNDED only when processed refunds equal captured amount', async () => {
+      const student = await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: `tax_exc_refund_${Date.now()}@hydrauliccourse.com`,
+          name: 'Tax Exc Student',
+          role: UserRole.STUDENT,
+          status: UserStatus.ACTIVE,
+        },
+      });
+
+      const product = await prisma.product.create({
+        data: {
+          id: uuidv7(),
+          slug: `tax-exc-prod-${Date.now()}`,
+          title: 'Tax Exclusive Product',
+          description: 'Course description for testing',
+          pricePaise: 100000, // Base ₹1,000
+        },
+      });
+
+      // Tax-exclusive: Subtotal ₹1,000 (100,000 paise) + 18% GST ₹180 (18,000 paise) = Total paid ₹1,180 (118,000 paise)
+      const order = await prisma.order.create({
+        data: {
+          id: uuidv7(),
+          userId: student.id,
+          productId: product.id,
+          idempotencyKey: `tax-exc-order-${Date.now()}`,
+          status: OrderStatus.PAID,
+          subtotalPaise: 100000, // Subtotal is only 100,000
+          taxPaise: 18000,
+          totalPaise: 118000, // Total captured is 118,000
+          paidAt: new Date(),
+        },
+      });
+
+      const payment = await prisma.payment.create({
+        data: {
+          id: uuidv7(),
+          orderId: order.id,
+          razorpayPaymentId: `pay_tax_exc_${Date.now()}`,
+          amountPaise: 118000, // Captured amount on payment
+          status: PaymentStatus.CAPTURED,
+          capturedAt: new Date(),
+        },
+      });
+
+      // Cap must be 118,000 paise (what customer paid), NOT subtotal 100,000 paise!
+      // Attempting 118,001 fails
+      const overRes = await request(app)
+        .post(`/api/v1/admin/orders/${order.id}/refund`)
+        .set('Authorization', `Bearer ${adminWith2FAToken}`)
+        .send({ amountPaise: 118001, reason: 'Over refund attempt' });
+      expect(overRes.status).toBe(400);
+      expect(overRes.body.error.message).toContain('Available for refund: 118000 paise');
+
+      // Attempting 118,000 paise succeeds (exceeding subtotal 100,000 paise, because tax was captured!)
+      const refundRes = await request(app)
+        .post(`/api/v1/admin/orders/${order.id}/refund`)
+        .set('Authorization', `Bearer ${adminWith2FAToken}`)
+        .send({ amountPaise: 118000, reason: 'Full refund including tax' });
+      expect(refundRes.status).toBe(200);
+
+      // Webhook processes refund
+      await orderService.handleRefundProcessed({
+        id: refundRes.body.data.refund.razorpayRefundId,
+        payment_id: payment.razorpayPaymentId,
+        amount: 118000,
+      });
+
+      // Order is now REFUNDED
+      const orderDone = await prisma.order.findUnique({ where: { id: order.id } });
+      expect(orderDone?.status).toBe(OrderStatus.REFUNDED);
     });
   });
 
@@ -1010,9 +1291,15 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
       expect(toKolkataDateString(paidAtOrderB)).toBe('2026-10-16');
 
       // Clean up any existing records for these exact test timestamps
-      await prisma.refund.deleteMany({ where: { razorpayRefundId: { startsWith: 'rfnd_kolkata_' } } });
-      await prisma.payment.deleteMany({ where: { razorpayPaymentId: { startsWith: 'pay_kolkata_' } } });
-      await prisma.order.deleteMany({ where: { idempotencyKey: { startsWith: 'kolkata-order-' } } });
+      await prisma.refund.deleteMany({
+        where: { razorpayRefundId: { startsWith: 'rfnd_kolkata_' } },
+      });
+      await prisma.payment.deleteMany({
+        where: { razorpayPaymentId: { startsWith: 'pay_kolkata_' } },
+      });
+      await prisma.order.deleteMany({
+        where: { idempotencyKey: { startsWith: 'kolkata-order-' } },
+      });
       await prisma.order.deleteMany({ where: { paidAt: { in: [paidAtOrderA, paidAtOrderB] } } });
 
       const orderA = await prisma.order.create({

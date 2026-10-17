@@ -104,11 +104,9 @@ describe('Order & Tax Configuration Integration Tests', () => {
     });
 
     if (product) {
-      const res = await request(app)
-        .post('/api/v1/orders/quote')
-        .send({
-          courseSlug: product.slug,
-        });
+      const res = await request(app).post('/api/v1/orders/quote').send({
+        courseSlug: product.slug,
+      });
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);

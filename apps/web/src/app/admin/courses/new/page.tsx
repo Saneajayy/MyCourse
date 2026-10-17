@@ -231,7 +231,9 @@ export default function NewCoursePage() {
                   onChange={() => setAccessType('lifetime')}
                 />
                 <div className="text-sm font-black">Lifetime Access</div>
-                <div className="text-[11px] opacity-90 mt-0.5">Students can watch videos indefinitely</div>
+                <div className="text-[11px] opacity-90 mt-0.5">
+                  Students can watch videos indefinitely
+                </div>
               </label>
 
               <label
@@ -249,7 +251,9 @@ export default function NewCoursePage() {
                   onChange={() => setAccessType('limited')}
                 />
                 <div className="text-sm font-black">Limited Validity</div>
-                <div className="text-[11px] opacity-90 mt-0.5">Access expires after a fixed number of days</div>
+                <div className="text-[11px] opacity-90 mt-0.5">
+                  Access expires after a fixed number of days
+                </div>
               </label>
             </div>
           </div>
@@ -282,7 +286,11 @@ export default function NewCoursePage() {
         {/* Submit Button */}
         <div className="flex items-center justify-end gap-3 pt-4 border-t border-black">
           <Link href="/admin/courses">
-            <Button type="button" variant="outline" className="text-xs font-bold uppercase tracking-wider py-2.5">
+            <Button
+              type="button"
+              variant="outline"
+              className="text-xs font-bold uppercase tracking-wider py-2.5"
+            >
               Cancel
             </Button>
           </Link>

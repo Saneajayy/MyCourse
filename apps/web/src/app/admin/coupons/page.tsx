@@ -164,7 +164,9 @@ export default function AdminCouponsPage() {
     // If flat, convert Rupees to paise
     const value = formType === 'PERCENT' ? Math.round(rawVal) : Math.round(rawVal * 100);
 
-    const maxRedemptions = formMaxRedemptions.trim() ? parseInt(formMaxRedemptions.trim(), 10) : null;
+    const maxRedemptions = formMaxRedemptions.trim()
+      ? parseInt(formMaxRedemptions.trim(), 10)
+      : null;
     const perUserLimit = parseInt(formPerUserLimit.trim(), 10) || 1;
     const validUntil = formValidUntil ? new Date(formValidUntil).toISOString() : null;
     const productId = formProductId ? formProductId : null;
@@ -232,7 +234,7 @@ export default function AdminCouponsPage() {
       setToast(
         newStatus
           ? `Coupon ${selectedCoupon.code} has been reactivated.`
-          : `Coupon ${selectedCoupon.code} has been deactivated. Students can no longer apply it.`
+          : `Coupon ${selectedCoupon.code} has been deactivated. Students can no longer apply it.`,
       );
       setSelectedCoupon(null);
       await fetchCouponsAndProducts();
@@ -262,7 +264,10 @@ export default function AdminCouponsPage() {
       {toast && (
         <div className="bg-[#E6F4EA] border border-[#137333] text-[#137333] p-4 font-bold flex justify-between items-center">
           <span>{toast}</span>
-          <button onClick={() => setToast(null)} className="text-xs uppercase font-black hover:underline">
+          <button
+            onClick={() => setToast(null)}
+            className="text-xs uppercase font-black hover:underline"
+          >
             Dismiss
           </button>
         </div>
@@ -271,20 +276,25 @@ export default function AdminCouponsPage() {
       {error && (
         <div className="bg-[#FCE8E6] border border-[#C5221F] text-[#C5221F] p-4 font-bold">
           <div>{error}</div>
-          {requestId && <div className="text-xs font-mono mt-1 font-normal">Request ID: {requestId}</div>}
+          {requestId && (
+            <div className="text-xs font-mono mt-1 font-normal">Request ID: {requestId}</div>
+          )}
         </div>
       )}
 
       {/* Coupon List Table */}
       <div className="bg-white border border-black overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500 font-bold">Loading promotional coupons...</div>
+          <div className="p-8 text-center text-gray-500 font-bold">
+            Loading promotional coupons...
+          </div>
         ) : coupons.length === 0 ? (
           <div className="p-12 text-center space-y-4">
             <div className="text-4xl">🏷️</div>
             <h2 className="text-lg font-black text-[#0A192F]">No Discount Coupons Created Yet</h2>
             <p className="text-sm text-gray-600 max-w-md mx-auto">
-              Create your first promotional discount coupon code (e.g. <strong>WELCOME50</strong> or <strong>FLAT500</strong>) to share with your YouTube audience.
+              Create your first promotional discount coupon code (e.g. <strong>WELCOME50</strong> or{' '}
+              <strong>FLAT500</strong>) to share with your YouTube audience.
             </p>
             <div>
               <button
@@ -321,12 +331,16 @@ export default function AdminCouponsPage() {
                         </span>
                       </td>
                       <td className="p-3 border-r border-black font-bold">
-                        {coupon.type === 'PERCENT' ? `${coupon.value}% OFF` : `₹${(coupon.value / 100).toFixed(2)} OFF`}
+                        {coupon.type === 'PERCENT'
+                          ? `${coupon.value}% OFF`
+                          : `₹${(coupon.value / 100).toFixed(2)} OFF`}
                       </td>
                       <td className="p-3 border-r border-black font-mono">
                         <strong className="text-black">{coupon._count?.redemptions ?? 0}</strong>
                         <span className="text-gray-500">
-                          {coupon.maxRedemptions ? ` / ${coupon.maxRedemptions} max` : ' (Unlimited)'}
+                          {coupon.maxRedemptions
+                            ? ` / ${coupon.maxRedemptions} max`
+                            : ' (Unlimited)'}
                         </span>
                       </td>
                       <td className="p-3 border-r border-black text-xs text-gray-600">
@@ -341,7 +355,9 @@ export default function AdminCouponsPage() {
                       </td>
                       <td className="p-3 border-r border-black text-xs font-mono">
                         {coupon.validUntil ? (
-                          <span className={isExpired ? 'text-[#C5221F] font-bold' : 'text-gray-700'}>
+                          <span
+                            className={isExpired ? 'text-[#C5221F] font-bold' : 'text-gray-700'}
+                          >
                             {new Date(coupon.validUntil).toLocaleDateString()}
                             {isExpired && ' (Expired)'}
                           </span>
@@ -426,7 +442,12 @@ export default function AdminCouponsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="coupon-form-type" className="block text-xs font-bold uppercase mb-1">Discount Type *</label>
+                  <label
+                    htmlFor="coupon-form-type"
+                    className="block text-xs font-bold uppercase mb-1"
+                  >
+                    Discount Type *
+                  </label>
                   <select
                     id="coupon-form-type"
                     value={formType}
@@ -440,7 +461,10 @@ export default function AdminCouponsPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="coupon-form-val" className="block text-xs font-bold uppercase mb-1">
+                  <label
+                    htmlFor="coupon-form-val"
+                    className="block text-xs font-bold uppercase mb-1"
+                  >
                     {formType === 'PERCENT' ? 'Percentage (1-100) *' : 'Amount in Rupees (₹) *'}
                   </label>
                   <input
@@ -454,13 +478,20 @@ export default function AdminCouponsPage() {
                     value={formValue}
                     onChange={(e) => setFormValue(e.target.value)}
                     className="w-full border border-black p-2 font-mono"
-                    aria-label={formType === 'PERCENT' ? 'Discount Percentage' : 'Discount Amount in Rupees'}
+                    aria-label={
+                      formType === 'PERCENT' ? 'Discount Percentage' : 'Discount Amount in Rupees'
+                    }
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="coupon-product-scope" className="block text-xs font-bold uppercase mb-1">Applicable Course Scope</label>
+                <label
+                  htmlFor="coupon-product-scope"
+                  className="block text-xs font-bold uppercase mb-1"
+                >
+                  Applicable Course Scope
+                </label>
                 <select
                   id="coupon-product-scope"
                   value={formProductId}
@@ -482,7 +513,9 @@ export default function AdminCouponsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase mb-1">Total Max Redemptions</label>
+                  <label className="block text-xs font-bold uppercase mb-1">
+                    Total Max Redemptions
+                  </label>
                   <input
                     type="number"
                     min="1"
@@ -509,7 +542,9 @@ export default function AdminCouponsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase mb-1">Expiration Date (Optional)</label>
+                <label className="block text-xs font-bold uppercase mb-1">
+                  Expiration Date (Optional)
+                </label>
                 <input
                   type="date"
                   value={formValidUntil}
@@ -549,7 +584,9 @@ export default function AdminCouponsPage() {
             <div className="flex justify-between items-center border-b border-black pb-3">
               <div>
                 <h2 className="text-lg font-black text-[#0A192F]">Edit Coupon</h2>
-                <p className="text-xs text-gray-500 font-mono mt-0.5">Code: {editingCoupon.code} (Fixed)</p>
+                <p className="text-xs text-gray-500 font-mono mt-0.5">
+                  Code: {editingCoupon.code} (Fixed)
+                </p>
               </div>
               <button
                 onClick={() => setEditModalOpen(false)}
@@ -588,7 +625,9 @@ export default function AdminCouponsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase mb-1">Uses Per Student *</label>
+                  <label className="block text-xs font-bold uppercase mb-1">
+                    Uses Per Student *
+                  </label>
                   <input
                     type="number"
                     min="1"
@@ -650,16 +689,22 @@ export default function AdminCouponsPage() {
       {selectedCoupon && (
         <ConfirmModal
           isOpen={toggleModalOpen}
-          title={selectedCoupon.isActive ? `Deactivate Coupon "${selectedCoupon.code}"?` : `Reactivate Coupon "${selectedCoupon.code}"?`}
+          title={
+            selectedCoupon.isActive
+              ? `Deactivate Coupon "${selectedCoupon.code}"?`
+              : `Reactivate Coupon "${selectedCoupon.code}"?`
+          }
           message={
             selectedCoupon.isActive ? (
               <p>
-                Deactivating <strong>{selectedCoupon.code}</strong> will immediately prevent students from applying it during checkout.
-                Students who already completed orders with this coupon will not be affected.
+                Deactivating <strong>{selectedCoupon.code}</strong> will immediately prevent
+                students from applying it during checkout. Students who already completed orders
+                with this coupon will not be affected.
               </p>
             ) : (
               <p>
-                Reactivating <strong>{selectedCoupon.code}</strong> will make it immediately valid again for checkouts (subject to expiration date and limits).
+                Reactivating <strong>{selectedCoupon.code}</strong> will make it immediately valid
+                again for checkouts (subject to expiration date and limits).
               </p>
             )
           }
