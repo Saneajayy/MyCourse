@@ -73,7 +73,7 @@ function sanitizeUser(user: {
 
 export class AuthService {
   public static readonly ADMIN_INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
-  private getNow: () => Date = () => new Date();
+  public getNow: () => Date = () => new Date();
   private adminActivityMemory: Map<string, number> = new Map();
 
   public setClock(clockFn: () => Date): void {
