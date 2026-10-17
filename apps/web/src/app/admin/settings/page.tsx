@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ConfirmModal } from '@/components/admin/ConfirmModal';
+import { apiClient, ApiError } from '../../../lib/api-client';
 
 interface AppSettings {
   businessName: string;
@@ -42,12 +43,7 @@ export default function AdminSettingsPage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch('/api/v1/admin/settings');
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.message || 'Failed to fetch settings');
-      }
-      const s: AppSettings = data.data;
+      const s = await apiClient<AppSettings>('/admin/settings');
       setInitialSettings(s);
       setBusinessName(s.businessName || '');
       setBusinessAddress(s.businessAddress || '');
@@ -95,9 +91,8 @@ export default function AdminSettingsPage() {
       setRequestId(null);
       setTaxConfirmModalOpen(false);
 
-      const res = await fetch('/api/v1/admin/settings', {
+      await apiClient<AppSettings>('/admin/settings', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           businessName: businessName.trim(),
           businessAddress: businessAddress.trim(),
@@ -111,15 +106,12 @@ export default function AdminSettingsPage() {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        setRequestId(res.headers.get('x-request-id') || null);
-        throw new Error(data.message || 'Failed to update store settings');
-      }
-
       setToast('Store settings saved successfully. New orders will use these updated parameters.');
       await fetchSettings();
     } catch (err: any) {
+      if (err instanceof ApiError && err.requestId) {
+        setRequestId(err.requestId);
+      }
       setError(err.message || 'Failed to save settings');
     } finally {
       setSaving(false);

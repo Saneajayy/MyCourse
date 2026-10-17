@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { apiClient } from '../../../lib/api-client';
 
 interface AuditLogItem {
   id: string;
@@ -18,6 +19,16 @@ interface AuditLogItem {
     name: string;
     email: string;
   } | null;
+}
+
+interface AuditLogsResponse {
+  items: AuditLogItem[];
+  pagination: {
+    total: number;
+    totalPages: number;
+    page: number;
+    limit: number;
+  };
 }
 
 export default function AdminAuditLogsPage() {
@@ -48,16 +59,11 @@ export default function AdminAuditLogsPage() {
       if (startDate) params.set('startDate', new Date(startDate).toISOString());
       if (endDate) params.set('endDate', new Date(endDate).toISOString());
 
-      const res = await fetch(`/api/v1/admin/audit-logs?${params.toString()}`);
-      const data = await res.json();
+      const data = await apiClient<AuditLogsResponse>(`/admin/audit-logs?${params.toString()}`);
 
-      if (!res.ok) {
-        throw new Error(data.message || 'Failed to load audit logs');
-      }
-
-      setLogs(data.data.items || []);
-      setTotalPages(data.data.pagination.totalPages || 1);
-      setTotalCount(data.data.pagination.total || 0);
+      setLogs(data.items || []);
+      setTotalPages(data.pagination.totalPages || 1);
+      setTotalCount(data.pagination.total || 0);
       setPage(targetPage);
     } catch (err: any) {
       setError(err.message || 'Error loading audit logs');

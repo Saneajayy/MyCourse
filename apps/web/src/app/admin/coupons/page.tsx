@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ConfirmModal } from '@/components/admin/ConfirmModal';
+import { apiClient, ApiError } from '../../../lib/api-client';
 
 interface CouponItem {
   id: string;
@@ -81,9 +82,8 @@ export default function AdminCouponsPage() {
       const perUser = parseInt(editPerUserLimit) || 1;
       const validUntil = editValidUntil ? new Date(editValidUntil).toISOString() : null;
 
-      const res = await fetch(`/api/v1/admin/coupons/${editingCoupon.id}`, {
+      await apiClient(`/admin/coupons/${editingCoupon.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           maxRedemptions: maxRed,
           perUserLimit: perUser,
@@ -92,17 +92,14 @@ export default function AdminCouponsPage() {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        setRequestId(res.headers.get('x-request-id') || null);
-        throw new Error(data.message || 'Failed to update coupon');
-      }
-
       setEditModalOpen(false);
       setToast(`Coupon ${editingCoupon.code} updated successfully.`);
       setEditingCoupon(null);
       await fetchCouponsAndProducts();
     } catch (err: any) {
+      if (err instanceof ApiError && err.requestId) {
+        setRequestId(err.requestId);
+      }
       setError(err.message || 'Failed to update coupon');
     } finally {
       setSubmitting(false);
@@ -113,21 +110,13 @@ export default function AdminCouponsPage() {
     try {
       setLoading(true);
       setError(null);
-      const [couponsRes, productsRes] = await Promise.all([
-        fetch('/api/v1/admin/coupons'),
-        fetch('/api/v1/admin/products'),
+      const [couponsData, productsData] = await Promise.all([
+        apiClient<CouponItem[]>('/admin/coupons'),
+        apiClient<ProductOption[]>('/admin/products').catch(() => []),
       ]);
 
-      const couponsData = await couponsRes.json();
-      if (!couponsRes.ok) {
-        throw new Error(couponsData.message || 'Failed to fetch coupons');
-      }
-      setCoupons(couponsData.data || []);
-
-      if (productsRes.ok) {
-        const pData = await productsRes.json();
-        setProducts(pData.data || []);
-      }
+      setCoupons(couponsData || []);
+      setProducts(productsData || []);
     } catch (err: any) {
       setError(err.message || 'Error loading coupons');
     } finally {
@@ -173,9 +162,8 @@ export default function AdminCouponsPage() {
 
     try {
       setSubmitting(true);
-      const res = await fetch('/api/v1/admin/coupons', {
+      await apiClient('/admin/coupons', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code,
           type: formType,
@@ -188,12 +176,6 @@ export default function AdminCouponsPage() {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok) {
-        setRequestId(res.headers.get('x-request-id') || null);
-        throw new Error(data.message || 'Failed to create coupon');
-      }
-
       setCreateModalOpen(false);
       setToast(`Coupon ${code} created successfully.`);
       // Reset form
@@ -205,6 +187,9 @@ export default function AdminCouponsPage() {
       setFormProductId('');
       await fetchCouponsAndProducts();
     } catch (err: any) {
+      if (err instanceof ApiError && err.requestId) {
+        setRequestId(err.requestId);
+      }
       setError(err.message || 'Failed to create coupon');
     } finally {
       setSubmitting(false);
@@ -218,17 +203,10 @@ export default function AdminCouponsPage() {
       setRequestId(null);
       const newStatus = !selectedCoupon.isActive;
 
-      const res = await fetch(`/api/v1/admin/coupons/${selectedCoupon.id}`, {
+      await apiClient(`/admin/coupons/${selectedCoupon.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive: newStatus }),
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        setRequestId(res.headers.get('x-request-id') || null);
-        throw new Error(data.message || 'Failed to update coupon status');
-      }
 
       setToggleModalOpen(false);
       setToast(
@@ -239,6 +217,9 @@ export default function AdminCouponsPage() {
       setSelectedCoupon(null);
       await fetchCouponsAndProducts();
     } catch (err: any) {
+      if (err instanceof ApiError && err.requestId) {
+        setRequestId(err.requestId);
+      }
       setError(err.message || 'Failed to toggle coupon');
     }
   };
