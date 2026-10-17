@@ -249,6 +249,15 @@ export class CourseController {
     }
   }
 
+  public async getLessonStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const status = await courseService.getLessonStatus(req.params.id as string);
+      res.status(200).json({ success: true, data: status });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   public async toggleFreePreview(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const isFreePreview = Boolean(req.body.isFreePreview);

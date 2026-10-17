@@ -92,6 +92,9 @@ adminCourseRouter.post('/sections/:sectionId/lessons/reorder', (req, res, next) 
 adminCourseRouter.post('/lessons/:id/upload-ticket', (req, res, next) =>
   courseController.generateLessonUploadTicket(req, res, next),
 );
+adminCourseRouter.get('/lessons/:id/status', (req, res, next) =>
+  courseController.getLessonStatus(req, res, next),
+);
 adminCourseRouter.post('/lessons/:id/free-preview', (req, res, next) =>
   courseController.toggleFreePreview(req, res, next),
 );

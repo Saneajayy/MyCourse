@@ -35,6 +35,9 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
     if (adminWith2FA?.id) {
       await authService.recordAdminActivity(adminWith2FA.id);
     }
+    if (adminWithout2FA?.id) {
+      await authService.recordAdminActivity(adminWithout2FA.id);
+    }
   });
 
   afterEach(async () => {

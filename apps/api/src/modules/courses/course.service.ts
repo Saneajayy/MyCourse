@@ -96,6 +96,37 @@ export class CourseService {
       throw new NotFoundError('Course product not found');
     }
 
+    // Auto-sync any processing lessons with video provider for resilient admin viewing
+    const processingLessons = product.sections
+      .flatMap((s) => s.lessons)
+      .filter((l) => l.status === LessonStatus.PROCESSING && l.videoProviderId);
+
+    if (processingLessons.length > 0) {
+      const provider = getVideoProvider();
+      await Promise.all(
+        processingLessons.map(async (lesson) => {
+          try {
+            const details = await provider.getVideoDetails(lesson.videoProviderId!);
+            if (details.status !== 'PROCESSING') {
+              const newStatus =
+                details.status === 'READY' ? LessonStatus.READY : LessonStatus.FAILED;
+              const updated = await prisma.lesson.update({
+                where: { id: lesson.id },
+                data: {
+                  status: newStatus,
+                  durationSeconds: details.durationSeconds || lesson.durationSeconds,
+                },
+              });
+              lesson.status = updated.status;
+              lesson.durationSeconds = updated.durationSeconds;
+            }
+          } catch (err) {
+            logger.warn({ err, lessonId: lesson.id }, 'Auto-sync failed for processing lesson');
+          }
+        }),
+      );
+    }
+
     const allLessons = product.sections.flatMap((s) => s.lessons);
     const missingVideosCount = allLessons.filter(
       (l) => !l.videoProviderId || l.status !== LessonStatus.READY,
@@ -639,6 +670,52 @@ export class CourseService {
     }
 
     return provider.generateUploadTicket(videoId, lesson.title);
+  }
+
+  /**
+   * Retrieves live lesson video encoding status with real-time provider fallback.
+   * If a lesson is in PROCESSING state, queries the video provider (Bunny Stream)
+   * to guarantee immediate consistency even if asynchronous webhooks are dropped or delayed.
+   */
+  public async getLessonStatus(lessonId: string): Promise<{
+    status: LessonStatus;
+    durationSeconds: number;
+    videoProviderId: string | null;
+  }> {
+    const lesson = await prisma.lesson.findUnique({ where: { id: lessonId } });
+    if (!lesson) {
+      throw new NotFoundError('Lesson not found');
+    }
+
+    if (lesson.status === LessonStatus.PROCESSING && lesson.videoProviderId) {
+      try {
+        const provider = getVideoProvider();
+        const details = await provider.getVideoDetails(lesson.videoProviderId);
+        if (details.status !== 'PROCESSING') {
+          const newStatus = details.status === 'READY' ? LessonStatus.READY : LessonStatus.FAILED;
+          const updated = await prisma.lesson.update({
+            where: { id: lesson.id },
+            data: {
+              status: newStatus,
+              durationSeconds: details.durationSeconds || lesson.durationSeconds,
+            },
+          });
+          return {
+            status: updated.status,
+            durationSeconds: updated.durationSeconds,
+            videoProviderId: updated.videoProviderId,
+          };
+        }
+      } catch (err) {
+        logger.warn({ err, lessonId }, 'Failed to query live video details from provider');
+      }
+    }
+
+    return {
+      status: lesson.status,
+      durationSeconds: lesson.durationSeconds,
+      videoProviderId: lesson.videoProviderId,
+    };
   }
 
   // ===========================================================================

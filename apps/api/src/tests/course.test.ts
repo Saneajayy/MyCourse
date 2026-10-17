@@ -516,6 +516,83 @@ describe('Phase 3 Course Management & Bunny Stream Video Pipeline Suite', () => 
       expect(syncedLesson?.status).toBe(LessonStatus.READY);
       expect(syncedLesson?.durationSeconds).toBe(450);
     });
+
+    it('verifies GET /api/v1/admin/lessons/:id/status queries provider and transitions lesson to READY', async () => {
+      const tempLessonId = uuidv7();
+      const tempVideoGuid = 'temp-live-guid-123';
+      await prisma.lesson.create({
+        data: {
+          id: tempLessonId,
+          section: { connect: { id: testSectionId } },
+          product: { connect: { id: testProductId } },
+          title: 'Transcoding Verification Lesson',
+          description: 'Testing live status check',
+          position: 99,
+          isPublished: true,
+          status: LessonStatus.PROCESSING,
+          videoProviderId: tempVideoGuid,
+          durationSeconds: 0,
+        },
+      });
+
+      fakeProvider.setVideoStatus(tempVideoGuid, 'READY', 320);
+
+      const res = await request(app)
+        .get(`/api/v1/admin/lessons/${tempLessonId}/status`)
+        .set('Authorization', `Bearer ${enrolledAdminToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.status).toBe(LessonStatus.READY);
+      expect(res.body.data.durationSeconds).toBe(320);
+
+      // Verify DB was updated
+      const dbLesson = await prisma.lesson.findUnique({ where: { id: tempLessonId } });
+      expect(dbLesson?.status).toBe(LessonStatus.READY);
+      expect(dbLesson?.durationSeconds).toBe(320);
+
+      // Clean up
+      await prisma.lesson.delete({ where: { id: tempLessonId } });
+    });
+
+    it('verifies getAdminProductById automatically auto-syncs processing lessons to READY', async () => {
+      const autoSyncLessonId = uuidv7();
+      const autoSyncVideoGuid = 'auto-sync-guid-456';
+      await prisma.lesson.create({
+        data: {
+          id: autoSyncLessonId,
+          section: { connect: { id: testSectionId } },
+          product: { connect: { id: testProductId } },
+          title: 'Auto Sync Curriculum Lesson',
+          description: 'Testing auto sync on curriculum load',
+          position: 100,
+          isPublished: true,
+          status: LessonStatus.PROCESSING,
+          videoProviderId: autoSyncVideoGuid,
+          durationSeconds: 0,
+        },
+      });
+
+      fakeProvider.setVideoStatus(autoSyncVideoGuid, 'READY', 250);
+
+      const res = await request(app)
+        .get(`/api/v1/admin/products/${testProductId}`)
+        .set('Authorization', `Bearer ${enrolledAdminToken}`);
+
+      expect(res.status).toBe(200);
+      const targetSection = res.body.data.sections.find((s: any) => s.id === testSectionId);
+      const targetLesson = targetSection?.lessons.find((l: any) => l.id === autoSyncLessonId);
+      expect(targetLesson?.status).toBe(LessonStatus.READY);
+      expect(targetLesson?.durationSeconds).toBe(250);
+
+      // Verify DB was updated
+      const dbLesson = await prisma.lesson.findUnique({ where: { id: autoSyncLessonId } });
+      expect(dbLesson?.status).toBe(LessonStatus.READY);
+      expect(dbLesson?.durationSeconds).toBe(250);
+
+      // Clean up
+      await prisma.lesson.delete({ where: { id: autoSyncLessonId } });
+    });
   });
 
   // ---------------------------------------------------------------------------

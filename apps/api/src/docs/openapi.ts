@@ -765,6 +765,41 @@ registry.registerPath({
   },
 });
 
+registry.registerPath({
+  method: 'get',
+  path: '/admin/lessons/{id}/status',
+  tags: ['Admin Lessons'],
+  summary: 'Get live lesson video status and duration',
+  description:
+    'Returns encoding status with live provider fallback to ensure immediate consistency even if webhooks are delayed.',
+  security: [{ BearerAuth: [] }],
+  parameters: [
+    {
+      name: 'id',
+      in: 'path',
+      required: true,
+      schema: { type: 'string', format: 'uuid' },
+    },
+  ],
+  responses: {
+    200: {
+      description: 'Lesson status retrieved successfully',
+      content: {
+        'application/json': {
+          schema: z.object({
+            success: z.boolean(),
+            data: z.object({
+              status: z.enum(['PROCESSING', 'READY', 'FAILED']),
+              durationSeconds: z.number(),
+              videoProviderId: z.string().nullable(),
+            }),
+          }),
+        },
+      },
+    },
+  },
+});
+
 // Bunny Webhook
 registry.registerPath({
   method: 'post',

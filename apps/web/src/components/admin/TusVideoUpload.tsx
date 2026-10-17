@@ -82,6 +82,7 @@ export function TusVideoUpload({
             if (res.status === 'READY') {
               setStatus('READY');
               setDurationSeconds(res.durationSeconds || 0);
+              onUploadSuccess?.(currentVideoId || initialVideoProviderId || '');
               return;
             } else if (res.status === 'FAILED') {
               setStatus('FAILED');
