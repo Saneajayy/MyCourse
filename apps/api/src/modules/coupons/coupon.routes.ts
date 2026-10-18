@@ -2,11 +2,12 @@ import { Router } from 'express';
 import { couponController } from './coupon.controller.js';
 import { requireAuth, requireRole, requireAdmin2FA } from '../../common/middleware/auth.js';
 import { UserRole } from '@course/shared';
+import { couponRateLimiter } from '../../common/middleware/rate-limiter.js';
 
 export const couponRouter = Router();
 
-// Public coupon lookup/validation
-couponRouter.get('/coupons/:code', requireAuth, (req, res, next) =>
+// Public coupon lookup/validation (rate limited to prevent coupon code enumeration while allowing legitimate users)
+couponRouter.get('/coupons/:code', requireAuth, couponRateLimiter, (req, res, next) =>
   couponController.getCouponByCode(req, res, next),
 );
 

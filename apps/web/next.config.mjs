@@ -95,7 +95,14 @@ function buildContentSecurityPolicy() {
 
   const cleanList = (arr) =>
     Array.from(new Set(arr.filter(Boolean)))
-      .filter((entry) => !isProd || (!entry.includes('localhost') && !entry.includes('127.0.0.1')))
+      .filter(
+        (entry) =>
+          !isProd ||
+          (!entry.includes('localhost') &&
+            !entry.includes('127.0.0.1') &&
+            !entry.includes('TODO_REPLACE') &&
+            !entry.includes('unsplash.com')),
+      )
       .join(' ');
   const workerSrc = ["'self'", 'blob:'];
 
@@ -125,6 +132,10 @@ const securityHeaders = [
   {
     key: 'X-Frame-Options',
     value: 'DENY',
+  },
+  {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=31536000; includeSubDomains',
   },
   {
     key: 'Referrer-Policy',

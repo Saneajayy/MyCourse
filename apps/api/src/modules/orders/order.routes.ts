@@ -20,7 +20,7 @@ orderRouter.get('/orders/tax-config', (req, res, next) =>
 import { createRateLimiter } from '../../common/middleware/rate-limiter.js';
 
 export const quoteRateLimiter = createRateLimiter({
-  points: 20,
+  points: 600,
   duration: 60,
   keyPrefix: 'rl_quote',
   isSensitive: true,

@@ -15,9 +15,9 @@ export interface EmailRateLimitConfig {
 const DEFAULT_CONFIG: Required<EmailRateLimitConfig> = {
   accountLimit: 3,
   accountWindowSec: 3600,
-  ipLimit: 50, // CGNAT-safe: Indian mobile networks share public IPs across many devices
+  ipLimit: 300, // CGNAT-safe: Indian mobile networks share public IPs across many devices
   ipWindowSec: 3600,
-  globalLimit: 500,
+  globalLimit: 1000,
   globalWindowSec: 600,
 };
 
@@ -138,8 +138,8 @@ export function contactFormRateLimiter(req: Request, res: Response, next: NextFu
       const [[, count], [, ttl]] = results as [[Error | null, number], [Error | null, number]];
       if (ttl === -1) redisClient.expire(key, 3600); // 1 hour window
 
-      // CGNAT safe: allow 30 submissions per hour per IP (honeypot + Turnstile filter out bots)
-      if (count > 30) {
+      // CGNAT safe: allow 60 submissions per hour per IP (honeypot + Turnstile filter out bots)
+      if (count > 60) {
         res.setHeader('Retry-After', Math.max(1, ttl));
         next(
           new RateLimitError(

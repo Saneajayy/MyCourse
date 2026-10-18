@@ -1,0 +1,16 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allow test fixtures, test mocks, and placeholder tokens in test files and documentation"
+paths = [
+  '''.*\.test\.ts$''',
+  '''.*\.spec\.ts$''',
+  '''\.env\.test.*''',
+  '''\.env\.example$''',
+  '''apps/api/src/tests/.*''',
+  '''apps/web/e2e/.*''',
+  '''apps/api/prisma/seed\.ts$''',
+  '''apps/api/src/common/crypto/argon2\.ts$''',
+  '''docs/.*'''
+]

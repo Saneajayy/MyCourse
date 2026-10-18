@@ -12,7 +12,7 @@ export function initializePaymentGateway(): PaymentGateway {
   }
 
   if (env.PAYMENT_PROVIDER === 'razorpay' && env.NODE_ENV !== 'test') {
-    logger.info({ keyId: env.RAZORPAY_KEY_ID }, 'Initializing RazorpayPaymentGateway');
+    logger.info('Initializing RazorpayPaymentGateway');
     activeGateway = new RazorpayPaymentGateway({
       keyId: env.RAZORPAY_KEY_ID,
       keySecret: env.RAZORPAY_KEY_SECRET,

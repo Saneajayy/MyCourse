@@ -33,6 +33,76 @@ This document details all pre-launch operational, technical, legal, and infrastr
 
 ---
 
+## Phase 11 Production Infrastructure Requirements
+
+The following requirements must be strictly satisfied during the Phase 11 production deployment rollout:
+
+### 1. Redis Password Authentication (`requirepass`)
+
+- **Requirement:** Redis must never run unauthenticated in staging or production.
+- **Specification:** Configure `requirepass <STRONG_64_CHAR_RANDOM_PASSWORD>` in `/etc/redis/redis.conf` or Docker environment.
+- **Connection String:** Connect using `REDIS_URL=redis://:<REDIS_PASSWORD>@127.0.0.1:6379/0` (with TLS enabled if cross-host).
+- **Verification:** `redis-cli ping` must fail with `(error) NOAUTH Authentication required.` until `AUTH <password>` is supplied.
+
+### 2. Network Isolation (Postgres & Redis Not Reachable from Internet)
+
+- **Requirement:** PostgreSQL (port 5432) and Redis (port 6379) must bind strictly to the loopback interface (`127.0.0.1`) or a private Docker/VPC bridge network.
+- **Specification:**
+  - PostgreSQL `listen_addresses = '127.0.0.1'` or internal Docker network subnet.
+  - Redis `bind 127.0.0.1` and `protected-mode yes`.
+  - Host firewall (`ufw` / security groups) must drop any incoming packets on ports 5432 and 6379 from public interfaces (`eth0` / `0.0.0.0/0`).
+- **Verification:** An external port scan (e.g. `nmap -p 5432,6379 <PUBLIC_SERVER_IP>`) must report ports as `FILTERED` or `CLOSED`.
+
+### 3. Least-Privilege Database User for Application Runtime
+
+- **Requirement:** The web/API application must never connect using the `postgres` superuser or migration owner.
+- **Specification:**
+  - Create two separate database roles:
+    1. **Migration Owner Role (`course_migration`):** Has `SUPERUSER` or `CREATEROLE` + `CREATE` on schema `public` for running `prisma migrate deploy`.
+    2. **Runtime Application Role (`course_app`):** Only granted `SELECT, INSERT, UPDATE, DELETE` on existing tables and `USAGE, SELECT` on sequences. Explicitly revoked from `DROP`, `ALTER`, `TRUNCATE`, and schema modifications.
+- **Grant Statements:**
+  ```sql
+  CREATE USER course_app WITH PASSWORD '<STRONG_RUNTIME_PASSWORD>';
+  GRANT CONNECT ON DATABASE mycourse TO course_app;
+  GRANT USAGE ON SCHEMA public TO course_app;
+  GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO course_app;
+  ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO course_app;
+  GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO course_app;
+  ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO course_app;
+  ```
+
+### 4. Strict Environment Secret Isolation
+
+- **Requirement:** Zero credential reuse across development, test, staging, and production.
+- **Specification:**
+  - Separate secrets for `JWT_ACCESS_SECRET` (min 64 chars high-entropy random), `TOTP_ENCRYPTION_KEY` (32 bytes cryptographically secure), Razorpay live keys vs test keys, and Bunny Stream API keys.
+  - Local `.env` and `.env.test` secrets must never be used on production servers.
+  - Secret management: Store production secrets in a dedicated secret store (e.g., Doppler, AWS Secrets Manager, or HashiCorp Vault) or inject via secure systemd service files with `chmod 600`.
+
+### 5. Trust Proxy & Authoritative Client IP Resolution
+
+- **Requirement:** The Express API and Next.js applications must accurately resolve client IPs behind Cloudflare and reverse proxies without permitting IP spoofing via attacker-supplied headers.
+- **Specification:**
+  - Configure `app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal', ...CLOUDFLARE_IPS])` or set count `2` (Cloudflare -> Nginx -> Node.js).
+  - Use `CF-Connecting-IP` as the authoritative client IP at the edge, falling back to Express's sanitized `req.ip`.
+
+### 6. Origin Firewall for Cloudflare (WAF Ingress Lock)
+
+- **Requirement:** Prevent direct-to-origin IP bypass. Attackers discovering the origin server's IP address must not be able to bypass Cloudflare WAF, rate limits, or DDoS mitigation.
+- **Specification:**
+  - Allow incoming TCP connections on ports 80 and 443 strictly from official Cloudflare IP prefixes:
+    - IPv4: `https://www.cloudflare.com/ips-v4`
+    - IPv6: `https://www.cloudflare.com/ips-v6`
+  - Drop all other incoming traffic on ports 80/443 using host firewall:
+    ```bash
+    for ip in $(curl -s https://www.cloudflare.com/ips-v4); do ufw allow from $ip to any port 443 proto tcp; done
+    ufw default deny incoming
+    ufw reload
+    ```
+  - Alternatively, use Cloudflare Authenticated Origin Pulls (AOP) with client SSL certificates.
+
+---
+
 ## Phase Status Summary
 
 - **Architecture, Auth, Payments, Security Hardening, Invoicing, Load Testing:** **COMPLETE (Phases 1 - 9)**

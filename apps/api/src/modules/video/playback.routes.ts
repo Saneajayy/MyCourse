@@ -1,23 +1,18 @@
 import { Router } from 'express';
 import { playbackController } from './playback.controller.js';
 import { requireAuth } from '../../common/middleware/auth.js';
-import { createRateLimiter } from '../../common/middleware/rate-limiter.js';
+import { playbackRateLimiter, heartbeatRateLimiter } from '../../common/middleware/rate-limiter.js';
 
 export const playbackRouter = Router();
 
-// Rate limiter safe for shared mobile IPs (NAT/carrier gateway safe: 40 requests per minute)
-const playbackLimiter = createRateLimiter({
-  points: 40,
-  duration: 60,
-  keyPrefix: 'rl:playback',
-});
-
 // Lesson playback & heartbeat endpoints
-playbackRouter.post('/lessons/:id/playback', requireAuth, playbackLimiter, (req, res, next) =>
+// playbackRateLimiter: 600 req/min per IP (CGNAT-safe) with single-device concurrent stream enforcement in service
+playbackRouter.post('/lessons/:id/playback', requireAuth, playbackRateLimiter, (req, res, next) =>
   playbackController.getPlaybackToken(req, res, next),
 );
 
-playbackRouter.post('/lessons/:id/heartbeat', requireAuth, (req, res, next) =>
+// heartbeatRateLimiter: 1,200 req/min per IP (supports 600+ concurrent students on shared network)
+playbackRouter.post('/lessons/:id/heartbeat', requireAuth, heartbeatRateLimiter, (req, res, next) =>
   playbackController.recordHeartbeat(req, res, next),
 );
 

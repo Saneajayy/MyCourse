@@ -89,7 +89,7 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
     error: {
       code: 'INTERNAL_SERVER_ERROR',
       message:
-        env.NODE_ENV === 'production'
+        process.env.NODE_ENV === 'production' || env.NODE_ENV === 'production'
           ? 'An unexpected error occurred. Please contact support if the issue persists.'
           : err.message,
       requestId,

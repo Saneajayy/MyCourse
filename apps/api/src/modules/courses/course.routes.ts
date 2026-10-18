@@ -112,7 +112,7 @@ publicCourseRouter.get('/:slug', (req, res, next) =>
 publicCourseRouter.get(
   '/:slug/lessons/:lessonId/preview-token',
   createRateLimiter({
-    points: 15,
+    points: 300,
     duration: 60,
     keyPrefix: 'rl:preview_token',
   }),

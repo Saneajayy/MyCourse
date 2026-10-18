@@ -455,6 +455,7 @@ function CheckoutContent() {
       const rzpInstance = new RazorpayConstructor(options);
       rzpInstance.open();
     } catch (err: unknown) {
+      sessionStorage.removeItem('checkout_idempotency_key');
       const msg = err instanceof Error ? err.message : 'Checkout failed';
       toastError('Payment Initialization Failed', msg);
       setIsSubmitting(false);

@@ -80,7 +80,18 @@ export function createApp(): Express {
   // 4. Security Headers (Helmet)
   app.use(
     helmet({
-      contentSecurityPolicy: env.NODE_ENV === 'production' ? undefined : false,
+      frameguard: { action: 'deny' },
+      hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: false,
+      },
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          frameAncestors: ["'none'"],
+        },
+      },
       crossOriginEmbedderPolicy: false,
     }),
   );

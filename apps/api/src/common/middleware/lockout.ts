@@ -4,7 +4,7 @@ import { logger } from '../logger/logger.js';
 import { env } from '../../config/env.js';
 
 const MAX_TARGET_FAILED_ATTEMPTS = 5; // 5 failed attempts on a specific email from a specific IP
-const MAX_IP_FAILED_ATTEMPTS = 20; // 20 failed attempts total from an IP across any emails
+const MAX_IP_FAILED_ATTEMPTS = 200; // 200 failed attempts total from an IP across any emails (CGNAT / carrier tower safe)
 const MAX_ACCOUNT_GLOBAL_FAILED_ATTEMPTS = 20; // 20 failed attempts on an account across all IPs (F2)
 const LOCKOUT_WINDOW_SECONDS = 15 * 60; // 15 minutes
 const ACCOUNT_GLOBAL_WINDOW_SECONDS = 60 * 60; // 1 hour
