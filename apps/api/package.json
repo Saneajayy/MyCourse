@@ -20,7 +20,7 @@
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",
     "@course/shared": "workspace:*",
-    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/adapter-pg": "7.10.1",
     "@prisma/client": "7.10.0",
     "@prisma/config": "7.10.0",
     "argon2": "^0.41.1",
