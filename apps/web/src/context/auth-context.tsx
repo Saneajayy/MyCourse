@@ -22,6 +22,7 @@ export interface User {
 interface LoginResult {
   requires2FA: boolean;
   tempToken?: string;
+  user?: User;
 }
 
 interface AuthContextValue {
@@ -104,7 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(res.user);
     }
 
-    return { requires2FA: false };
+    return { requires2FA: false, user: res.user };
   };
 
   const verify2FA = async (tempToken: string, code: string): Promise<void> => {

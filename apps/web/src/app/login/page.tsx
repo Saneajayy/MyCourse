@@ -42,8 +42,25 @@ function LoginForm() {
         return;
       }
 
-      toastSuccess('Welcome back!', 'Successfully logged in to your student account.');
-      router.push(redirectUrl);
+      const explicitRedirect = searchParams.get('redirect');
+
+      // Admin users MUST ALWAYS be redirected directly to Admin Panel, never to student pages
+      if (result.user?.role === 'ADMIN') {
+        const adminDest = explicitRedirect && explicitRedirect.startsWith('/admin')
+          ? explicitRedirect
+          : '/admin';
+        toastSuccess('Welcome Admin', 'Redirecting to Admin Console...');
+        router.push(adminDest);
+        return;
+      }
+
+      if (explicitRedirect) {
+        toastSuccess('Welcome back!', 'Successfully logged in.');
+        router.push(explicitRedirect);
+      } else {
+        toastSuccess('Welcome back!', 'Successfully logged in to your account.');
+        router.push('/my-courses');
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Invalid login credentials';
       setErrorMsg(message);

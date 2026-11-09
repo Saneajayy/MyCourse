@@ -20,6 +20,7 @@ import {
   LogOut,
   Sparkles,
   BookOpen,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface SessionData {
@@ -75,14 +76,24 @@ function AccountNavbar() {
 
         {/* Right Side: Student Actions */}
         <div className="flex items-stretch shrink-0">
-          {/* My Courses Link */}
-          <Link
-            href="/my-courses"
-            className="figma-glass-divider h-full flex items-center justify-center px-4 sm:px-6 lg:px-8 text-white/90 hover:text-white hover:bg-white/10 transition-colors font-semibold text-xs sm:text-sm gap-2"
-          >
-            <BookOpen className="w-4 h-4" />
-            <span className="hidden sm:inline">My Courses</span>
-          </Link>
+          {/* Admin Panel or My Courses Link */}
+          {user?.role === 'ADMIN' ? (
+            <Link
+              href="/admin"
+              className="figma-glass-divider h-full flex items-center justify-center px-4 sm:px-6 lg:px-8 text-white hover:bg-white/10 transition-colors font-semibold text-xs sm:text-sm gap-2"
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-400 stroke-[2.5]" />
+              <span>Admin Panel</span>
+            </Link>
+          ) : (
+            <Link
+              href="/my-courses"
+              className="figma-glass-divider h-full flex items-center justify-center px-4 sm:px-6 lg:px-8 text-white/90 hover:text-white hover:bg-white/10 transition-colors font-semibold text-xs sm:text-sm gap-2"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span className="hidden sm:inline">My Courses</span>
+            </Link>
+          )}
 
           {/* Active Account Cell */}
           <div className="figma-glass-divider h-full flex items-center justify-center px-4 sm:px-6 lg:px-8 text-[#0033FF] font-bold text-xs sm:text-sm bg-white gap-2">
@@ -157,8 +168,12 @@ export default function AccountPage() {
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login?redirect=/account');
+      return;
     }
-  }, [authLoading, isAuthenticated, router]);
+    if (user?.role === 'ADMIN') {
+      router.replace('/admin/settings');
+    }
+  }, [authLoading, isAuthenticated, user, router]);
 
   useEffect(() => {
     if (user) {
@@ -336,6 +351,17 @@ export default function AccountPage() {
       setLoggingOutAll(false);
     }
   };
+
+  if (user?.role === 'ADMIN') {
+    return (
+      <div className="bg-[#00186B] min-h-screen text-white font-reddit flex items-center justify-center">
+        <div className="text-white text-sm font-bold flex items-center gap-3">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          <span>Redirecting to Admin Settings...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (authLoading) {
     return (

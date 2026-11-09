@@ -15,6 +15,7 @@ import {
   Award,
   BookOpen,
   Check,
+  ShieldCheck,
 } from 'lucide-react';
 import { ScatterCanvas } from '../../components/ui';
 
@@ -51,7 +52,7 @@ function MyCoursesNavbar({
   searchQuery: string;
   setSearchQuery: (q: string) => void;
 }) {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 w-full figma-glass-nav font-reddit select-none">
@@ -100,6 +101,17 @@ function MyCoursesNavbar({
 
         {/* Right Side: Account & Logout Action Cells (My Courses button removed) */}
         <div className="flex items-stretch shrink-0">
+          {/* Admin Panel Quick Link (Visible only to Admin users) */}
+          {user?.role === 'ADMIN' && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-2 self-center px-3.5 py-1.5 mr-3 rounded-lg bg-white/15 hover:bg-white/25 border border-white/30 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm"
+              title="Open Admin Console"
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-400 stroke-[2.5]" />
+              <span>Admin Panel</span>
+            </Link>
+          )}
           {/* Account Profile Icon Cell */}
           <Link
             href="/account"
@@ -247,6 +259,12 @@ export default function MyCoursesPage() {
 
     if (!isAuthenticated) return;
 
+    // Admin users must never see the student dashboard - redirect immediately to /admin
+    if (user?.role === 'ADMIN') {
+      router.replace('/admin');
+      return;
+    }
+
     async function fetchMyCourses() {
       try {
         const res = await apiClient<EnrolledCourse[]>('/me/courses');
@@ -287,6 +305,18 @@ export default function MyCoursesPage() {
   const completedCourses = courses.filter(
     (c) => (c.progress?.percentComplete ?? 0) >= 100,
   );
+
+  // Admin users must never see student dashboard content
+  if (user?.role === 'ADMIN') {
+    return (
+      <div className="bg-[#00186B] min-h-screen text-white font-reddit flex items-center justify-center">
+        <div className="text-white text-sm font-bold flex items-center gap-3">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          <span>Redirecting to Admin Console...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (authLoading || loading) {
     return (
