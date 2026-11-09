@@ -64,7 +64,7 @@ const envSchema = z.object({
   TURNSTILE_SECRET_KEY: z.string().optional(),
 
   // GST & Business Details
-  BUSINESS_NAME: z.string().default('Hydraulic Engineering Academy'),
+  BUSINESS_NAME: z.string().default('Hydro Basics'),
   BUSINESS_ADDRESS: z.string().default('123 Industrial Area, Phase 2, New Delhi, India'),
   GSTIN: z.string().default(''),
   GST_RATE_PERCENT: z.coerce.number().default(0),

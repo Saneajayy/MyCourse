@@ -262,7 +262,7 @@ export class InvoiceService {
       doc
         .fontSize(20)
         .font('Helvetica-Bold')
-        .text(business.businessName || 'Hydraulic Engineering Academy', 50, 50);
+        .text(business.businessName || 'Hydro Basics', 50, 50);
       doc
         .fontSize(10)
         .font('Helvetica')
@@ -281,7 +281,12 @@ export class InvoiceService {
         .text(`Date: ${(order.paidAt ?? new Date()).toLocaleDateString('en-IN')}`, 400, 90, {
           align: 'right',
         })
-        .text(`Order ID: ${order.id.slice(0, 8)}...`, 400, 105, { align: 'right' });
+        .text(
+          `Order Ref: ORD-#${order.id.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase()}`,
+          400,
+          105,
+          { align: 'right' },
+        );
 
       doc.moveTo(50, 130).lineTo(550, 130).stroke('#cccccc');
 

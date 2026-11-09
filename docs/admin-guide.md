@@ -1,4 +1,4 @@
-# Hydraulic Engineering Academy — Solo Operator Admin Guide
+# Hydro Basics — Solo Operator Admin Guide
 
 Welcome to your Academy Admin Console! This guide was written specifically for you as the solo operator of the academy. You do not need any coding or technical knowledge to run the platform. Every tool is designed with clear labels, plain-language buttons, and safety confirmation checks before anything can be modified.
 
@@ -178,4 +178,4 @@ Here is a quick reference table for common situations:
 
 ---
 
-_Hydraulic Engineering Academy • Operations Manual Version 1.0 (Phase 7)_
+_Hydro Basics • Operations Manual Version 1.0 (Phase 7)_

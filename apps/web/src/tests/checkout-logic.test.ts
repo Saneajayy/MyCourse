@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { computeOrderTotals } from '../lib/tax';
+import { formatDisplayOrderId } from '../lib/order';
 
 describe('Checkout State & Price Computation Logic', () => {
   const basePricePaise = 499900; // ₹4,999.00
@@ -159,5 +160,19 @@ describe('Checkout State & Price Computation Logic', () => {
     // Mock order created on server with same product and coupon
     const serverOrderTotal = 449900;
     expect(displayedTotal).toBe(serverOrderTotal);
+  });
+
+  it('formats raw UUIDv7 order IDs into clean customer-facing ORD-# references', () => {
+    // Standard UUIDv7 string
+    const rawUuid = '0192df4b-e854-7f12-a1b2-c3d4e5f67890';
+    expect(formatDisplayOrderId(rawUuid)).toBe('ORD-#0192DF4B');
+
+    // Custom code or already formatted
+    expect(formatDisplayOrderId('183bheb3-7621-419a-99ef-8712a45bc812')).toBe('ORD-#183BHEB3');
+    expect(formatDisplayOrderId('ORD-#183BHEB3')).toBe('ORD-#183BHEB3');
+
+    // Handles null / empty
+    expect(formatDisplayOrderId('')).toBe('');
+    expect(formatDisplayOrderId(null)).toBe('');
   });
 });

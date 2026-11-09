@@ -1,14 +1,15 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/auth-context';
-import { apiClient } from '../../lib/api-client';
+import { apiClient, ApiError } from '../../lib/api-client';
+import { formatDisplayOrderId } from '../../lib/order';
 import { siteConfig } from '../../config/site';
-import { Card, Button, Input, Badge, Tabs, useToast } from '../../components/ui';
+import { useToast } from '../../components/ui';
 import {
   User as UserIcon,
-  Shield,
   Laptop,
   Receipt,
   Download,
@@ -16,6 +17,9 @@ import {
   MailCheck,
   Loader2,
   Trash2,
+  LogOut,
+  Sparkles,
+  BookOpen,
 } from 'lucide-react';
 
 interface SessionData {
@@ -42,6 +46,81 @@ interface OrderHistoryItem {
     id: string;
     invoiceNumber: string;
   } | null;
+}
+
+function AccountNavbar() {
+  const { user, logout } = useAuth();
+
+  return (
+    <header className="fixed top-0 inset-x-0 z-50 w-full figma-glass-nav font-reddit select-none">
+      <nav
+        aria-label="Student Account Navigation"
+        className="w-full h-20 md:h-[84px] flex items-stretch justify-between"
+      >
+        {/* Left Side: Brand Logo */}
+        <div className="flex items-center pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24">
+          <Link
+            href="/"
+            className="flex flex-col justify-center -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity shrink-0"
+            aria-label="HYDRO BASICS Home"
+          >
+            <span className="font-extrabold text-[19px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[19px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+              BASICS
+            </span>
+          </Link>
+        </div>
+
+        {/* Right Side: Student Actions */}
+        <div className="flex items-stretch shrink-0">
+          {/* My Courses Link */}
+          <Link
+            href="/my-courses"
+            className="figma-glass-divider h-full flex items-center justify-center px-4 sm:px-6 lg:px-8 text-white/90 hover:text-white hover:bg-white/10 transition-colors font-semibold text-xs sm:text-sm gap-2"
+          >
+            <BookOpen className="w-4 h-4" />
+            <span className="hidden sm:inline">My Courses</span>
+          </Link>
+
+          {/* Active Account Cell */}
+          <div className="figma-glass-divider h-full flex items-center justify-center px-4 sm:px-6 lg:px-8 text-[#0033FF] font-bold text-xs sm:text-sm bg-white gap-2">
+            <UserIcon className="w-4 h-4 text-[#0033FF] stroke-[2.5]" />
+            <span className="hidden sm:inline">
+              {user?.name ? user.name.split(' ')[0] : 'Account'}
+            </span>
+          </div>
+
+          {/* Logout Action Cell */}
+          <div className="figma-glass-divider border-r border-white/20 h-full flex items-stretch">
+            <button
+              type="button"
+              onClick={() => logout()}
+              className="h-full flex items-center justify-center px-4 sm:px-6 lg:px-8 text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer focus:outline-none"
+              title="Log out"
+              aria-label="Log out"
+            >
+              <svg
+                className="w-5 h-5 text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </nav>
+    </header>
+  );
 }
 
 export default function AccountPage() {
@@ -84,6 +163,7 @@ export default function AccountPage() {
   useEffect(() => {
     if (user) {
       setName(user.name || '');
+      setPhone(user.phone || '');
     }
   }, [user]);
 
@@ -94,11 +174,22 @@ export default function AccountPage() {
       const data = await apiClient<{ sessions: SessionData[] }>('/sessions');
       setSessions(data.sessions || []);
     } catch (err: unknown) {
+      if (
+        (err instanceof ApiError && err.status === 401) ||
+        (err instanceof Error &&
+          (err.message.toLowerCase().includes('session has been revoked') ||
+            err.message.toLowerCase().includes('authentication token') ||
+            err.message.toLowerCase().includes('unauthorized')))
+      ) {
+        await logout();
+        router.push('/login?message=session-expired');
+        return;
+      }
       toastError('Failed to load sessions', err instanceof Error ? err.message : 'Error');
     } finally {
       setSessionsLoading(false);
     }
-  }, [toastError]);
+  }, [toastError, logout, router]);
 
   // Load Orders
   const loadOrders = useCallback(async () => {
@@ -107,11 +198,22 @@ export default function AccountPage() {
       const data = await apiClient<OrderHistoryItem[]>('/orders');
       setOrders(data);
     } catch (err: unknown) {
+      if (
+        (err instanceof ApiError && err.status === 401) ||
+        (err instanceof Error &&
+          (err.message.toLowerCase().includes('session has been revoked') ||
+            err.message.toLowerCase().includes('authentication token') ||
+            err.message.toLowerCase().includes('unauthorized')))
+      ) {
+        await logout();
+        router.push('/login?message=session-expired');
+        return;
+      }
       toastError('Failed to load orders', err instanceof Error ? err.message : 'Error');
     } finally {
       setOrdersLoading(false);
     }
-  }, [toastError]);
+  }, [toastError, logout, router]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -138,6 +240,17 @@ export default function AccountPage() {
       await refreshUser();
       toastSuccess('Profile Updated', 'Your student details were saved successfully.');
     } catch (err: unknown) {
+      if (
+        (err instanceof ApiError && err.status === 401) ||
+        (err instanceof Error &&
+          (err.message.toLowerCase().includes('session has been revoked') ||
+            err.message.toLowerCase().includes('authentication token') ||
+            err.message.toLowerCase().includes('unauthorized')))
+      ) {
+        await logout();
+        router.push('/login?message=session-expired');
+        return;
+      }
       toastError('Save Failed', err instanceof Error ? err.message : 'Error updating profile');
     } finally {
       setProfileSaving(false);
@@ -171,7 +284,9 @@ export default function AccountPage() {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      toastSuccess('Password Changed', 'Your account password has been updated.');
+      toastSuccess('Password Changed', 'Password updated successfully. Please log in with your new password.');
+      await logout();
+      router.push('/login?message=password-changed');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to change password';
       setPasswordError(msg);
@@ -224,348 +339,486 @@ export default function AccountPage() {
 
   if (authLoading) {
     return (
-      <div className="py-20 text-center space-y-3">
-        <Loader2 className="w-8 h-8 animate-spin mx-auto text-course-orange" />
-        <p className="text-xs uppercase font-mono tracking-widest text-course-darkBlue">
-          Loading Account Profile...
-        </p>
+      <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
+        <div className="noise-texture" aria-hidden="true" />
+        <AccountNavbar />
+        <div className="w-full flex-1 flex flex-col items-center justify-center py-28 space-y-4">
+          <Loader2 className="w-10 h-10 animate-spin text-white" />
+          <p className="text-sm font-semibold tracking-wider uppercase text-white/80">
+            Loading Account Profile...
+          </p>
+        </div>
       </div>
     );
   }
 
-  const tabsList = [
-    { id: 'profile', label: 'Profile & Security' },
-    { id: 'sessions', label: 'Active Devices', count: sessions.length || undefined },
-    { id: 'orders', label: 'Order History', count: orders.length || undefined },
-  ];
-
   return (
-    <div className="max-w-5xl mx-auto px-4 py-12 space-y-8">
-      {/* Title */}
-      <div className="border-b border-black pb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <div className="text-xs font-bold uppercase tracking-wider text-course-orange mb-1">
-            Student Management
-          </div>
-          <h1 className="text-3xl font-black text-course-darkBlue tracking-tight">
-            Account &amp; Security Settings
+    <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
+      {/* Background Noise Texture */}
+      <div className="noise-texture" aria-hidden="true" />
+
+      {/* Floating Glass Navbar */}
+      <AccountNavbar />
+
+      {/* Main Student Portal Content - Aligned directly under the navbar logo */}
+      <main className="relative z-10 flex-1 w-full py-8 sm:py-10 md:py-12 pb-16 sm:pb-24 pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 pr-6 sm:pr-8 md:pr-12 lg:pr-16">
+        {/* Header Block: STUDENT ACCOUNT. */}
+        <div className="mb-5 sm:mb-6 select-none">
+          <h1 className="font-extrabold text-white uppercase leading-[0.88] tracking-[-0.02em] text-4xl sm:text-5xl md:text-6xl lg:text-[72px] select-none">
+            <span className="block">STUDENT</span>
+            <span className="block">ACCOUNT.</span>
           </h1>
-          <p className="text-xs md:text-sm text-course-navyMuted mt-1">
-            Manage your credentials, active devices, and tax invoices
-          </p>
         </div>
 
-        <div>
-          <Badge variant={user?.emailVerifiedAt ? 'success' : 'error'}>
-            {user?.emailVerifiedAt ? 'Email Verified' : 'Email Unverified'}
-          </Badge>
+        {/* Sub-Navbar Under Title: Profile & Security, Active Devices, Order History */}
+        <div className="flex items-center select-none mb-8 sm:mb-10">
+          <div
+            role="tablist"
+            aria-label="Student Account Navigation"
+            className="inline-flex items-stretch rounded-lg sm:rounded-xl overflow-hidden border border-white bg-transparent"
+          >
+            <button
+              type="button"
+              role="tab"
+              id="tab-profile"
+              aria-selected={activeTab === 'profile'}
+              onClick={() => setActiveTab('profile')}
+              className={`h-10 sm:h-11 px-5 sm:px-7 text-xs sm:text-sm font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 ${activeTab === 'profile'
+                ? 'bg-white text-[#0033FF]'
+                : 'bg-transparent text-white hover:bg-white/10 active:bg-white/20'
+                }`}
+            >
+              <UserIcon className="w-4 h-4 shrink-0 -translate-x-1 sm:-translate-x-1.5" />
+              <span>Profile</span>
+            </button>
+
+            {/* Vertical Partition Line */}
+            <div className="w-px bg-white self-stretch shrink-0" aria-hidden="true" />
+
+            <button
+              type="button"
+              role="tab"
+              id="tab-sessions"
+              aria-selected={activeTab === 'sessions'}
+              onClick={() => setActiveTab('sessions')}
+              className={`h-10 sm:h-11 px-5 sm:px-7 text-xs sm:text-sm font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 ${activeTab === 'sessions'
+                ? 'bg-white text-[#0033FF]'
+                : 'bg-transparent text-white hover:bg-white/10 active:bg-white/20'
+                }`}
+            >
+              <Laptop className="w-4 h-4 shrink-0 -translate-x-1 sm:-translate-x-1.5" />
+              <span>Devices</span>
+            </button>
+
+            {/* Vertical Partition Line */}
+            <div className="w-px bg-white self-stretch shrink-0" aria-hidden="true" />
+
+            <button
+              type="button"
+              role="tab"
+              id="tab-orders"
+              aria-selected={activeTab === 'orders'}
+              onClick={() => setActiveTab('orders')}
+              className={`h-10 sm:h-11 px-5 sm:px-7 text-xs sm:text-sm font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 ${activeTab === 'orders'
+                ? 'bg-white text-[#0033FF]'
+                : 'bg-transparent text-white hover:bg-white/10 active:bg-white/20'
+                }`}
+            >
+              <Receipt className="w-4 h-4 shrink-0 -translate-x-1 sm:-translate-x-1.5" />
+              <span>Orders</span>
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Navigation Tabs */}
-      <Tabs
-        tabs={tabsList}
-        activeTab={activeTab}
-        onChange={(tabId) => setActiveTab(tabId as 'profile' | 'sessions' | 'orders')}
-      />
+        {/* TAB 1: Profile & Security */}
+        {activeTab === 'profile' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
+            {/* Card 1: Profile Details - Smooth Plain White Card */}
+            <div className="relative w-full bg-white rounded-lg sm:rounded-xl shadow-lg p-6 sm:p-8 select-none">
+              {/* Card Content */}
+              <div className="relative z-10 w-full text-neutral-900 space-y-6">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-[#0033FF] uppercase tracking-tight">
+                    PROFILE DETAILS.
+                  </h2>
+                  <p className="text-xs text-neutral-500 font-medium mt-1">
+                    Personal student credentials &amp; contact
+                  </p>
+                </div>
 
-      {/* TAB 1: Profile & Security */}
-      {activeTab === 'profile' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Profile Details */}
-          <Card variant="default">
-            <div className="flex items-center gap-2 mb-6">
-              <UserIcon className="w-5 h-5 text-course-orange" />
-              <h2 className="text-lg font-black text-course-darkBlue uppercase tracking-tight">
-                Profile Details
-              </h2>
+                <form onSubmit={handleSaveProfile} className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-neutral-700 block mb-1.5">
+                      Full Name <span className="text-rose-600">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      placeholder="e.g. Ramesh Kumar"
+                      className="w-full h-11 sm:h-12 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-[#0033FF] rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0033FF]/20 transition-all placeholder:text-neutral-400"
+                    />
+                    <span className="text-[11px] text-neutral-500 mt-1 block font-mono">
+                      Printed on course completion certificates
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-neutral-700 block mb-1.5">
+                      Registered Email
+                    </label>
+                    <input
+                      type="email"
+                      value={user?.email || ''}
+                      disabled
+                      className="w-full h-11 sm:h-12 px-3.5 bg-neutral-100 text-neutral-600 border border-neutral-200 rounded-md sm:rounded-lg text-sm font-medium cursor-not-allowed font-mono"
+                    />
+                    <span className="text-[11px] text-neutral-500 mt-1 block font-mono">
+                      Primary email cannot be changed directly
+                    </span>
+                  </div>
+
+                  {!user?.emailVerifiedAt && (
+                    <div className="p-4 border border-amber-300 bg-amber-50 rounded-md sm:rounded-lg text-xs text-amber-950 flex flex-col gap-2.5">
+                      <div className="flex items-center gap-2 font-bold">
+                        <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
+                        <span>Your email address is not verified yet.</span>
+                      </div>
+                      <p className="text-[11px] text-amber-900 leading-relaxed">
+                        Verify your email to ensure uninterrupted course access and certificate issuance.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleResendVerification}
+                        disabled={resendingVerification}
+                        className="w-full h-10 bg-white border border-amber-400 hover:bg-amber-100 active:bg-amber-200 text-amber-950 font-bold text-xs uppercase tracking-wider rounded-md cursor-pointer transition-colors flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        {resendingVerification ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <MailCheck className="w-3.5 h-3.5 text-amber-800" />
+                        )}
+                        <span>Resend Verification Email</span>
+                      </button>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-neutral-700 block mb-1.5">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      placeholder="+91 98765 43210"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full h-11 sm:h-12 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-[#0033FF] rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0033FF]/20 transition-all placeholder:text-neutral-400"
+                    />
+                    <span className="text-[11px] text-neutral-500 mt-1 block font-mono">
+                      Used for transaction SMS and notifications
+                    </span>
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={profileSaving}
+                      className="w-full h-11 sm:h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020B8] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase rounded-md sm:rounded-lg flex items-center justify-center transition-colors select-none gap-2 cursor-pointer"
+                    >
+                      {profileSaving ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin text-white" />
+                          <span>Saving Changes...</span>
+                        </>
+                      ) : (
+                        <span>Save Profile Changes</span>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
 
-            <form onSubmit={handleSaveProfile} className="space-y-4">
-              <Input
-                label="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                helperText="Printed on completion certificate"
-              />
+            {/* Card 2: Change Password - Smooth Plain White Card */}
+            <div className="relative w-full bg-white rounded-lg sm:rounded-xl shadow-lg p-6 sm:p-8 select-none">
+              {/* Card Content */}
+              <div className="relative z-10 w-full text-neutral-900 space-y-6">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-[#0033FF] uppercase tracking-tight">
+                    CHANGE PASSWORD.
+                  </h2>
+                  <p className="text-xs text-neutral-500 font-medium mt-1">
+                    Update your account security credentials
+                  </p>
+                </div>
 
-              <Input
-                label="Registered Email"
-                value={user?.email || ''}
-                disabled
-                helperText="Primary email cannot be changed directly"
-              />
-
-              {!user?.emailVerifiedAt && (
-                <div className="p-3 border border-black bg-amber-50 text-xs text-amber-950 flex flex-col gap-2">
-                  <div className="flex items-center gap-1.5 font-bold">
-                    <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
-                    <span>Your email is not verified yet.</span>
+                {passwordError && (
+                  <div className="p-3.5 border border-rose-300 bg-rose-50 text-rose-950 text-xs font-bold rounded-md sm:rounded-lg">
+                    {passwordError}
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={handleResendVerification}
-                    isLoading={resendingVerification}
-                  >
-                    <MailCheck className="w-3.5 h-3.5 mr-1.5" />
-                    Resend Verification Email
-                  </Button>
+                )}
+
+                <form onSubmit={handleChangePassword} className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-neutral-700 block mb-1.5">
+                      Current Password <span className="text-rose-600">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="••••••••••••"
+                      required
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      className="w-full h-11 sm:h-12 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-[#0033FF] rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0033FF]/20 transition-all placeholder:text-neutral-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-neutral-700 block mb-1.5">
+                      New Password <span className="text-rose-600">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Min 10 characters"
+                      required
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      className="w-full h-11 sm:h-12 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-[#0033FF] rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0033FF]/20 transition-all placeholder:text-neutral-400"
+                    />
+                    <span className="text-[11px] text-neutral-500 mt-1 block font-mono">
+                      Must be at least 10 characters long
+                    </span>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-neutral-700 block mb-1.5">
+                      Confirm New Password <span className="text-rose-600">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      placeholder="Re-enter new password"
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="w-full h-11 sm:h-12 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-[#0033FF] rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0033FF]/20 transition-all placeholder:text-neutral-400"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={passwordSaving}
+                      className="w-full h-11 sm:h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020B8] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase rounded-md sm:rounded-lg flex items-center justify-center transition-colors select-none gap-2 cursor-pointer"
+                    >
+                      {passwordSaving ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin text-white" />
+                          <span>Updating Password...</span>
+                        </>
+                      ) : (
+                        <span>Update Password</span>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 2: Active Devices & Streaming Sessions */}
+        {activeTab === 'sessions' && (
+          <div className="relative w-full bg-white rounded-lg sm:rounded-xl shadow-lg p-6 sm:p-8 select-none">
+            {/* Card Content */}
+            <div className="relative z-10 w-full text-neutral-900 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-[#0033FF] uppercase tracking-tight">
+                    ACTIVE SESSIONS.
+                  </h2>
+                  <p className="text-xs text-neutral-500 font-medium mt-1">
+                    Single-stream playback enforced. Revoke any unrecognized devices.
+                  </p>
+                </div>
+
+                {/* Log Out Everywhere Button for E2E Test Contract */}
+                <button
+                  type="button"
+                  onClick={handleLogoutEverywhere}
+                  disabled={loggingOutAll}
+                  className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-xs uppercase tracking-wider rounded-md sm:rounded-lg transition-colors flex items-center gap-2 cursor-pointer shadow-sm self-start sm:self-auto"
+                >
+                  {loggingOutAll ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                  ) : (
+                    <LogOut className="w-3.5 h-3.5" />
+                  )}
+                  <span>Log Out Everywhere</span>
+                </button>
+              </div>
+
+              {sessionsLoading ? (
+                <div className="py-16 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3">
+                  <Loader2 className="w-6 h-6 animate-spin text-[#0033FF]" />
+                  <span>Loading active sessions...</span>
+                </div>
+              ) : sessions.length === 0 ? (
+                <div className="py-16 text-center text-sm font-medium text-neutral-500">
+                  No active session records found.
+                </div>
+              ) : (
+                <div className="overflow-x-auto border border-neutral-200 rounded-md sm:rounded-lg">
+                  <table className="w-full text-left text-xs sm:text-sm border-collapse">
+                    <thead className="bg-neutral-50 text-neutral-700 uppercase font-bold text-[11px] border-b border-neutral-200">
+                      <tr>
+                        <th className="py-3.5 px-4">Device / Browser</th>
+                        <th className="py-3.5 px-4">IP Address</th>
+                        <th className="py-3.5 px-4">Last Active</th>
+                        <th className="py-3.5 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-200">
+                      {sessions.map((sess) => (
+                        <tr key={sess.id} className="hover:bg-neutral-50/70 transition-colors">
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-2.5">
+                              <Laptop className="w-4 h-4 text-[#0033FF] shrink-0" />
+                              <div>
+                                <div className="font-bold text-neutral-900 truncate max-w-xs">
+                                  {sess.userAgent || 'Unknown Browser / Platform'}
+                                </div>
+                                {sess.isCurrent && (
+                                  <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-[#0033FF] text-white">
+                                    Current Session
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-neutral-600">
+                            {sess.ipAddress || '—'}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-neutral-600">
+                            {new Date(sess.lastUsedAt).toLocaleString('en-IN')}
+                          </td>
+                          <td className="py-3.5 px-4 text-right">
+                            <button
+                              type="button"
+                              disabled={revokingSessionId === sess.id}
+                              onClick={() => handleRevokeSession(sess.id)}
+                              className="text-xs font-bold uppercase tracking-wider py-1.5 px-3 border border-rose-200 text-rose-600 hover:bg-rose-50 active:bg-rose-100 rounded-md transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Revoke</span>
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
-
-              <Input
-                label="Phone Number"
-                type="tel"
-                placeholder="+91 98765 43210"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                helperText="Used for transaction SMS and notifications"
-              />
-
-              <Button
-                type="submit"
-                variant="primary"
-                className="w-full text-xs"
-                isLoading={profileSaving}
-              >
-                Save Changes
-              </Button>
-            </form>
-          </Card>
-
-          {/* Change Password */}
-          <Card variant="default">
-            <div className="flex items-center gap-2 mb-6">
-              <Shield className="w-5 h-5 text-course-orange" />
-              <h2 className="text-lg font-black text-course-darkBlue uppercase tracking-tight">
-                Change Password
-              </h2>
             </div>
+          </div>
+        )}
 
-            {passwordError && (
-              <div className="p-3 border border-black bg-rose-50 text-rose-950 text-xs font-bold mb-4">
-                {passwordError}
+        {/* TAB 3: Order History & Tax Invoices */}
+        {activeTab === 'orders' && (
+          <div className="relative w-full bg-white rounded-lg sm:rounded-xl shadow-lg p-6 sm:p-8 select-none">
+            {/* Card Content */}
+            <div className="relative z-10 w-full text-neutral-900 space-y-6">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-[#0033FF] uppercase tracking-tight">
+                  PURCHASE &amp; INVOICES.
+                </h2>
+                <p className="text-xs text-neutral-500 font-medium mt-1">
+                  Official GST tax invoices can be downloaded directly in PDF format for expense reimbursement.
+                </p>
               </div>
-            )}
 
-            <form onSubmit={handleChangePassword} className="space-y-4">
-              <Input
-                label="Current Password"
-                type="password"
-                placeholder="••••••••••••"
-                required
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-              />
-
-              <Input
-                label="New Password"
-                type="password"
-                placeholder="Min 10 characters"
-                required
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                helperText="Must be at least 10 characters long"
-              />
-
-              <Input
-                label="Confirm New Password"
-                type="password"
-                placeholder="Re-enter new password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-
-              <Button
-                type="submit"
-                variant="primary"
-                className="w-full text-xs"
-                isLoading={passwordSaving}
-              >
-                Update Password
-              </Button>
-            </form>
-          </Card>
-        </div>
-      )}
-
-      {/* TAB 2: Active Devices / Sessions */}
-      {activeTab === 'sessions' && (
-        <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-black p-4 bg-course-orangeSubtle">
-            <div>
-              <h3 className="font-bold text-sm text-course-darkBlue">
-                Logged-In Devices &amp; Sessions
-              </h3>
-              <p className="text-xs text-course-navyMuted mt-0.5">
-                For security, single-stream playback is enforced. You can revoke any unrecognized
-                device.
-              </p>
-            </div>
-            <Button
-              variant="dark"
-              size="sm"
-              onClick={handleLogoutEverywhere}
-              isLoading={loggingOutAll}
-            >
-              Log Out Everywhere
-            </Button>
-          </div>
-
-          {sessionsLoading ? (
-            <div className="p-12 text-center text-xs font-mono uppercase">
-              Loading active sessions...
-            </div>
-          ) : sessions.length === 0 ? (
-            <Card variant="default" className="text-center py-12">
-              <p className="text-xs text-course-navyMuted">No active session records found.</p>
-            </Card>
-          ) : (
-            <div className="border border-black bg-course-white overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="border-b border-black bg-course-bg text-course-darkBlue uppercase font-mono">
-                  <tr>
-                    <th className="p-3">Device / Browser</th>
-                    <th className="p-3">IP Address</th>
-                    <th className="p-3">Last Active</th>
-                    <th className="p-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-black/10">
-                  {sessions.map((sess) => (
-                    <tr key={sess.id} className="hover:bg-course-orangeSubtle/30">
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <Laptop className="w-4 h-4 text-course-orange shrink-0" />
-                          <div>
-                            <div className="font-bold text-course-darkBlue truncate max-w-xs">
-                              {sess.userAgent || 'Unknown Browser / Platform'}
-                            </div>
-                            {sess.isCurrent && (
-                              <Badge variant="orangeSubtle" size="sm" className="mt-1">
-                                Current Session
-                              </Badge>
+              {ordersLoading ? (
+                <div className="py-16 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3">
+                  <Loader2 className="w-6 h-6 animate-spin text-[#0033FF]" />
+                  <span>Loading orders and invoices...</span>
+                </div>
+              ) : orders.length === 0 ? (
+                <div className="py-16 text-center text-sm font-medium text-neutral-500 space-y-3">
+                  <Receipt className="w-10 h-10 text-neutral-400 mx-auto" />
+                  <p>No previous purchase records found.</p>
+                  <Link
+                    href="/#pricing"
+                    className="inline-flex items-center justify-center h-10 px-6 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs uppercase tracking-wider rounded-md shadow-sm transition-all gap-1.5"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>View Courses</span>
+                  </Link>
+                </div>
+              ) : (
+                <div className="overflow-x-auto border border-neutral-200 rounded-lg">
+                  <table className="w-full text-left text-xs sm:text-sm border-collapse">
+                    <thead className="bg-neutral-50 text-neutral-700 uppercase font-bold text-[11px] border-b border-neutral-200">
+                      <tr>
+                        <th className="py-3.5 px-4">Order ID</th>
+                        <th className="py-3.5 px-4">Date</th>
+                        <th className="py-3.5 px-4">Course</th>
+                        <th className="py-3.5 px-4">Amount</th>
+                        <th className="py-3.5 px-4">Status</th>
+                        <th className="py-3.5 px-4 text-right">Invoice</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-200">
+                      {orders.map((ord) => (
+                        <tr key={ord.id} className="hover:bg-neutral-50/70 transition-colors">
+                          <td className="py-3.5 px-4 font-mono font-bold text-neutral-900">
+                            {formatDisplayOrderId(ord.orderNumber || ord.id)}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono text-neutral-600">
+                            {new Date(ord.createdAt).toLocaleDateString('en-IN')}
+                          </td>
+                          <td className="py-3.5 px-4 font-bold text-neutral-900">
+                            {ord.product.title}
+                          </td>
+                          <td className="py-3.5 px-4 font-mono font-bold text-neutral-900">
+                            ₹{(ord.amountPaise / 100).toLocaleString('en-IN')}
+                          </td>
+                          <td className="py-3.5 px-4">
+                            <span
+                              className={`px-2.5 py-0.5 text-[10px] font-bold uppercase rounded ${ord.status === 'PAID'
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                : ord.status === 'FAILED'
+                                  ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                  : 'bg-neutral-100 text-neutral-700 border border-neutral-200'
+                                }`}
+                            >
+                              {ord.status}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 text-right">
+                            {ord.invoice ? (
+                              <a
+                                href={`${siteConfig.urls.api}/api/v1/invoices/${ord.invoice.id}/download`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs font-bold uppercase tracking-wider py-1.5 px-3 bg-[#0033FF] hover:bg-[#0028D6] text-white rounded-md transition-colors inline-flex items-center gap-1.5 shadow-sm"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                <span>PDF Invoice</span>
+                              </a>
+                            ) : (
+                              <span className="text-neutral-400 font-mono text-xs">—</span>
                             )}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-3 font-mono text-course-navySubtle">
-                        {sess.ipAddress || '—'}
-                      </td>
-                      <td className="p-3 font-mono text-course-navySubtle">
-                        {new Date(sess.lastUsedAt).toLocaleString('en-IN')}
-                      </td>
-                      <td className="p-3 text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-[11px] py-1 px-2.5"
-                          disabled={revokingSessionId === sess.id}
-                          onClick={() => handleRevokeSession(sess.id)}
-                        >
-                          <Trash2 className="w-3.5 h-3.5 mr-1 text-rose-600" />
-                          <span>Revoke</span>
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      )}
-
-      {/* TAB 3: Order History & Invoices */}
-      {activeTab === 'orders' && (
-        <div className="space-y-6">
-          <div className="border border-black p-4 bg-course-bg">
-            <h3 className="font-bold text-sm text-course-darkBlue">
-              Purchase &amp; Invoice History
-            </h3>
-            <p className="text-xs text-course-navyMuted mt-0.5">
-              Official GST tax invoices can be downloaded directly in PDF format for company expense
-              reimbursement.
-            </p>
           </div>
-
-          {ordersLoading ? (
-            <div className="p-12 text-center text-xs font-mono uppercase">
-              Loading orders and invoices...
-            </div>
-          ) : orders.length === 0 ? (
-            <Card variant="default" className="text-center py-12 space-y-3">
-              <Receipt className="w-8 h-8 text-course-navyMuted mx-auto" />
-              <p className="text-xs text-course-navyMuted">No previous purchase records found.</p>
-            </Card>
-          ) : (
-            <div className="border border-black bg-course-white overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="border-b border-black bg-course-bg text-course-darkBlue uppercase font-mono">
-                  <tr>
-                    <th className="p-3">Order ID</th>
-                    <th className="p-3">Date</th>
-                    <th className="p-3">Course</th>
-                    <th className="p-3">Amount</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3 text-right">Invoice</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-black/10">
-                  {orders.map((ord) => (
-                    <tr key={ord.id} className="hover:bg-course-orangeSubtle/30">
-                      <td className="p-3 font-mono font-bold text-course-darkBlue">
-                        {ord.orderNumber || ord.id.substring(0, 13)}
-                      </td>
-                      <td className="p-3 font-mono text-course-navySubtle">
-                        {new Date(ord.createdAt).toLocaleDateString('en-IN')}
-                      </td>
-                      <td className="p-3 font-bold text-course-darkBlue">{ord.product.title}</td>
-                      <td className="p-3 font-mono font-bold text-course-darkBlue">
-                        ₹{(ord.amountPaise / 100).toLocaleString('en-IN')}
-                      </td>
-                      <td className="p-3">
-                        <Badge
-                          variant={
-                            ord.status === 'PAID'
-                              ? 'success'
-                              : ord.status === 'FAILED'
-                                ? 'error'
-                                : 'default'
-                          }
-                          size="sm"
-                        >
-                          {ord.status}
-                        </Badge>
-                      </td>
-                      <td className="p-3 text-right">
-                        {ord.invoice ? (
-                          <a
-                            href={`${siteConfig.urls.api}/api/v1/invoices/${ord.invoice.id}/download`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn-outline text-[11px] py-1 px-2.5 inline-flex items-center gap-1.5"
-                          >
-                            <Download className="w-3.5 h-3.5 text-course-orange" />
-                            <span>PDF</span>
-                          </a>
-                        ) : (
-                          <span className="text-course-navySubtle font-mono text-[10px]">—</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </main>
     </div>
   );
 }

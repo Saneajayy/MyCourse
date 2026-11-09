@@ -15,7 +15,7 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
   }) => {
     // 1. Visit Landing Page
     await page.goto('/');
-    await expect(page).toHaveTitle(/Hydraulic Engineering Academy/);
+    await expect(page).toHaveTitle(/Hydro Basics/);
     await expect(page.locator('h1')).toContainText('Practical Hydraulic Engineering');
 
     // 2. Open Free Preview Player Modal from Hero (using .first() to target hero button)
@@ -45,14 +45,14 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
 
     // 5. Log in
     await page.goto('/login');
-    await page.getByPlaceholder('engineer@plant.com').fill(testStudent.email);
-    await page.getByPlaceholder('••••••••••••').fill(testStudent.password);
-    await page.getByRole('button', { name: /Sign In/i }).click();
+    await page.getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i).fill(testStudent.email);
+    await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill(testStudent.password);
+    await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
     await page.waitForURL('**/my-courses');
 
     // 6. Navigate to Checkout
     await page.goto('/checkout');
-    await expect(page.locator('h1')).toContainText('Checkout & Invoicing');
+    await expect(page.locator('h1')).toContainText(/Checkout & Invoicing/i);
 
     // 7. Apply 100% Test Coupon (FREE100) for Instant Activation
     await page.fill('input[placeholder="Coupon Code"]', 'FREE100');
@@ -68,14 +68,13 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
 
     // Lands on Order Success Page
     await page.waitForURL('**/order/success/**');
-    await expect(page.locator('h1')).toContainText('Enrollment Confirmed!');
-    await expect(page.locator('text=Payment Confirmed • Access Active')).toBeVisible();
+    await expect(page.locator('h1')).toContainText(/Payment Confirmed/i);
     await expect(page.locator('text=Download Tax Invoice')).toBeVisible();
 
     // 9. Open My Courses
     await page.goto('/my-courses');
-    await expect(page.locator('h1')).toContainText('My Enrolled Courses');
-    await expect(page.locator('text=Industrial Hydraulic Systems & Circuit Design')).toBeVisible();
+    await expect(page.locator('h1')).toContainText(/Enrolled Courses/i);
+    await expect(page.locator('text=Hydraulic System Basics')).toBeVisible();
     await expect(page.locator('text=Active • 365 Days Left')).toBeVisible();
 
     // 10. Open Learning Player
@@ -102,9 +101,9 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
     await page.waitForURL(/\/login/);
 
     // 12. Log back in and verify resume state
-    await page.getByPlaceholder('engineer@plant.com').fill(testStudent.email);
-    await page.getByPlaceholder('••••••••••••').fill(testStudent.password);
-    await page.getByRole('button', { name: /Sign In/i }).click();
+    await page.getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i).fill(testStudent.email);
+    await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill(testStudent.password);
+    await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
     await page.waitForURL((url) => url.pathname === '/my-courses' || url.pathname === '/account');
 
     await page.goto('/learn/hydraulic-engineering-mastery');
@@ -124,9 +123,9 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
 
     // Log in directly without verification
     await page.goto('/login');
-    await page.getByPlaceholder('engineer@plant.com').fill(unverifiedEmail);
-    await page.getByPlaceholder('••••••••••••').fill('RobustHydraulics#2026!Key');
-    await page.getByRole('button', { name: /Sign In/i }).click();
+    await page.getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i).fill(unverifiedEmail);
+    await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill('RobustHydraulics#2026!Key');
+    await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
     await page.waitForURL('**/my-courses');
 
     // Go to checkout

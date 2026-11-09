@@ -176,7 +176,7 @@ devRouter.get('/checkout', (_req, res) => {
           key: keyId,
           amount: amountPaise,
           currency: 'INR',
-          name: 'Hydraulic Engineering Academy',
+          name: 'Hydro Basics',
           description: orderData.data.order.product.title,
           order_id: rzpOrderId,
           prefill: {
@@ -248,7 +248,7 @@ devRouter.get('/player', (_req, res) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer-when-downgrade">
-  <title>Secure Player Test - Hydraulic Engineering Academy</title>
+  <title>Secure Player Test - Hydro Basics</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0b1120; color: #f8fafc; padding: 1.5rem; max-width: 900px; margin: 0 auto; line-height: 1.5; }
@@ -340,7 +340,7 @@ devRouter.get('/player', (_req, res) => {
     <div class="player-wrapper" id="playerWrapper">
       <div id="watermarkOverlay">
         <span id="watermarkText">student@example.com</span><br>
-        <span style="font-size:0.7rem; opacity:0.8;">Hydraulic Engineering Academy</span>
+        <span style="font-size:0.7rem; opacity:0.8;">Hydro Basics</span>
       </div>
       <video id="videoPlayer" playsinline controls style="display:none;"></video>
       <iframe id="embedFrame" allow="autoplay; fullscreen" style="display:none;"></iframe>

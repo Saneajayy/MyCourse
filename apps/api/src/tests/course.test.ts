@@ -751,7 +751,7 @@ describe('Phase 3 Course Management & Bunny Stream Video Pipeline Suite', () => 
       expect(res.status).toBe(200);
       expect(res.headers['content-type']).toContain('application/json');
       expect(res.body.openapi).toBe('3.0.3');
-      expect(res.body.info.title).toContain('Hydraulic Engineering Academy API');
+      expect(res.body.info.title).toContain('Hydro Basics API');
       expect(res.body.paths['/courses/{slug}']).toBeDefined();
       expect(res.body.paths['/courses/{slug}/lessons/{lessonId}/preview-token']).toBeDefined();
       expect(res.body.paths['/admin/products/{id}/thumbnail']).toBeDefined();

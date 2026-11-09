@@ -130,7 +130,7 @@ const indexHtml = `<!DOCTYPE html>
 </head>
 <body>
   <h1>Transactional Email Previews (Phase 8)</h1>
-  <p>Flat design email templates for Hydraulic Engineering Academy. HTML4/XHTML table layout, zero external image dependencies, AA+ contrast.</p>
+  <p>Flat design email templates for Hydro Basics. HTML4/XHTML table layout, zero external image dependencies, AA+ contrast.</p>
   <div class="grid">
     ${templates
       .map(

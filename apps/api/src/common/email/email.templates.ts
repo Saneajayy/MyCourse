@@ -38,7 +38,7 @@ export function assertNoTodoMarkers(content: string): void {
  * - Dynamic brand name, support email, and links from config / APP_URL
  */
 export function buildEmailHtml(options: EmailLayoutOptions): string {
-  const brandName = options.brandName || 'Hydraulic Engineering Academy';
+  const brandName = options.brandName || 'Hydro Basics';
   const supportEmail = options.supportEmail || 'support@hydrauliccourse.com';
   const year = new Date().getFullYear();
 
@@ -161,18 +161,21 @@ export function getEmailVerificationTemplate(data: {
   brandName?: string;
   supportEmail?: string;
 }): { subject: string; html: string; text: string } {
-  const brandName = data.brandName || 'Hydraulic Engineering Academy';
+  const brandName = data.brandName || 'Hydro Basics';
   const verifyUrl = `${env.APP_URL}/verify-email?token=${data.token}`;
-  const subject = `Verify your email address - ${brandName}`;
+  const subject = `Your verification code is ${data.token} - ${brandName}`;
 
   const text = `Hello ${data.name},
 
 Thank you for registering at ${brandName}.
 
-Please verify your email address to activate your account and access your courses by clicking the link below:
-${verifyUrl}
+Your 6-digit verification code is:
+${data.token}
 
-This verification link will expire in 24 hours.
+Enter this verification code on the verification screen to activate your account. This code expires in 15 minutes.
+
+Verification link:
+${verifyUrl}
 
 If you did not create an account, you can safely ignore this email.
 
@@ -183,21 +186,27 @@ Support: ${data.supportEmail || 'support@hydrauliccourse.com'}`;
   const contentHtml = `
     <p style="margin: 0 0 14px 0;">Hello <strong>${data.name}</strong>,</p>
     <p style="margin: 0 0 14px 0;">Thank you for registering at <strong>${brandName}</strong>.</p>
-    <p style="margin: 0 0 14px 0;">Please verify your email address to activate your account and proceed with secure course access:</p>
+    <p style="margin: 0 0 14px 0;">Please use the 6-digit verification code below to activate your student account:</p>
+    <div style="text-align: center; margin: 26px 0;">
+      <div style="display: inline-block; padding: 14px 28px; background-color: #EEF2FF; border: 2px solid #0033FF; border-radius: 8px; font-family: monospace, Courier, sans-serif; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #0033FF;">
+        ${data.token}
+      </div>
+      <p style="margin: 10px 0 0 0; font-size: 12px; color: #64748B;">This verification code will expire in <strong>15 minutes</strong>.</p>
+    </div>
   `;
 
   const footerHtml = `
-    <p style="margin: 0 0 6px 0;">This verification link expires in <strong>24 hours</strong>.</p>
-    <p style="margin: 0;">If button clicking does not work, copy and paste this URL into your browser:<br /><span style="font-family: monospace; word-break: break-all; color: #0A192F;">${verifyUrl}</span></p>
+    <p style="margin: 0 0 6px 0;">Enter this code on the verification screen to activate your account.</p>
+    <p style="margin: 0;">Verification URL:<br /><span style="font-family: monospace; word-break: break-all; color: #0A192F;">${verifyUrl}</span></p>
   `;
 
   const html = buildEmailHtml({
     brandName,
     supportEmail: data.supportEmail,
-    preheader: 'Verify your email address to activate your course account.',
+    preheader: `Your verification code is ${data.token}`,
     title: 'Verify Your Email Address',
     contentHtml,
-    cta: { text: 'Verify Email Address', url: verifyUrl },
+    cta: { text: 'Enter Verification Code', url: verifyUrl },
     footerHtml,
   });
 
@@ -214,7 +223,7 @@ export function getPasswordResetTemplate(data: {
   brandName?: string;
   supportEmail?: string;
 }): { subject: string; html: string; text: string } {
-  const brandName = data.brandName || 'Hydraulic Engineering Academy';
+  const brandName = data.brandName || 'Hydro Basics';
   const resetUrl = `${env.APP_URL}/reset-password?token=${data.token}`;
   const subject = `Password Reset Request - ${brandName}`;
 
@@ -268,7 +277,7 @@ export function getPasswordChangedTemplate(data: {
   brandName?: string;
   supportEmail?: string;
 }): { subject: string; html: string; text: string } {
-  const brandName = data.brandName || 'Hydraulic Engineering Academy';
+  const brandName = data.brandName || 'Hydro Basics';
   const supportEmail = data.supportEmail || 'support@hydrauliccourse.com';
   const formattedDate = (data.changedAt || new Date()).toUTCString();
   const loginUrl = `${env.APP_URL}/login`;
@@ -324,7 +333,7 @@ export function getOrderReceiptTemplate(data: {
   brandName?: string;
   supportEmail?: string;
 }): { subject: string; html: string; text: string } {
-  const brandName = data.brandName || 'Hydraulic Engineering Academy';
+  const brandName = data.brandName || 'Hydro Basics';
   const amountRupees = (data.amountPaise / 100).toFixed(2);
   const myCoursesUrl = `${env.APP_URL}/account`;
   const invoiceDownloadUrl = `${env.APP_URL}/api/v1/orders/${data.orderId}/invoice`;
@@ -416,7 +425,7 @@ export function getRefundConfirmationTemplate(data: {
   brandName?: string;
   supportEmail?: string;
 }): { subject: string; html: string; text: string } {
-  const brandName = data.brandName || 'Hydraulic Engineering Academy';
+  const brandName = data.brandName || 'Hydro Basics';
   const amountRupees = (data.amountPaise / 100).toFixed(2);
   const subject = `Refund Processed for Order #${data.orderId.slice(0, 8)} - ${brandName}`;
 
@@ -484,7 +493,7 @@ export function getAdminAccessGrantedTemplate(data: {
   brandName?: string;
   supportEmail?: string;
 }): { subject: string; html: string; text: string } {
-  const brandName = data.brandName || 'Hydraulic Engineering Academy';
+  const brandName = data.brandName || 'Hydro Basics';
   const courseUrl = `${env.APP_URL}/learn/${data.slug}`;
   const subject = `Course Access Granted: ${data.courseTitle} - ${brandName}`;
   const expiryText = data.expiresAt
@@ -539,7 +548,7 @@ export function getAccountExistsNoticeTemplate(data: {
   brandName?: string;
   supportEmail?: string;
 }): { subject: string; html: string; text: string } {
-  const brandName = data.brandName || 'Hydraulic Engineering Academy';
+  const brandName = data.brandName || 'Hydro Basics';
   const loginUrl = `${env.APP_URL}/login`;
   const resetUrl = `${env.APP_URL}/forgot-password`;
   const subject = `Account Registration Attempt - ${brandName}`;

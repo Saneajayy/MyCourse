@@ -225,6 +225,94 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
     });
+
+    it('verifies email using 6-digit numeric OTP with email and otp payload', async () => {
+      const otp = '849201';
+      const otpEmail = `otp_test_${Date.now()}@testcourse.com`;
+
+      const user = await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: otpEmail,
+          passwordHash: '$argon2id$v=19$m=65536,t=3,p=4$dummyhash',
+          name: 'OTP Student',
+          role: 'STUDENT',
+        },
+      });
+
+      await prisma.emailVerificationToken.create({
+        data: {
+          id: uuidv7(),
+          userId: user.id,
+          tokenHash: hashToken(`${otpEmail}:${otp}`),
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+        },
+      });
+
+      const res = await request(app).post('/api/v1/auth/verify-email').send({
+        email: otpEmail,
+        otp,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+
+      const updated = await prisma.user.findUnique({ where: { id: user.id } });
+      expect(updated?.emailVerifiedAt).not.toBeNull();
+    });
+
+    it('resends OTP via public unauthenticated /api/v1/auth/resend-otp endpoint', async () => {
+      const otpEmail = `resend_otp_${Date.now()}@testcourse.com`;
+
+      await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: otpEmail,
+          passwordHash: '$argon2id$v=19$m=65536,t=3,p=4$dummyhash',
+          name: 'Resend Student',
+          role: 'STUDENT',
+        },
+      });
+
+      const res = await request(app).post('/api/v1/auth/resend-otp').send({
+        email: otpEmail,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.message).toContain('If an account exists, a new verification code has been sent');
+    });
+
+    it('locks out verification attempts after 5 incorrect OTP attempts', async () => {
+      const otpEmail = `lockout_otp_${Date.now()}@testcourse.com`;
+
+      await prisma.user.create({
+        data: {
+          id: uuidv7(),
+          email: otpEmail,
+          passwordHash: '$argon2id$v=19$m=65536,t=3,p=4$dummyhash',
+          name: 'Lockout Student',
+          role: 'STUDENT',
+        },
+      });
+
+      // 5 consecutive wrong OTP attempts
+      for (let i = 0; i < 5; i++) {
+        const failRes = await request(app).post('/api/v1/auth/verify-email').send({
+          email: otpEmail,
+          otp: '000000',
+        });
+        expect(failRes.status).toBe(400);
+      }
+
+      // 6th attempt must be locked out (429)
+      const lockedRes = await request(app).post('/api/v1/auth/verify-email').send({
+        email: otpEmail,
+        otp: '000000',
+      });
+      expect(lockedRes.status).toBe(429);
+      expect(lockedRes.body.error.message).toContain('Too many failed');
+    });
   });
 
   // ---------------------------------------------------------------------------

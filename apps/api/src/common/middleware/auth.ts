@@ -26,13 +26,19 @@ declare global {
 }
 
 export async function requireAuth(req: Request, _res: Response, next: NextFunction): Promise<void> {
+  let token: string | undefined;
+
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.substring(7).trim();
+  } else if (typeof req.query.token === 'string') {
+    token = req.query.token.trim();
+  }
+
+  if (!token) {
     next(new UnauthorizedError('Authentication token missing or invalid'));
     return;
   }
-
-  const token = authHeader.substring(7).trim();
 
   try {
     const payload = verifyAccessToken(token);

@@ -116,7 +116,7 @@ function TwoFactorFlow() {
 
   const handleDownloadCodes = () => {
     if (!setupData?.recoveryCodes) return;
-    const content = `HYDRAULIC ENGINEERING ACADEMY - ADMIN RECOVERY CODES\nGenerated: ${new Date().toISOString()}\n\nKeep these codes in a secure, offline location. Each code can be used once if you lose access to your phone.\n\n${setupData.recoveryCodes.join('\n')}\n`;
+    const content = `HYDRO BASICS - ADMIN RECOVERY CODES\nGenerated: ${new Date().toISOString()}\n\nKeep these codes in a secure, offline location. Each code can be used once if you lose access to your phone.\n\n${setupData.recoveryCodes.join('\n')}\n`;
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');

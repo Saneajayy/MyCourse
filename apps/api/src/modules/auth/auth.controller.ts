@@ -10,6 +10,7 @@ import {
   registerSchema,
   loginSchema,
   verifyEmailSchema,
+  resendOtpSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   changePasswordSchema,
@@ -35,8 +36,34 @@ export class AuthController {
 
   public async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { token } = verifyEmailSchema.parse(req.body);
-      const result = await authService.verifyEmail(token, req.ip, req.headers['user-agent']);
+      const validatedInput = verifyEmailSchema.parse(req.body);
+      const result = await authService.verifyEmail(validatedInput, req.ip, req.headers['user-agent']);
+
+      if (result.refreshToken) {
+        setRefreshTokenCookie(res, result.refreshToken);
+      }
+
+      res.status(200).json({
+        success: true,
+        data: {
+          success: true,
+          message: result.message,
+          user: result.user,
+          accessToken: result.accessToken,
+          defaultRedirect: result.defaultRedirect,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public async resendOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const validatedInput = resendOtpSchema.parse(req.body);
+      const clientIp =
+        (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || '127.0.0.1';
+      const result = await authService.resendOtp(validatedInput.email, clientIp);
 
       res.status(200).json({
         success: true,
@@ -212,6 +239,8 @@ export class AuthController {
         req.ip,
         req.headers['user-agent'],
       );
+
+      clearRefreshTokenCookie(res);
 
       res.status(200).json({
         success: true,

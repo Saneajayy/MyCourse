@@ -1046,7 +1046,7 @@ const generator = new OpenApiGeneratorV3(registry.definitions);
 export const openApiSpec = generator.generateDocument({
   openapi: '3.0.3',
   info: {
-    title: 'Hydraulic Engineering Academy API',
+    title: 'Hydro Basics API',
     version: '1.0.0',
     description:
       'High-performance production REST API for Course Management, Video Delivery (Bunny Stream TUS), and Razorpay payments. Generated directly from Zod domain schemas.',

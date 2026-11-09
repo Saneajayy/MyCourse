@@ -116,7 +116,18 @@ export function createApp(): Express {
     cors({
       origin: (origin, callback) => {
         // Allow requests with no origin (e.g. mobile apps, curl, server-to-server webhooks)
-        if (!origin || allowedOrigins.includes(origin)) {
+        // In non-production, also allow Cloudflare tunnels and local network origins
+        if (
+          !origin ||
+          allowedOrigins.includes(origin) ||
+          (env.NODE_ENV !== 'production' &&
+            (origin.endsWith('.trycloudflare.com') ||
+              origin.includes('localhost') ||
+              origin.includes('127.0.0.1') ||
+              origin.endsWith('.loca.lt') ||
+              origin.endsWith('.ngrok-free.app') ||
+              origin.endsWith('.ngrok.io')))
+        ) {
           callback(null, true);
         } else {
           callback(

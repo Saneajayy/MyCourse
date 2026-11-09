@@ -1,9 +1,36 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { siteConfig } from '../config/site';
 import { Mail, Youtube } from 'lucide-react';
 
 export function Footer() {
+  const pathname = usePathname();
+  const isExcludedPage =
+    [
+      '/',
+      '/login',
+      '/signup',
+      '/register',
+      '/forgot-password',
+      '/reset-password',
+      '/verify-email',
+      '/checkout',
+      '/my-courses',
+      '/account',
+      '/contact',
+      '/terms',
+      '/privacy',
+      '/refunds',
+    ].includes(pathname) ||
+    pathname.startsWith('/order') ||
+    pathname.startsWith('/learn');
+
+  if (isExcludedPage) {
+    return null;
+  }
   return (
     <footer className="border-t border-black bg-course-white text-course-darkBlue">
       <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">

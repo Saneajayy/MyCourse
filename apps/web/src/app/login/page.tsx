@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/auth-context';
-import { Button, Input, Card, useToast } from '../../components/ui';
+import { useToast } from '../../components/ui';
 import { siteConfig } from '../../config/site';
-import { LogIn, AlertCircle } from 'lucide-react';
+import { AlertCircle, Check, Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
@@ -18,6 +19,7 @@ function LoginForm() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [requestId, setRequestId] = useState<string | null>(null);
@@ -40,7 +42,7 @@ function LoginForm() {
         return;
       }
 
-      toastSuccess('Welcome back!', 'Successfully signed in to your student account.');
+      toastSuccess('Welcome back!', 'Successfully logged in to your student account.');
       router.push(redirectUrl);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Invalid login credentials';
@@ -54,83 +56,66 @@ function LoginForm() {
     }
   };
 
+  const [showRemindHint, setShowRemindHint] = useState(false);
+
   return (
-    <Card variant="default" padding="lg" className="border-2">
-      <div className="text-center mb-8">
-        <div className="w-10 h-10 bg-course-orange text-course-white inline-flex items-center justify-center border border-black mb-3">
-          <LogIn className="w-5 h-5" />
-        </div>
-        <h1 className="text-2xl font-black text-course-darkBlue tracking-tight">
-          Sign In to Your Account
-        </h1>
-        <p className="text-xs text-course-navySubtle mt-1">
-          Access your courses, streaming progress, and invoices
-        </p>
+    <div className="relative w-full bg-white border border-neutral-200/90 rounded-2xl lg:bg-transparent lg:border-none lg:rounded-none p-5 sm:p-8 select-none">
+      {/* SVG Deckled / Textured Edge Filter (Desktop Only) */}
+      <svg className="hidden lg:block absolute w-0 h-0 pointer-events-none" aria-hidden="true">
+        <defs>
+          <filter
+            id="figma-texture-login"
+            x="-10%"
+            y="-15%"
+            width="120%"
+            height="130%"
+            filterUnits="objectBoundingBox"
+            primitiveUnits="userSpaceOnUse"
+          >
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.25"
+              numOctaves="3"
+              result="noise"
+            />
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="noise"
+              scale="5.1"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+        </defs>
+      </svg>
+
+      {/* Textured White Card Background via SVG Filter (Desktop Only) */}
+      <div className="hidden lg:block absolute inset-0 pointer-events-none overflow-visible">
+        <svg
+          className="w-full h-full overflow-visible"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            rx="5.1"
+            ry="5.1"
+            fill="white"
+            filter="url(#figma-texture-login)"
+          />
+        </svg>
       </div>
 
-      {errorMsg && (
-        <div className="mb-6 p-4 border border-black bg-rose-50 text-rose-950 text-xs">
-          <div className="flex items-center gap-2 font-bold mb-1">
-            <AlertCircle className="w-4 h-4 text-rose-700 shrink-0" />
-            <span>{errorMsg}</span>
-          </div>
-          {requestId && (
-            <p className="font-mono text-[10px] text-course-navySubtle mt-1">Ref ID: {requestId}</p>
-          )}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <Input
-          label="Registered Email"
-          type="email"
-          autoComplete="email"
-          placeholder="engineer@plant.com"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <div>
-          <Input
-            label="Password"
-            type="password"
-            autoComplete="current-password"
-            placeholder="••••••••••••"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <div className="flex justify-end mt-1.5">
-            <Link
-              href="/forgot-password"
-              className="text-xs font-bold text-course-darkBlue hover:text-course-orange hover:underline min-h-[32px] inline-flex items-center"
-            >
-              Forgot your password?
-            </Link>
-          </div>
-        </div>
-
-        <Button
-          type="submit"
-          variant="primary"
-          className="w-full text-xs font-black uppercase tracking-wider py-3"
-          isLoading={isLoading}
-        >
-          Sign In
-        </Button>
-      </form>
-
-      {/* Alternative Social Login */}
-      <div className="mt-8 pt-6 border-t border-black text-center space-y-4">
-        <div className="text-xs font-bold uppercase tracking-wider text-course-navyMuted">
-          Or Continue With
-        </div>
+      {/* Card Content */}
+      <div className="relative z-10 w-full">
+        {/* 1. Continue with Google Button */}
         <a
           href={`${siteConfig.urls.api}/api/v1/auth/google`}
-          className="w-full min-h-[44px] inline-flex items-center justify-center gap-2 border border-black bg-course-white text-course-darkBlue hover:bg-course-orangeSubtle font-bold text-xs uppercase tracking-wider transition-colors"
+          className="w-full h-[46px] sm:h-[48px] rounded-lg border border-neutral-300 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-neutral-900 font-semibold text-sm sm:text-[15px] flex items-center justify-center gap-3 transition-colors"
         >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
             <path
               fill="#4285F4"
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -148,30 +133,228 @@ function LoginForm() {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
             />
           </svg>
-          <span>Sign In With Google</span>
+          <span>Continue with Google</span>
         </a>
-      </div>
 
-      <div className="mt-6 text-center text-xs text-course-navyMuted">
-        Don&apos;t have an account yet?{' '}
-        <Link
-          href="/register"
-          className="font-bold text-course-darkBlue hover:text-course-orange underline min-h-[32px] inline-flex items-center"
-        >
-          Create New Account
-        </Link>
+        {/* Success Notification Alert */}
+        {searchParams.get('message') === 'password-changed' && !errorMsg && (
+          <div className="mt-4 p-3.5 rounded-lg border border-emerald-300 bg-emerald-50/95 text-emerald-950 text-xs">
+            <div className="flex items-center gap-2 font-medium">
+              <Check className="w-4 h-4 text-emerald-600 shrink-0 stroke-[2.5]" />
+              <span>Password updated successfully. Please sign in with your new password.</span>
+            </div>
+          </div>
+        )}
+
+        {/* Session Expired Alert */}
+        {searchParams.get('message') === 'session-expired' && !errorMsg && (
+          <div className="mt-4 p-3.5 rounded-lg border border-amber-300 bg-amber-50/95 text-amber-950 text-xs">
+            <div className="flex items-center gap-2 font-medium">
+              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>Your session has expired. Please sign in again to continue.</span>
+            </div>
+          </div>
+        )}
+
+        {/* Error Alert */}
+        {errorMsg && (
+          <div className="mt-4 p-3.5 rounded-lg border border-rose-200 bg-rose-50/90 text-rose-950 text-xs">
+            <div className="flex items-center gap-2 font-medium">
+              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+            {requestId && (
+              <p className="font-mono text-[10px] text-rose-700/80 mt-1 pl-6">Ref ID: {requestId}</p>
+            )}
+          </div>
+        )}
+
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="mt-6 sm:mt-7 space-y-4 sm:space-y-5">
+          {/* Username or Email */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label htmlFor="login-email" className="text-sm font-bold text-neutral-900">
+                Username or Email
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowRemindHint((prev) => !prev)}
+                className="text-sm text-neutral-600 underline hover:text-black cursor-pointer"
+              >
+                Remind me
+              </button>
+            </div>
+            {showRemindHint && (
+              <p className="text-xs text-neutral-600 bg-neutral-100 p-2 rounded-md">
+                Your username is the registered email you used during enrollment.
+              </p>
+            )}
+            <div className="relative">
+              <input
+                id="login-email"
+                type="email"
+                autoComplete="email"
+                placeholder="Username or Email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none focus:ring-1 focus:ring-[#0033FF] transition-all"
+              />
+              {email.includes('@') && email.length > 4 && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-600">
+                  <Check className="w-5 h-5 stroke-[2.5]" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label htmlFor="login-password" className="text-sm font-bold text-neutral-900">
+                Password
+              </label>
+              <Link
+                href="/forgot-password"
+                className="text-sm text-neutral-600 underline hover:text-black"
+              >
+                Forgot
+              </Link>
+            </div>
+            <div className="relative">
+              <input
+                id="login-password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                placeholder="Password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none focus:ring-1 focus:ring-[#0033FF] transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors p-1 rounded-md focus:outline-none"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" aria-hidden="true" />
+                ) : (
+                  <Eye className="w-4 h-4" aria-hidden="true" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Blue Submit Button */}
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-[46px] sm:h-[48px] bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              {isLoading && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
+              <span>{isLoading ? 'Signing in...' : 'Sign in'}</span>
+            </button>
+          </div>
+        </form>
+
+        {/* New here? Create an account */}
+        <div className="mt-5 text-center text-sm text-neutral-600">
+          New here?{' '}
+          <Link
+            href={redirectUrl ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : '/register'}
+            className="font-bold text-[#0033FF] underline hover:text-[#0028D6] ml-1"
+          >
+            Create an account
+          </Link>
+        </div>
+
+        {/* Horizontal Divider */}
+        <div className="-mx-5 sm:-mx-8 border-t border-neutral-200 my-6" />
+
+        {/* Footer Disclaimer */}
+        <p className="text-center text-xs text-neutral-500 leading-normal">
+          By signing in, you agree to our{' '}
+          <Link href="/terms" className="underline hover:text-neutral-800">
+            Terms &amp; policies
+          </Link>
+          .
+        </p>
       </div>
-    </Card>
+    </div>
   );
 }
 
 export default function LoginPage() {
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = '#FFFFFF';
+    document.body.style.backgroundColor = '#FFFFFF';
+    return () => {
+      document.documentElement.style.backgroundColor = '';
+      document.body.style.backgroundColor = '';
+    };
+  }, []);
+
   return (
-    <div className="min-h-[calc(100vh-16rem)] flex items-center justify-center px-4 py-16 bg-course-white">
-      <div className="w-full max-w-md">
-        <Suspense fallback={<div className="p-8 text-center text-sm">Loading sign in...</div>}>
-          <LoginForm />
-        </Suspense>
+    <div className="fixed inset-0 w-full h-full bg-white font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col lg:flex-row overflow-hidden">
+      {/* Left Column (Desktop Only): Signature Dot Halftone Graphic on Deep Cobalt Blue */}
+      <div className="hidden lg:relative lg:flex lg:w-1/2 h-full bg-[#00186B] overflow-hidden select-none">
+        <Image
+          src="/login-pixelated.png"
+          alt="HydroBasics Industrial Hydraulic Engineer"
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover object-center mix-blend-screen opacity-95 select-none"
+        />
+        {/* Soft overlay gradient for subtle depth */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/80 via-transparent to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
+      </div>
+
+      {/* Right Column: White on Mobile, Royal Blue (#0033FF) on Desktop */}
+      <div className="w-full lg:w-1/2 h-full bg-white lg:bg-[#0033FF] flex flex-col overflow-y-auto relative">
+        {/* Top Header Bar inside the right side login area */}
+        <header className="w-full flex items-center justify-between px-5 pt-5 sm:px-8 sm:pt-8 shrink-0 z-20">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-neutral-600 hover:text-[#0033FF] lg:text-white lg:hover:text-white/80 text-xs sm:text-sm font-semibold transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
+            <span>Back to Course</span>
+          </Link>
+
+          <Link
+            href="/"
+            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] lg:text-white hover:opacity-90 transition-opacity select-none text-right"
+            aria-label="HYDRO BASICS Home"
+          >
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+              BASICS
+            </span>
+          </Link>
+        </header>
+
+        {/* Perfectly Centered Login Card */}
+        <div className="m-auto w-full max-w-[420px] sm:max-w-[440px] px-4 py-6 sm:py-8 relative z-10">
+          <Suspense
+            fallback={
+              <div className="p-8 text-center text-sm font-mono text-neutral-500">
+                Loading login...
+              </div>
+            }
+          >
+            <LoginForm />
+          </Suspense>
+        </div>
       </div>
     </div>
   );

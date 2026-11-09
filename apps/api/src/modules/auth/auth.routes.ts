@@ -14,6 +14,9 @@ authRouter.post('/register', authRateLimiter, (req, res, next) =>
 authRouter.post('/verify-email', standardRateLimiter, (req, res, next) =>
   authController.verifyEmail(req, res, next),
 );
+authRouter.post('/resend-otp', authRateLimiter, (req, res, next) =>
+  authController.resendOtp(req, res, next),
+);
 authRouter.post('/login', authRateLimiter, (req, res, next) =>
   authController.login(req, res, next),
 );

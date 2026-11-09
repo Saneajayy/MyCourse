@@ -10,8 +10,9 @@ const config: Config = {
     extend: {
       colors: {
         course: {
+          brandBlue: '#0033FF', // Electric blue branding
           white: '#FFFFFF',
-          bg: '#FAFAFA',
+          bg: '#0033FF',
           black: '#000000',
           darkBlue: '#0A192F', // Deep navy for headings, body text, and dark sections
           navyMuted: '#1E293B', // Secondary text (14.3:1 contrast on white)
@@ -27,24 +28,14 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
-        heading: ['var(--font-heading)', 'system-ui', 'sans-serif'],
-      },
-      boxShadow: {
-        // Enforce STRICT NO-SHADOW policy
-        DEFAULT: 'none',
-        sm: 'none',
-        md: 'none',
-        lg: 'none',
-        xl: 'none',
-        '2xl': 'none',
-        inner: 'none',
-        none: 'none',
-      },
-      backgroundImage: {
-        // Enforce STRICT NO-GRADIENT policy
-        'gradient-radial': 'none',
-        'gradient-conic': 'none',
+        sans: ['"Reddit Sans"', 'var(--font-inclusive)', 'system-ui', 'sans-serif'],
+        inclusive: ['var(--font-inclusive)', 'Inclusive Sans', 'sans-serif'],
+        heading: ['"Reddit Sans"', 'system-ui', 'sans-serif'],
+        reddit: ['"Reddit Sans"', 'sans-serif'],
+        elms: ['"Elms Sans"', 'sans-serif'],
+        poppins: ['"Poppins"', 'sans-serif'],
+        questrial: ['"Questrial"', 'sans-serif'],
+        snippet: ['"Snippet"', 'sans-serif'],
       },
       borderWidth: {
         DEFAULT: '1px',

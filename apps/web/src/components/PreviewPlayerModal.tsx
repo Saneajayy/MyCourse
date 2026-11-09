@@ -2,9 +2,17 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type Hls from 'hls.js';
-import { Modal, Button } from './ui';
 import { siteConfig } from '../config/site';
-import { Play, Pause, Volume2, VolumeX, Maximize, AlertCircle, Loader2 } from 'lucide-react';
+import {
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Maximize,
+  AlertCircle,
+  Loader2,
+  X,
+} from 'lucide-react';
 
 interface PreviewPlayerModalProps {
   isOpen: boolean;
@@ -36,6 +44,25 @@ export function PreviewPlayerModal({
 
   // Watermark position state
   const [watermarkPos, setWatermarkPos] = useState({ top: '15%', left: '20%' });
+
+  // Handle Escape key and body scroll lock
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, onClose]);
 
   // Move watermark every 8 seconds
   useEffect(() => {
@@ -195,47 +222,98 @@ export function PreviewPlayerModal({
     }
   }, []);
 
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!videoRef.current || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const newProgress = Math.max(0, Math.min(1, clickX / rect.width));
+    const newTime = newProgress * duration;
+    videoRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
   const formatTime = (secs: number) => {
     const mins = Math.floor(secs / 60);
     const remainder = Math.floor(secs % 60);
     return `${mins}:${remainder < 10 ? '0' : ''}${remainder}`;
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={lessonTitle || 'Free Lesson Preview'}
-      description="Experience the lesson delivery, schematic diagrams, and teaching methodology."
-      size="xl"
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="preview-modal-title"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/75 backdrop-blur-md animate-in fade-in duration-200"
     >
-      <div className="space-y-4">
+      {/* Backdrop Click Dismiss */}
+      <div
+        className="fixed inset-0"
+        aria-hidden="true"
+        onClick={onClose}
+      />
+
+      {/* Modal Dialog Card */}
+      <div
+        className="relative z-10 w-full max-w-4xl bg-gradient-to-b from-[#0033FF] via-[#002be8] to-[#001fb8] border border-white/25 rounded-lg sm:rounded-xl p-5 sm:p-7 md:p-8 max-h-[92vh] overflow-y-auto font-reddit text-white shadow-[0_25px_80px_rgba(0,0,0,0.65)] select-none"
+      >
+        {/* Modal Header: Big standalone FREE PREVIEW heading & standalone rotating cross mark */}
+        <div className="flex items-start justify-between gap-4 mb-4 sm:mb-5">
+          <div className="min-w-0">
+            <h2
+              id="preview-modal-title"
+              className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white uppercase tracking-[-0.02em] leading-none select-none"
+            >
+              FREE PREVIEW
+            </h2>
+            <p className="text-white/85 font-medium text-base sm:text-lg mt-2 sm:mt-2.5 tracking-tight">
+              {(() => {
+                const cleaned = (lessonTitle || 'How hydraulic systems work').replace(
+                  /^Lesson\s*\d+(\.\d+)?\s*[:-]?\s*/i,
+                  '',
+                ).trim();
+                return `Lesson 1 - ${cleaned || 'How hydraulic systems work'}`;
+              })()}
+            </p>
+          </div>
+
+          {/* Standalone Cross Mark (rotates 90 degrees on hover) */}
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close dialog"
+            className="text-white hover:text-white/80 transition-transform duration-300 ease-out hover:rotate-90 p-1 shrink-0 cursor-pointer focus:outline-none"
+          >
+            <X className="w-7 h-7 sm:w-8 sm:h-8 stroke-[2.2]" />
+          </button>
+        </div>
+
         {/* Video Player Container */}
         <div
           ref={containerRef}
-          className="relative w-full aspect-video bg-black border border-black overflow-hidden flex items-center justify-center select-none"
+          className="relative w-full aspect-video bg-black/95 rounded-md sm:rounded-lg border border-white/20 overflow-hidden flex items-center justify-center select-none shadow-2xl group/player"
         >
           {isLoading && (
-            <div className="flex flex-col items-center gap-2 text-white">
-              <Loader2 className="w-8 h-8 animate-spin text-course-orange" />
-              <span className="text-xs uppercase font-mono tracking-widest">
+            <div className="flex flex-col items-center gap-2.5 text-white/80">
+              <Loader2 className="w-8 h-8 animate-spin text-white/80" />
+              <span className="text-xs uppercase font-reddit font-medium tracking-widest text-white/70">
                 Securing Preview Stream...
               </span>
             </div>
           )}
 
           {errorMsg && (
-            <div className="p-6 text-center text-white max-w-sm">
-              <AlertCircle className="w-8 h-8 text-rose-500 mx-auto mb-2" />
-              <p className="text-sm font-bold">{errorMsg}</p>
-              <Button
-                size="sm"
-                variant="outline"
-                className="mt-4 bg-white text-black"
+            <div className="p-6 text-center text-white max-w-md">
+              <AlertCircle className="w-10 h-10 text-cyan-300 mx-auto mb-3" />
+              <p className="text-sm font-semibold text-white/90 mb-4">{errorMsg}</p>
+              <button
+                type="button"
+                className="px-4 py-1.5 rounded-md bg-white text-[#0033FF] font-bold text-xs uppercase tracking-wider hover:bg-white/90 active:scale-95 transition-all shadow-sm cursor-pointer"
                 onClick={onClose}
               >
                 Close Preview
-              </Button>
+              </button>
             </div>
           )}
 
@@ -244,7 +322,7 @@ export function PreviewPlayerModal({
               <video
                 ref={videoRef}
                 playsInline
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain cursor-pointer"
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
                 onTimeUpdate={() => {
@@ -256,91 +334,100 @@ export function PreviewPlayerModal({
                 onClick={togglePlay}
               />
 
-              {/* Anti-Piracy Watermark Overlay */}
+              {/* Subtle Anti-Piracy Watermark: small greyed-out HSB text, not a bold button */}
               <div
-                className="absolute pointer-events-none transition-all duration-700 ease-in-out font-mono font-bold text-xs uppercase px-2 py-1 bg-black/60 text-white/70 border border-white/20 select-none"
+                className="absolute pointer-events-none transition-all duration-700 ease-in-out font-mono font-medium text-[11px] sm:text-xs text-white/35 select-none tracking-widest uppercase"
                 style={{ top: watermarkPos.top, left: watermarkPos.left }}
                 aria-hidden="true"
               >
-                FREE PREVIEW • {siteConfig.brandName}
+                HSB
               </div>
 
-              {/* Player Bottom Control Bar */}
-              <div className="absolute bottom-0 inset-x-0 bg-black/85 p-3 flex items-center justify-between gap-3 text-white border-t border-black/40">
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={togglePlay}
-                    aria-label={isPlaying ? 'Pause video' : 'Play video'}
-                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-course-orange focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+              {/* Custom Video Controls Bar */}
+              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-3 sm:p-4 text-white">
+                {/* Scrubber Progress Bar */}
+                <div
+                  className="w-full h-1.5 hover:h-2 bg-white/25 rounded-sm cursor-pointer transition-all duration-150 mb-2.5 relative group/bar"
+                  onClick={handleSeek}
+                >
+                  <div
+                    className="h-full bg-white rounded-sm transition-all duration-75 relative"
+                    style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                   >
-                    {isPlaying ? (
-                      <Pause className="w-5 h-5" />
-                    ) : (
-                      <Play className="w-5 h-5 fill-current" />
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={toggleMute}
-                    aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
-                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-course-orange focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
-                  >
-                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                  </button>
-
-                  <span className="text-xs font-mono">
-                    {formatTime(currentTime)} / {formatTime(duration)}
-                  </span>
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-sm shadow opacity-0 group-hover/bar:opacity-100 transition-opacity" />
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={changeSpeed}
-                    aria-label={`Current speed ${playbackRate}x. Click to change.`}
-                    className="min-h-[44px] px-2 text-xs font-bold font-mono hover:text-course-orange"
-                  >
-                    {playbackRate}x
-                  </button>
+                {/* Control Buttons Row */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 sm:gap-2.5">
+                    <button
+                      type="button"
+                      onClick={togglePlay}
+                      aria-label={isPlaying ? 'Pause video' : 'Play video'}
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg bg-white text-[#0033FF] flex items-center justify-center hover:bg-white/90 active:scale-95 transition-all shadow-md cursor-pointer"
+                    >
+                      {isPlaying ? (
+                        <Pause className="w-4 h-4 fill-current" />
+                      ) : (
+                        <Play className="w-4 h-4 fill-current translate-x-0.5" />
+                      )}
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={toggleFullscreen}
-                    aria-label="Toggle Fullscreen"
-                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center hover:text-course-orange"
-                  >
-                    <Maximize className="w-5 h-5" />
-                  </button>
+                    <button
+                      type="button"
+                      onClick={toggleMute}
+                      aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer"
+                    >
+                      {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                    </button>
+
+                    <span className="text-xs sm:text-[13px] font-mono font-medium text-white/90">
+                      {formatTime(currentTime)} / {formatTime(duration)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={changeSpeed}
+                      aria-label={`Current speed ${playbackRate}x. Click to change.`}
+                      className="px-2 py-1 rounded-md bg-white/15 hover:bg-white/25 active:scale-95 text-white font-mono text-xs font-bold border border-white/20 transition-all cursor-pointer"
+                    >
+                      {playbackRate}x
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={toggleFullscreen}
+                      aria-label="Toggle Fullscreen"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer"
+                    >
+                      <Maximize className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </>
           )}
         </div>
 
-        {/* Call to Action below preview */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border border-black bg-course-orangeSubtle">
-          <div>
-            <div className="text-sm font-extrabold text-course-darkBlue">
-              Liked this preview? Get the complete industrial training
-            </div>
-            <div className="text-xs text-course-navySubtle mt-0.5">
-              Includes all 60+ lessons, blueprint downloads, and direct Q&amp;A support.
-            </div>
-          </div>
-          <Button
-            variant="primary"
-            size="sm"
+        {/* Below video: Simple standalone ENROLL NOW button */}
+        <div className="mt-5 sm:mt-6 flex justify-center w-full">
+          <button
+            type="button"
             onClick={() => {
               onClose();
               window.location.href = '/checkout';
             }}
+            className="w-full sm:w-auto min-w-[240px] px-8 py-3.5 sm:px-10 sm:py-4 rounded-md sm:rounded-lg bg-white text-[#0033FF] font-black text-lg sm:text-xl md:text-2xl uppercase tracking-wide shadow-md hover:bg-white/95 active:scale-95 transition-all cursor-pointer leading-none flex items-center justify-center gap-2.5"
           >
-            Enroll in Full Course
-          </Button>
+            <span>ENROLL NOW</span>
+            <span className="text-xl sm:text-2xl leading-none">→</span>
+          </button>
         </div>
       </div>
-    </Modal>
+    </div>
   );
 }

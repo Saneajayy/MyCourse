@@ -31,7 +31,7 @@ Before launching the course website to production, review and replace all items 
 
 - [ ] **Logo / Brand Wordmark**
   - **Config File:** `apps/web/src/config/site.ts` (`siteConfig.logo`)
-  - **Current State:** Text wordmark ("Hydraulic Engineering Academy" / "HEA").
+  - **Current State:** Text wordmark ("Hydro Basics" / "HB").
   - **Action:** If an official logo PNG/SVG exists, place it in `apps/web/public/logo.png` and set `logo.type = 'image'`.
 
 ---

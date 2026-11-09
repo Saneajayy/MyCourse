@@ -180,7 +180,7 @@ export default function AdminSettingsPage() {
               required
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
-              placeholder="Hydraulic Engineering Academy"
+              placeholder="Hydro Basics"
               className="w-full border border-black p-2 text-sm"
             />
             <p className="text-[11px] text-gray-500 mt-0.5">

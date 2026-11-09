@@ -30,11 +30,23 @@ export type LoginInput = z.infer<typeof loginSchema>;
 
 export const verifyEmailSchema = z
   .object({
-    token: z.string().min(1, 'Verification token is required'),
+    token: z.string().min(1, 'Verification token or code is required').optional(),
+    otp: z.string().min(1, 'OTP is required').optional(),
+    email: z.string().trim().email('Invalid email address').optional(),
+  })
+  .refine((data) => Boolean(data.token || data.otp), {
+    message: 'Verification code or token is required',
+  });
+
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+
+export const resendOtpSchema = z
+  .object({
+    email: z.string().trim().email('Invalid email address'),
   })
   .strict();
 
-export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+export type ResendOtpInput = z.infer<typeof resendOtpSchema>;
 
 export const forgotPasswordSchema = z
   .object({

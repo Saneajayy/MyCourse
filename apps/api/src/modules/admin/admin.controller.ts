@@ -798,7 +798,7 @@ export class AdminController {
       }
 
       const businessProfile = settingsMap['business_profile'] || {
-        businessName: 'Hydraulic Engineering Academy',
+        businessName: 'Hydro Basics',
         businessAddress: '123 Industrial Area, Phase 2, New Delhi, India',
         supportEmail: 'support@hydrauliccourse.com',
       };

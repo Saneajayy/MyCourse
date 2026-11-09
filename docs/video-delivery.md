@@ -1,6 +1,6 @@
 # Video Delivery & Streaming Architecture: Phase 5 Decisions
 
-This document outlines the security architecture, player decision matrix, session management, and access revocation strategies for video delivery in the Hydraulic Engineering Academy platform.
+This document outlines the security architecture, player decision matrix, session management, and access revocation strategies for video delivery in the Hydro Basics platform.
 
 ---
 

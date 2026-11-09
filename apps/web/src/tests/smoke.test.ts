@@ -1,9 +1,17 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+vi.mock('next/font/google', () => ({
+  Inclusive_Sans: () => ({ variable: '--font-inclusive' }),
+}));
+vi.mock('next/font/local', () => ({
+  default: () => ({ className: 'font-reddit', variable: '--font-reddit' }),
+}));
+
 import { metadata } from '../app/layout.js';
 
 describe('Web Application Baseline Tests', () => {
   it('Configures SEO metadata for course landing page', () => {
-    expect(metadata.title).toContain('Hydraulic Engineering Academy');
+    expect(metadata.title).toContain('Hydro Basics');
     expect(metadata.description).toContain('hydraulic systems');
   });
 

@@ -214,7 +214,7 @@ All transactional emails follow strict engineering guidelines:
   - Accent / Action Button Fill: Course Orange `#E05305`
   - Text on Buttons: Dark Blue `#0A192F` (ensures >7:1 AAA contrast)
   - Text on White: Dark Blue `#0A192F` or Slate `#64748B` (Orange is **never** used as thin text on white)
-- **Zero Remote Image Blockers:** Header uses a bold CSS-styled text wordmark (`HYDRAULIC ENGINEERING ACADEMY`) instead of remote images. The email is 100% readable even with images disabled by default.
+- **Zero Remote Image Blockers:** Header uses a bold CSS-styled text wordmark (`HYDRO BASICS`) instead of remote images. The email is 100% readable even with images disabled by default.
 - **Touch Target Size:** Action buttons are rendered in full table cells with minimum height of 44px and generous horizontal padding (28px).
 - **Placeholder Leak Prevention:** The build and template generators execute `assertNoTodoMarkers()`, throwing a fatal error if any `[TODO_REPLACE` or unpopulated variable remains.
 

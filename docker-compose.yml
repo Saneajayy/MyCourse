@@ -65,7 +65,7 @@ services:
       EMAIL_PROVIDER: console
       EMAIL_API_KEY: placeholder_email_api_key
       EMAIL_FROM: support@hydrauliccourse.com
-      BUSINESS_NAME: Hydraulic Engineering Academy
+      BUSINESS_NAME: Hydro Basics
       BUSINESS_ADDRESS: 123 Industrial Area, Phase 2, New Delhi, India
       GSTIN: ''
       GST_RATE_PERCENT: 0

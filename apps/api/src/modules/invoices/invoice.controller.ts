@@ -5,7 +5,6 @@ import { fileURLToPath } from 'url';
 import { prisma } from '../../common/db/prisma.js';
 import { ForbiddenError, NotFoundError } from '../../common/errors/app-error.js';
 import { invoiceService } from './invoice.service.js';
-import { logger } from '../../common/logger/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -68,25 +67,21 @@ export class InvoiceController {
       const safeFileName = `invoice-${invoice.invoiceNumber.replace(/[\/\\]/g, '_')}.pdf`;
       const filePath = path.join(INVOICES_DIR, safeFileName);
 
-      // On-demand regeneration if pdfUrl is missing or file is gone from disk (A2)
-      if (!invoice.pdfUrl || !fs.existsSync(filePath)) {
-        logger.info(
-          { invoiceId: invoice.id, invoiceNumber: invoice.invoiceNumber },
-          'Invoice PDF missing on disk or pdfUrl null; regenerating on demand',
-        );
-        const businessSetting = await prisma.appSetting.findUnique({
-          where: { key: 'business_profile' },
-        });
-        const taxSetting = await prisma.appSetting.findUnique({ where: { key: 'tax_config' } });
+      const businessSetting = await prisma.appSetting.findUnique({
+        where: { key: 'business_profile' },
+      });
+      const taxSetting = await prisma.appSetting.findUnique({ where: { key: 'tax_config' } });
 
-        const pdfUrl = await invoiceService.generateInvoicePdf(
-          invoice.id,
-          invoice.invoiceNumber,
-          invoice.order,
-          (businessSetting?.value as any) || {},
-          (taxSetting?.value as any) || {},
-        );
+      // Always generate PDF fresh with current business profile and tax configuration
+      const pdfUrl = await invoiceService.generateInvoicePdf(
+        invoice.id,
+        invoice.invoiceNumber,
+        invoice.order,
+        (businessSetting?.value as any) || {},
+        (taxSetting?.value as any) || {},
+      );
 
+      if (invoice.pdfUrl !== pdfUrl) {
         await prisma.invoice.update({
           where: { id: invoice.id },
           data: { pdfUrl },

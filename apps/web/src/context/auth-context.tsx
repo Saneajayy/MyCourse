@@ -31,6 +31,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<LoginResult>;
   verify2FA: (tempToken: string, code: string) => Promise<void>;
   register: (name: string, email: string, password: string, phone?: string) => Promise<void>;
+  setSession: (user: User, accessToken: string) => void;
   logout: () => Promise<void>;
   refreshUser: () => Promise<User | null>;
 }
@@ -139,6 +140,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(res.user);
   };
 
+  const setSession = useCallback((newUser: User, accessToken: string) => {
+    setAccessToken(accessToken);
+    setUser(newUser);
+  }, []);
+
   const logout = async (): Promise<void> => {
     try {
       await apiClient('/auth/logout', {
@@ -168,6 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         verify2FA,
         register,
+        setSession,
         logout,
         refreshUser,
       }}

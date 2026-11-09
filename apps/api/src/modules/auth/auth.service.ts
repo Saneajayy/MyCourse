@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { prisma } from '../../common/db/prisma.js';
 import { uuidv7 } from 'uuidv7';
 import { generateSecret, generateURI, verify as verifyTOTP } from 'otplib';
@@ -71,6 +72,12 @@ function sanitizeUser(user: {
     emailVerifiedAt: user.emailVerifiedAt,
     twoFactorEnabled: user.twoFactorEnabled,
   };
+}
+
+function generateNumericOtp(digits = 6): string {
+  const min = Math.pow(10, digits - 1);
+  const max = Math.pow(10, digits);
+  return crypto.randomInt(min, max).toString();
 }
 
 export class AuthService {
@@ -171,9 +178,9 @@ export class AuthService {
     const passwordHash = await hashPassword(input.password);
     const userId = uuidv7();
 
-    const rawVerificationToken = generateRandomToken(32);
-    const verificationTokenHash = hashToken(rawVerificationToken);
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    const rawVerificationToken = generateNumericOtp(6);
+    const verificationTokenHash = hashToken(`${normalizedEmail}:${rawVerificationToken}`);
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes for OTP
 
     const user = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
@@ -200,7 +207,7 @@ export class AuthService {
       return newUser;
     });
 
-    // Send verification email via transactional queue
+    // Send verification email via transactional queue with OTP
     await emailService.sendVerificationEmail(user.email, user.name, rawVerificationToken);
 
     await auditService.log({
@@ -220,21 +227,82 @@ export class AuthService {
   }
 
   /**
-   * Verify email address using a single-use expiring token
+   * Verify email address using a 6-digit OTP or single-use verification token
    */
   public async verifyEmail(
-    token: string,
+    input: { token?: string; otp?: string; email?: string } | string,
     ip?: string,
     userAgent?: string,
-  ): Promise<{ success: true; message: string }> {
-    const tokenHash = hashToken(token);
+  ): Promise<{
+    success: true;
+    message: string;
+    user?: ReturnType<typeof sanitizeUser>;
+    accessToken?: string;
+    refreshToken?: string;
+    defaultRedirect?: string;
+  }> {
+    const rawCode = typeof input === 'string' ? input : (input.otp || input.token || '');
+    const code = rawCode.trim();
+    if (!code) {
+      throw new BadRequestError('Verification code is required');
+    }
 
-    const tokenRecord = await prisma.emailVerificationToken.findUnique({
-      where: { tokenHash },
-      include: { user: true },
-    });
+    const email = typeof input === 'object' ? input.email?.trim().toLowerCase() : undefined;
+    const clientIp = ip || '127.0.0.1';
+
+    if (email) {
+      await lockoutService.checkLockout(email, clientIp);
+    }
+
+    let tokenRecord = null;
+
+    // 1. Try finding by email-salted hash
+    if (email) {
+      tokenRecord = await prisma.emailVerificationToken.findUnique({
+        where: { tokenHash: hashToken(`${email}:${code}`) },
+        include: { user: true },
+      });
+    }
+
+    // 2. Try direct tokenHash (legacy tokens or direct token tests)
+    if (!tokenRecord) {
+      tokenRecord = await prisma.emailVerificationToken.findUnique({
+        where: { tokenHash: hashToken(code) },
+        include: { user: true },
+      });
+    }
+
+    // 3. Fallback: If email provided, check user's active tokens
+    if (!tokenRecord && email) {
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (user) {
+        const activeTokens = await prisma.emailVerificationToken.findMany({
+          where: {
+            userId: user.id,
+            usedAt: null,
+            expiresAt: { gt: new Date() },
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 3,
+          include: { user: true },
+        });
+
+        for (const t of activeTokens) {
+          if (
+            t.tokenHash === hashToken(code) ||
+            t.tokenHash === hashToken(`${email}:${code}`)
+          ) {
+            tokenRecord = t;
+            break;
+          }
+        }
+      }
+    }
 
     if (!tokenRecord || tokenRecord.usedAt !== null || tokenRecord.expiresAt < new Date()) {
+      if (email) {
+        await lockoutService.recordFailedAttempt(email, clientIp);
+      }
       throw new BadRequestError('Verification link is invalid or has expired');
     }
 
@@ -250,6 +318,10 @@ export class AuthService {
       });
     });
 
+    if (email) {
+      await lockoutService.clearFailedAttempts(email, clientIp);
+    }
+
     await auditService.log({
       actorUserId: tokenRecord.userId,
       action: AuditAction.EMAIL_VERIFIED,
@@ -259,9 +331,51 @@ export class AuthService {
       userAgent,
     });
 
+    const user = await prisma.user.findUnique({
+      where: { id: tokenRecord.userId },
+    });
+    if (!user) {
+      throw new BadRequestError('User account not found');
+    }
+
+    // Auto-login: create session and issue tokens immediately
+    const { accessToken, refreshToken } = await this.createSession(
+      user,
+      ip || '127.0.0.1',
+      userAgent || 'unknown',
+    );
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    });
+
+    await auditService.log({
+      actorUserId: user.id,
+      action: AuditAction.USER_LOGIN,
+      entityType: 'User',
+      entityId: user.id,
+      ipAddress: ip,
+      userAgent,
+    });
+
+    // Check if user already has an active entitlement to decide default redirect
+    const activeEntitlementsCount = await prisma.entitlement.count({
+      where: {
+        userId: user.id,
+        status: 'ACTIVE',
+      },
+    });
+
+    const defaultRedirect = activeEntitlementsCount > 0 ? '/my-courses' : '/checkout';
+
     return {
       success: true,
-      message: 'Email address verified successfully. You may now log in.',
+      message: 'Email address verified successfully.',
+      user: sanitizeUser(user),
+      accessToken,
+      refreshToken,
+      defaultRedirect,
     };
   }
 
@@ -1045,12 +1159,19 @@ export class AuthService {
       where: { email: user.email.toLowerCase() },
     });
     if (isSuppressed) {
-      return { message: 'A new verification link has been sent to your email.' };
+      return { message: 'A new verification code has been sent to your email.' };
     }
 
-    const rawVerificationToken = generateRandomToken(32);
-    const verificationTokenHash = hashToken(rawVerificationToken);
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    const rawOtp = generateNumericOtp(6);
+    const normalizedEmail = user.email.toLowerCase();
+    const verificationTokenHash = hashToken(`${normalizedEmail}:${rawOtp}`);
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    // Invalidate previous unused tokens for this user
+    await prisma.emailVerificationToken.updateMany({
+      where: { userId: user.id, usedAt: null },
+      data: { usedAt: new Date() },
+    });
 
     await prisma.emailVerificationToken.create({
       data: {
@@ -1061,9 +1182,58 @@ export class AuthService {
       },
     });
 
-    await emailService.sendVerificationEmail(user.email, user.name, rawVerificationToken, user.id);
+    await emailService.sendVerificationEmail(user.email, user.name, rawOtp, user.id);
 
     return { message: 'A new verification link has been sent to your email.' };
+  }
+
+  /**
+   * Public (unauthenticated) endpoint for resending OTP by email
+   */
+  public async resendOtp(email: string, ip?: string): Promise<{ message: string }> {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Rate-limit resend verification per email, per IP
+    await assertEmailRateLimit(normalizedEmail, ip || '127.0.0.1', 'resend_verification');
+
+    const user = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    // Zero-enumeration: return standard message whether user exists or not
+    if (!user || user.emailVerifiedAt) {
+      return { message: 'If an account exists, a new verification code has been sent.' };
+    }
+
+    const isSuppressed = await prisma.emailSuppression.findUnique({
+      where: { email: normalizedEmail },
+    });
+    if (isSuppressed) {
+      return { message: 'If an account exists, a new verification code has been sent.' };
+    }
+
+    const rawOtp = generateNumericOtp(6);
+    const verificationTokenHash = hashToken(`${normalizedEmail}:${rawOtp}`);
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    // Invalidate previous unused tokens for this user
+    await prisma.emailVerificationToken.updateMany({
+      where: { userId: user.id, usedAt: null },
+      data: { usedAt: new Date() },
+    });
+
+    await prisma.emailVerificationToken.create({
+      data: {
+        id: uuidv7(),
+        userId: user.id,
+        tokenHash: verificationTokenHash,
+        expiresAt,
+      },
+    });
+
+    await emailService.sendVerificationEmail(user.email, user.name, rawOtp, user.id);
+
+    return { message: 'If an account exists, a new verification code has been sent.' };
   }
 }
 

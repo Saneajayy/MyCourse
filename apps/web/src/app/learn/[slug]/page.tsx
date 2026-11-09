@@ -16,14 +16,12 @@ import {
   Maximize,
   Minimize,
   Settings,
+  ChevronDown,
   ChevronRight,
-  CheckCircle2,
-  Circle,
+  Check,
   AlertTriangle,
   RotateCcw,
   SkipForward,
-  Menu,
-  X,
   Loader2,
   Lock,
 } from 'lucide-react';
@@ -70,10 +68,10 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
   // Curriculum State
   const [sections, setSections] = useState<SectionProgressItem[]>([]);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [curriculumLoading, setCurriculumLoading] = useState(true);
   const [curriculumError, setCurriculumError] = useState<string | null>(null);
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Video & Stream State
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -123,6 +121,16 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       const data = await apiClient<SectionProgressItem[]>(`/courses/${slug}/progress`);
       setSections(data);
 
+      // Initialize all sections as expanded by default
+      setExpandedSections((prev) => {
+        if (Object.keys(prev).length > 0) return prev;
+        const initial: Record<string, boolean> = {};
+        data.forEach((s) => {
+          initial[s.sectionId] = true;
+        });
+        return initial;
+      });
+
       // Select first lesson or first uncompleted lesson if none selected
       if (!selectedLessonId && data.length > 0) {
         let candidateId: string | null = null;
@@ -141,6 +149,10 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         }
       }
     } catch (err: unknown) {
+      if (err instanceof ApiError && err.status === 401) {
+        router.push(`/login?redirect=/learn/${slug}&message=session-expired`);
+        return;
+      }
       if (err instanceof ApiError && err.status === 403) {
         setCurriculumError('You do not have an active enrollment for this course.');
       } else {
@@ -149,7 +161,29 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     } finally {
       setCurriculumLoading(false);
     }
-  }, [slug, selectedLessonId]);
+  }, [slug, selectedLessonId, router]);
+
+  // Ensure the section containing the active lesson is always expanded
+  useEffect(() => {
+    if (!selectedLessonId || sections.length === 0) return;
+    const currentSection = sections.find((s) =>
+      s.lessons.some((l) => l.lessonId === selectedLessonId)
+    );
+    if (currentSection && !expandedSections[currentSection.sectionId]) {
+      setExpandedSections((prev) => ({
+        ...prev,
+        [currentSection.sectionId]: true,
+      }));
+    }
+  }, [selectedLessonId, sections]);
+
+  // Accordion toggle helpers
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [sectionId]: !prev[sectionId],
+    }));
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -439,9 +473,10 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
   if (authLoading || curriculumLoading) {
     return (
-      <div className="py-24 text-center space-y-3">
-        <Loader2 className="w-8 h-8 animate-spin mx-auto text-course-orange" />
-        <p className="text-xs uppercase font-mono tracking-widest text-course-darkBlue">
+      <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-hidden flex flex-col justify-center items-center space-y-4">
+        <div className="noise-texture" aria-hidden="true" />
+        <Loader2 className="w-10 h-10 animate-spin text-white" />
+        <p className="text-sm font-semibold tracking-wider uppercase text-white/80">
           Loading Classroom &amp; Video Streams...
         </p>
       </div>
@@ -450,16 +485,22 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
   if (curriculumError) {
     return (
-      <div className="max-w-md mx-auto px-4 py-20 text-center space-y-4">
-        <div className="w-12 h-12 bg-rose-50 text-rose-700 inline-flex items-center justify-center border border-rose-800">
-          <Lock className="w-6 h-6 text-rose-700" />
-        </div>
-        <h1 className="text-2xl font-black text-course-darkBlue">Access Restricted</h1>
-        <p className="text-xs text-course-navyMuted leading-relaxed">{curriculumError}</p>
-        <div className="pt-2">
-          <Link href="/#pricing" className="btn-primary text-xs uppercase tracking-wide">
-            Enroll to Unlock Access
-          </Link>
+      <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-hidden flex flex-col justify-center items-center p-4">
+        <div className="noise-texture" aria-hidden="true" />
+        <div className="max-w-md w-full bg-white p-8 rounded-none border border-neutral-300 shadow-none text-neutral-900 space-y-4 text-center">
+          <div className="w-12 h-12 bg-rose-50 text-rose-600 inline-flex items-center justify-center border border-rose-200 mx-auto rounded-none">
+            <Lock className="w-6 h-6 text-rose-600" />
+          </div>
+          <h1 className="text-2xl font-black text-black">Access Restricted</h1>
+          <p className="text-xs text-neutral-600 leading-relaxed">{curriculumError}</p>
+          <div className="pt-2">
+            <Link
+              href="/#pricing"
+              className="inline-flex items-center justify-center h-11 px-6 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs uppercase tracking-wider rounded-none transition-all"
+            >
+              Enroll to Unlock Access
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -471,374 +512,471 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     'Video Lesson';
 
   return (
-    <div className="flex flex-col flex-1 bg-course-white">
-      {/* Top Banner Bar */}
-      <div className="border-b border-black bg-course-bg px-4 py-2.5 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+    <div className="fixed inset-0 z-20 flex flex-col bg-[#0033FF] overflow-hidden font-reddit select-none text-white">
+      {/* Top Header Bar: Glassy navbar matching home page (figma-glass-nav) */}
+      <header className="h-16 md:h-20 w-full figma-glass-nav px-6 sm:px-8 flex items-stretch justify-between shrink-0 z-30 select-none">
+        {/* Left: HYDRO BASICS Logo */}
+        <div className="flex items-center gap-6 sm:gap-8">
           <Link
-            href="/my-courses"
-            className="text-xs font-bold text-course-darkBlue hover:text-course-orange uppercase tracking-wider flex items-center gap-1"
+            href="/"
+            className="flex flex-col justify-center -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity shrink-0"
+            aria-label="HYDRO BASICS Home"
           >
-            ← My Courses
+            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+              BASICS
+            </span>
           </Link>
-          <span className="text-black/30">|</span>
-          <span className="text-xs font-bold text-course-darkBlue truncate max-w-xs md:max-w-md">
-            {currentLessonTitle}
-          </span>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="text-xs font-bold uppercase tracking-wider border border-black px-2.5 py-1 bg-course-white text-course-darkBlue hover:bg-course-orangeSubtle md:hidden flex items-center gap-1"
-        >
-          {isSidebarOpen ? <X className="w-3.5 h-3.5" /> : <Menu className="w-3.5 h-3.5" />}
-          <span>Curriculum</span>
-        </button>
-      </div>
-
-      {/* Main Classroom Workspace */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-        {/* Left: Video Player Workspace */}
-        <div className="flex-1 flex flex-col p-4 md:p-6 bg-course-white overflow-y-auto">
-          {/* Player Container (Supports Custom Page-Level Fullscreen) */}
-          <div
-            ref={containerRef}
-            className={`relative bg-black border-2 border-black overflow-hidden select-none ${
-              isFullscreen
-                ? 'fixed inset-0 z-50 w-screen h-screen flex flex-col justify-center bg-black'
-                : 'w-full aspect-video'
-            }`}
+        {/* Right: Glassy Actions with Full-Height Vertical Dividers */}
+        <div className="flex items-stretch">
+          <Link
+            href="/my-courses"
+            className="figma-glass-divider border-r border-white/20 h-full flex items-center justify-center px-4 sm:px-6 text-white/90 hover:text-white hover:bg-white/10 transition-colors font-semibold text-xs sm:text-sm uppercase tracking-wider"
           >
-            {/* Loading Overlay */}
-            {streamLoading && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white z-10 space-y-2">
-                <Loader2 className="w-8 h-8 animate-spin text-course-orange" />
-                <span className="text-xs font-mono tracking-widest uppercase">
-                  Securing Stream Ticket...
-                </span>
-              </div>
-            )}
+            <span>← My Courses</span>
+          </Link>
+        </div>
+      </header>
 
-            {/* Error Overlay */}
-            {streamError && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 text-white p-6 z-20 text-center space-y-3">
-                <AlertTriangle className="w-10 h-10 text-rose-500" />
-                <p className="text-sm font-bold text-rose-200">{streamError}</p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="bg-white text-black"
-                  onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
-                >
-                  <RotateCcw className="w-4 h-4 mr-1.5" />
-                  Retry Playback
-                </Button>
-              </div>
-            )}
+      {/* Main Split Layout: On mobile, flows vertically with video sticky on top -> details -> modules */}
+      <div className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden min-h-0 bg-[#0033FF]">
+        {/* SYLLABUS & MODULES: On mobile: order-2 (placed below video & details). On desktop: order-1 (left column) */}
+        <aside
+          className="order-2 md:order-1 w-full md:w-80 lg:w-[340px] xl:w-[380px] md:h-full border-t md:border-t-0 md:border-r border-white/20 bg-[#0033FF] flex flex-col shrink-0 md:overflow-hidden"
+        >
+          {/* Actual Course Name Header Cell (Aligned to left side, NO 'COURSE NAME' text, NO plus icon) */}
+          <div className="border-b border-white/20 py-4 px-5 bg-[#0033FF] text-left shrink-0">
+            <span className="text-[10px] font-mono tracking-widest text-white/70 uppercase block mb-1">
+              Course Curriculum
+            </span>
+            <h2 className="font-bold text-sm sm:text-base text-white">
+              Hydraulic System Basics
+            </h2>
+          </div>
 
-            {/* Session Eviction Overlay: Another Device Took Over */}
-            {isEvicted && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 text-white p-6 z-30 text-center space-y-4">
-                <div className="w-12 h-12 bg-amber-500/20 text-amber-400 inline-flex items-center justify-center border border-amber-500">
-                  <AlertTriangle className="w-6 h-6 text-amber-400" />
-                </div>
-                <div className="max-w-md space-y-1">
-                  <h3 className="text-lg font-black text-amber-300">
-                    You started watching on another device
-                  </h3>
-                  <p className="text-xs text-gray-300 leading-relaxed">
-                    Your streaming session was paused because playback was initiated on another
-                    browser or device.
-                  </p>
-                </div>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
-                >
-                  Resume Watching Here
-                </Button>
-              </div>
-            )}
+          {/* Scrollable Modules List (Independent Scroll on desktop) */}
+          <div className="flex-1 md:overflow-y-auto bg-[#0033FF]">
+            {sections.map((section, sIdx) => {
+              const isExpanded = expandedSections[section.sectionId] ?? true;
+              const completedCount = section.lessons.filter((l) => l.isCompleted).length;
+              const isModuleCompleted =
+                section.lessons.length > 0 && completedCount === section.lessons.length;
 
-            {/* HTML5 Video Element */}
-            <video
-              ref={videoRef}
-              playsInline
-              className="w-full h-full object-contain"
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              onTimeUpdate={() => {
-                if (videoRef.current) {
-                  setCurrentTime(videoRef.current.currentTime);
-                  setDuration(videoRef.current.duration || 0);
-                }
-              }}
-              onEnded={() => {
-                setIsPlaying(false);
-                fetchCurriculum(); // Refresh progress ticks
-              }}
-              onClick={togglePlay}
-            />
-
-            {/* Moving Anti-Piracy Watermark Overlay (Pointer-events none) */}
-            <div
-              className="absolute pointer-events-none transition-all duration-1000 ease-in-out font-mono font-bold text-xs uppercase px-2.5 py-1 bg-black/60 text-white/70 border border-white/20 select-none"
-              style={{ top: watermarkPos.top, left: watermarkPos.left }}
-              aria-hidden="true"
-            >
-              {user?.email || siteConfig.brandName}
-            </div>
-
-            {/* Custom Video Control Bar */}
-            <div className="absolute bottom-0 inset-x-0 bg-black/90 p-2 md:p-3 flex flex-col gap-2 text-white border-t border-black/40">
-              {/* Scrubbing timeline slider */}
-              <input
-                type="range"
-                min={0}
-                max={duration || 100}
-                value={currentTime}
-                onChange={handleSeek}
-                aria-label="Video seek slider"
-                className="w-full h-1.5 bg-gray-700 accent-course-orange cursor-pointer"
-              />
-
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 md:gap-3">
+              return (
+                <div key={section.sectionId} className="bg-[#0033FF]">
+                  {/* MODULE HEADER: border-b border-white/20 (thin line, normal capitalization, font-bold) */}
                   <button
                     type="button"
-                    onClick={togglePlay}
-                    aria-label={isPlaying ? 'Pause video (Space)' : 'Play video (Space)'}
-                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-course-orange"
+                    onClick={() => toggleSection(section.sectionId)}
+                    className="w-full py-3.5 px-5 border-b border-white/20 text-white flex items-center justify-between hover:bg-white/10 transition-colors cursor-pointer select-none bg-[#0033FF] text-left"
+                    aria-expanded={isExpanded}
                   >
-                    {isPlaying ? (
-                      <Pause className="w-5 h-5" />
-                    ) : (
-                      <Play className="w-5 h-5 fill-current" />
-                    )}
+                    <div className="min-w-0 pr-3">
+                      <span className="block font-bold text-xs sm:text-sm">
+                        Module {sIdx + 1}
+                      </span>
+                      {section.title && (
+                        <span className="block text-xs text-white/80 font-normal mt-0.5 truncate">
+                          {section.title.replace(/^Module\s*\d+\s*:\s*/i, '')}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2.5 shrink-0 text-white/80">
+                      {isModuleCompleted ? (
+                        <div
+                          className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0"
+                          title="Module Completed"
+                        >
+                          <Check className="w-3.5 h-3.5 text-[#0033FF] stroke-[3]" />
+                        </div>
+                      ) : (
+                        <span className="text-[10px] font-mono">
+                          {completedCount}/{section.lessons.length}
+                        </span>
+                      )}
+                      {isExpanded ? (
+                        <ChevronDown className="w-4 h-4 text-white" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-white" />
+                      )}
+                    </div>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={toggleMute}
-                    aria-label={isMuted ? 'Unmute (M)' : 'Mute (M)'}
-                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-course-orange"
-                  >
-                    {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-                  </button>
+                  {/* LESSONS: Each separated by a thin white horizontal divider line, video titles 1 step less bold than module */}
+                  {isExpanded && (
+                    <div className="bg-[#0033FF]">
+                      {section.lessons.map((lesson, lIdx) => {
+                        const isCurrent = lesson.lessonId === selectedLessonId;
+                        return (
+                          <button
+                            key={lesson.lessonId}
+                            type="button"
+                            onClick={() => setSelectedLessonId(lesson.lessonId)}
+                            className={`w-full py-3 px-5 border-b border-white/15 text-left flex items-center gap-3 transition-colors cursor-pointer ${
+                              isCurrent
+                                ? 'bg-white text-[#0033FF]'
+                                : 'text-white hover:bg-white/10'
+                            }`}
+                          >
+                            <div className="shrink-0 flex items-center justify-center w-5">
+                              {lesson.isCompleted ? (
+                                <div
+                                  className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                                    isCurrent ? 'bg-[#0033FF]' : 'bg-white'
+                                  }`}
+                                  title="Completed"
+                                >
+                                  <Check
+                                    className={`w-2.5 h-2.5 stroke-[3] ${
+                                      isCurrent ? 'text-white' : 'text-[#0033FF]'
+                                    }`}
+                                  />
+                                </div>
+                              ) : isCurrent ? (
+                                <span className="text-xs font-black text-[#0033FF]">▶</span>
+                              ) : (
+                                <span className="text-[10px] font-mono text-white/60">
+                                  {String(lIdx + 1).padStart(2, '0')}
+                                </span>
+                              )}
+                            </div>
 
-                  {/* Volume Slider */}
+                            <div className="min-w-0 flex-1">
+                              <div
+                                className={`text-xs sm:text-[13px] leading-snug truncate ${
+                                  isCurrent ? 'font-semibold text-[#0033FF]' : 'font-medium text-white/90'
+                                }`}
+                              >
+                                {lesson.title}
+                              </div>
+                            </div>
+
+                            <div
+                              className={`text-[10px] font-mono shrink-0 ${
+                                isCurrent ? 'text-[#0033FF]/80 font-bold' : 'text-white/60'
+                              }`}
+                            >
+                              {Math.floor(lesson.durationSeconds / 60)}m
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </aside>
+
+        {/* MAIN VIDEO & DETAILS AREA: On mobile: order-1 (sits at the top). On desktop: order-2 (right column) */}
+        <main className="order-1 md:order-2 flex-1 flex flex-col md:h-full md:overflow-y-auto bg-[#0033FF] min-w-0 shrink-0">
+          <div className="w-full flex-1 flex flex-col">
+            {/* Black Video Player Frame (Sticky on mobile) */}
+            <div className="w-full bg-black shrink-0 relative flex items-center justify-center border-b border-white/20 sticky top-0 z-20">
+              <div
+                ref={containerRef}
+                className={`relative bg-black w-full select-none ${
+                  isFullscreen
+                    ? 'fixed inset-0 z-50 w-screen h-screen flex flex-col justify-center bg-black'
+                    : 'aspect-video max-h-[68vh] mx-auto'
+                }`}
+              >
+                {/* Loading Overlay */}
+                {streamLoading && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white z-10 space-y-2">
+                    <Loader2 className="w-8 h-8 animate-spin text-[#0033FF]" />
+                    <span className="text-xs font-mono tracking-widest uppercase">
+                      Securing Stream Ticket...
+                    </span>
+                  </div>
+                )}
+
+                {/* Error Overlay */}
+                {streamError && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 text-white p-6 z-20 text-center space-y-3">
+                    <AlertTriangle className="w-10 h-10 text-rose-500" />
+                    <p className="text-sm font-bold text-rose-200">{streamError}</p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-white text-black rounded-none border border-black"
+                      onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
+                    >
+                      <RotateCcw className="w-4 h-4 mr-1.5" />
+                      Retry Playback
+                    </Button>
+                  </div>
+                )}
+
+                {/* Session Eviction Overlay: Another Device Took Over */}
+                {isEvicted && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 text-white p-6 z-30 text-center space-y-4">
+                    <div className="w-12 h-12 bg-amber-500/20 text-amber-400 inline-flex items-center justify-center border border-amber-500 rounded-none">
+                      <AlertTriangle className="w-6 h-6 text-amber-400" />
+                    </div>
+                    <div className="max-w-md space-y-1">
+                      <h3 className="text-lg font-black text-amber-300">
+                        You started watching on another device
+                      </h3>
+                      <p className="text-xs text-gray-300 leading-relaxed">
+                        Your streaming session was paused because playback was initiated on another
+                        browser or device.
+                      </p>
+                    </div>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="bg-[#0033FF] hover:bg-[#0028D6] text-white rounded-none"
+                      onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
+                    >
+                      Resume Watching Here
+                    </Button>
+                  </div>
+                )}
+
+                {/* HTML5 Video Element */}
+                <video
+                  ref={videoRef}
+                  playsInline
+                  className="w-full h-full object-contain"
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  onTimeUpdate={() => {
+                    if (videoRef.current) {
+                      setCurrentTime(videoRef.current.currentTime);
+                      setDuration(videoRef.current.duration || 0);
+                    }
+                  }}
+                  onEnded={() => {
+                    setIsPlaying(false);
+                    if (selectedLessonId) {
+                      setSections((prev) =>
+                        prev.map((sec) => ({
+                          ...sec,
+                          lessons: sec.lessons.map((l) =>
+                            l.lessonId === selectedLessonId ? { ...l, isCompleted: true } : l
+                          ),
+                        }))
+                      );
+                      if (playbackData) {
+                        apiClient(`/lessons/${selectedLessonId}/heartbeat`, {
+                          method: 'POST',
+                          body: JSON.stringify({
+                            sessionId: playbackData.sessionId,
+                            positionSeconds: Math.floor(duration || playbackData.durationSeconds),
+                            durationSeconds: Math.floor(duration || playbackData.durationSeconds),
+                            watchedSeconds: Math.floor(duration || playbackData.durationSeconds),
+                            isPlaying: false,
+                            state: 'completed',
+                          }),
+                        }).catch(() => {});
+                      }
+                      fetchCurriculum();
+                    }
+                  }}
+                  onClick={togglePlay}
+                />
+
+                {/* Moving Anti-Piracy Watermark: Greyed-out text, no box */}
+                <div
+                  className="absolute pointer-events-none transition-all duration-1000 ease-in-out font-mono text-xs uppercase text-white/30 select-none"
+                  style={{ top: watermarkPos.top, left: watermarkPos.left }}
+                  aria-hidden="true"
+                >
+                  {user?.email || siteConfig.brandName}
+                </div>
+
+                {/* Custom Video Control Bar */}
+                <div className="absolute bottom-0 inset-x-0 bg-black/90 p-2 md:p-3 flex flex-col gap-2 text-white border-t border-white/10">
+                  {/* Scrubbing timeline slider with Royal Blue accent */}
                   <input
                     type="range"
                     min={0}
-                    max={1}
-                    step={0.05}
-                    value={isMuted ? 0 : volume}
-                    onChange={handleVolumeChange}
-                    aria-label="Volume slider"
-                    className="w-16 md:w-20 h-1 bg-gray-700 accent-course-orange hidden sm:block"
+                    max={duration || 100}
+                    value={currentTime}
+                    onChange={handleSeek}
+                    aria-label="Video seek slider"
+                    className="w-full h-1.5 bg-white/20 accent-[#0033FF] cursor-pointer"
                   />
 
-                  <span className="text-xs font-mono">
-                    {formatTime(currentTime)} / {formatTime(duration)}
-                  </span>
-                </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <button
+                        type="button"
+                        onClick={togglePlay}
+                        aria-label={isPlaying ? 'Pause video (Space)' : 'Play video (Space)'}
+                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-[#0033FF] transition-colors cursor-pointer"
+                      >
+                        {isPlaying ? (
+                          <Pause className="w-5 h-5" />
+                        ) : (
+                          <Play className="w-5 h-5 fill-current" />
+                        )}
+                      </button>
 
-                <div className="flex items-center gap-2">
-                  {/* Settings Menu (Speed & Quality) */}
-                  <div className="relative">
-                    <button
-                      type="button"
-                      onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-                      aria-label="Player settings"
-                      className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center hover:text-course-orange"
-                    >
-                      <Settings className="w-5 h-5" />
-                    </button>
+                      <button
+                        type="button"
+                        onClick={toggleMute}
+                        aria-label={isMuted ? 'Unmute (M)' : 'Mute (M)'}
+                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-[#0033FF] transition-colors cursor-pointer"
+                      >
+                        {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                      </button>
 
-                    {showSettingsMenu && (
-                      <div className="absolute right-0 bottom-12 w-48 bg-course-white text-course-darkBlue border-2 border-black p-3 space-y-3 z-30 shadow-none text-xs">
-                        {/* Playback speed */}
-                        <div>
-                          <span className="font-bold uppercase tracking-wider block mb-1">
-                            Speed
-                          </span>
-                          <div className="grid grid-cols-3 gap-1">
-                            {[0.75, 1, 1.25, 1.5, 1.75, 2].map((s) => (
-                              <button
-                                key={s}
-                                type="button"
-                                onClick={() => handleSpeedChange(s)}
-                                className={`p-1 border border-black font-mono font-bold ${
-                                  playbackRate === s
-                                    ? 'bg-course-orange text-white'
-                                    : 'bg-white hover:bg-course-orangeSubtle'
-                                }`}
-                              >
-                                {s}x
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                      {/* Volume Slider with Royal Blue accent */}
+                      <input
+                        type="range"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={isMuted ? 0 : volume}
+                        onChange={handleVolumeChange}
+                        aria-label="Volume slider"
+                        className="w-16 md:w-20 h-1 bg-white/20 accent-[#0033FF] hidden sm:block"
+                      />
 
-                        {/* Quality selector */}
-                        {qualityLevels.length > 0 && (
-                          <div className="border-t border-black pt-2">
-                            <span className="font-bold uppercase tracking-wider block mb-1">
-                              Quality
-                            </span>
-                            <div className="space-y-1">
-                              <button
-                                type="button"
-                                onClick={() => handleQualityChange(-1)}
-                                className={`w-full text-left p-1 border border-black font-bold ${
-                                  currentQuality === -1
-                                    ? 'bg-course-orange text-white'
-                                    : 'bg-white hover:bg-course-orangeSubtle'
-                                }`}
-                              >
-                                Auto
-                              </button>
-                              {qualityLevels.map((lvl) => (
-                                <button
-                                  key={lvl.id}
-                                  type="button"
-                                  onClick={() => handleQualityChange(lvl.id)}
-                                  className={`w-full text-left p-1 border border-black font-bold ${
-                                    currentQuality === lvl.id
-                                      ? 'bg-course-orange text-white'
-                                      : 'bg-white hover:bg-course-orangeSubtle'
-                                  }`}
-                                >
-                                  {lvl.label}
-                                </button>
-                              ))}
+                      <span className="text-xs font-mono text-white/90">
+                        {formatTime(currentTime)} / {formatTime(duration)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {/* Settings Menu (Speed & Quality) */}
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+                          aria-label="Player settings"
+                          className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-[#0033FF] transition-colors cursor-pointer"
+                        >
+                          <Settings className="w-5 h-5" />
+                        </button>
+
+                        {showSettingsMenu && (
+                          <div className="absolute right-0 bottom-12 w-48 bg-white text-black border border-neutral-300 p-3 space-y-3 z-30 shadow-none rounded-none text-xs">
+                            {/* Playback speed */}
+                            <div>
+                              <span className="font-bold uppercase tracking-wider block mb-1 text-black">
+                                Speed
+                              </span>
+                              <div className="grid grid-cols-3 gap-1">
+                                {[0.75, 1, 1.25, 1.5, 1.75, 2].map((s) => (
+                                  <button
+                                    key={s}
+                                    type="button"
+                                    onClick={() => handleSpeedChange(s)}
+                                    className={`p-1 border border-neutral-300 font-mono font-bold rounded-none cursor-pointer ${
+                                      playbackRate === s
+                                        ? 'bg-[#0033FF] text-white border-[#0033FF]'
+                                        : 'bg-white hover:bg-neutral-100 text-black'
+                                    }`}
+                                  >
+                                    {s}x
+                                  </button>
+                                ))}
+                              </div>
                             </div>
+
+                            {/* Quality selector */}
+                            {qualityLevels.length > 0 && (
+                              <div className="border-t border-neutral-200 pt-2">
+                                <span className="font-bold uppercase tracking-wider block mb-1 text-black">
+                                  Quality
+                                </span>
+                                <div className="space-y-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQualityChange(-1)}
+                                    className={`w-full text-left p-1 border border-neutral-300 font-bold rounded-none cursor-pointer ${
+                                      currentQuality === -1
+                                        ? 'bg-[#0033FF] text-white border-[#0033FF]'
+                                        : 'bg-white hover:bg-neutral-100 text-black'
+                                    }`}
+                                  >
+                                    Auto
+                                  </button>
+                                  {qualityLevels.map((lvl) => (
+                                    <button
+                                      key={lvl.id}
+                                      type="button"
+                                      onClick={() => handleQualityChange(lvl.id)}
+                                      className={`w-full text-left p-1 border border-neutral-300 font-bold rounded-none cursor-pointer ${
+                                        currentQuality === lvl.id
+                                          ? 'bg-[#0033FF] text-white border-[#0033FF]'
+                                          : 'bg-white hover:bg-neutral-100 text-black'
+                                      }`}
+                                    >
+                                      {lvl.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
-                    )}
-                  </div>
 
-                  {/* Next Lesson Trigger */}
-                  <button
-                    type="button"
-                    onClick={handleNextLesson}
-                    aria-label="Next lesson"
-                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center hover:text-course-orange"
-                  >
-                    <SkipForward className="w-5 h-5" />
-                  </button>
-
-                  {/* Fullscreen Button */}
-                  <button
-                    type="button"
-                    onClick={toggleCustomFullscreen}
-                    aria-label={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
-                    className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center hover:text-course-orange"
-                  >
-                    {isFullscreen ? (
-                      <Minimize className="w-5 h-5" />
-                    ) : (
-                      <Maximize className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Lesson Metadata & Description */}
-          <div className="mt-6 border border-black p-6 bg-course-white">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-              <div>
-                <span className="text-xs font-mono font-bold text-course-orange uppercase tracking-wider">
-                  Industrial Lesson Stream
-                </span>
-                <h1 className="text-xl md:text-2xl font-black text-course-darkBlue tracking-tight mt-1">
-                  {currentLessonTitle}
-                </h1>
-              </div>
-
-              <Button variant="outline" size="sm" onClick={handleNextLesson}>
-                <span>Next Lesson</span>
-                <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
-            </div>
-
-            <p className="text-xs md:text-sm text-course-navyMuted leading-relaxed">
-              Keyboard shortcuts: Space / K (Play/Pause), Left/Right (Seek 5s), M (Mute), F
-              (Fullscreen).
-            </p>
-          </div>
-        </div>
-
-        {/* Right: Curriculum Sidebar */}
-        <aside
-          className={`w-full md:w-80 lg:w-96 border-t md:border-t-0 md:border-l border-black bg-course-white flex flex-col ${
-            isSidebarOpen ? 'block' : 'hidden md:block'
-          }`}
-        >
-          <div className="border-b border-black p-4 bg-course-bg">
-            <h2 className="font-extrabold text-sm uppercase tracking-wider text-course-darkBlue">
-              Course Curriculum
-            </h2>
-            <div className="text-[11px] font-mono text-course-navyMuted mt-0.5">
-              Click any lesson to switch stream
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto divide-y divide-black">
-            {sections.map((section) => (
-              <div key={section.sectionId} className="bg-course-white">
-                <div className="p-3 bg-course-orangeSubtle border-b border-black text-xs font-black uppercase tracking-wider text-course-darkBlue">
-                  {section.title}
-                </div>
-                <div className="divide-y divide-black/10">
-                  {section.lessons.map((lesson) => {
-                    const isCurrent = lesson.lessonId === selectedLessonId;
-                    return (
+                      {/* Next Lesson Trigger */}
                       <button
-                        key={lesson.lessonId}
                         type="button"
-                        onClick={() => setSelectedLessonId(lesson.lessonId)}
-                        className={`w-full p-3 text-left flex items-start gap-3 transition-colors ${
-                          isCurrent
-                            ? 'bg-course-darkBlue text-course-white'
-                            : 'hover:bg-course-orangeSubtle text-course-darkBlue'
-                        }`}
+                        onClick={handleNextLesson}
+                        aria-label="Next lesson"
+                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-[#0033FF] transition-colors cursor-pointer"
                       >
-                        <div className="mt-0.5 shrink-0">
-                          {lesson.isCompleted ? (
-                            <CheckCircle2
-                              className={`w-4 h-4 ${
-                                isCurrent ? 'text-course-orange' : 'text-emerald-700'
-                              }`}
-                            />
-                          ) : (
-                            <Circle className="w-4 h-4 text-black/30" />
-                          )}
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="text-xs font-bold leading-snug">{lesson.title}</div>
-                          <div
-                            className={`text-[10px] font-mono mt-1 ${
-                              isCurrent ? 'text-white/70' : 'text-course-navySubtle'
-                            }`}
-                          >
-                            {Math.floor(lesson.durationSeconds / 60)} mins
-                          </div>
-                        </div>
+                        <SkipForward className="w-5 h-5" />
                       </button>
-                    );
-                  })}
+
+                      {/* Fullscreen Button */}
+                      <button
+                        type="button"
+                        onClick={toggleCustomFullscreen}
+                        aria-label={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
+                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-[#0033FF] transition-colors cursor-pointer"
+                      >
+                        {isFullscreen ? (
+                          <Minimize className="w-5 h-5" />
+                        ) : (
+                          <Maximize className="w-5 h-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Lesson Title and Description on Royal Blue Background */}
+            <div className="p-6 md:p-8 lg:p-10 space-y-4 bg-[#0033FF] text-white">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <div>
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">
+                    {currentLessonTitle}
+                  </h1>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleNextLesson}
+                  className="inline-flex items-center justify-center h-10 px-5 bg-white hover:bg-neutral-100 text-[#0033FF] font-black text-xs uppercase tracking-wider rounded-none transition-all gap-2 cursor-pointer shrink-0 border border-white"
+                >
+                  <span>Next Lesson</span>
+                  <span className="text-xs">▶</span>
+                </button>
+              </div>
+
+              <div className="space-y-2 text-white/90 text-xs sm:text-sm leading-relaxed max-w-3xl">
+                <p>
+                  Fundamental principles of fluid power, hydraulic circuit behavior, and practical workplace concepts. Watch the stream above, use playback controls as needed, and proceed to the next lesson once completed.
+                </p>
+              </div>
+            </div>
           </div>
-        </aside>
+        </main>
       </div>
     </div>
   );

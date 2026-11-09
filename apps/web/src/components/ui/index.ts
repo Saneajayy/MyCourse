@@ -8,3 +8,6 @@ export * from './Toast';
 export * from './Skeleton';
 export * from './Accordion';
 export * from './ProgressBar';
+export * from './TiltCard';
+export * from './ScatterCanvas';
+export * from './ClaudeIcon';

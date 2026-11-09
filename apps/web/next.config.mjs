@@ -35,7 +35,7 @@ function buildContentSecurityPolicy() {
     scriptSrc.push("'unsafe-eval'");
   }
 
-  const styleSrc = ["'self'", "'unsafe-inline'"];
+  const styleSrc = ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'];
 
   // img-src restricted strictly to app, api, Bunny CDN, and Razorpay (no Unsplash, no wildcards)
   const imgSrc = [
@@ -52,7 +52,7 @@ function buildContentSecurityPolicy() {
     'https://*.mediadelivery.net',
   ];
 
-  const fontSrc = ["'self'", 'data:'];
+  const fontSrc = ["'self'", 'data:', 'https://fonts.gstatic.com'];
 
   const connectSrc = [
     "'self'",
@@ -187,6 +187,17 @@ const nextConfig = {
         : []),
     ],
   },
+  async rewrites() {
+    const backendUrl =
+      process.env.INTERNAL_API_URL || process.env.API_URL || 'http://localhost:4000';
+    return [
+      {
+        source: '/api/v1/:path*',
+        destination: `${backendUrl}/api/v1/:path*`,
+      },
+    ];
+  },
+  allowedDevOrigins: ['*.trycloudflare.com'],
   async headers() {
     return [
       {

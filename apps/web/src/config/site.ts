@@ -4,7 +4,7 @@
  * Entries marked with [TODO_REPLACE] must be filled in with real owner details prior to live launch.
  */
 export const siteConfig = {
-  brandName: process.env.NEXT_PUBLIC_BRAND_NAME || 'Hydraulic Engineering Academy',
+  brandName: process.env.NEXT_PUBLIC_BRAND_NAME || 'Hydro Basics',
   tagline:
     process.env.NEXT_PUBLIC_TAGLINE ||
     'Practical Industrial Hydraulic Engineering, Circuit Design & Plant Troubleshooting',
@@ -33,8 +33,8 @@ export const siteConfig = {
   // Logo configuration: Text wordmark for now, easy to swap for an image later
   logo: {
     type: 'text' as 'text' | 'image',
-    text: 'Hydraulic Engineering Academy',
-    shortWordmark: 'HEA',
+    text: 'Hydro Basics',
+    shortWordmark: 'HB',
     imageSrc: '/logo.png',
   },
 
@@ -51,8 +51,12 @@ export const siteConfig = {
   },
 
   urls: {
-    app: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
-    api: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
+    app:
+      process.env.NEXT_PUBLIC_APP_URL ||
+      (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'),
+    api:
+      process.env.NEXT_PUBLIC_API_URL ||
+      (typeof window !== 'undefined' ? '' : process.env.INTERNAL_API_URL || 'http://localhost:4000'),
   },
 
   razorpayKeyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_ToZGDbt27ZdYCc',

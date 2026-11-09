@@ -15,7 +15,9 @@
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:seed": "tsx prisma/seed.ts",
     "prisma:studio": "prisma studio",
-    "generate:email-previews": "tsx src/scripts/generate-email-previews.ts"
+    "generate:email-previews": "tsx src/scripts/generate-email-previews.ts",
+    "test:email": "tsx src/scripts/test-send-email.ts",
+    "db:clean": "tsx prisma/clean-reset-db.ts"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",

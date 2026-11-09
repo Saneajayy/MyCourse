@@ -2,13 +2,39 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '../context/auth-context';
 import { siteConfig } from '../config/site';
 import { Menu, X, User as UserIcon, BookOpen, LogOut } from 'lucide-react';
 
 export function Header() {
+  const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const isExcludedPage =
+    [
+      '/',
+      '/login',
+      '/signup',
+      '/register',
+      '/forgot-password',
+      '/reset-password',
+      '/verify-email',
+      '/checkout',
+      '/my-courses',
+      '/account',
+      '/contact',
+      '/terms',
+      '/privacy',
+      '/refunds',
+    ].includes(pathname) ||
+    pathname.startsWith('/order') ||
+    pathname.startsWith('/learn');
+
+  if (isExcludedPage) {
+    return null;
+  }
 
   return (
     <header className="border-b border-black bg-course-white sticky top-0 z-40">

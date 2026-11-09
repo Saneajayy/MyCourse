@@ -215,7 +215,7 @@ describe('Phase 4 Orders, Payments, Invoicing, and Entitlements Suite', () => {
         id: uuidv7(),
         key: 'business_profile',
         value: {
-          businessName: 'Hydraulic Engineering Academy',
+          businessName: 'Hydro Basics',
           businessAddress: '123 Industrial Area, Phase 2, New Delhi, India',
           supportEmail: 'support@hydrauliccourse.com',
         },

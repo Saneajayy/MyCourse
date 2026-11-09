@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from 'lucide-react';
 
 export type ToastType = 'info' | 'success' | 'error' | 'warning';
@@ -25,6 +26,8 @@ interface ToastContextValue {
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith('/admin');
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const removeToast = useCallback((id: string) => {
@@ -33,6 +36,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const showToast = useCallback(
     (type: ToastType, title: string, message?: string, duration = 5000) => {
+      // Toasts are strictly reserved for admin workflows; user interfaces use inline banners/states
+      if (!isAdmin) return;
+
       const id = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
       const newToast: Toast = { id, type, title, message, duration };
 
@@ -44,7 +50,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         }, duration);
       }
     },
-    [removeToast],
+    [isAdmin, removeToast],
   );
 
   const info = useCallback(
@@ -72,43 +78,62 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={contextValue}>
       {children}
-      <div
-        aria-live="polite"
-        className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"
-      >
-        {toasts.map((toast) => (
-          <ToastCard key={toast.id} toast={toast} onDismiss={() => removeToast(toast.id)} />
-        ))}
-      </div>
+      {isAdmin && toasts.length > 0 && (
+        <div
+          aria-live="polite"
+          className="fixed top-4 sm:top-5 right-0 sm:right-5 z-[9999] flex flex-col items-center sm:items-end gap-2.5 max-w-[380px] sm:max-w-[400px] w-full px-4 sm:px-0 pointer-events-none"
+        >
+          {toasts.map((toast) => (
+            <ToastCard key={toast.id} toast={toast} onDismiss={() => removeToast(toast.id)} />
+          ))}
+        </div>
+      )}
     </ToastContext.Provider>
   );
 }
 
 function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }) {
-  const icons = {
-    info: <Info className="w-5 h-5 text-course-darkBlue shrink-0" />,
-    success: <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0" />,
-    error: <AlertCircle className="w-5 h-5 text-rose-700 shrink-0" />,
-    warning: <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />,
+  const configs = {
+    info: {
+      badgeBg: 'bg-[#0033FF]/10 border-[#0033FF]/20 text-[#0033FF]',
+      borderAccent: 'border-l-[#0033FF]',
+      icon: <Info className="w-4 h-4 stroke-[2.5]" />,
+    },
+    success: {
+      badgeBg: 'bg-emerald-50 border-emerald-200/70 text-emerald-600',
+      borderAccent: 'border-l-emerald-500',
+      icon: <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />,
+    },
+    error: {
+      badgeBg: 'bg-rose-50 border-rose-200/70 text-rose-600',
+      borderAccent: 'border-l-rose-500',
+      icon: <AlertCircle className="w-4 h-4 stroke-[2.5]" />,
+    },
+    warning: {
+      badgeBg: 'bg-amber-50 border-amber-200/70 text-amber-600',
+      borderAccent: 'border-l-amber-500',
+      icon: <AlertTriangle className="w-4 h-4 stroke-[2.5]" />,
+    },
   };
 
-  const borderClasses = {
-    info: 'border-l-4 border-l-course-darkBlue',
-    success: 'border-l-4 border-l-emerald-600',
-    error: 'border-l-4 border-l-rose-600',
-    warning: 'border-l-4 border-l-amber-500',
-  };
+  const config = configs[toast.type];
 
   return (
     <div
       role="status"
-      className={`pointer-events-auto flex items-start gap-3 p-4 bg-course-white border border-black ${borderClasses[toast.type]}`}
+      className={`pointer-events-auto flex items-start gap-3 p-3.5 sm:p-4 bg-white/95 backdrop-blur-md border border-neutral-200/90 border-l-[3.5px] ${config.borderAccent} rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08),0_4px_10px_-2px_rgba(0,0,0,0.04)] w-full transition-all animate-in fade-in slide-in-from-top-3 duration-200 select-none`}
     >
-      {icons[toast.type]}
-      <div className="flex-1 text-left min-w-0">
-        <h4 className="text-sm font-bold text-course-darkBlue leading-tight">{toast.title}</h4>
+      <div
+        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg border flex items-center justify-center shrink-0 ${config.badgeBg}`}
+      >
+        {config.icon}
+      </div>
+      <div className="flex-1 text-left min-w-0 pt-0.5">
+        <h4 className="text-[13px] sm:text-sm font-bold text-neutral-900 leading-tight">
+          {toast.title}
+        </h4>
         {toast.message && (
-          <p className="text-xs text-course-navySubtle mt-1 leading-relaxed break-words">
+          <p className="text-xs text-neutral-600 mt-1 leading-relaxed break-words font-normal">
             {toast.message}
           </p>
         )}
@@ -117,9 +142,9 @@ function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
         type="button"
         onClick={onDismiss}
         aria-label="Dismiss notification"
-        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-course-darkBlue hover:bg-course-orangeSubtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-black -mr-2 -mt-2"
+        className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors -mr-1 -mt-1 cursor-pointer shrink-0"
       >
-        <X className="w-4 h-4" />
+        <X className="w-3.5 h-3.5 stroke-[2.2]" />
       </button>
     </div>
   );

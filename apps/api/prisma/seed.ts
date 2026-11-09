@@ -113,7 +113,7 @@ async function main() {
     {
       key: 'business_profile',
       value: {
-        businessName: process.env.BUSINESS_NAME || 'Hydraulic Engineering Academy',
+        businessName: process.env.BUSINESS_NAME || 'Hydro Basics',
         businessAddress:
           process.env.BUSINESS_ADDRESS || '123 Industrial Area, Phase 2, New Delhi, India',
         supportEmail: process.env.EMAIL_FROM || 'support@hydrauliccourse.com',
@@ -189,75 +189,173 @@ async function main() {
       },
     });
 
-    // Section 1: Fundamentals
-    const section1Id = uuidv7();
-    await prisma.section.create({
-      data: {
-        id: section1Id,
-        productId: product.id,
-        title: 'Section 1: Fundamentals of Industrial Hydraulics',
-        position: 1,
+    // Seed the 4-module syllabus
+    const curriculum = [
+      {
+        title: 'Module 1: Hydraulic Basics',
+        lessons: [
+          {
+            title: 'How hydraulic systems work',
+            description: 'Fundamental principles of fluid power, hydraulic circuit behavior, and practical workplace concepts.',
+            durationSeconds: 720,
+            isFreePreview: true,
+            videoProviderId: 'sample-bunny-video-01',
+          },
+          {
+            title: 'Pressure, flow and power in simple terms',
+            description: 'Understanding Pascal’s law, pressure vs flow relationships, and calculating actuator power without heavy math.',
+            durationSeconds: 980,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-02',
+          },
+          {
+            title: 'Main parts of a hydraulic circuit',
+            description: 'Overview of power units, reservoirs, actuators, manifolds, and how components interact in real machines.',
+            durationSeconds: 840,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-03',
+          },
+          {
+            title: 'Hydraulic oil and filters',
+            description: 'Fluid selection, viscosity indexes, contamination control standards (ISO 4406), and filter sizing.',
+            durationSeconds: 910,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-04',
+          },
+        ],
       },
-    });
+      {
+        title: 'Module 2: Pumps, Valves and Circuits',
+        lessons: [
+          {
+            title: 'Choosing the right pump',
+            description: 'Gear, vane, and piston pumps compared: operational limits, noise, displacement, and plant sizing.',
+            durationSeconds: 1120,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-05',
+          },
+          {
+            title: 'Directional and pressure control valves',
+            description: 'Spool configurations, direct vs pilot operated relief valves, sequence valves, and counterbalance valves.',
+            durationSeconds: 1250,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-06',
+          },
+          {
+            title: 'Proportional valves explained',
+            description: 'Proportional solenoids, LVDT feedback, amplifier cards, ramp controls, and servo valve differences.',
+            durationSeconds: 1340,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-07',
+          },
+          {
+            title: 'Reading hydraulic schematics',
+            description: 'ISO 1219 standard symbol decoding, signal flow tracing, and breaking down complex industrial blueprints.',
+            durationSeconds: 1480,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-08',
+          },
+        ],
+      },
+      {
+        title: 'Module 3: Troubleshooting and Maintenance',
+        lessons: [
+          {
+            title: 'Common hydraulic problems and their causes',
+            description: 'Overheating, aeration, cavitation, excessive vibration, and unresponsiveness diagnosis.',
+            durationSeconds: 1190,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-09',
+          },
+          {
+            title: 'Step-by-step fault finding',
+            description: 'Logical diagnostic procedures, pressure tap checks, flow meter tests, and isolation techniques.',
+            durationSeconds: 1310,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-10',
+          },
+          {
+            title: 'Preventive maintenance checklist',
+            description: 'Daily, weekly, and monthly maintenance routines for industrial hydraulic power units and accumulators.',
+            durationSeconds: 880,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-11',
+          },
+          {
+            title: 'Real plant case studies',
+            description: 'Detailed post-mortem analysis of actual plant breakdowns, root-cause investigations, and preventive fixes.',
+            durationSeconds: 1420,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-12',
+          },
+        ],
+      },
+      {
+        title: 'Module 4: Interview Problems',
+        lessons: [
+          {
+            title: 'Interview Problem Part 1',
+            description: 'Core concepts interview questions: circuit efficiency, pump failure mechanisms, and relief valve settings.',
+            durationSeconds: 960,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-13',
+          },
+          {
+            title: 'Interview Problem Part 2',
+            description: 'Schematic tracing interview problems: analyzing multi-cylinder sequential automation circuits.',
+            durationSeconds: 1040,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-14',
+          },
+          {
+            title: 'Interview Problem Part 3',
+            description: 'Troubleshooting interview scenarios: low pressure with high motor current, hydraulic hammer, and slow actuation.',
+            durationSeconds: 1110,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-15',
+          },
+          {
+            title: 'Interview Problem Part 4',
+            description: 'Design and sizing challenge: selecting pump, motor HP, pipe diameters, and tank volume from machine specs.',
+            durationSeconds: 1280,
+            isFreePreview: false,
+            videoProviderId: 'sample-bunny-video-16',
+          },
+        ],
+      },
+    ];
 
-    await prisma.lesson.create({
-      data: {
-        id: uuidv7(),
-        sectionId: section1Id,
-        productId: product.id,
-        title: 'Lesson 1.1: Welcome & Course Overview',
-        description:
-          'Introduction to course structure, hydraulic safety, and industrial applications.',
-        position: 1,
-        durationSeconds: 720, // 12 mins
-        isFreePreview: true, // Free preview
-        status: LessonStatus.READY,
-        videoProviderId: 'sample-bunny-video-01',
-      },
-    });
+    for (let sIdx = 0; sIdx < curriculum.length; sIdx++) {
+      const sData = curriculum[sIdx]!;
+      const section = await prisma.section.create({
+        data: {
+          id: uuidv7(),
+          productId: product.id,
+          title: sData.title,
+          position: sIdx + 1,
+          isPublished: true,
+        },
+      });
 
-    await prisma.lesson.create({
-      data: {
-        id: uuidv7(),
-        sectionId: section1Id,
-        productId: product.id,
-        title: 'Lesson 1.2: Pascal’s Law & Fluid Power Physics',
-        description:
-          'Detailed analysis of pressure transmission, force multiplication, and practical calculations.',
-        position: 2,
-        durationSeconds: 1540,
-        isFreePreview: false,
-        status: LessonStatus.READY,
-        videoProviderId: 'sample-bunny-video-02',
-      },
-    });
-
-    // Section 2: Pumps & Actuators
-    const section2Id = uuidv7();
-    await prisma.section.create({
-      data: {
-        id: section2Id,
-        productId: product.id,
-        title: 'Section 2: Hydraulic Pumps & Actuators',
-        position: 2,
-      },
-    });
-
-    await prisma.lesson.create({
-      data: {
-        id: uuidv7(),
-        sectionId: section2Id,
-        productId: product.id,
-        title: 'Lesson 2.1: Gear, Vane, and Piston Pump Architecture',
-        description:
-          'Comparative operational analysis, displacement calculations, and efficiency curves.',
-        position: 1,
-        durationSeconds: 1820,
-        isFreePreview: false,
-        status: LessonStatus.READY,
-        videoProviderId: 'sample-bunny-video-03',
-      },
-    });
+      for (let lIdx = 0; lIdx < sData.lessons.length; lIdx++) {
+        const lData = sData.lessons[lIdx]!;
+        await prisma.lesson.create({
+          data: {
+            id: uuidv7(),
+            sectionId: section.id,
+            productId: product.id,
+            title: lData.title,
+            description: lData.description,
+            position: lIdx + 1,
+            durationSeconds: lData.durationSeconds,
+            isFreePreview: lData.isFreePreview,
+            isPublished: true,
+            status: LessonStatus.READY,
+            videoProviderId: lData.videoProviderId,
+          },
+        });
+      }
+    }
 
     // Seed a sample coupon (10% discount)
     await prisma.coupon.create({
@@ -273,7 +371,7 @@ async function main() {
       },
     });
 
-    console.log(`Seeded course: "${product.title}" with 2 sections and 3 lessons.`);
+    console.log(`Seeded course: "${product.title}" with 4 sections and 16 lessons.`);
   } else {
     console.log(`Sample product "${sampleSlug}" already seeded.`);
   }

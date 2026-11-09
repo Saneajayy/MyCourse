@@ -83,7 +83,7 @@ describe('Phase 8 Production Email Infrastructure & System Notifications Integra
         cta: { text: 'Click Here', url: 'https://hydrauliccourse.com/test' },
       });
 
-      expect(html).toContain('Hydraulic Engineering Academy');
+      expect(html).toContain('Hydro Basics');
       expect(html).toContain('#0A192F'); // Dark Blue
       expect(html).toContain('#E05305'); // Orange fill
       expect(html).toContain('min-height: 44px'); // Touch target
@@ -710,7 +710,7 @@ describe('Phase 8 Production Email Infrastructure & System Notifications Integra
       const res = await request(devApp).get('/dev/email-previews/raw?template=order-receipt');
       expect(res.status).toBe(200);
       expect(res.header['content-type']).toContain('text/html');
-      expect(res.text).toContain('Hydraulic Engineering Academy');
+      expect(res.text).toContain('Hydro Basics');
       expect(res.text).toContain('Invoice Number');
     });
 
