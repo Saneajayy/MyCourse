@@ -200,33 +200,32 @@ function ForgotPasswordContent() {
   const isComplete = digits.every((d) => d.length === 1);
 
   return (
-    <div className="relative w-full bg-white border border-neutral-200/90 rounded-2xl p-5 sm:p-7 select-none flex flex-col items-center text-center">
+    <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-8 select-none overflow-hidden">
       {step === 'email' ? (
         <>
-          {/* Main Headline */}
-          <h1 className="text-2xl sm:text-[28px] md:text-[30px] font-bold text-neutral-900 tracking-tight sm:whitespace-nowrap mb-2.5">
-            Forgot your Password?
-          </h1>
-
-          {/* Subtitle */}
-          <div className="text-neutral-600 text-[13px] sm:text-[14px] font-normal mb-6 space-y-0.5">
-            <p className="text-neutral-600">Enter your registered email address to receive</p>
-            <p className="text-neutral-600">a 6-digit verification code.</p>
+          {/* Main Headline - Sizing & Placing identical to login, signup, and verify-email */}
+          <div className="text-center mb-6">
+            <h1 className="text-2xl sm:text-[28px] md:text-[30px] font-bold text-neutral-900 tracking-tight">
+              Forgot your Password?
+            </h1>
+            <p className="text-xs sm:text-sm text-neutral-600 mt-1.5 leading-relaxed">
+              Enter your registered email address to receive a 6-digit verification code.
+            </p>
           </div>
 
           {/* Error Message Alert Banner */}
           {errorMsg && (
-            <div className="mb-5 px-3.5 py-2.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium text-center w-full max-w-[320px]">
+            <div className="mb-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium text-center">
               <span>{errorMsg}</span>
             </div>
           )}
 
           {/* Email Input Form */}
-          <form onSubmit={handleSendCode} className="w-full flex flex-col items-center space-y-5">
-            <div className="w-full max-w-[320px] space-y-1.5 text-left">
+          <form onSubmit={handleSendCode} className="space-y-4">
+            <div className="space-y-1.5 text-left">
               <label
                 htmlFor="forgot-email"
-                className="text-xs sm:text-sm font-bold text-neutral-900"
+                className="text-sm font-bold text-neutral-900"
               >
                 Registered Email
               </label>
@@ -239,35 +238,31 @@ function ForgotPasswordContent() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-[42px] sm:h-[44px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none focus:ring-1 focus:ring-[#0033FF] transition-all"
+                  className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none focus:ring-1 focus:ring-[#0033FF] transition-all"
                 />
                 {email.includes('@') && email.length > 4 && (
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-600">
-                    <Check className="w-4 h-4 stroke-[2.5]" />
+                    <Check className="w-5 h-5 stroke-[2.5]" />
                   </div>
                 )}
               </div>
             </div>
 
             {/* Send Reset Code Button */}
-            <button
-              type="submit"
-              disabled={isLoading || !email.trim()}
-              className="w-full max-w-[240px] sm:w-[240px] h-[44px] lg:h-[42px] font-bold text-[14px] sm:text-[15px] rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  <span>Sending Code...</span>
-                </>
-              ) : (
-                <span>Send Reset Code</span>
-              )}
-            </button>
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isLoading || !email.trim()}
+                className="w-full h-[46px] sm:h-[48px] bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isLoading && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
+                <span>{isLoading ? 'Sending Code...' : 'Send Reset Code'}</span>
+              </button>
+            </div>
           </form>
 
           {/* Back to Login Link */}
-          <div className="mt-6 text-center text-xs sm:text-[13px] text-neutral-600">
+          <div className="mt-5 text-center text-sm text-neutral-600">
             Remember your password?{' '}
             <Link
               href="/login"
@@ -278,7 +273,7 @@ function ForgotPasswordContent() {
           </div>
 
           {/* Horizontal Divider */}
-          <div className="-mx-5 sm:-mx-7 border-t border-neutral-200/90 my-5 w-[calc(100%+2.5rem)] sm:w-[calc(100%+3.5rem)]" />
+          <div className="-mx-5 sm:-mx-8 border-t border-neutral-200 my-6" />
 
           {/* Footer Disclaimer */}
           <p className="text-center text-xs text-neutral-500 leading-normal">
@@ -291,44 +286,44 @@ function ForgotPasswordContent() {
         </>
       ) : (
         <>
-          {/* Main Headline - In One Line on Desktop (exact verify-email spacing) */}
-          <h1 className="text-2xl sm:text-[28px] md:text-[30px] font-bold text-neutral-900 tracking-tight sm:whitespace-nowrap mb-2.5">
-            Please check your email
-          </h1>
-
-          {/* Subtitle & Email */}
-          <div className="text-neutral-600 text-[13px] sm:text-[14px] font-normal mb-6 space-y-0.5">
-            <p className="text-neutral-600">Enter the 6 digit OTP we sent you to</p>
-            <div>
-              <span
-                onClick={() => {
-                  setStep('email');
-                  setErrorMsg(null);
-                }}
-                className="text-neutral-900 font-medium cursor-pointer break-all hover:opacity-80 inline-block"
-                title="Click to change email"
-              >
-                {email || 'your email address'}
-              </span>
+          {/* Main Headline - In One Line on Desktop (exact verify-email sizing and placing) */}
+          <div className="text-center mb-6">
+            <h1 className="text-2xl sm:text-[28px] md:text-[30px] font-bold text-neutral-900 tracking-tight">
+              Please check your email
+            </h1>
+            <div className="text-neutral-600 text-[13px] sm:text-[14px] font-normal mt-1.5 space-y-0.5">
+              <p>Enter the 6 digit OTP we sent you to</p>
+              <div>
+                <span
+                  onClick={() => {
+                    setStep('email');
+                    setErrorMsg(null);
+                  }}
+                  className="text-neutral-900 font-semibold cursor-pointer break-all hover:opacity-80 inline-block"
+                  title="Click to change email"
+                >
+                  {email || 'your email address'}
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Error Message Alert Banner */}
           {errorMsg && (
-            <div className="mb-5 px-3.5 py-2.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium text-center w-full max-w-[320px]">
+            <div className="mb-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium text-center">
               <span>{errorMsg}</span>
             </div>
           )}
 
-          {/* 6 Digit OTP Inputs Form (exact verify-email dimensions & spacing) */}
+          {/* 6 Digit OTP Inputs Form */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleVerifyOtp();
             }}
-            className="w-full flex flex-col items-center space-y-6"
+            className="space-y-5"
           >
-            <div className="flex items-center justify-center gap-2 sm:gap-2.5" onPaste={handlePaste}>
+            <div className="flex items-center justify-center gap-2 sm:gap-2.5 my-2" onPaste={handlePaste}>
               {digits.map((digit, index) => (
                 <input
                   key={index}
@@ -352,26 +347,22 @@ function ForgotPasswordContent() {
             </div>
 
             {/* Verify & Continue Button */}
-            <button
-              type="submit"
-              disabled={!isComplete || isVerifying}
-              className="w-full max-w-[240px] sm:w-[240px] h-[44px] lg:h-[42px] font-bold text-[14px] sm:text-[15px] rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white"
-            >
-              {isVerifying ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  <span>Verifying...</span>
-                </>
-              ) : (
-                <span>Verify & Continue</span>
-              )}
-            </button>
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={!isComplete || isVerifying}
+                className="w-full h-[46px] sm:h-[48px] bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+              >
+                {isVerifying && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
+                <span>{isVerifying ? 'Verifying Code...' : 'Verify & Continue'}</span>
+              </button>
+            </div>
           </form>
 
           {/* Resend Code Section */}
-          <div className="mt-6 flex flex-col items-center gap-1 text-[13px] text-neutral-600">
+          <div className="mt-5 flex flex-col items-center gap-1 text-[13px] text-neutral-600">
             <div className="flex items-center gap-1.5 flex-wrap justify-center">
-              <span className="text-neutral-600">Didn&apos;t receive the email?</span>
+              <span>Didn&apos;t receive the email?</span>
               {resendCooldown > 0 ? (
                 <span className="text-neutral-400 font-normal">
                   Resend in {resendCooldown}s
@@ -391,7 +382,7 @@ function ForgotPasswordContent() {
           </div>
 
           {/* Horizontal Divider */}
-          <div className="-mx-5 sm:-mx-7 border-t border-neutral-200/90 my-5 w-[calc(100%+2.5rem)] sm:w-[calc(100%+3.5rem)]" />
+          <div className="-mx-5 sm:-mx-8 border-t border-neutral-200 my-6" />
 
           {/* Footer - Wrong Account */}
           <p className="text-center text-xs text-neutral-500 leading-normal">
@@ -460,7 +451,7 @@ export default function ForgotPasswordPage() {
           </Link>
         </header>
 
-        {/* Centered OTP Verification Area (exact verify-email wrapper) */}
+        {/* Centered OTP Verification Area */}
         <div className="m-auto w-full max-w-[420px] sm:max-w-[440px] px-4 py-6 sm:py-8 relative z-10">
           <Suspense fallback={<div className="p-8 text-center text-sm font-mono text-neutral-500">Loading form...</div>}>
             <ForgotPasswordContent />

@@ -119,9 +119,9 @@ function ResetPasswordForm() {
           </div>
         ) : (
           <>
-            {/* Header & Title */}
-            <div className="text-left mb-5">
-              <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
+            {/* Header & Title - Sizing & Placing identical to login, signup, and verify-email */}
+            <div className="text-center mb-6">
+              <h1 className="text-2xl sm:text-[28px] md:text-[30px] font-bold text-neutral-900 tracking-tight">
                 Create New Password
               </h1>
               <p className="text-xs sm:text-sm text-neutral-600 mt-1.5 leading-relaxed">
