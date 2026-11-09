@@ -83,59 +83,11 @@ export default function ForgotPasswordPage() {
         </Link>
       </div>
 
-      {/* Right Column: Royal Blue Canvas with Centered Deckled White Card (80% on mobile) */}
+      {/* Right Column: Royal Blue Canvas with Centered Plain Rounded White Card (80% on mobile) */}
       <div className="relative w-full lg:w-1/2 flex-1 min-h-0 lg:min-h-screen bg-[#0033FF] flex flex-col items-center justify-center p-3.5 sm:p-8 lg:p-14">
-        <div className="relative w-full max-w-[430px] sm:max-w-[460px] p-6 sm:p-8 md:p-9 select-none drop-shadow-[0_20px_35px_rgba(0,0,60,0.35)]">
-          {/* SVG Deckled / Torn Paper Textured Edge Filter */}
-          <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
-            <defs>
-              <filter
-                id="figma-texture-forgot"
-                x="-10%"
-                y="-15%"
-                width="120%"
-                height="130%"
-                filterUnits="objectBoundingBox"
-                primitiveUnits="userSpaceOnUse"
-              >
-                <feTurbulence
-                  type="fractalNoise"
-                  baseFrequency="0.25"
-                  numOctaves="3"
-                  result="noise"
-                />
-                <feDisplacementMap
-                  in="SourceGraphic"
-                  in2="noise"
-                  scale="5.5"
-                  xChannelSelector="R"
-                  yChannelSelector="G"
-                />
-              </filter>
-            </defs>
-          </svg>
-
-          {/* Textured White Card Background via SVG Filter */}
-          <div className="absolute inset-0 pointer-events-none overflow-visible">
-            <svg
-              className="w-full h-full overflow-visible"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect
-                x="0"
-                y="0"
-                width="100%"
-                height="100%"
-                rx="5.1"
-                ry="5.1"
-                fill="white"
-                filter="url(#figma-texture-forgot)"
-              />
-            </svg>
-          </div>
-
+        <div className="w-full max-w-[430px] sm:max-w-[460px] bg-white rounded-xl sm:rounded-2xl shadow-2xl p-6 sm:p-8 md:p-9 text-neutral-900 border border-neutral-200/80 relative z-10 select-none">
           {/* Card Content */}
-          <div className="relative z-10 w-full">
+          <div className="w-full">
             {isSubmitted ? (
               <div className="text-center py-4 space-y-4">
                 <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">

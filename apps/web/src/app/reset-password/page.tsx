@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '../../components/ui';
 import { apiClient } from '../../lib/api-client';
-import { AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, X } from 'lucide-react';
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -45,6 +45,7 @@ function ResetPasswordForm() {
         method: 'POST',
         body: JSON.stringify({
           token: token.trim(),
+          password: newPassword,
           newPassword,
         }),
         skipAuth: true,
@@ -65,57 +66,9 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="relative w-full max-w-[430px] sm:max-w-[460px] p-6 sm:p-8 md:p-9 select-none drop-shadow-[0_20px_35px_rgba(0,0,60,0.35)]">
-      {/* SVG Deckled / Torn Paper Textured Edge Filter */}
-      <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
-        <defs>
-          <filter
-            id="figma-texture-reset"
-            x="-10%"
-            y="-15%"
-            width="120%"
-            height="130%"
-            filterUnits="objectBoundingBox"
-            primitiveUnits="userSpaceOnUse"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.25"
-              numOctaves="3"
-              result="noise"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="noise"
-              scale="5.5"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-        </defs>
-      </svg>
-
-      {/* Textured White Card Background via SVG Filter */}
-      <div className="absolute inset-0 pointer-events-none overflow-visible">
-        <svg
-          className="w-full h-full overflow-visible"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            rx="5.1"
-            ry="5.1"
-            fill="white"
-            filter="url(#figma-texture-reset)"
-          />
-        </svg>
-      </div>
-
+    <div className="w-full max-w-[430px] sm:max-w-[460px] bg-white rounded-xl sm:rounded-2xl shadow-2xl p-6 sm:p-8 md:p-9 text-neutral-900 border border-neutral-200/80 relative z-10 select-none">
       {/* Card Content */}
-      <div className="relative z-10 w-full">
+      <div className="w-full">
         {isSuccess ? (
           <div className="text-center py-4 space-y-4">
             <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
@@ -148,8 +101,8 @@ function ResetPasswordForm() {
 
             {/* Error Banner */}
             {errorMsg && (
-              <div className="mb-4 p-3.5 rounded-lg border border-rose-200 bg-rose-50/90 text-rose-950 text-xs shadow-sm flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <div className="mb-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium shadow-sm flex items-center gap-2.5">
+                <X className="w-4 h-4 text-white shrink-0 stroke-[2.5]" />
                 <span>{errorMsg}</span>
               </div>
             )}

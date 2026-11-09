@@ -295,11 +295,10 @@ function VerifyEmailForm() {
         <button
           type="submit"
           disabled={!isComplete || status === 'verifying' || status === 'success'}
-          className={`w-full max-w-[240px] sm:w-[240px] h-[44px] lg:h-[42px] font-bold text-[14px] sm:text-[15px] rounded-lg lg:rounded-[4px] transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
-            status === 'success'
+          className={`w-full max-w-[240px] sm:w-[240px] h-[44px] lg:h-[42px] font-bold text-[14px] sm:text-[15px] rounded-lg lg:rounded-[4px] transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${status === 'success'
               ? 'bg-emerald-600 text-white lg:bg-white lg:text-emerald-700'
               : 'bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] lg:bg-[#D1D5DB] lg:hover:bg-white lg:active:bg-neutral-200 text-white lg:text-[#0033FF]'
-          }`}
+            }`}
         >
           {status === 'verifying' ? (
             <>
@@ -309,7 +308,7 @@ function VerifyEmailForm() {
           ) : status === 'success' ? (
             <>
               <Check className="w-4 h-4 stroke-[3] text-white lg:text-emerald-600" />
-              <span>Verified! Redirecting...</span>
+              <span>Redirecting...</span>
             </>
           ) : (
             <span>Verify & Continue</span>

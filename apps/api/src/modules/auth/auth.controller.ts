@@ -208,10 +208,11 @@ export class AuthController {
 
   public async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { token, password } = resetPasswordSchema.parse(req.body);
+      const parsed = resetPasswordSchema.parse(req.body);
+      const effectivePassword = (parsed.password || parsed.newPassword)!;
       const result = await authService.resetPassword(
-        token,
-        password,
+        parsed.token,
+        effectivePassword,
         req.ip,
         req.headers['user-agent'],
       );

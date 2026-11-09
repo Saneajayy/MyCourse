@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/auth-context';
 import { useToast } from '../../components/ui';
 import { siteConfig } from '../../config/site';
-import { AlertCircle, Check, Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react';
+import { AlertCircle, Check, Eye, EyeOff, Loader2, ArrowLeft, X } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
@@ -22,12 +22,10 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [requestId, setRequestId] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
-    setRequestId(null);
     setIsLoading(true);
 
     try {
@@ -62,11 +60,8 @@ function LoginForm() {
         router.push('/my-courses');
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Invalid login credentials';
+      const message = err instanceof Error ? err.message : 'Invalid email or password';
       setErrorMsg(message);
-      if (err && typeof err === 'object' && 'requestId' in err) {
-        setRequestId((err as { requestId?: string }).requestId || null);
-      }
       toastError('Login Failed', message);
     } finally {
       setIsLoading(false);
@@ -76,55 +71,7 @@ function LoginForm() {
   const [showRemindHint, setShowRemindHint] = useState(false);
 
   return (
-    <div className="relative w-full bg-white border border-neutral-200/90 rounded-2xl lg:bg-transparent lg:border-none lg:rounded-none p-5 sm:p-8 select-none">
-      {/* SVG Deckled / Textured Edge Filter (Desktop Only) */}
-      <svg className="hidden lg:block absolute w-0 h-0 pointer-events-none" aria-hidden="true">
-        <defs>
-          <filter
-            id="figma-texture-login"
-            x="-10%"
-            y="-15%"
-            width="120%"
-            height="130%"
-            filterUnits="objectBoundingBox"
-            primitiveUnits="userSpaceOnUse"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.25"
-              numOctaves="3"
-              result="noise"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="noise"
-              scale="5.1"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-        </defs>
-      </svg>
-
-      {/* Textured White Card Background via SVG Filter (Desktop Only) */}
-      <div className="hidden lg:block absolute inset-0 pointer-events-none overflow-visible">
-        <svg
-          className="w-full h-full overflow-visible"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect
-            x="0"
-            y="0"
-            width="100%"
-            height="100%"
-            rx="5.1"
-            ry="5.1"
-            fill="white"
-            filter="url(#figma-texture-login)"
-          />
-        </svg>
-      </div>
-
+    <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl shadow-2xl p-5 sm:p-8 select-none overflow-hidden">
       {/* Card Content */}
       <div className="relative z-10 w-full">
         {/* 1. Continue with Google Button */}
@@ -175,14 +122,9 @@ function LoginForm() {
 
         {/* Error Alert */}
         {errorMsg && (
-          <div className="mt-4 p-3.5 rounded-lg border border-rose-200 bg-rose-50/90 text-rose-950 text-xs">
-            <div className="flex items-center gap-2 font-medium">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-            {requestId && (
-              <p className="font-mono text-[10px] text-rose-700/80 mt-1 pl-6">Ref ID: {requestId}</p>
-            )}
+          <div className="mt-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium shadow-sm flex items-center gap-2.5">
+            <X className="w-4 h-4 text-white shrink-0 stroke-[2.5]" />
+            <span>{errorMsg}</span>
           </div>
         )}
 

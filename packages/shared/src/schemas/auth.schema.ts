@@ -62,9 +62,18 @@ export const resetPasswordSchema = z
     password: z
       .string()
       .min(10, 'Password must be at least 10 characters long')
-      .max(128, 'Password must not exceed 128 characters'),
+      .max(128, 'Password must not exceed 128 characters')
+      .optional(),
+    newPassword: z
+      .string()
+      .min(10, 'Password must be at least 10 characters long')
+      .max(128, 'Password must not exceed 128 characters')
+      .optional(),
   })
-  .strict();
+  .refine((data) => Boolean(data.password || data.newPassword), {
+    message: 'Password must be at least 10 characters long',
+    path: ['password'],
+  });
 
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
