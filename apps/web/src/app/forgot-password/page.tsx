@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '../../components/ui';
 import { apiClient } from '../../lib/api-client';
-import { Check, Loader2, ArrowLeft, RotateCw } from 'lucide-react';
+import { Check, Loader2, RotateCw } from 'lucide-react';
 
 function ForgotPasswordContent() {
   const router = useRouter();
@@ -202,7 +202,7 @@ function ForgotPasswordContent() {
       {step === 'email' ? (
         <>
           {/* Header & Title */}
-          <div className="text-left mb-6">
+          <div className="text-center mb-6">
             <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
               Forgot your Password?
             </h1>
@@ -285,18 +285,7 @@ function ForgotPasswordContent() {
       ) : (
         <>
           {/* Step 2: 6-Digit OTP Screen */}
-          <div className="text-left mb-5">
-            <button
-              type="button"
-              onClick={() => {
-                setStep('email');
-                setErrorMsg(null);
-              }}
-              className="inline-flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-900 mb-3 transition-colors cursor-pointer"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Change email</span>
-            </button>
+          <div className="text-left mb-6">
             <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
               Enter 6-Digit Code
             </h1>
