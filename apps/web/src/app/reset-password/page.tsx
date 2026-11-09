@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '../../components/ui';
 import { apiClient } from '../../lib/api-client';
-import { Eye, EyeOff, Loader2, X } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -66,7 +66,7 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="w-full max-w-[430px] sm:max-w-[460px] bg-white rounded-xl sm:rounded-2xl shadow-2xl p-6 sm:p-8 md:p-9 text-neutral-900 border border-neutral-200/80 relative z-10 select-none">
+    <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-8 select-none overflow-hidden">
       {/* Card Content */}
       <div className="w-full">
         {isSuccess ? (
@@ -81,7 +81,7 @@ function ResetPasswordForm() {
               <button
                 type="button"
                 onClick={() => router.push('/login')}
-                className="w-full h-[46px] sm:h-[48px] bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-base rounded-md sm:rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center cursor-pointer"
+                className="w-full h-[46px] sm:h-[48px] bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-base rounded-lg transition-all flex items-center justify-center cursor-pointer"
               >
                 Sign In Now
               </button>
@@ -99,10 +99,9 @@ function ResetPasswordForm() {
               </p>
             </div>
 
-            {/* Error Banner */}
+            {/* Error Banner (center-aligned, no cross icon, no shadow) */}
             {errorMsg && (
-              <div className="mb-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium shadow-sm flex items-center gap-2.5">
-                <X className="w-4 h-4 text-white shrink-0 stroke-[2.5]" />
+              <div className="mb-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium text-center">
                 <span>{errorMsg}</span>
               </div>
             )}
@@ -110,7 +109,7 @@ function ResetPasswordForm() {
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-3.5">
               {/* Token */}
-              <div className="space-y-1 text-left">
+              <div className="space-y-1.5 text-left">
                 <label htmlFor="reset-token" className="text-sm font-bold text-neutral-900">
                   Reset Security Token
                 </label>
@@ -121,12 +120,12 @@ function ResetPasswordForm() {
                   required
                   value={token}
                   onChange={(e) => setToken(e.target.value)}
-                  className="w-full h-[42px] sm:h-[44px] rounded-md sm:rounded-lg border border-neutral-400 bg-white px-3.5 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all font-mono"
+                  className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none focus:ring-1 focus:ring-[#0033FF] transition-all font-mono"
                 />
               </div>
 
               {/* New Password */}
-              <div className="space-y-1 text-left">
+              <div className="space-y-1.5 text-left">
                 <label htmlFor="reset-password" className="text-sm font-bold text-neutral-900">
                   New Password
                 </label>
@@ -139,12 +138,12 @@ function ResetPasswordForm() {
                     required
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full h-[42px] sm:h-[44px] rounded-md sm:rounded-lg border border-neutral-400 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
+                    className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none focus:ring-1 focus:ring-[#0033FF] transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors p-1 rounded-md focus:outline-none"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors p-1 rounded-md focus:outline-none cursor-pointer"
                     aria-label={showNewPassword ? 'Hide password' : 'Show password'}
                   >
                     {showNewPassword ? (
@@ -157,7 +156,7 @@ function ResetPasswordForm() {
               </div>
 
               {/* Confirm New Password */}
-              <div className="space-y-1 text-left">
+              <div className="space-y-1.5 text-left">
                 <label htmlFor="reset-confirm-password" className="text-sm font-bold text-neutral-900">
                   Confirm New Password
                 </label>
@@ -170,12 +169,12 @@ function ResetPasswordForm() {
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full h-[42px] sm:h-[44px] rounded-md sm:rounded-lg border border-neutral-400 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
+                    className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none focus:ring-1 focus:ring-[#0033FF] transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors p-1 rounded-md focus:outline-none"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors p-1 rounded-md focus:outline-none cursor-pointer"
                     aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                   >
                     {showConfirmPassword ? (
@@ -187,12 +186,12 @@ function ResetPasswordForm() {
                 </div>
               </div>
 
-              {/* Submit Button */}
+              {/* Submit Button (no shadow) */}
               <div className="pt-2">
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-[46px] sm:h-[48px] bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] active:scale-[0.99] text-white font-bold text-base rounded-md sm:rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer border border-[#0033FF]/50"
+                  className="w-full h-[46px] sm:h-[48px] bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {isLoading && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
                   <span>{isLoading ? 'Updating Password...' : 'Reset Password'}</span>
@@ -201,18 +200,18 @@ function ResetPasswordForm() {
             </form>
 
             {/* Back to Login */}
-            <div className="mt-4 text-center text-sm text-neutral-700">
+            <div className="mt-5 text-center text-sm text-neutral-600">
               Remember your password?{' '}
               <Link
                 href="/login"
-                className="font-bold text-neutral-900 underline hover:text-black ml-1"
+                className="font-bold text-[#0033FF] underline hover:text-[#0028D6] ml-1"
               >
                 Sign in
               </Link>
             </div>
 
             {/* Horizontal Divider */}
-            <div className="w-full border-t border-neutral-200 my-5" />
+            <div className="-mx-5 sm:-mx-8 border-t border-neutral-200 my-6" />
 
             {/* Footer Disclaimer */}
             <p className="text-center text-xs text-neutral-500 leading-normal">
@@ -230,56 +229,58 @@ function ResetPasswordForm() {
 }
 
 export default function ResetPasswordPage() {
-  return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#0033FF] font-reddit selection:bg-white selection:text-[#0033FF] overflow-x-hidden">
-      {/* Desktop Floating Escape / Back Navigation */}
-      <Link
-        href="/login"
-        className="hidden lg:inline-block absolute top-6 right-8 z-30 text-white hover:text-white/80 text-sm font-semibold underline-offset-4 hover:underline transition-colors"
-      >
-        Back to Login
-      </Link>
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = '#FFFFFF';
+    document.body.style.backgroundColor = '#FFFFFF';
+    return () => {
+      document.documentElement.style.backgroundColor = '';
+      document.body.style.backgroundColor = '';
+    };
+  }, []);
 
-      {/* Top Banner (20% length on mobile, 50% left column on desktop): Hero Halftone Photo with "HYDRO BASICS" */}
-      <div className="relative w-full lg:w-1/2 h-[20vh] min-h-[130px] sm:h-[22vh] sm:min-h-[160px] lg:h-auto lg:min-h-screen bg-[#0033FF] overflow-hidden flex flex-col justify-end">
-        {/* All-White Halftone Dot Graphic (permanent, no flash or WebGL fade transition) */}
+  return (
+    <div className="fixed inset-0 w-full h-full bg-white font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col lg:flex-row overflow-hidden">
+      {/* Left Column (Desktop Only): Signature Dot Halftone Graphic on Deep Cobalt Blue */}
+      <div className="hidden lg:relative lg:flex lg:w-1/2 h-full bg-[#00186B] overflow-hidden select-none">
         <Image
           src="/login-pixelated.png"
           alt="HydroBasics Industrial Hydraulic Engineer"
           fill
           priority
-          sizes="(max-width: 1024px) 100vw, 50vw"
-          className="object-cover object-center select-none"
+          sizes="50vw"
+          className="object-cover object-center mix-blend-screen opacity-95 select-none"
         />
-
-        {/* Soft Depth Gradient */}
+        {/* Soft overlay gradient for subtle depth */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#001040]/70 via-transparent to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/80 via-transparent to-transparent pointer-events-none"
           aria-hidden="true"
         />
-
-        {/* Signature Bold Brand Header: HYDRO BASICS */}
-        <div className="relative z-20 p-3.5 sm:p-6 lg:p-16 select-none pointer-events-none">
-          <div className="font-extrabold text-white uppercase tracking-tight leading-[0.84] text-2xl sm:text-4xl md:text-6xl lg:text-[76px] xl:text-[88px] drop-shadow-[0_4px_16px_rgba(0,0,0,0.5)]">
-            <span className="block">HYDRO</span>
-            <span className="block">BASICS</span>
-          </div>
-        </div>
-
-        {/* Mobile Back to Login: Bottom Right of the image with high-contrast gradient backdrop */}
-        <Link
-          href="/login"
-          className="lg:hidden absolute bottom-3 right-3.5 sm:bottom-4 sm:right-6 z-30 text-white/95 hover:text-white text-xs sm:text-sm font-semibold underline-offset-4 hover:underline transition-colors drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
-        >
-          Back to Login
-        </Link>
       </div>
 
-      {/* Right Column: Royal Blue Canvas with Centered Deckled White Card (80% on mobile) */}
-      <div className="relative w-full lg:w-1/2 flex-1 min-h-0 lg:min-h-screen bg-[#0033FF] flex flex-col items-center justify-center p-3.5 sm:p-8 lg:p-14">
-        <Suspense fallback={<div className="p-8 text-center text-sm font-mono text-white/80">Loading reset form...</div>}>
-          <ResetPasswordForm />
-        </Suspense>
+      {/* Right Column: Clean White Background on both Mobile & Desktop */}
+      <div className="w-full lg:w-1/2 h-full bg-white flex flex-col overflow-y-auto relative">
+        {/* Top Header Bar inside the right side area */}
+        <header className="w-full flex items-center justify-end px-5 pt-5 sm:px-8 sm:pt-8 shrink-0 z-20">
+          <Link
+            href="/"
+            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+            aria-label="HYDRO BASICS Home - Back to Course"
+          >
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+              BASICS
+            </span>
+          </Link>
+        </header>
+
+        {/* Perfectly Centered Card */}
+        <div className="m-auto w-full max-w-[420px] sm:max-w-[440px] px-4 py-6 sm:py-8 relative z-10">
+          <Suspense fallback={<div className="p-8 text-center text-sm font-mono text-neutral-500">Loading reset form...</div>}>
+            <ResetPasswordForm />
+          </Suspense>
+        </div>
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/auth-context';
 import { useToast } from '../../components/ui';
 import { siteConfig } from '../../config/site';
-import { AlertCircle, Check, Eye, EyeOff, Loader2, ArrowLeft, X } from 'lucide-react';
+import { AlertCircle, Check, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
@@ -71,7 +71,7 @@ function LoginForm() {
   const [showRemindHint, setShowRemindHint] = useState(false);
 
   return (
-    <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl shadow-2xl p-5 sm:p-8 select-none overflow-hidden">
+    <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-8 select-none overflow-hidden">
       {/* Card Content */}
       <div className="relative z-10 w-full">
         {/* 1. Continue with Google Button */}
@@ -122,8 +122,7 @@ function LoginForm() {
 
         {/* Error Alert */}
         {errorMsg && (
-          <div className="mt-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium shadow-sm flex items-center gap-2.5">
-            <X className="w-4 h-4 text-white shrink-0 stroke-[2.5]" />
+          <div className="mt-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium text-center">
             <span>{errorMsg}</span>
           </div>
         )}
@@ -276,22 +275,14 @@ export default function LoginPage() {
         />
       </div>
 
-      {/* Right Column: White on Mobile, Royal Blue (#0033FF) on Desktop */}
-      <div className="w-full lg:w-1/2 h-full bg-white lg:bg-[#0033FF] flex flex-col overflow-y-auto relative">
+      {/* Right Column: Clean White Background */}
+      <div className="w-full lg:w-1/2 h-full bg-white flex flex-col overflow-y-auto relative">
         {/* Top Header Bar inside the right side login area */}
-        <header className="w-full flex items-center justify-between px-5 pt-5 sm:px-8 sm:pt-8 shrink-0 z-20">
+        <header className="w-full flex items-center justify-end px-5 pt-5 sm:px-8 sm:pt-8 shrink-0 z-20">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-neutral-600 hover:text-[#0033FF] lg:text-white lg:hover:text-white/80 text-xs sm:text-sm font-semibold transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
-            <span>Back to Course</span>
-          </Link>
-
-          <Link
-            href="/"
-            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] lg:text-white hover:opacity-90 transition-opacity select-none text-right"
-            aria-label="HYDRO BASICS Home"
+            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+            aria-label="HYDRO BASICS Home - Back to Course"
           >
             <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
               HYDRO
