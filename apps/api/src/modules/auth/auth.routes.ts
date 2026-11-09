@@ -32,6 +32,9 @@ authRouter.post('/logout', standardRateLimiter, validateCookieCsrf, (req, res, n
 authRouter.post('/forgot-password', authRateLimiter, (req, res, next) =>
   authController.forgotPassword(req, res, next),
 );
+authRouter.post('/verify-reset-otp', authRateLimiter, (req, res, next) =>
+  authController.verifyResetOtp(req, res, next),
+);
 authRouter.post('/reset-password', authRateLimiter, (req, res, next) =>
   authController.resetPassword(req, res, next),
 );

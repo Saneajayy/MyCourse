@@ -806,9 +806,17 @@ export class AuthService {
     });
 
     if (user && user.status !== UserStatus.BANNED) {
-      const rawToken = generateRandomToken(32);
-      const tokenHash = hashToken(rawToken);
-      const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 mins
+      const rawOtp = generateNumericOtp(6);
+      const tokenHash = hashToken(`${normalizedEmail}:${rawOtp}`);
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+
+      // Clean up previous unused reset tokens for this user
+      await prisma.passwordResetToken.deleteMany({
+        where: {
+          userId: user.id,
+          usedAt: null,
+        },
+      });
 
       await prisma.passwordResetToken.create({
         data: {
@@ -819,7 +827,7 @@ export class AuthService {
         },
       });
 
-      await emailService.sendPasswordResetEmail(user.email, user.name, rawToken, user.id);
+      await emailService.sendPasswordResetEmail(user.email, user.name, rawOtp, user.id);
 
       await auditService.log({
         actorUserId: user.id,
@@ -836,6 +844,97 @@ export class AuthService {
     return {
       message:
         'If an account exists with that email address, password reset instructions have been sent.',
+    };
+  }
+
+  /**
+   * Verify 6-digit OTP for password reset and return a single-use reset token
+   */
+  public async verifyResetOtp(
+    email: string,
+    otp: string,
+    ip?: string,
+    userAgent?: string,
+  ): Promise<{ success: true; resetToken: string }> {
+    const normalizedEmail = email.trim().toLowerCase();
+    const cleanOtp = otp.trim();
+
+    if (!cleanOtp || cleanOtp.length < 6) {
+      throw new BadRequestError('Invalid reset code');
+    }
+
+    const clientIp = ip || '127.0.0.1';
+    await lockoutService.checkLockout(normalizedEmail, clientIp);
+
+    const user = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (!user || user.status === UserStatus.BANNED) {
+      await lockoutService.recordFailedAttempt(normalizedEmail, clientIp);
+      throw new BadRequestError('Invalid or expired reset code');
+    }
+
+    const activeTokens = await prisma.passwordResetToken.findMany({
+      where: {
+        userId: user.id,
+        usedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+    });
+
+    let matchedToken = null;
+    const expectedSaltedHash = hashToken(`${normalizedEmail}:${cleanOtp}`);
+    const expectedDirectHash = hashToken(cleanOtp);
+
+    for (const t of activeTokens) {
+      if (t.tokenHash === expectedSaltedHash || t.tokenHash === expectedDirectHash) {
+        matchedToken = t;
+        break;
+      }
+    }
+
+    if (!matchedToken) {
+      await lockoutService.recordFailedAttempt(normalizedEmail, clientIp);
+      throw new BadRequestError('Invalid or expired reset code');
+    }
+
+    // Mark the OTP token as used, and issue a secure single-use reset session token
+    const rawResetToken = generateRandomToken(32);
+    const resetTokenHash = hashToken(rawResetToken);
+    const resetExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    await prisma.$transaction(async (tx) => {
+      await tx.passwordResetToken.update({
+        where: { id: matchedToken.id },
+        data: { usedAt: new Date() },
+      });
+
+      await tx.passwordResetToken.create({
+        data: {
+          id: uuidv7(),
+          userId: user.id,
+          tokenHash: resetTokenHash,
+          expiresAt: resetExpiresAt,
+        },
+      });
+    });
+
+    await auditService.log({
+      actorUserId: user.id,
+      action: AuditAction.PASSWORD_RESET,
+      entityType: 'User',
+      entityId: user.id,
+      ipAddress: ip,
+      userAgent,
+      afterState: { step: 'OTP_VERIFIED' },
+    });
+
+    return {
+      success: true,
+      resetToken: rawResetToken,
     };
   }
 

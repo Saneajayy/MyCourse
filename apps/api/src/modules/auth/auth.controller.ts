@@ -12,6 +12,7 @@ import {
   verifyEmailSchema,
   resendOtpSchema,
   forgotPasswordSchema,
+  verifyResetOtpSchema,
   resetPasswordSchema,
   changePasswordSchema,
   adminTotpVerifySchema,
@@ -196,6 +197,25 @@ export class AuthController {
     try {
       const { email } = forgotPasswordSchema.parse(req.body);
       const result = await authService.forgotPassword(email, req.ip, req.headers['user-agent']);
+
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public async verifyResetOtp(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { email, otp } = verifyResetOtpSchema.parse(req.body);
+      const result = await authService.verifyResetOtp(
+        email,
+        otp,
+        req.ip,
+        req.headers['user-agent'],
+      );
 
       res.status(200).json({
         success: true,

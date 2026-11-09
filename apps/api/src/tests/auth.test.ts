@@ -614,6 +614,70 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
         .send({ token: rawResetToken, password: 'AnotherPassword#2026!' });
       expect(replayReset.status).toBe(400);
     });
+
+    it('verifies 6-digit reset OTP and allows creating a new password', async () => {
+      const studentEmail = `reset_otp_${Date.now()}@testcourse.com`;
+      const originalPassword = 'InitialValidPassword123!';
+      const newPassword = 'BrandNewValidPassword2026!';
+
+      // 1. Register student
+      const reg = await request(app)
+        .post('/api/v1/auth/register')
+        .send({
+          email: studentEmail,
+          password: originalPassword,
+          name: 'Reset Student',
+        });
+      expect(reg.status).toBe(201);
+
+      // 2. Request password reset (generates 6-digit OTP)
+      const forgotRes = await request(app)
+        .post('/api/v1/auth/forgot-password')
+        .send({ email: studentEmail });
+      expect(forgotRes.status).toBe(200);
+
+      // 3. Create a test OTP token
+      const testOtp = '654321';
+      const user = await prisma.user.findUnique({ where: { email: studentEmail.toLowerCase() } });
+      expect(user).toBeDefined();
+
+      await prisma.passwordResetToken.create({
+        data: {
+          id: uuidv7(),
+          userId: user!.id,
+          tokenHash: hashToken(`${studentEmail.toLowerCase()}:${testOtp}`),
+          expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+        },
+      });
+
+      // 4. Verify invalid OTP -> rejected
+      const invalidVerify = await request(app)
+        .post('/api/v1/auth/verify-reset-otp')
+        .send({ email: studentEmail, otp: '000000' });
+      expect(invalidVerify.status).toBe(400);
+
+      // 5. Verify valid OTP -> succeeds and returns single-use resetToken
+      const validVerify = await request(app)
+        .post('/api/v1/auth/verify-reset-otp')
+        .send({ email: studentEmail, otp: testOtp });
+      expect(validVerify.status).toBe(200);
+      expect(validVerify.body.success).toBe(true);
+      expect(validVerify.body.data.resetToken).toBeDefined();
+
+      const { resetToken } = validVerify.body.data;
+
+      // 6. Reset password with returned resetToken
+      const resetRes = await request(app)
+        .post('/api/v1/auth/reset-password')
+        .send({ token: resetToken, password: newPassword });
+      expect(resetRes.status).toBe(200);
+
+      // 7. Login with newly created password -> succeeds
+      const loginRes = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: studentEmail, password: newPassword });
+      expect(loginRes.status).toBe(200);
+    });
   });
 
   // ---------------------------------------------------------------------------

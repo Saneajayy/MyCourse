@@ -6,12 +6,13 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '../../components/ui';
 import { apiClient } from '../../lib/api-client';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialToken = searchParams.get('token') || '';
+  const initialEmail = searchParams.get('email') || '';
 
   const { error: toastError, success: toastSuccess } = useToast();
 
@@ -24,9 +25,20 @@ function ResetPasswordForm() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (initialToken) {
+      setToken(initialToken);
+    }
+  }, [initialToken]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+
+    if (!token.trim()) {
+      setErrorMsg('Reset token is missing. Please request a verification code.');
+      return;
+    }
 
     if (newPassword.length < 10) {
       setErrorMsg('Password must be at least 10 characters.');
@@ -87,19 +99,41 @@ function ResetPasswordForm() {
               </button>
             </div>
           </div>
+        ) : !token && !initialToken ? (
+          <div className="text-center py-4 space-y-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
+              Verification Code Required
+            </h2>
+            <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
+              To reset your password, please start by requesting a 6-digit code for your email address.
+            </p>
+            <div className="pt-4 border-t border-neutral-200">
+              <Link
+                href="/forgot-password"
+                className="w-full h-[46px] sm:h-[48px] bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-base rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Request Reset Code</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
         ) : (
           <>
             {/* Header & Title */}
-            <div className="text-center mb-5">
+            <div className="text-left mb-5">
               <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
-                Set New Password
+                Create New Password
               </h1>
               <p className="text-xs sm:text-sm text-neutral-600 mt-1.5 leading-relaxed">
-                Enter your reset token and your new strong password
+                {initialEmail ? (
+                  <>Setting new password for <strong className="text-neutral-900 font-semibold">{initialEmail}</strong></>
+                ) : (
+                  'Choose a secure new password of at least 10 characters'
+                )}
               </p>
             </div>
 
-            {/* Error Banner (center-aligned, no cross icon, no shadow) */}
+            {/* Error Banner */}
             {errorMsg && (
               <div className="mb-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium text-center">
                 <span>{errorMsg}</span>
@@ -108,22 +142,6 @@ function ResetPasswordForm() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-3.5">
-              {/* Token */}
-              <div className="space-y-1.5 text-left">
-                <label htmlFor="reset-token" className="text-sm font-bold text-neutral-900">
-                  Reset Security Token
-                </label>
-                <input
-                  id="reset-token"
-                  type="text"
-                  placeholder="Paste token from your email"
-                  required
-                  value={token}
-                  onChange={(e) => setToken(e.target.value)}
-                  className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none focus:ring-1 focus:ring-[#0033FF] transition-all font-mono"
-                />
-              </div>
-
               {/* New Password */}
               <div className="space-y-1.5 text-left">
                 <label htmlFor="reset-password" className="text-sm font-bold text-neutral-900">
@@ -186,7 +204,7 @@ function ResetPasswordForm() {
                 </div>
               </div>
 
-              {/* Submit Button (no shadow) */}
+              {/* Submit Button */}
               <div className="pt-2">
                 <button
                   type="submit"
@@ -194,7 +212,7 @@ function ResetPasswordForm() {
                   className="w-full h-[46px] sm:h-[48px] bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {isLoading && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
-                  <span>{isLoading ? 'Updating Password...' : 'Reset Password'}</span>
+                  <span>{isLoading ? 'Updating Password...' : 'Save New Password'}</span>
                 </button>
               </div>
             </form>

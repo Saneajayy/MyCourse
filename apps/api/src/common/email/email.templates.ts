@@ -225,16 +225,19 @@ export function getPasswordResetTemplate(data: {
 }): { subject: string; html: string; text: string } {
   const brandName = data.brandName || 'Hydro Basics';
   const resetUrl = `${env.APP_URL}/reset-password?token=${data.token}`;
-  const subject = `Password Reset Request - ${brandName}`;
+  const isOtp = /^\d{6}$/.test(data.token);
+  const subject = isOtp
+    ? `Your password reset code is ${data.token} - ${brandName}`
+    : `Password Reset Request - ${brandName}`;
 
   const text = `Hello ${data.name},
 
 We received a request to reset the password for your ${brandName} account.
 
-Click the link below to choose a new password:
-${resetUrl}
+Your 6-digit password reset code is:
+${data.token}
 
-This link expires in 30 minutes.
+Enter this code on the reset password screen to create a new password. This code expires in 15 minutes.
 
 If you did not request this password reset, please ignore this email. Your password will remain unchanged and your account is secure.
 
@@ -245,22 +248,28 @@ Support: ${data.supportEmail || 'support@hydrauliccourse.com'}`;
   const contentHtml = `
     <p style="margin: 0 0 14px 0;">Hello <strong>${data.name}</strong>,</p>
     <p style="margin: 0 0 14px 0;">We received a request to reset the password for your account at <strong>${brandName}</strong>.</p>
-    <p style="margin: 0 0 14px 0;">Click the button below to set a new password:</p>
+    <p style="margin: 0 0 14px 0;">Please use the 6-digit password reset code below to create your new password:</p>
+    <div style="text-align: center; margin: 26px 0;">
+      <div style="display: inline-block; padding: 14px 28px; background-color: #EEF2FF; border: 2px solid #0033FF; border-radius: 8px; font-family: monospace, Courier, sans-serif; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #0033FF;">
+        ${data.token}
+      </div>
+      <p style="margin: 10px 0 0 0; font-size: 12px; color: #64748B;">This code will expire in <strong>15 minutes</strong>.</p>
+    </div>
   `;
 
   const footerHtml = `
-    <p style="margin: 0 0 6px 0;">This password reset link expires in <strong>30 minutes</strong>.</p>
+    <p style="margin: 0 0 6px 0;">Enter this code on the password reset screen to create your new password.</p>
     <p style="margin: 0 0 6px 0;">If you did not request this, you can safely ignore this email. Your current password remains secure.</p>
-    <p style="margin: 0;">Direct URL: <span style="font-family: monospace; word-break: break-all; color: #0A192F;">${resetUrl}</span></p>
+    <p style="margin: 0;">Reset URL: <span style="font-family: monospace; word-break: break-all; color: #0A192F;">${resetUrl}</span></p>
   `;
 
   const html = buildEmailHtml({
     brandName,
     supportEmail: data.supportEmail,
-    preheader: 'Reset your account password.',
+    preheader: isOtp ? `Your password reset code is ${data.token}` : 'Reset your account password.',
     title: 'Reset Your Password',
     contentHtml,
-    cta: { text: 'Reset Password', url: resetUrl },
+    cta: { text: 'Enter Reset Code', url: `${env.APP_URL}/forgot-password?email=&step=otp` },
     footerHtml,
   });
 

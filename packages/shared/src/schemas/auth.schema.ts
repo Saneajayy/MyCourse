@@ -56,6 +56,15 @@ export const forgotPasswordSchema = z
 
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 
+export const verifyResetOtpSchema = z
+  .object({
+    email: z.string().trim().email('Invalid email address'),
+    otp: z.string().trim().min(6, 'Reset code must be 6 digits').max(8),
+  })
+  .strict();
+
+export type VerifyResetOtpInput = z.infer<typeof verifyResetOtpSchema>;
+
 export const resetPasswordSchema = z
   .object({
     token: z.string().min(1, 'Reset token is required'),
