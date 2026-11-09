@@ -381,11 +381,8 @@ function ForgotPasswordContent() {
             </div>
           </div>
 
-          {/* Horizontal Divider */}
-          <div className="-mx-5 sm:-mx-8 border-t border-neutral-200 my-6" />
-
-          {/* Footer - Wrong Account */}
-          <p className="text-center text-xs text-neutral-500 leading-normal">
+          {/* Wrong Account Link - Sized and styled identically to Create an account on login */}
+          <div className="mt-5 text-center text-sm text-neutral-600">
             Wrong account?{' '}
             <button
               type="button"
@@ -393,10 +390,22 @@ function ForgotPasswordContent() {
                 setStep('email');
                 setErrorMsg(null);
               }}
-              className="font-medium text-[#0033FF] hover:underline cursor-pointer ml-0.5"
+              className="font-bold text-[#0033FF] underline hover:text-[#0028D6] ml-1 cursor-pointer"
             >
               Try another email
             </button>
+          </div>
+
+          {/* Horizontal Divider */}
+          <div className="-mx-5 sm:-mx-8 border-t border-neutral-200 my-6" />
+
+          {/* Footer Disclaimer */}
+          <p className="text-center text-xs text-neutral-500 leading-normal">
+            Need assistance? Contact our{' '}
+            <Link href="/contact" className="underline hover:text-neutral-800">
+              support desk
+            </Link>
+            .
           </p>
         </>
       )}
