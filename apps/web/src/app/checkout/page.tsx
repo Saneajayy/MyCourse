@@ -396,6 +396,27 @@ function CheckoutContent() {
       return;
     }
 
+    if (!name.trim()) {
+      const msg = 'Please enter your full name for certificate and invoicing.';
+      setCheckoutError(msg);
+      toastError('Name Required', msg);
+      return;
+    }
+
+    if (!phone.trim()) {
+      const msg = 'Please enter your mobile phone number to receive your course receipt.';
+      setCheckoutError(msg);
+      toastError('Phone Number Required', msg);
+      return;
+    }
+
+    if (!/^[0-9+ -]{10,15}$/.test(phone.trim())) {
+      const msg = 'Please enter a valid 10 to 15 digit phone number.';
+      setCheckoutError(msg);
+      toastError('Invalid Phone', msg);
+      return;
+    }
+
     setCheckoutError(null);
     setIsSubmitting(true);
 
@@ -437,7 +458,7 @@ function CheckoutContent() {
           billingDetails: {
             name: name.trim(),
             email: email.trim(),
-            phone: phone.trim() ? phone.trim() : undefined,
+            phone: phone.trim(),
             gstin: gstin.trim() ? gstin.trim().toUpperCase() : undefined,
             country: 'IN',
           },
@@ -485,7 +506,7 @@ function CheckoutContent() {
         prefill: {
           name: name.trim(),
           email: email.trim(),
-          contact: phone.trim() || undefined,
+          contact: phone.trim(),
         },
         theme: {
           color: '#0033FF',
@@ -684,7 +705,7 @@ function CheckoutContent() {
                   <button
                     type="submit"
                     disabled={couponLoading}
-                    className="h-10 px-4 bg-white hover:bg-neutral-100 text-[#00186B] font-bold text-xs rounded-lg transition-all shadow-sm flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0"
+                    className="h-10 px-4 bg-white hover:bg-neutral-100 text-[#00186B] font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0"
                   >
                     {couponLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin text-[#00186B]" />
@@ -832,7 +853,7 @@ function CheckoutContent() {
                 <div className="flex flex-wrap items-center gap-2.5 pt-1">
                   <Link
                     href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
-                    className="h-9 px-3.5 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs rounded-lg shadow-sm transition-all flex items-center justify-center cursor-pointer"
+                    className="h-9 px-3.5 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer"
                   >
                     Enter 6-Digit OTP
                   </Link>
@@ -840,7 +861,7 @@ function CheckoutContent() {
                     type="button"
                     onClick={handleResendVerification}
                     disabled={resendingVerification}
-                    className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-lg shadow-sm transition-all flex items-center cursor-pointer disabled:opacity-60"
+                    className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-lg transition-all flex items-center cursor-pointer disabled:opacity-60"
                   >
                     {resendingVerification ? (
                       <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
@@ -853,7 +874,7 @@ function CheckoutContent() {
                     type="button"
                     onClick={handleCheckVerification}
                     disabled={checkingVerification}
-                    className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-lg shadow-sm transition-all flex items-center cursor-pointer disabled:opacity-60"
+                    className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-lg transition-all flex items-center cursor-pointer disabled:opacity-60"
                   >
                     {checkingVerification ? (
                       <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
@@ -919,12 +940,13 @@ function CheckoutContent() {
             {/* Phone Number */}
             <div className="space-y-1.5 text-left">
               <label htmlFor="checkout-phone" className="text-sm font-bold text-neutral-900 flex items-center justify-between">
-                <span>Phone Number</span>
+                <span>Phone Number <span className="text-rose-500">*</span></span>
                 <span className="text-[11px] font-normal text-neutral-500">SMS &amp; WhatsApp Receipt</span>
               </label>
               <input
                 id="checkout-phone"
                 type="tel"
+                required
                 placeholder="+91 98765 43210"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
@@ -961,7 +983,7 @@ function CheckoutContent() {
             {!isAuthenticated ? (
               <Link
                 href="/login?redirect=/checkout"
-                className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all shadow-md shadow-[#0033FF]/20 hover:shadow-lg hover:shadow-[#0033FF]/30 flex items-center justify-center cursor-pointer text-center select-none"
+                className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all flex items-center justify-center cursor-pointer text-center select-none"
               >
                 Sign In to Continue Checkout &rarr;
               </Link>
@@ -978,7 +1000,7 @@ function CheckoutContent() {
                 type="button"
                 onClick={handleProceedToPayment}
                 disabled={quoteLoading || isSubmitting}
-                className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all shadow-md shadow-[#0033FF]/20 hover:shadow-lg hover:shadow-[#0033FF]/30 disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer select-none"
+                className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer select-none"
               >
                 {isSubmitting || quoteLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin text-white" />
