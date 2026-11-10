@@ -660,7 +660,7 @@ function CheckoutContent() {
           aria-hidden="true"
         />
         {/* Price & Coupon Controls (Directly on Image, No Card) */}
-        <div className="relative z-10 w-full mb-6 select-none">
+        <div className="relative z-10 w-full mb-1 select-none">
           <div className="flex items-end justify-between gap-4">
             {/* Coupon Code Entry: Apply button then input bar */}
             <div className="shrink-0">
@@ -723,28 +723,6 @@ function CheckoutContent() {
               </span>
             </div>
           </div>
-        </div>
-
-        {/* Terms & Refund Disclaimer (Desktop Only - Bottom of Left Section) */}
-        <div className="relative z-10 text-center text-xs text-blue-100/75 space-y-1">
-          <p>
-            By completing this payment, you agree to the{' '}
-            <Link href="/terms" className="underline text-white hover:text-cyan-200">
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link href="/refunds" className="underline text-white hover:text-cyan-200">
-              Refund Policy
-            </Link>
-            .
-          </p>
-          <p className="text-[11px] text-blue-100/60">
-            Need assistance? Contact{' '}
-            <a href={`mailto:${siteConfig.supportEmail}`} className="underline text-white hover:text-cyan-200">
-              {siteConfig.supportEmail}
-            </a>
-            .
-          </p>
         </div>
       </div>
 
@@ -1118,8 +1096,8 @@ function CheckoutContent() {
             </div>
           </div>
 
-          {/* Terms & Refund Disclaimer (Mobile Only - Below Billing Info) */}
-          <div className="lg:hidden pt-1 text-center text-xs text-neutral-500 space-y-1">
+          {/* Terms & Refund Disclaimer (Below Billing Info - Desktop & Mobile) */}
+          <div className="pt-1 text-center text-xs text-neutral-500 space-y-1">
             <p>
               By completing this payment, you agree to the{' '}
               <Link href="/terms" className="underline hover:text-neutral-800">
