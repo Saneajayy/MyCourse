@@ -47,7 +47,7 @@ export default function OrderFailedPage() {
   const orderId = params.id as string;
 
   return (
-    <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
+    <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
       <div className="noise-texture" aria-hidden="true" />
       <OrderFailedNavbar />
 
@@ -127,7 +127,7 @@ export default function OrderFailedPage() {
             <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <Link
                 href="/checkout"
-                className="flex-1 h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-sm uppercase rounded-md sm:rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer tracking-wider"
+                className="flex-1 h-12 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-sm uppercase rounded-md sm:rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer tracking-wider"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Retry Payment</span>

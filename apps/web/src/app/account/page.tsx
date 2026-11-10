@@ -11,8 +11,8 @@ export default function AccountPage() {
   }, [router]);
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-[#00186B] text-white flex items-center justify-center font-reddit">
-      <div className="flex items-center gap-3 text-sm font-bold text-blue-200">
+    <div className="fixed inset-0 w-full h-full bg-black text-white flex items-center justify-center font-reddit">
+      <div className="flex items-center gap-3 text-sm font-bold text-neutral-400">
         <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
         <span>Loading Account Profile...</span>
       </div>

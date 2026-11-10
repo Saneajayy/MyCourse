@@ -95,8 +95,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }) {
   const configs = {
     info: {
-      badgeBg: 'bg-[#0033FF]/10 border-[#0033FF]/20 text-[#0033FF]',
-      borderAccent: 'border-l-[#0033FF]',
+      badgeBg: 'bg-black/10 border-black/20 text-black',
+      borderAccent: 'border-l-[#000000]',
       icon: <Info className="w-4 h-4 stroke-[2.5]" />,
     },
     success: {

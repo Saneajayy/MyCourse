@@ -53,24 +53,24 @@ export function CertificateSection() {
             maxTilt={4}
           >
             {/* Inner White Card with Blue Border & Blue Content */}
-            <div className="relative z-10 bg-white border border-[#0033FF] rounded-md sm:rounded-lg overflow-hidden text-[#0033FF] flex flex-col">
+            <div className="relative z-10 bg-white border border-black rounded-md sm:rounded-lg overflow-hidden text-black flex flex-col">
               {/* Top Bar: COURSE CERTIFICATE and CERT-98372 */}
               <div className="flex items-center justify-between px-5 sm:px-6 pt-5 sm:pt-6 pb-3.5 sm:pb-4">
-                <span className="text-[#0033FF] font-normal text-[11px] sm:text-[12px] tracking-[0.06em] uppercase">
+                <span className="text-black font-normal text-[11px] sm:text-[12px] tracking-[0.06em] uppercase">
                   COURSE CERTIFICATE
                 </span>
-                <span className="text-[#0033FF] font-normal text-[11px] sm:text-[12px] tracking-[0.06em] uppercase">
+                <span className="text-black font-normal text-[11px] sm:text-[12px] tracking-[0.06em] uppercase">
                   CERT-98372
                 </span>
               </div>
 
               {/* Top Divider Line */}
-              <div className="w-full border-b border-[#0033FF]" />
+              <div className="w-full border-b border-black" />
 
               {/* Main Certificate Content */}
               <div className="px-5 sm:px-6 pt-6 sm:pt-7 pb-6 sm:pb-7 flex flex-col items-start text-left">
                 {/* 1. Certificate Title */}
-                <div className="flex flex-col items-start text-left mt-1 sm:mt-2 select-none leading-none text-[#0033FF]">
+                <div className="flex flex-col items-start text-left mt-1 sm:mt-2 select-none leading-none text-black">
                   <span className="font-light text-[32px] sm:text-[36px] tracking-tight uppercase leading-[1.05]">
                     CERTIFICATE OF
                   </span>
@@ -80,17 +80,17 @@ export function CertificateSection() {
                 </div>
 
                 {/* 3. "presented to" */}
-                <p className="text-[#0033FF]/75 font-light text-[13px] sm:text-[14px] lowercase tracking-normal text-left mt-5 sm:mt-6 select-none">
+                <p className="text-black/75 font-light text-[13px] sm:text-[14px] lowercase tracking-normal text-left mt-5 sm:mt-6 select-none">
                   presented to
                 </p>
 
-                <h3 className="font-extrabold text-[#0033FF] text-[24px] sm:text-[27px] tracking-wide uppercase leading-tight select-none mt-1 sm:mt-1.5 mb-2.5 sm:mb-3">
+                <h3 className="font-extrabold text-black text-[24px] sm:text-[27px] tracking-wide uppercase leading-tight select-none mt-1 sm:mt-1.5 mb-2.5 sm:mb-3">
                   VARUN KUMAR
                 </h3>
 
                 {/* 5. Course Completion Description */}
-                <p className="text-[#0033FF]/80 font-light text-[12px] sm:text-[13px] leading-[1.45] text-left select-none max-w-[340px]">
-                  For completing the course of <strong className="font-bold text-[#0033FF]">Hydraulic System Basics</strong> by Mr. Hira lal, covering the Fundamentals of Hydraulic systems, components and circuit designs.
+                <p className="text-black/80 font-light text-[12px] sm:text-[13px] leading-[1.45] text-left select-none max-w-[340px]">
+                  For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong> by Mr. Hira lal, covering the Fundamentals of Hydraulic systems, components and circuit designs.
                 </p>
 
                 {/* 6. Bottom Row: QR Code (Left) and Signature (Right) */}
@@ -119,12 +119,12 @@ export function CertificateSection() {
                         priority
                       />
                     </div>
-                    <span className="font-normal text-[#0033FF] text-[11px] sm:text-xs tracking-normal mt-0.5">
+                    <span className="font-normal text-black text-[11px] sm:text-xs tracking-normal mt-0.5">
                       Course Instructor
                     </span>
 
                     {/* Exact Stacked Brand Logo below Course Instructor */}
-                    <div className="flex flex-col items-start -space-y-0.5 leading-[0.92] text-[#0033FF] select-none mt-2 sm:mt-2.5">
+                    <div className="flex flex-col items-start -space-y-0.5 leading-[0.92] text-black select-none mt-2 sm:mt-2.5">
                       <span className="font-extrabold text-[26px] sm:text-[29px] tracking-[0.01em] uppercase leading-[0.92]">
                         HYDRO
                       </span>
@@ -160,7 +160,7 @@ export function CertificateSection() {
             </div>
 
             {/* Inner Blue Frame & Certificate Content Area */}
-            <div className="relative z-10 border border-[#0033FF]/35 rounded-md sm:rounded-lg p-6 sm:p-7 md:p-8 lg:p-9 min-h-[460px] md:min-h-[476px]" />
+            <div className="relative z-10 border border-black/35 rounded-md sm:rounded-lg p-6 sm:p-7 md:p-8 lg:p-9 min-h-[460px] md:min-h-[476px]" />
           </TiltCard>
         </div>
       </div>

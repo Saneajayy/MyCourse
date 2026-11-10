@@ -120,7 +120,7 @@ export default function OrderSuccessPage() {
   if (loading) {
     return (
       <div className="w-full h-screen h-[100dvh] flex flex-col items-center justify-center space-y-4 bg-white font-reddit">
-        <Loader2 className="w-10 h-10 animate-spin text-[#0033FF]" />
+        <Loader2 className="w-10 h-10 animate-spin text-black" />
         <p className="text-sm font-semibold tracking-wider uppercase text-neutral-600">
           Loading Order Receipt...
         </p>
@@ -138,7 +138,7 @@ export default function OrderSuccessPage() {
           </p>
           <Link
             href="/my-courses"
-            className="inline-flex items-center justify-center h-11 px-6 bg-[#0033FF] text-white font-bold text-sm uppercase rounded-lg hover:bg-[#0028D6] transition-colors"
+            className="inline-flex items-center justify-center h-11 px-6 bg-black text-white font-bold text-sm uppercase rounded-lg hover:bg-[#262626] transition-colors"
           >
             Go to My Courses
           </Link>
@@ -163,11 +163,11 @@ export default function OrderSuccessPage() {
       : order.product.title || 'Hydraulic System Basics';
 
   return (
-    <div className="w-full h-screen h-[100dvh] overflow-hidden bg-white font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col lg:flex-row">
+    <div className="w-full h-screen h-[100dvh] overflow-hidden bg-white font-reddit selection:bg-black selection:text-white flex flex-col lg:flex-row">
       {/* ============================================================== */}
       {/* LEFT COLUMN (Desktop Only): Signature Halftone Graphic         */}
       {/* ============================================================== */}
-      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-end lg:w-1/2 h-full bg-[#00186B] overflow-hidden select-none p-6 sm:p-8">
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-end lg:w-1/2 h-full bg-black overflow-hidden select-none p-6 sm:p-8">
         <Image
           src="/login-pixelated.png"
           alt="HydroBasics Industrial Hydraulic Engineer"
@@ -177,7 +177,7 @@ export default function OrderSuccessPage() {
           className="object-cover object-center mix-blend-screen opacity-95 select-none"
         />
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/95 via-[#000c3b]/45 to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-t from-[#000000]/95 via-[#000000]/45 to-transparent pointer-events-none"
           aria-hidden="true"
         />
 
@@ -192,7 +192,7 @@ export default function OrderSuccessPage() {
             </div>
 
             <div className="flex flex-col items-end shrink-0 text-right">
-              <span className="text-[11px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
+              <span className="text-[11px] uppercase font-bold tracking-wider text-neutral-400 drop-shadow">
                 Amount Paid
               </span>
               <span className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
@@ -212,16 +212,16 @@ export default function OrderSuccessPage() {
           <div className="pointer-events-auto">
             <Link
               href="/my-courses"
-              className="text-xs sm:text-sm font-bold text-neutral-600 hover:text-[#0033FF] flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="text-xs sm:text-sm font-bold text-neutral-600 hover:text-black flex items-center gap-1.5 transition-colors cursor-pointer"
             >
-              <BookOpen className="w-4 h-4 text-[#0033FF]" />
+              <BookOpen className="w-4 h-4 text-black" />
               <span>My Courses &rarr;</span>
             </Link>
           </div>
 
           <Link
             href="/"
-            className="pointer-events-auto flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+            className="pointer-events-auto flex flex-col items-end -space-y-0.5 leading-[0.92] text-black hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
             aria-label="HYDRO BASICS Home - Back to Course"
           >
             <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
@@ -234,7 +234,7 @@ export default function OrderSuccessPage() {
         </header>
 
         {/* Mobile Upper Part: Fixed Halftone Graphic */}
-        <div className="lg:hidden relative w-full h-[220px] sm:h-[250px] bg-[#00186B] shrink-0 overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5">
+        <div className="lg:hidden relative w-full h-[220px] sm:h-[250px] bg-black shrink-0 overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5">
           <Image
             src="/login-pixelated.png"
             alt="HydroBasics Industrial Hydraulic Engineer"
@@ -244,14 +244,14 @@ export default function OrderSuccessPage() {
             className="object-cover object-center mix-blend-screen opacity-95 select-none"
           />
           <div
-            className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/95 via-[#000c3b]/35 to-[#000c3b]/45 pointer-events-none"
+            className="absolute inset-0 bg-gradient-to-t from-[#000000]/95 via-[#000000]/35 to-[#000000]/45 pointer-events-none"
             aria-hidden="true"
           />
 
           <div className="relative z-10 w-full flex items-center justify-between">
             <Link
               href="/my-courses"
-              className="text-xs text-blue-100 font-semibold flex items-center gap-1 hover:text-white"
+              className="text-xs text-neutral-300 font-semibold flex items-center gap-1 hover:text-white"
             >
               <BookOpen className="w-3.5 h-3.5" />
               <span>My Courses &rarr;</span>
@@ -280,7 +280,7 @@ export default function OrderSuccessPage() {
               </div>
 
               <div className="flex flex-col items-end shrink-0 text-right">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400 drop-shadow">
                   Amount Paid
                 </span>
                 <span className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">

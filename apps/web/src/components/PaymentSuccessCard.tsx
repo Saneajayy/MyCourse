@@ -44,7 +44,7 @@ interface ConfettiParticle {
 }
 
 const CONFETTI_COLORS = [
-  '#0033FF', // royal blue
+  '#000000', // royal blue
   '#3B82F6', // sky blue
   '#10B981', // emerald
   '#F59E0B', // gold
@@ -66,7 +66,7 @@ function createBurstParticles(cx: number, cy: number, count = 28): ConfettiParti
       randType > 0.4 ? 'rect' : randType > 0.15 ? 'circle' : 'sparkle';
 
     const color =
-      CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)] ?? '#0033FF';
+      CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)] ?? '#000000';
 
     particles.push({
       x: cx + Math.cos(angle) * spawnDist,
@@ -235,7 +235,7 @@ export function PaymentSuccessCard({
           <ConfettiBurst />
 
           {/* Blue Circle with White Tick */}
-          <div className="relative z-10 w-12 h-12 rounded-full bg-[#0033FF] text-white flex items-center justify-center shrink-0">
+          <div className="relative z-10 w-12 h-12 rounded-full bg-black text-white flex items-center justify-center shrink-0">
             <svg
               className="w-6 h-6"
               viewBox="0 0 24 24"
@@ -266,7 +266,7 @@ export function PaymentSuccessCard({
 
       {/* 2. Combined Course & Price Block with Blue Boundary (Order Summary text removed) */}
       <div className="pt-0.5">
-        <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl border border-[#0033FF]">
+        <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl border border-black">
           {/* Left: Course Name & Validity */}
           <div className="min-w-0 flex-1 space-y-0.5">
             <span className="font-bold text-neutral-900 text-sm sm:text-base block truncate">
@@ -304,7 +304,7 @@ export function PaymentSuccessCard({
         {/* Primary CTA */}
         <Link
           href={`/learn/${data.courseSlug || 'hydraulic-engineering-mastery'}`}
-          className="w-full h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-sm sm:text-[15px] rounded-xl shadow-sm hover:shadow transition-all flex items-center justify-center cursor-pointer tracking-wide"
+          className="w-full h-12 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-sm sm:text-[15px] rounded-xl shadow-sm hover:shadow transition-all flex items-center justify-center cursor-pointer tracking-wide"
         >
           <span>Start learning</span>
         </Link>
@@ -315,7 +315,7 @@ export function PaymentSuccessCard({
             type="button"
             onClick={onDownloadInvoice}
             disabled={downloadingInvoice}
-            className="w-full h-12 border border-[#0033FF] bg-white hover:bg-blue-50/50 text-[#0033FF] font-bold text-sm sm:text-[15px] rounded-xl transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center text-center"
+            className="w-full h-12 border border-black bg-white hover:bg-neutral-100 text-black font-bold text-sm sm:text-[15px] rounded-xl transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center text-center"
           >
             {downloadingInvoice ? 'Downloading Receipt...' : 'Download Receipt'}
           </button>

@@ -64,35 +64,35 @@ export function PricingSection({
               className="relative w-full max-w-[410px] sm:max-w-[475px] md:max-w-[530px] lg:max-w-[580px] xl:max-w-[630px] p-7 sm:p-8 md:p-9 lg:p-10 bg-white rounded-lg sm:rounded-xl select-none cursor-pointer"
               maxTilt={5.5}
             >
-              {/* Card Content in Royal Blue #0033FF */}
+              {/* Card Content in Royal Blue #000000 */}
               <div className="relative z-10 flex flex-col items-start w-full">
                 {/* Course Title Header */}
-                <span className="text-[#0033FF] font-bold text-sm sm:text-base md:text-[17px] tracking-tight uppercase">
+                <span className="text-black font-bold text-sm sm:text-base md:text-[17px] tracking-tight uppercase">
                   HYDRAULIC SYSTEM BASICS
                 </span>
 
                 {/* Price Display */}
-                <div className="text-[#0033FF] font-bold text-5xl sm:text-6xl md:text-[66px] lg:text-[72px] tracking-tight mt-1.5 sm:mt-2 leading-none">
+                <div className="text-black font-bold text-5xl sm:text-6xl md:text-[66px] lg:text-[72px] tracking-tight mt-1.5 sm:mt-2 leading-none">
                   {priceFormatted}
                 </div>
 
                 {/* Subtitle */}
-                <p className="text-[#0033FF]/80 font-medium text-xs sm:text-sm md:text-[15px] mt-1.5 sm:mt-2">
+                <p className="text-black/80 font-medium text-xs sm:text-sm md:text-[15px] mt-1.5 sm:mt-2">
                   One-time payment. No monthly fees.
                 </p>
 
                 {/* Divider Line */}
-                <div className="w-full border-b border-[#0033FF]/20 my-5 sm:my-6 md:my-7" />
+                <div className="w-full border-b border-black/20 my-5 sm:my-6 md:my-7" />
 
                 {/* Features List with Claude-Style Starburst Bullet Points */}
                 <div className="space-y-3.5 sm:space-y-4 md:space-y-4.5 w-full">
                   {features.map((feature) => (
                     <div key={feature} className="flex items-center gap-3">
                       {/* Claude-Like Sign Bullet Point */}
-                      <ClaudeIcon className="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px] md:w-[22px] md:h-[22px] text-[#0033FF] shrink-0" />
+                      <ClaudeIcon className="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px] md:w-[22px] md:h-[22px] text-black shrink-0" />
 
                       {/* Feature Text */}
-                      <span className="text-[#0033FF] font-bold text-[15px] sm:text-[16px] md:text-[17.5px] lg:text-[18.5px] leading-tight">
+                      <span className="text-black font-bold text-[15px] sm:text-[16px] md:text-[17.5px] lg:text-[18.5px] leading-tight">
                         {feature}
                       </span>
                     </div>
@@ -102,16 +102,16 @@ export function PricingSection({
                 {/* Checkout CTA Button: Enlarged, bold, high-contrast */}
                 <Link
                   href="/checkout"
-                  className="mt-7 sm:mt-8 md:mt-9 w-full h-[54px] sm:h-[58px] md:h-[62px] lg:h-[66px] py-0 px-2 rounded-xl bg-[#0033FF] hover:bg-[#0022cc] text-white font-black text-[24px] sm:text-[27px] md:text-[30px] lg:text-[32px] uppercase tracking-wide flex items-center justify-center leading-none text-center transition-all duration-200 active:scale-[0.98]"
+                  className="mt-7 sm:mt-8 md:mt-9 w-full h-[54px] sm:h-[58px] md:h-[62px] lg:h-[66px] py-0 px-2 rounded-xl bg-black hover:bg-[#262626] text-white font-black text-[24px] sm:text-[27px] md:text-[30px] lg:text-[32px] uppercase tracking-wide flex items-center justify-center leading-none text-center transition-all duration-200 active:scale-[0.98]"
                 >
                   CHECKOUT NOW
                 </Link>
 
                 {/* Secure Payment Footer */}
-                <div className="mt-3.5 sm:mt-4 w-full flex items-center justify-center gap-1.5 text-[#0033FF]/80 text-xs sm:text-[13px]">
+                <div className="mt-3.5 sm:mt-4 w-full flex items-center justify-center gap-1.5 text-black/80 text-xs sm:text-[13px]">
                   <span>Secure payments powered by</span>
-                  <span className="font-bold text-[#0033FF] italic flex items-center gap-0.5">
-                    <svg className="w-3.5 h-3.5 fill-[#0033FF]" viewBox="0 0 24 24">
+                  <span className="font-bold text-black italic flex items-center gap-0.5">
+                    <svg className="w-3.5 h-3.5 fill-black" viewBox="0 0 24 24">
                       <path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5L4.5 9.75 3 10.5l9 4.5 9-4.5-1.5-.75L12 13.5z" />
                     </svg>
                     Razorpay

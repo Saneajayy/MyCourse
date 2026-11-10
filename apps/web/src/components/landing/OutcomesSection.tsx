@@ -49,17 +49,17 @@ export function OutcomesSection() {
               className="relative p-5 sm:p-8 md:p-9 lg:p-10 bg-white rounded-lg sm:rounded-xl select-none group cursor-pointer"
               maxTilt={6.5}
             >
-              {/* Card Content (stays crisp, sharp and vector-rendered in #0033FF) */}
+              {/* Card Content (stays crisp, sharp and vector-rendered in #000000) */}
               <div className="relative z-10 flex items-start gap-3 sm:gap-4.5 md:gap-5">
                 {/* Claude-Like Sign Bullet Point: Mobile original, sm+ enlarged */}
-                <ClaudeIcon className="w-[19px] h-[19px] sm:w-[26px] sm:h-[26px] md:w-[28px] md:h-[28px] text-[#0033FF] shrink-0 mt-0.5 sm:mt-1" />
+                <ClaudeIcon className="w-[19px] h-[19px] sm:w-[26px] sm:h-[26px] md:w-[28px] md:h-[28px] text-black shrink-0 mt-0.5 sm:mt-1" />
 
                 {/* Typography: Mobile original (19px/15px), sm+ enlarged (24-27px/17.5-19.5px) */}
                 <div className="flex flex-col">
-                  <h3 className="text-[#0033FF] font-bold text-[19px] sm:text-[24px] md:text-[26px] lg:text-[27px] tracking-[-0.01em] leading-tight">
+                  <h3 className="text-black font-bold text-[19px] sm:text-[24px] md:text-[26px] lg:text-[27px] tracking-[-0.01em] leading-tight">
                     {item.title}
                   </h3>
-                  <p className="mt-1.5 sm:mt-2.5 text-[#0033FF] font-normal text-[15px] sm:text-[17.5px] md:text-[18.5px] lg:text-[19.5px] leading-snug tracking-[-0.005em]">
+                  <p className="mt-1.5 sm:mt-2.5 text-black font-normal text-[15px] sm:text-[17.5px] md:text-[18.5px] lg:text-[19.5px] leading-snug tracking-[-0.005em]">
                     {item.desc}
                   </p>
                 </div>

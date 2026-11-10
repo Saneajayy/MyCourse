@@ -157,7 +157,7 @@ function LoginForm() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none focus:ring-1 focus:ring-[#0033FF] transition-all"
+                className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
               />
               {email.includes('@') && email.length > 4 && (
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-600">
@@ -189,7 +189,7 @@ function LoginForm() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none focus:ring-1 focus:ring-[#0033FF] transition-all"
+                className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
               />
               <button
                 type="button"
@@ -211,7 +211,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full h-[46px] sm:h-[48px] bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
             >
               {isLoading && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
               <span>{isLoading ? 'Signing in...' : 'Sign in'}</span>
@@ -224,7 +224,7 @@ function LoginForm() {
           New here?{' '}
           <Link
             href={redirectUrl ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : '/register'}
-            className="font-bold text-[#0033FF] underline hover:text-[#0028D6] ml-1"
+            className="font-bold text-black underline hover:text-[#262626] ml-1"
           >
             Create an account
           </Link>
@@ -257,9 +257,9 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-white font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col lg:flex-row overflow-hidden">
+    <div className="fixed inset-0 w-full h-full bg-white font-reddit selection:bg-black selection:text-white flex flex-col lg:flex-row overflow-hidden">
       {/* Left Column (Desktop Only): Signature Dot Halftone Graphic on Deep Cobalt Blue */}
-      <div className="hidden lg:relative lg:flex lg:w-1/2 h-full bg-[#00186B] overflow-hidden select-none">
+      <div className="hidden lg:relative lg:flex lg:w-1/2 h-full bg-black overflow-hidden select-none">
         <Image
           src="/login-pixelated.png"
           alt="HydroBasics Industrial Hydraulic Engineer"
@@ -270,7 +270,7 @@ export default function LoginPage() {
         />
         {/* Soft overlay gradient for subtle depth */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/80 via-transparent to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-t from-[#000000]/80 via-transparent to-transparent pointer-events-none"
           aria-hidden="true"
         />
       </div>
@@ -281,7 +281,7 @@ export default function LoginPage() {
         <header className="w-full flex items-center justify-end px-5 pt-5 sm:px-8 sm:pt-8 shrink-0 z-20">
           <Link
             href="/"
-            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-black hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
             aria-label="HYDRO BASICS Home - Back to Course"
           >
             <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">

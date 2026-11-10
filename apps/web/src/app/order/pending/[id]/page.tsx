@@ -116,7 +116,7 @@ export default function OrderPendingPage() {
   };
 
   return (
-    <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
+    <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
       <div className="noise-texture" aria-hidden="true" />
       <OrderPendingNavbar />
 
@@ -175,7 +175,7 @@ export default function OrderPendingPage() {
           <div className="relative z-10 w-full text-neutral-900 space-y-6 text-left">
             {!isTimedOut && !errorMsg && (
               <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-[#0033FF]/10 text-[#0033FF] inline-flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-black/10 text-black inline-flex items-center justify-center">
                   <Loader2 className="w-6 h-6 animate-spin stroke-[2.5]" />
                 </div>
                 <h2 className="text-2xl font-bold text-neutral-900 tracking-tight">
@@ -205,7 +205,7 @@ export default function OrderPendingPage() {
                   <button
                     type="button"
                     onClick={handleManualRefresh}
-                    className="h-11 px-6 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-sm uppercase rounded-md shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="h-11 px-6 bg-black hover:bg-[#262626] text-white font-bold text-sm uppercase rounded-md shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <RefreshCw className="w-4 h-4" />
                     <span>Check Status Again</span>
@@ -227,7 +227,7 @@ export default function OrderPendingPage() {
                 </div>
                 <Link
                   href="/checkout"
-                  className="inline-flex items-center justify-center h-11 px-6 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-sm uppercase rounded-md transition-colors"
+                  className="inline-flex items-center justify-center h-11 px-6 bg-black hover:bg-[#262626] text-white font-bold text-sm uppercase rounded-md transition-colors"
                 >
                   Return to Checkout
                 </Link>

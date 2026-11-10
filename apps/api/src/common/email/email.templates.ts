@@ -188,7 +188,7 @@ Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
     <p style="margin: 0 0 14px 0;">Thank you for registering at <strong>${brandName}</strong>.</p>
     <p style="margin: 0 0 14px 0;">Please use the 6-digit verification code below to activate your student account:</p>
     <div style="text-align: center; margin: 26px 0;">
-      <div style="display: inline-block; padding: 14px 28px; background-color: #EEF2FF; border: 2px solid #0033FF; border-radius: 8px; font-family: monospace, Courier, sans-serif; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #0033FF;">
+      <div style="display: inline-block; padding: 14px 28px; background-color: #EEF2FF; border: 2px solid #000000; border-radius: 8px; font-family: monospace, Courier, sans-serif; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #000000;">
         ${data.token}
       </div>
       <p style="margin: 10px 0 0 0; font-size: 12px; color: #64748B;">This verification code will expire in <strong>15 minutes</strong>.</p>
@@ -250,7 +250,7 @@ Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
     <p style="margin: 0 0 14px 0;">We received a request to reset the password for your account at <strong>${brandName}</strong>.</p>
     <p style="margin: 0 0 14px 0;">Please use the 6-digit password reset code below to create your new password:</p>
     <div style="text-align: center; margin: 26px 0;">
-      <div style="display: inline-block; padding: 14px 28px; background-color: #EEF2FF; border: 2px solid #0033FF; border-radius: 8px; font-family: monospace, Courier, sans-serif; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #0033FF;">
+      <div style="display: inline-block; padding: 14px 28px; background-color: #EEF2FF; border: 2px solid #000000; border-radius: 8px; font-family: monospace, Courier, sans-serif; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #000000;">
         ${data.token}
       </div>
       <p style="margin: 10px 0 0 0; font-size: 12px; color: #64748B;">This code will expire in <strong>15 minutes</strong>.</p>

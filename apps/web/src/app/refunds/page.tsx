@@ -66,7 +66,7 @@ function RefundNavbar() {
 
 export default function RefundPage() {
   return (
-    <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
+    <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
       {/* Background Noise Texture */}
       <div className="noise-texture" aria-hidden="true" />
 
@@ -138,10 +138,10 @@ export default function RefundPage() {
             {/* Meta Header */}
             <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#0033FF] flex items-center justify-center text-white shrink-0 shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white shrink-0 shadow-sm">
                   <RefreshCw className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0033FF]">
+                <span className="text-xs font-bold uppercase tracking-wider text-black">
                   100% Engineering Satisfaction Guarantee
                 </span>
               </div>
@@ -154,7 +154,7 @@ export default function RefundPage() {
             <div className="space-y-8 text-sm sm:text-base text-neutral-800 leading-relaxed">
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">01.</span> Free Previews Before Purchase
+                  <span className="text-black font-mono">01.</span> Free Previews Before Purchase
                 </h2>
                 <p>
                   We provide free, full-length preview video lessons on our homepage for all prospective students. We strongly encourage you to watch the free preview videos, inspect the curriculum syllabus, and verify seamless video streaming on your plant device prior to purchasing enrollment.
@@ -163,22 +163,22 @@ export default function RefundPage() {
 
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">02.</span> 7-Day Money-Back Evaluation Window
+                  <span className="text-black font-mono">02.</span> 7-Day Money-Back Evaluation Window
                 </h2>
                 <p>
                   We want you to be completely confident in the practical, industrial value of this training. If you determine that the course does not meet your engineering expectations, you are eligible for a <strong className="text-neutral-950">100% full refund</strong> within <strong className="text-neutral-950">7 calendar days</strong> of purchase, provided:
                 </p>
                 <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-md space-y-2 text-xs sm:text-sm text-neutral-700">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#0033FF] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-black shrink-0" />
                     <span>Your request is received within 7 calendar days of the payment timestamp.</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#0033FF] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-black shrink-0" />
                     <span>You have watched less than <strong className="text-neutral-950">20% of the total course video curriculum</strong>.</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#0033FF] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-black shrink-0" />
                     <span>You have not downloaded all supplementary blueprint files or proprietary calculators.</span>
                   </div>
                 </div>
@@ -186,13 +186,13 @@ export default function RefundPage() {
 
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">03.</span> How to Initiate a Refund
+                  <span className="text-black font-mono">03.</span> How to Initiate a Refund
                 </h2>
                 <p>
                   To request a refund, simply send an email from your registered account email address to{' '}
                   <a
                     href={`mailto:${siteConfig.supportEmail}`}
-                    className="font-bold underline text-[#0033FF] hover:underline"
+                    className="font-bold underline text-black hover:underline"
                   >
                     {siteConfig.supportEmail}
                   </a>{' '}
@@ -205,7 +205,7 @@ export default function RefundPage() {
 
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">04.</span> Settlement Timeline &amp; Reversal
+                  <span className="text-black font-mono">04.</span> Settlement Timeline &amp; Reversal
                 </h2>
                 <p>
                   Approved refunds are processed immediately through our Razorpay merchant integration. Funds are credited back to your original payment source (Bank Account, Credit/Debit Card, or UPI handle) within <strong className="text-neutral-950">5 to 7 business days</strong> according to banking clearing cycles.
@@ -217,7 +217,7 @@ export default function RefundPage() {
 
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">05.</span> No Recurring Subscriptions or Hidden Charges
+                  <span className="text-black font-mono">05.</span> No Recurring Subscriptions or Hidden Charges
                 </h2>
                 <p>
                   Course enrollment is strictly a single, one-time payment providing 365 days of streaming access. We do NOT maintain auto-debits, recurring subscriptions, or surprise renewal fees. You remain in complete control of your payment transactions.

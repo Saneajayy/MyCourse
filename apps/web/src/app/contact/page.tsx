@@ -119,7 +119,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
+    <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
       {/* Background Noise Texture */}
       <div className="noise-texture" aria-hidden="true" />
 
@@ -190,7 +190,7 @@ export default function ContactPage() {
               </div>
 
               <div className="relative z-10 flex items-start gap-4 text-neutral-900">
-                <div className="w-10 h-10 rounded-full bg-[#0033FF] flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
+                <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
@@ -199,7 +199,7 @@ export default function ContactPage() {
                   </div>
                   <a
                     href={`mailto:${siteConfig.supportEmail}`}
-                    className="text-base sm:text-lg font-bold text-[#0033FF] hover:underline mt-0.5 block"
+                    className="text-base sm:text-lg font-bold text-black hover:underline mt-0.5 block"
                   >
                     {siteConfig.supportEmail}
                   </a>
@@ -228,7 +228,7 @@ export default function ContactPage() {
               </div>
 
               <div className="relative z-10 flex items-start gap-4 text-neutral-900">
-                <div className="w-10 h-10 rounded-full bg-[#0033FF] flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
+                <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
                   <Clock className="w-5 h-5" />
                 </div>
                 <div>
@@ -264,7 +264,7 @@ export default function ContactPage() {
 
               <div className="relative z-10 space-y-4 text-neutral-900">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#0033FF] flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
+                  <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
@@ -278,7 +278,7 @@ export default function ContactPage() {
                 </div>
 
                 <div className="flex items-start gap-4 pt-2">
-                  <div className="w-10 h-10 rounded-full bg-[#0033FF] flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
+                  <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5">
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
@@ -315,7 +315,7 @@ export default function ContactPage() {
 
               <div className="relative z-10 w-full text-neutral-900 space-y-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#0033FF] flex items-center justify-center text-white shrink-0 shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white shrink-0 shadow-sm">
                     <Send className="w-5 h-5" />
                   </div>
                   <div>
@@ -349,7 +349,7 @@ export default function ContactPage() {
                           setSubject('');
                           setMessage('');
                         }}
-                        className="inline-flex items-center justify-center h-11 px-6 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs uppercase tracking-wider rounded-md sm:rounded-lg shadow-md transition-all gap-2"
+                        className="inline-flex items-center justify-center h-11 px-6 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-md sm:rounded-lg shadow-md transition-all gap-2"
                       >
                         Send Another Message
                       </button>
@@ -388,7 +388,7 @@ export default function ContactPage() {
                           placeholder="e.g. Ramesh Kumar"
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          className="w-full h-11 sm:h-12 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-[#0033FF] rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0033FF]/20 transition-all placeholder:text-neutral-400"
+                          className="w-full h-11 sm:h-12 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-black rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#000000]/20 transition-all placeholder:text-neutral-400"
                         />
                       </div>
 
@@ -402,7 +402,7 @@ export default function ContactPage() {
                           placeholder="engineer@plant.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="w-full h-11 sm:h-12 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-[#0033FF] rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0033FF]/20 transition-all placeholder:text-neutral-400"
+                          className="w-full h-11 sm:h-12 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-black rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#000000]/20 transition-all placeholder:text-neutral-400"
                         />
                       </div>
                     </div>
@@ -417,7 +417,7 @@ export default function ContactPage() {
                         placeholder="e.g. Corporate enrollment for 10 engineers"
                         value={subject}
                         onChange={(e) => setSubject(e.target.value)}
-                        className="w-full h-11 sm:h-12 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-[#0033FF] rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0033FF]/20 transition-all placeholder:text-neutral-400"
+                        className="w-full h-11 sm:h-12 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-black rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#000000]/20 transition-all placeholder:text-neutral-400"
                       />
                     </div>
 
@@ -431,7 +431,7 @@ export default function ContactPage() {
                         placeholder="Please describe your question or requirements in detail..."
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        className="w-full p-3.5 bg-neutral-50 border border-neutral-300 focus:border-[#0033FF] rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#0033FF]/20 transition-all placeholder:text-neutral-400 resize-none"
+                        className="w-full p-3.5 bg-neutral-50 border border-neutral-300 focus:border-black rounded-md sm:rounded-lg text-neutral-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#000000]/20 transition-all placeholder:text-neutral-400 resize-none"
                       />
                     </div>
 
@@ -439,7 +439,7 @@ export default function ContactPage() {
                       <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-sm uppercase tracking-wider rounded-md sm:rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        className="w-full h-12 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-sm uppercase tracking-wider rounded-md sm:rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
                       >
                         {isLoading ? (
                           <>

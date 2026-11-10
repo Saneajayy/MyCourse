@@ -473,7 +473,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
   if (authLoading || curriculumLoading) {
     return (
-      <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-hidden flex flex-col justify-center items-center space-y-4">
+      <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-hidden flex flex-col justify-center items-center space-y-4">
         <div className="noise-texture" aria-hidden="true" />
         <Loader2 className="w-10 h-10 animate-spin text-white" />
         <p className="text-sm font-semibold tracking-wider uppercase text-white/80">
@@ -485,7 +485,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
   if (curriculumError) {
     return (
-      <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-hidden flex flex-col justify-center items-center p-4">
+      <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-hidden flex flex-col justify-center items-center p-4">
         <div className="noise-texture" aria-hidden="true" />
         <div className="max-w-md w-full bg-white p-8 rounded-none border border-neutral-300 shadow-none text-neutral-900 space-y-4 text-center">
           <div className="w-12 h-12 bg-rose-50 text-rose-600 inline-flex items-center justify-center border border-rose-200 mx-auto rounded-none">
@@ -496,7 +496,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
           <div className="pt-2">
             <Link
               href="/#pricing"
-              className="inline-flex items-center justify-center h-11 px-6 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs uppercase tracking-wider rounded-none transition-all"
+              className="inline-flex items-center justify-center h-11 px-6 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none transition-all"
             >
               Enroll to Unlock Access
             </Link>
@@ -512,7 +512,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     'Video Lesson';
 
   return (
-    <div className="fixed inset-0 z-20 flex flex-col bg-[#0033FF] overflow-hidden font-reddit select-none text-white">
+    <div className="fixed inset-0 z-20 flex flex-col bg-black overflow-hidden font-reddit select-none text-white">
       {/* Top Header Bar: Glassy navbar matching home page (figma-glass-nav) */}
       <header className="h-16 md:h-20 w-full figma-glass-nav px-6 sm:px-8 flex items-stretch justify-between shrink-0 z-30 select-none">
         {/* Left: HYDRO BASICS Logo */}
@@ -543,13 +543,13 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       </header>
 
       {/* Main Split Layout: On mobile, flows vertically with video sticky on top -> details -> modules */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden min-h-0 bg-[#0033FF]">
+      <div className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden min-h-0 bg-black">
         {/* SYLLABUS & MODULES: On mobile: order-2 (placed below video & details). On desktop: order-1 (left column) */}
         <aside
-          className="order-2 md:order-1 w-full md:w-80 lg:w-[340px] xl:w-[380px] md:h-full border-t md:border-t-0 md:border-r border-white/20 bg-[#0033FF] flex flex-col shrink-0 md:overflow-hidden"
+          className="order-2 md:order-1 w-full md:w-80 lg:w-[340px] xl:w-[380px] md:h-full border-t md:border-t-0 md:border-r border-white/20 bg-black flex flex-col shrink-0 md:overflow-hidden"
         >
           {/* Actual Course Name Header Cell (Aligned to left side, NO 'COURSE NAME' text, NO plus icon) */}
-          <div className="border-b border-white/20 py-4 px-5 bg-[#0033FF] text-left shrink-0">
+          <div className="border-b border-white/20 py-4 px-5 bg-black text-left shrink-0">
             <span className="text-[10px] font-mono tracking-widest text-white/70 uppercase block mb-1">
               Course Curriculum
             </span>
@@ -559,7 +559,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
           </div>
 
           {/* Scrollable Modules List (Independent Scroll on desktop) */}
-          <div className="flex-1 md:overflow-y-auto bg-[#0033FF]">
+          <div className="flex-1 md:overflow-y-auto bg-black">
             {sections.map((section, sIdx) => {
               const isExpanded = expandedSections[section.sectionId] ?? true;
               const completedCount = section.lessons.filter((l) => l.isCompleted).length;
@@ -567,12 +567,12 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 section.lessons.length > 0 && completedCount === section.lessons.length;
 
               return (
-                <div key={section.sectionId} className="bg-[#0033FF]">
+                <div key={section.sectionId} className="bg-black">
                   {/* MODULE HEADER: border-b border-white/20 (thin line, normal capitalization, font-bold) */}
                   <button
                     type="button"
                     onClick={() => toggleSection(section.sectionId)}
-                    className="w-full py-3.5 px-5 border-b border-white/20 text-white flex items-center justify-between hover:bg-white/10 transition-colors cursor-pointer select-none bg-[#0033FF] text-left"
+                    className="w-full py-3.5 px-5 border-b border-white/20 text-white flex items-center justify-between hover:bg-white/10 transition-colors cursor-pointer select-none bg-black text-left"
                     aria-expanded={isExpanded}
                   >
                     <div className="min-w-0 pr-3">
@@ -591,7 +591,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                           className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0"
                           title="Module Completed"
                         >
-                          <Check className="w-3.5 h-3.5 text-[#0033FF] stroke-[3]" />
+                          <Check className="w-3.5 h-3.5 text-black stroke-[3]" />
                         </div>
                       ) : (
                         <span className="text-[10px] font-mono">
@@ -608,7 +608,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
                   {/* LESSONS: Each separated by a thin white horizontal divider line, video titles 1 step less bold than module */}
                   {isExpanded && (
-                    <div className="bg-[#0033FF]">
+                    <div className="bg-black">
                       {section.lessons.map((lesson, lIdx) => {
                         const isCurrent = lesson.lessonId === selectedLessonId;
                         return (
@@ -618,7 +618,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             onClick={() => setSelectedLessonId(lesson.lessonId)}
                             className={`w-full py-3 px-5 border-b border-white/15 text-left flex items-center gap-3 transition-colors cursor-pointer ${
                               isCurrent
-                                ? 'bg-white text-[#0033FF]'
+                                ? 'bg-white text-black'
                                 : 'text-white hover:bg-white/10'
                             }`}
                           >
@@ -626,18 +626,18 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                               {lesson.isCompleted ? (
                                 <div
                                   className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
-                                    isCurrent ? 'bg-[#0033FF]' : 'bg-white'
+                                    isCurrent ? 'bg-black' : 'bg-white'
                                   }`}
                                   title="Completed"
                                 >
                                   <Check
                                     className={`w-2.5 h-2.5 stroke-[3] ${
-                                      isCurrent ? 'text-white' : 'text-[#0033FF]'
+                                      isCurrent ? 'text-white' : 'text-black'
                                     }`}
                                   />
                                 </div>
                               ) : isCurrent ? (
-                                <span className="text-xs font-black text-[#0033FF]">▶</span>
+                                <span className="text-xs font-black text-black">▶</span>
                               ) : (
                                 <span className="text-[10px] font-mono text-white/60">
                                   {String(lIdx + 1).padStart(2, '0')}
@@ -648,7 +648,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             <div className="min-w-0 flex-1">
                               <div
                                 className={`text-xs sm:text-[13px] leading-snug truncate ${
-                                  isCurrent ? 'font-semibold text-[#0033FF]' : 'font-medium text-white/90'
+                                  isCurrent ? 'font-semibold text-black' : 'font-medium text-white/90'
                                 }`}
                               >
                                 {lesson.title}
@@ -657,7 +657,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
                             <div
                               className={`text-[10px] font-mono shrink-0 ${
-                                isCurrent ? 'text-[#0033FF]/80 font-bold' : 'text-white/60'
+                                isCurrent ? 'text-black/80 font-bold' : 'text-white/60'
                               }`}
                             >
                               {Math.floor(lesson.durationSeconds / 60)}m
@@ -674,7 +674,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         </aside>
 
         {/* MAIN VIDEO & DETAILS AREA: On mobile: order-1 (sits at the top). On desktop: order-2 (right column) */}
-        <main className="order-1 md:order-2 flex-1 flex flex-col md:h-full md:overflow-y-auto bg-[#0033FF] min-w-0 shrink-0">
+        <main className="order-1 md:order-2 flex-1 flex flex-col md:h-full md:overflow-y-auto bg-black min-w-0 shrink-0">
           <div className="w-full flex-1 flex flex-col">
             {/* Black Video Player Frame (Sticky on mobile) */}
             <div className="w-full bg-black shrink-0 relative flex items-center justify-center border-b border-white/20 sticky top-0 z-20">
@@ -689,7 +689,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 {/* Loading Overlay */}
                 {streamLoading && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white z-10 space-y-2">
-                    <Loader2 className="w-8 h-8 animate-spin text-[#0033FF]" />
+                    <Loader2 className="w-8 h-8 animate-spin text-black" />
                     <span className="text-xs font-mono tracking-widest uppercase">
                       Securing Stream Ticket...
                     </span>
@@ -731,7 +731,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                     <Button
                       variant="primary"
                       size="sm"
-                      className="bg-[#0033FF] hover:bg-[#0028D6] text-white rounded-none"
+                      className="bg-black hover:bg-[#262626] text-white rounded-none"
                       onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
                     >
                       Resume Watching Here
@@ -801,7 +801,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                     value={currentTime}
                     onChange={handleSeek}
                     aria-label="Video seek slider"
-                    className="w-full h-1.5 bg-white/20 accent-[#0033FF] cursor-pointer"
+                    className="w-full h-1.5 bg-white/20 accent-black cursor-pointer"
                   />
 
                   <div className="flex items-center justify-between gap-3">
@@ -810,7 +810,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                         type="button"
                         onClick={togglePlay}
                         aria-label={isPlaying ? 'Pause video (Space)' : 'Play video (Space)'}
-                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-[#0033FF] transition-colors cursor-pointer"
+                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-black transition-colors cursor-pointer"
                       >
                         {isPlaying ? (
                           <Pause className="w-5 h-5" />
@@ -823,7 +823,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                         type="button"
                         onClick={toggleMute}
                         aria-label={isMuted ? 'Unmute (M)' : 'Mute (M)'}
-                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-[#0033FF] transition-colors cursor-pointer"
+                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-black transition-colors cursor-pointer"
                       >
                         {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                       </button>
@@ -837,7 +837,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                         value={isMuted ? 0 : volume}
                         onChange={handleVolumeChange}
                         aria-label="Volume slider"
-                        className="w-16 md:w-20 h-1 bg-white/20 accent-[#0033FF] hidden sm:block"
+                        className="w-16 md:w-20 h-1 bg-white/20 accent-black hidden sm:block"
                       />
 
                       <span className="text-xs font-mono text-white/90">
@@ -852,7 +852,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                           type="button"
                           onClick={() => setShowSettingsMenu(!showSettingsMenu)}
                           aria-label="Player settings"
-                          className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-[#0033FF] transition-colors cursor-pointer"
+                          className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-black transition-colors cursor-pointer"
                         >
                           <Settings className="w-5 h-5" />
                         </button>
@@ -872,7 +872,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                                     onClick={() => handleSpeedChange(s)}
                                     className={`p-1 border border-neutral-300 font-mono font-bold rounded-none cursor-pointer ${
                                       playbackRate === s
-                                        ? 'bg-[#0033FF] text-white border-[#0033FF]'
+                                        ? 'bg-black text-white border-black'
                                         : 'bg-white hover:bg-neutral-100 text-black'
                                     }`}
                                   >
@@ -894,7 +894,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                                     onClick={() => handleQualityChange(-1)}
                                     className={`w-full text-left p-1 border border-neutral-300 font-bold rounded-none cursor-pointer ${
                                       currentQuality === -1
-                                        ? 'bg-[#0033FF] text-white border-[#0033FF]'
+                                        ? 'bg-black text-white border-black'
                                         : 'bg-white hover:bg-neutral-100 text-black'
                                     }`}
                                   >
@@ -907,7 +907,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                                       onClick={() => handleQualityChange(lvl.id)}
                                       className={`w-full text-left p-1 border border-neutral-300 font-bold rounded-none cursor-pointer ${
                                         currentQuality === lvl.id
-                                          ? 'bg-[#0033FF] text-white border-[#0033FF]'
+                                          ? 'bg-black text-white border-black'
                                           : 'bg-white hover:bg-neutral-100 text-black'
                                       }`}
                                     >
@@ -926,7 +926,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                         type="button"
                         onClick={handleNextLesson}
                         aria-label="Next lesson"
-                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-[#0033FF] transition-colors cursor-pointer"
+                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-black transition-colors cursor-pointer"
                       >
                         <SkipForward className="w-5 h-5" />
                       </button>
@@ -936,7 +936,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                         type="button"
                         onClick={toggleCustomFullscreen}
                         aria-label={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
-                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-[#0033FF] transition-colors cursor-pointer"
+                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-black transition-colors cursor-pointer"
                       >
                         {isFullscreen ? (
                           <Minimize className="w-5 h-5" />
@@ -951,7 +951,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             </div>
 
             {/* Lesson Title and Description on Royal Blue Background */}
-            <div className="p-6 md:p-8 lg:p-10 space-y-4 bg-[#0033FF] text-white">
+            <div className="p-6 md:p-8 lg:p-10 space-y-4 bg-black text-white">
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div>
                   <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">
@@ -962,7 +962,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 <button
                   type="button"
                   onClick={handleNextLesson}
-                  className="inline-flex items-center justify-center h-10 px-5 bg-white hover:bg-neutral-100 text-[#0033FF] font-black text-xs uppercase tracking-wider rounded-none transition-all gap-2 cursor-pointer shrink-0 border border-white"
+                  className="inline-flex items-center justify-center h-10 px-5 bg-white hover:bg-neutral-100 text-black font-black text-xs uppercase tracking-wider rounded-none transition-all gap-2 cursor-pointer shrink-0 border border-white"
                 >
                   <span>Next Lesson</span>
                   <span className="text-xs">▶</span>

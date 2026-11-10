@@ -68,7 +68,7 @@ export default async function HomePage() {
   };
 
   return (
-    <div className="bg-[#0033FF] min-h-screen text-white font-sans relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px]">
+    <div className="bg-black min-h-screen text-white font-sans relative selection:bg-white selection:text-black overflow-x-hidden pt-20 md:pt-[84px]">
       {/* Background Noise Texture Overlay */}
       <div className="noise-texture" aria-hidden="true" />
 

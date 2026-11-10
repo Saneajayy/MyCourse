@@ -146,14 +146,14 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
             width: clamped >= 100 ? '100%' : `calc(${clamped}% - 14px)`,
             minWidth: clamped > 0 && clamped < 100 ? '8px' : undefined,
             backgroundImage:
-              'repeating-linear-gradient(to right, #0033FF 0px, #0033FF 1.5px, transparent 1.5px, transparent 4px)',
+              'repeating-linear-gradient(to right, #000000 0px, #000000 1.5px, transparent 1.5px, transparent 4px)',
           }}
         />
       )}
 
       {/* Percentage Label */}
       <span
-        className={`text-[#0033FF] font-medium text-[11px] sm:text-xs leading-none shrink-0 select-none ${
+        className={`text-black font-medium text-[11px] sm:text-xs leading-none shrink-0 select-none ${
           clamped === 0 ? 'pr-1.5' : clamped === 100 ? 'pl-1.5' : 'px-1.5'
         }`}
       >
@@ -166,7 +166,7 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
           className="flex-1 h-full"
           style={{
             backgroundImage:
-              'repeating-linear-gradient(to right, #DFE4FA 0px, #DFE4FA 1.5px, transparent 1.5px, transparent 4px)',
+              'repeating-linear-gradient(to right, #E5E5E5 0px, #E5E5E5 1.5px, transparent 1.5px, transparent 4px)',
           }}
         />
       )}
@@ -433,9 +433,9 @@ function StudentDashboardContent() {
 
   if (authLoading || (coursesLoading && courses.length === 0)) {
     return (
-      <div className="fixed inset-0 w-full h-full bg-[#0033FF] text-white font-reddit flex flex-col items-center justify-center space-y-4">
+      <div className="fixed inset-0 w-full h-full bg-black text-white font-reddit flex flex-col items-center justify-center space-y-4">
         <Loader2 className="w-10 h-10 animate-spin text-white" />
-        <p className="text-sm font-bold tracking-wider uppercase text-blue-200">
+        <p className="text-sm font-bold tracking-wider uppercase text-neutral-400">
           Loading Student Portal...
         </p>
       </div>
@@ -451,13 +451,13 @@ function StudentDashboardContent() {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-white font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col md:flex-row">
+    <div className="min-h-screen w-full bg-white font-reddit selection:bg-black selection:text-white flex flex-col md:flex-row">
       {/* ============================================================== */}
-      {/* 1. LEFT BLUE COLUMN (Solid #0033FF, embedded image, clean tabs) */}
+      {/* 1. LEFT BLUE COLUMN (Solid #000000, embedded image, clean tabs) */}
       {/* ============================================================== */}
 
       {/* Mobile Top Header: Solid Blue Bar with Brand Logo & Three Bars Dropdown */}
-      <div className="md:hidden sticky top-0 inset-x-0 w-full bg-[#0033FF] border-b border-white/50 select-none z-40 shrink-0 relative shadow-none">
+      <div className="md:hidden sticky top-0 inset-x-0 w-full bg-black border-b border-white/50 select-none z-40 shrink-0 relative shadow-none">
         {/* Mobile Header Bar */}
         <div className="w-full h-16 sm:h-20 px-5 sm:px-6 flex items-center justify-between">
           <Link
@@ -487,7 +487,7 @@ function StudentDashboardContent() {
 
         {/* Dropping Column when opened (just like in home page mobile view) */}
         {isMobileMenuOpen && (
-          <div className="w-full bg-[#0033FF] border-t border-white/50 relative overflow-hidden transition-all animate-in slide-in-from-top-2 duration-150">
+          <div className="w-full bg-black border-t border-white/50 relative overflow-hidden transition-all animate-in slide-in-from-top-2 duration-150">
             {/* Background halftone image shifted to the right, full-bleed with no left cut-off */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-15">
               <Image
@@ -517,7 +517,7 @@ function StudentDashboardContent() {
                     }}
                     className={`w-full text-left px-6 py-4 text-[15px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
                       isActive
-                        ? 'bg-white text-[#0033FF] font-extrabold'
+                        ? 'bg-white text-black font-extrabold'
                         : 'bg-transparent text-white hover:bg-white/10'
                     }`}
                   >
@@ -555,7 +555,7 @@ function StudentDashboardContent() {
       </div>
 
       {/* Desktop Sidebar: Solid Blue Column with Embedded Image & Contrasting Tabs */}
-      <aside className="hidden md:flex md:fixed md:top-0 md:bottom-0 md:left-0 md:w-64 lg:w-72 bg-[#0033FF] text-white flex-col shrink-0 z-30 select-none border-r border-white/50 overflow-y-auto relative shadow-none">
+      <aside className="hidden md:flex md:fixed md:top-0 md:bottom-0 md:left-0 md:w-64 lg:w-72 bg-black text-white flex-col shrink-0 z-30 select-none border-r border-white/50 overflow-y-auto relative shadow-none">
         {/* Previous Image Embedded on Column Back (Shifted to the Right, Full-Bleed with No Left Cut-Off) */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
           <Image
@@ -596,7 +596,7 @@ function StudentDashboardContent() {
                 onClick={() => handleTabChange(tab.id)}
                 className={`w-full text-left px-6 sm:px-7 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
                   isActive
-                    ? 'bg-white text-[#0033FF] font-extrabold'
+                    ? 'bg-white text-black font-extrabold'
                     : 'bg-transparent text-white hover:bg-white/10'
                 }`}
               >
@@ -658,7 +658,7 @@ function StudentDashboardContent() {
                     placeholder="Search courses..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-10 pl-9 pr-8 bg-white border border-neutral-300 rounded-lg text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:outline-none transition-all shadow-none"
+                    className="w-full h-10 pl-9 pr-8 bg-white border border-neutral-300 rounded-lg text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:outline-none transition-all shadow-none"
                   />
                   {searchQuery && (
                     <button
@@ -684,7 +684,7 @@ function StudentDashboardContent() {
               {/* Empty State: No Courses Enrolled */}
               {courses.length === 0 && !coursesError && (
                 <div className="bg-white border border-neutral-200 rounded-xl p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
-                  <div className="w-12 h-12 rounded-lg bg-blue-50 text-[#0033FF] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-lg bg-neutral-100 text-black flex items-center justify-center">
                     <BookOpen className="w-6 h-6" />
                   </div>
                   <div className="space-y-1">
@@ -696,7 +696,7 @@ function StudentDashboardContent() {
                   <div>
                     <Link
                       href="/#pricing"
-                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none"
+                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Explore Masterclass</span>
@@ -714,7 +714,7 @@ function StudentDashboardContent() {
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="text-xs font-bold text-[#0033FF] hover:underline cursor-pointer"
+                    className="text-xs font-bold text-black hover:underline cursor-pointer"
                   >
                     Clear Search
                   </button>
@@ -735,7 +735,7 @@ function StudentDashboardContent() {
                         <div className="w-full flex flex-col">
                           {/* Expiration Date Header - Minimal text like before, NO pills */}
                           <div className="mb-2 sm:mb-2.5">
-                            <span className="text-[#0033FF] text-[11px] sm:text-[12px] font-medium tracking-wider uppercase select-none block">
+                            <span className="text-black text-[11px] sm:text-[12px] font-medium tracking-wider uppercase select-none block">
                               {formatExpiryDate(c.entitlement?.expiresAt, c.entitlement?.isLifetime)}
                             </span>
                           </div>
@@ -753,7 +753,7 @@ function StudentDashboardContent() {
                           </div>
 
                           {/* Course Title: HYDRAULIC SYSTEM BASICS. */}
-                          <h2 className="font-extrabold text-[#0033FF] uppercase text-[20px] sm:text-[22px] md:text-[23px] tracking-tight leading-tight select-none">
+                          <h2 className="font-extrabold text-black uppercase text-[20px] sm:text-[22px] md:text-[23px] tracking-tight leading-tight select-none">
                             {formatCourseTitle(c.product.title)}
                           </h2>
 
@@ -763,7 +763,7 @@ function StudentDashboardContent() {
                           {/* Full-Width Solid Blue Continue Learning Action Button - No Arrow, Shadow-none */}
                           <Link
                             href={`/learn/${c.product.slug}`}
-                            className="w-full h-11 sm:h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020B8] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase rounded-lg flex items-center justify-center transition-colors select-none shadow-none"
+                            className="w-full h-11 sm:h-12 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase rounded-lg flex items-center justify-center transition-colors select-none shadow-none"
                           >
                             <span>CONTINUE LEARNING</span>
                           </Link>
@@ -790,7 +790,7 @@ function StudentDashboardContent() {
 
               {completedCourses.length === 0 ? (
                 <div className="bg-white border border-neutral-200 rounded-xl p-8 text-left space-y-4 max-w-md shadow-none">
-                  <div className="w-12 h-12 rounded-lg bg-blue-50 text-[#0033FF] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-lg bg-neutral-100 text-black flex items-center justify-center">
                     <Award className="w-6 h-6" />
                   </div>
                   <div className="space-y-1">
@@ -803,7 +803,7 @@ function StudentDashboardContent() {
                     <button
                       type="button"
                       onClick={() => handleTabChange('courses')}
-                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none cursor-pointer"
+                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none cursor-pointer"
                     >
                       <BookOpen className="w-3.5 h-3.5" />
                       <span>Go to My Courses</span>
@@ -838,7 +838,7 @@ function StudentDashboardContent() {
 
                       <Link
                         href={`/learn/${c.product.slug}`}
-                        className="w-full h-10 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 shadow-none"
+                        className="w-full h-10 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 shadow-none"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Download Certificate</span>
@@ -865,7 +865,7 @@ function StudentDashboardContent() {
               {/* Personal Details Card */}
               <div className="bg-white border border-neutral-200 rounded-xl p-6 sm:p-7 shadow-none space-y-5 text-left max-w-xl">
                 <div className="flex items-center gap-2.5 pb-2 border-b border-neutral-200">
-                  <UserIcon className="w-4 h-4 text-[#0033FF]" />
+                  <UserIcon className="w-4 h-4 text-black" />
                   <h2 className="text-base font-bold text-neutral-900">Personal Information</h2>
                 </div>
 
@@ -880,7 +880,7 @@ function StudentDashboardContent() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Your name"
-                      className="w-full h-10 px-3.5 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none transition-all shadow-none"
+                      className="w-full h-10 px-3.5 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 focus:border-black focus:outline-none transition-all shadow-none"
                     />
                   </div>
 
@@ -912,7 +912,7 @@ function StudentDashboardContent() {
                       <div className="flex items-center gap-3 pt-1">
                         <Link
                           href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
-                          className="text-xs font-bold text-[#0033FF] hover:underline"
+                          className="text-xs font-bold text-black hover:underline"
                         >
                           Enter 6-digit OTP &rarr;
                         </Link>
@@ -938,7 +938,7 @@ function StudentDashboardContent() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="+91 98765 43210"
-                      className="w-full h-10 px-3.5 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none transition-all shadow-none"
+                      className="w-full h-10 px-3.5 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 focus:border-black focus:outline-none transition-all shadow-none"
                     />
                   </div>
 
@@ -946,7 +946,7 @@ function StudentDashboardContent() {
                     <button
                       type="submit"
                       disabled={profileSaving}
-                      className="h-10 px-5 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                      className="h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                     >
                       {profileSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                       <span>{profileSaving ? 'Saving...' : 'Save Profile'}</span>
@@ -958,7 +958,7 @@ function StudentDashboardContent() {
               {/* Change Password Card */}
               <div className="bg-white border border-neutral-200 rounded-xl p-6 sm:p-7 shadow-none space-y-5 text-left max-w-xl">
                 <div className="flex items-center gap-2.5 pb-2 border-b border-neutral-200">
-                  <Lock className="w-4 h-4 text-[#0033FF]" />
+                  <Lock className="w-4 h-4 text-black" />
                   <h2 className="text-base font-bold text-neutral-900">Security &amp; Password</h2>
                 </div>
 
@@ -981,7 +981,7 @@ function StudentDashboardContent() {
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         required
                         placeholder="••••••••"
-                        className="w-full h-10 px-3.5 pr-10 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none transition-all shadow-none"
+                        className="w-full h-10 px-3.5 pr-10 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 focus:border-black focus:outline-none transition-all shadow-none"
                       />
                       <button
                         type="button"
@@ -1006,7 +1006,7 @@ function StudentDashboardContent() {
                         onChange={(e) => setNewPassword(e.target.value)}
                         required
                         placeholder="At least 8 characters"
-                        className="w-full h-10 px-3.5 pr-10 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none transition-all shadow-none"
+                        className="w-full h-10 px-3.5 pr-10 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 focus:border-black focus:outline-none transition-all shadow-none"
                       />
                       <button
                         type="button"
@@ -1030,7 +1030,7 @@ function StudentDashboardContent() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       placeholder="Repeat new password"
-                      className="w-full h-10 px-3.5 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none transition-all shadow-none"
+                      className="w-full h-10 px-3.5 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 focus:border-black focus:outline-none transition-all shadow-none"
                     />
                   </div>
 
@@ -1038,7 +1038,7 @@ function StudentDashboardContent() {
                     <button
                       type="submit"
                       disabled={passwordSaving}
-                      className="h-10 px-5 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                      className="h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                     >
                       {passwordSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                       <span>{passwordSaving ? 'Updating...' : 'Update Password'}</span>
@@ -1076,7 +1076,7 @@ function StudentDashboardContent() {
 
               {sessionsLoading ? (
                 <div className="bg-white border border-neutral-200 rounded-xl p-10 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-none">
-                  <Loader2 className="w-5 h-5 animate-spin text-[#0033FF]" />
+                  <Loader2 className="w-5 h-5 animate-spin text-black" />
                   <span>Loading active sessions...</span>
                 </div>
               ) : sessions.length === 0 ? (
@@ -1090,7 +1090,7 @@ function StudentDashboardContent() {
                     return (
                       <div key={sess.id} className="p-4 sm:p-4.5 flex items-center justify-between gap-4 hover:bg-neutral-50 transition-colors">
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-9 h-9 rounded-lg bg-blue-50 text-[#0033FF] flex items-center justify-center shrink-0 border border-blue-100">
+                          <div className="w-9 h-9 rounded-lg bg-neutral-100 text-black flex items-center justify-center shrink-0 border border-neutral-200">
                             {isMobile ? <Smartphone className="w-4 h-4" /> : <Laptop className="w-4 h-4" />}
                           </div>
                           <div className="min-w-0 text-left">
@@ -1142,12 +1142,12 @@ function StudentDashboardContent() {
 
               {ordersLoading ? (
                 <div className="bg-white border border-neutral-200 rounded-xl p-10 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-none">
-                  <Loader2 className="w-5 h-5 animate-spin text-[#0033FF]" />
+                  <Loader2 className="w-5 h-5 animate-spin text-black" />
                   <span>Loading payment orders...</span>
                 </div>
               ) : orders.length === 0 ? (
                 <div className="bg-white border border-neutral-200 rounded-xl p-8 text-left space-y-4 max-w-md shadow-none">
-                  <div className="w-12 h-12 rounded-lg bg-blue-50 text-[#0033FF] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-lg bg-neutral-100 text-black flex items-center justify-center">
                     <Receipt className="w-6 h-6" />
                   </div>
                   <div className="space-y-1">
@@ -1159,7 +1159,7 @@ function StudentDashboardContent() {
                   <div>
                     <Link
                       href="/#pricing"
-                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none"
+                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>View Courses</span>
@@ -1213,7 +1213,7 @@ function StudentDashboardContent() {
                                   href={`${siteConfig.urls.api}/api/v1/invoices/${ord.invoice.id}/download`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-xs font-bold py-1.5 px-3 bg-[#0033FF] hover:bg-[#0028D6] text-white rounded-md transition-colors inline-flex items-center gap-1.5 shadow-none"
+                                  className="text-xs font-bold py-1.5 px-3 bg-black hover:bg-[#262626] text-white rounded-md transition-colors inline-flex items-center gap-1.5 shadow-none"
                                 >
                                   <Download className="w-3.5 h-3.5" />
                                   <span>PDF</span>
@@ -1251,9 +1251,9 @@ export default function MyCoursesPage() {
   return (
     <Suspense
       fallback={
-        <div className="fixed inset-0 w-full h-full bg-[#0033FF] text-white font-reddit flex flex-col items-center justify-center space-y-4">
+        <div className="fixed inset-0 w-full h-full bg-black text-white font-reddit flex flex-col items-center justify-center space-y-4">
           <Loader2 className="w-10 h-10 animate-spin text-white" />
-          <p className="text-sm font-bold tracking-wider uppercase text-blue-200">
+          <p className="text-sm font-bold tracking-wider uppercase text-neutral-400">
             Loading Student Portal...
           </p>
         </div>

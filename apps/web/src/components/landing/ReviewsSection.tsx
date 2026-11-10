@@ -138,19 +138,19 @@ export function ReviewsSection() {
               scale={1.02}
               className="relative w-[320px] sm:w-[420px] md:w-[480px] lg:w-[540px] xl:w-[580px] min-h-[305px] sm:min-h-[350px] md:min-h-[385px] lg:min-h-[410px] p-6 sm:p-7 md:p-8 lg:p-9 bg-white rounded-lg sm:rounded-xl shrink-0 select-none flex flex-col justify-between cursor-pointer"
             >
-              {/* Card Content in Royal Blue #0033FF */}
+              {/* Card Content in Royal Blue #000000 */}
               <div className="relative z-10 flex flex-col justify-between h-full">
                 {/* Review Quote Body */}
-                <p className="text-[#0033FF] font-normal text-base sm:text-[18px] md:text-[20px] lg:text-[22px] leading-[1.55] sm:leading-[1.5] tracking-[-0.01em]">
+                <p className="text-black font-normal text-base sm:text-[18px] md:text-[20px] lg:text-[22px] leading-[1.55] sm:leading-[1.5] tracking-[-0.01em]">
                   {item.content}
                 </p>
 
                 {/* Author Details & Star Rating */}
-                <div className="pt-4 sm:pt-5 mt-4 sm:mt-5 border-t border-[#0033FF]/15">
-                  <h3 className="text-[#0033FF] font-bold text-lg sm:text-[21px] md:text-[23px] tracking-tight leading-tight">
+                <div className="pt-4 sm:pt-5 mt-4 sm:mt-5 border-t border-black/15">
+                  <h3 className="text-black font-bold text-lg sm:text-[21px] md:text-[23px] tracking-tight leading-tight">
                     {item.name}
                   </h3>
-                  <p className="text-[#0033FF]/80 font-normal text-xs sm:text-sm md:text-[15px] mt-1">
+                  <p className="text-black/80 font-normal text-xs sm:text-sm md:text-[15px] mt-1">
                     {item.role}
                   </p>
 
@@ -159,7 +159,7 @@ export function ReviewsSection() {
                     {[...Array(item.rating)].map((_, sIdx) => (
                       <svg
                         key={sIdx}
-                        className="w-4 h-4 sm:w-5 sm:h-5 fill-[#0033FF]"
+                        className="w-4 h-4 sm:w-5 sm:h-5 fill-black"
                         viewBox="0 0 20 20"
                       >
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />

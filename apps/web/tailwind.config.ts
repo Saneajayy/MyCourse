@@ -10,11 +10,11 @@ const config: Config = {
     extend: {
       colors: {
         course: {
-          brandBlue: '#0033FF', // Electric blue branding
+          brandBlue: '#000000', // Monochrome black branding
           white: '#FFFFFF',
-          bg: '#0033FF',
+          bg: '#000000',
           black: '#000000',
-          darkBlue: '#0A192F', // Deep navy for headings, body text, and dark sections
+          darkBlue: '#0A0A0A', // Deep black for dark sections
           navyMuted: '#1E293B', // Secondary text (14.3:1 contrast on white)
           navySubtle: '#475569',
           orange: '#E05305', // High-contrast industrial safety orange

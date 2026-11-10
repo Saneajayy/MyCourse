@@ -66,7 +66,7 @@ function PrivacyNavbar() {
 
 export default function PrivacyPage() {
   return (
-    <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
+    <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
       {/* Background Noise Texture */}
       <div className="noise-texture" aria-hidden="true" />
 
@@ -138,10 +138,10 @@ export default function PrivacyPage() {
             {/* Meta Timestamp Header */}
             <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#0033FF] flex items-center justify-center text-white shrink-0 shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white shrink-0 shadow-sm">
                   <Lock className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0033FF]">
+                <span className="text-xs font-bold uppercase tracking-wider text-black">
                   Data Protection &amp; Security Architecture
                 </span>
               </div>
@@ -154,7 +154,7 @@ export default function PrivacyPage() {
             <div className="space-y-8 text-sm sm:text-base text-neutral-800 leading-relaxed">
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">01.</span> Information We Collect
+                  <span className="text-black font-mono">01.</span> Information We Collect
                 </h2>
                 <p>
                   When you register for an account, enroll in courses, or stream instructional videos, we collect only the information necessary to provide authentication, tax invoicing, and course delivery:
@@ -189,7 +189,7 @@ export default function PrivacyPage() {
 
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">02.</span> Payment Security &amp; Zero Card Storage
+                  <span className="text-black font-mono">02.</span> Payment Security &amp; Zero Card Storage
                 </h2>
                 <p>
                   We strictly do NOT store, process, or transmit your credit/debit card numbers, CVVs, netbanking credentials, or UPI PINs on our servers. All financial transactions are processed directly by RBI-regulated, PCI-DSS Level 1 compliant payment aggregators (Razorpay Software Private Limited).
@@ -198,7 +198,7 @@ export default function PrivacyPage() {
 
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">03.</span> Cookie &amp; Storage Architecture
+                  <span className="text-black font-mono">03.</span> Cookie &amp; Storage Architecture
                 </h2>
                 <p>
                   In strict accordance with enterprise security practices (ADR 001), student session access tokens are maintained in volatile browser memory only and are never exposed to browser <code className="text-xs font-mono bg-neutral-100 px-1.5 py-0.5 rounded">localStorage</code>. Refresh tokens are secured in encrypted <code className="text-xs font-mono bg-neutral-100 px-1.5 py-0.5 rounded">httpOnly</code> cookies protected by <code className="text-xs font-mono bg-neutral-100 px-1.5 py-0.5 rounded">SameSite=Lax</code> policies to completely neutralize Cross-Site Scripting (XSS) risks.
@@ -207,13 +207,13 @@ export default function PrivacyPage() {
 
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">04.</span> Student Privacy Rights &amp; Access
+                  <span className="text-black font-mono">04.</span> Student Privacy Rights &amp; Access
                 </h2>
                 <p>
                   You hold full legal rights under the Digital Personal Data Protection (DPDP) Act, 2023 to inspect your stored student profile, download your GST purchase invoices, update contact details, or request permanent account erasure. Inquiries can be submitted directly to our compliance officer at{' '}
                   <a
                     href={`mailto:${siteConfig.supportEmail}`}
-                    className="font-bold underline text-[#0033FF] hover:underline"
+                    className="font-bold underline text-black hover:underline"
                   >
                     {siteConfig.supportEmail}
                   </a>

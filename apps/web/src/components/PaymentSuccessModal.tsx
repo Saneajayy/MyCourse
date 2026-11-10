@@ -65,7 +65,7 @@ export function PaymentSuccessModal({
 
         {status === 'verifying' ? (
           <div className="bg-white rounded-[24px] sm:rounded-[28px] p-8 sm:p-10 shadow-2xl border border-neutral-100 text-center space-y-4">
-            <Loader2 className="w-12 h-12 animate-spin text-[#0033FF] mx-auto" />
+            <Loader2 className="w-12 h-12 animate-spin text-black mx-auto" />
             <h2 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight">
               Verifying Payment...
             </h2>

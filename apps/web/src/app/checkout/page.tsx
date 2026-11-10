@@ -164,7 +164,7 @@ function RazorpayLogo({ className = 'h-3.5 w-auto' }: { className?: string }) {
       <g transform="translate(0, 1) scale(0.72)">
         <path
           d="M22.436 0l-11.91 7.773-1.174 4.276 6.625-4.297L11.65 24h4.391l6.395-24zM14.26 10.098L3.389 17.166 1.564 24h9.008l3.688-13.902Z"
-          fill="#0033FF"
+          fill="#000000"
         />
       </g>
       <text
@@ -647,7 +647,7 @@ function CheckoutContent() {
           contact: phone.trim(),
         },
         theme: {
-          color: '#0033FF',
+          color: '#000000',
         },
         handler: async (response: {
           razorpay_payment_id: string;
@@ -736,7 +736,7 @@ function CheckoutContent() {
   if (courseLoading || authLoading) {
     return (
       <div className="w-full flex-1 flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <Loader2 className="w-10 h-10 animate-spin text-[#0033FF]" />
+        <Loader2 className="w-10 h-10 animate-spin text-black" />
         <p className="text-sm font-semibold tracking-wider uppercase text-neutral-600">
           Securing Checkout Session...
         </p>
@@ -747,12 +747,12 @@ function CheckoutContent() {
 
 
   return (
-    <div className="w-full h-screen h-[100dvh] overflow-hidden bg-white font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col lg:flex-row">
+    <div className="w-full h-screen h-[100dvh] overflow-hidden bg-white font-reddit selection:bg-black selection:text-white flex flex-col lg:flex-row">
       {/* ============================================================== */}
       {/* LEFT COLUMN (Desktop Only): Signature Halftone Graphic         */}
       {/* (100% identical styling to Login & Register split view)       */}
       {/* ============================================================== */}
-      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-end lg:w-1/2 h-full bg-[#00186B] overflow-hidden select-none p-6 sm:p-8">
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-end lg:w-1/2 h-full bg-black overflow-hidden select-none p-6 sm:p-8">
         {/* Full-Bleed Signature Dot Halftone Graphic */}
         <Image
           src="/login-pixelated.png"
@@ -764,7 +764,7 @@ function CheckoutContent() {
         />
         {/* Soft overlay gradient for subtle depth */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/95 via-[#000c3b]/45 to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-t from-[#000000]/95 via-[#000000]/45 to-transparent pointer-events-none"
           aria-hidden="true"
         />
         {/* Price & Coupon Controls (Directly on Image, No Card) */}
@@ -795,10 +795,10 @@ function CheckoutContent() {
                     <button
                       type="submit"
                       disabled={couponLoading}
-                      className="h-11 px-5 bg-white hover:bg-blue-50 active:bg-blue-100 text-[#00186B] font-extrabold text-sm rounded-md transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-md"
+                      className="h-11 px-5 bg-white hover:bg-neutral-100 active:bg-neutral-200 text-black font-extrabold text-sm rounded-md transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-md"
                     >
                       {couponLoading ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-[#00186B]" />
+                        <Loader2 className="w-4 h-4 animate-spin text-black" />
                       ) : (
                         'Apply'
                       )}
@@ -808,7 +808,7 @@ function CheckoutContent() {
                       placeholder="COUPON CODE"
                       value={couponInput}
                       onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                      className="h-11 w-44 sm:w-56 md:w-64 rounded-md border border-white/45 bg-transparent px-3.5 text-sm font-mono uppercase text-white placeholder:text-blue-200/60 focus:border-white focus:outline-none transition-all"
+                      className="h-11 w-44 sm:w-56 md:w-64 rounded-md border border-white/45 bg-transparent px-3.5 text-sm font-mono uppercase text-white placeholder:text-neutral-400/60 focus:border-white focus:outline-none transition-all"
                     />
                   </div>
                   {couponError && (
@@ -823,7 +823,7 @@ function CheckoutContent() {
 
             {/* Final Price on the Right */}
             <div className="flex flex-col items-end shrink-0 text-right">
-              <span className="text-[11px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
+              <span className="text-[11px] uppercase font-bold tracking-wider text-neutral-400/80 drop-shadow">
                 Final Price
               </span>
               <span className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
@@ -847,7 +847,7 @@ function CheckoutContent() {
                 Already enrolled?{' '}
                 <Link
                   href="/login?redirect=/checkout"
-                  className="font-bold text-[#0033FF] hover:underline hover:text-[#0028D6] ml-0.5"
+                  className="font-bold text-black hover:underline hover:text-[#262626] ml-0.5"
                 >
                   Sign In &rarr;
                 </Link>
@@ -858,7 +858,7 @@ function CheckoutContent() {
           {/* Top-Right Corner: Brand Logo deeply in corner */}
           <Link
             href="/"
-            className="pointer-events-auto flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+            className="pointer-events-auto flex flex-col items-end -space-y-0.5 leading-[0.92] text-black hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
             aria-label="HYDRO BASICS Home - Back to Course"
           >
             <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
@@ -871,7 +871,7 @@ function CheckoutContent() {
         </header>
 
         {/* Mobile Upper Part: Fixed full-bleed edge-to-edge halftone header */}
-        <div className="lg:hidden fixed top-0 inset-x-0 z-30 w-full h-[250px] sm:h-[280px] bg-[#00186B] overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5 shadow-sm touch-none">
+        <div className="lg:hidden fixed top-0 inset-x-0 z-30 w-full h-[250px] sm:h-[280px] bg-black overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5 shadow-sm touch-none">
           {/* Full-Bleed Signature Dot Halftone Graphic */}
           <Image
             src="/login-pixelated.png"
@@ -883,7 +883,7 @@ function CheckoutContent() {
           />
           {/* Soft overlay gradient for subtle depth */}
           <div
-            className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/95 via-[#000c3b]/35 to-[#000c3b]/45 pointer-events-none"
+            className="absolute inset-0 bg-gradient-to-t from-[#000000]/95 via-[#000000]/35 to-[#000000]/45 pointer-events-none"
             aria-hidden="true"
           />
 
@@ -891,7 +891,7 @@ function CheckoutContent() {
           <div className="relative z-10 w-full flex items-center justify-between pointer-events-auto touch-auto">
             <div>
               {!isAuthenticated && (
-                <div className="text-xs text-blue-100 font-medium">
+                <div className="text-xs text-neutral-300 font-medium">
                   Already enrolled?{' '}
                   <Link
                     href="/login?redirect=/checkout"
@@ -942,10 +942,10 @@ function CheckoutContent() {
                       <button
                         type="submit"
                         disabled={couponLoading}
-                        className="h-11 px-4 bg-white hover:bg-blue-50 active:bg-blue-100 text-[#00186B] font-extrabold text-xs sm:text-sm rounded-md transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
+                        className="h-11 px-4 bg-white hover:bg-neutral-100 active:bg-neutral-200 text-black font-extrabold text-xs sm:text-sm rounded-md transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
                       >
                         {couponLoading ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin text-[#00186B]" />
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-black" />
                         ) : (
                           'Apply'
                         )}
@@ -955,7 +955,7 @@ function CheckoutContent() {
                         placeholder="COUPON CODE"
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                        className="h-11 flex-1 min-w-0 rounded-md border border-white/45 bg-transparent px-3 text-xs sm:text-sm font-mono uppercase text-white placeholder:text-blue-200/60 focus:border-white focus:outline-none transition-all"
+                        className="h-11 flex-1 min-w-0 rounded-md border border-white/45 bg-transparent px-3 text-xs sm:text-sm font-mono uppercase text-white placeholder:text-neutral-400/60 focus:border-white focus:outline-none transition-all"
                       />
                     </div>
                     {couponError && (
@@ -970,7 +970,7 @@ function CheckoutContent() {
 
               {/* Final Price on the Right */}
               <div className="flex flex-col items-end shrink-0 text-right">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400/80 drop-shadow">
                   Final Price
                 </span>
                 <span className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
@@ -1000,7 +1000,7 @@ function CheckoutContent() {
                 <div className="flex flex-wrap items-center gap-2.5 pt-1">
                   <Link
                     href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
-                    className="h-9 px-3.5 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer"
+                    className="h-9 px-3.5 bg-black hover:bg-[#262626] text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer"
                   >
                     Enter 6-Digit OTP
                   </Link>
@@ -1062,7 +1062,7 @@ function CheckoutContent() {
                     placeholder="Ramesh"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
+                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all"
                   />
                 </div>
                 <div className="space-y-1.5 text-left">
@@ -1076,7 +1076,7 @@ function CheckoutContent() {
                     placeholder="Kumar"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
+                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all"
                   />
                 </div>
               </div>
@@ -1094,7 +1094,7 @@ function CheckoutContent() {
                   placeholder="engineer@plant.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -1110,7 +1110,7 @@ function CheckoutContent() {
                   placeholder="+91 98765 43210"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono"
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all font-mono"
                 />
               </div>
 
@@ -1125,7 +1125,7 @@ function CheckoutContent() {
                   placeholder="22AAAAA0000A1Z5"
                   value={gstin}
                   onChange={(e) => setGstin(e.target.value.toUpperCase())}
-                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono uppercase"
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all font-mono uppercase"
                 />
               </div>
             </div>
@@ -1142,7 +1142,7 @@ function CheckoutContent() {
               {!isAuthenticated ? (
                 <Link
                   href="/login?redirect=/checkout"
-                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all flex items-center justify-center cursor-pointer text-center select-none"
+                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all flex items-center justify-center cursor-pointer text-center select-none"
                 >
                   Sign In to Continue Checkout &rarr;
                 </Link>
@@ -1159,7 +1159,7 @@ function CheckoutContent() {
                   type="button"
                   onClick={handleProceedToPayment}
                   disabled={quoteLoading || isSubmitting}
-                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer select-none"
+                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer select-none"
                 >
                   {isSubmitting || quoteLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin text-white" />
@@ -1253,11 +1253,11 @@ export default function CheckoutPage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden bg-white font-reddit selection:bg-[#0033FF] selection:text-white">
+    <div className="fixed inset-0 w-full h-full overflow-hidden bg-white font-reddit selection:bg-black selection:text-white">
       <Suspense
         fallback={
           <div className="w-full h-full flex flex-col items-center justify-center space-y-4 bg-white">
-            <Loader2 className="w-10 h-10 animate-spin text-[#0033FF]" />
+            <Loader2 className="w-10 h-10 animate-spin text-black" />
             <p className="text-sm font-semibold tracking-wider uppercase text-neutral-600">
               Loading Checkout Session...
             </p>

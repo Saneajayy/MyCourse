@@ -66,7 +66,7 @@ function TermsNavbar() {
 
 export default function TermsPage() {
   return (
-    <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
+    <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
       {/* Background Noise Texture */}
       <div className="noise-texture" aria-hidden="true" />
 
@@ -138,10 +138,10 @@ export default function TermsPage() {
             {/* Meta Timestamp Header */}
             <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#0033FF] flex items-center justify-center text-white shrink-0 shadow-sm">
+                <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white shrink-0 shadow-sm">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0033FF]">
+                <span className="text-xs font-bold uppercase tracking-wider text-black">
                   Binding Legal Agreement
                 </span>
               </div>
@@ -154,7 +154,7 @@ export default function TermsPage() {
             <div className="space-y-8 text-sm sm:text-base text-neutral-800 leading-relaxed">
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">01.</span> Acceptance of Terms
+                  <span className="text-black font-mono">01.</span> Acceptance of Terms
                 </h2>
                 <p>
                   By registering for an account or enrolling in courses provided by{' '}
@@ -165,7 +165,7 @@ export default function TermsPage() {
 
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">02.</span> Course Access &amp; Validity
+                  <span className="text-black font-mono">02.</span> Course Access &amp; Validity
                 </h2>
                 <p>
                   Enrolling in the course grants you a single-user, non-exclusive, non-transferable license to stream instructional videos, review hydraulic schematics, and access supplemental reference materials for a period of <strong className="text-neutral-950">365 days (1 year)</strong> from the timestamp of payment confirmation, unless lifetime access was explicitly purchased.
@@ -174,7 +174,7 @@ export default function TermsPage() {
 
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">03.</span> Anti-Piracy &amp; Dynamic Watermarking
+                  <span className="text-black font-mono">03.</span> Anti-Piracy &amp; Dynamic Watermarking
                 </h2>
                 <p>
                   All video lectures are dynamically embedded with cryptographic watermarks displaying the enrolled student&apos;s registered email address and session tokens. Screen-recording, ripping, downloading, sharing credentials, or publicly distributing course materials is strictly prohibited and constitutes a copyright violation punishable under the Indian Copyright Act, 1957.
@@ -186,7 +186,7 @@ export default function TermsPage() {
 
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">04.</span> Pricing, Payments &amp; Taxes
+                  <span className="text-black font-mono">04.</span> Pricing, Payments &amp; Taxes
                 </h2>
                 <p>
                   All course fees are quoted in Indian Rupees (INR) and are inclusive of Goods and Services Tax (GST) where applicable. Payments are processed securely via RBI-authorized payment aggregators (Razorpay). Valid GST tax invoices are automatically generated upon payment confirmation and remain available for PDF download in your student account dashboard.
@@ -207,18 +207,18 @@ export default function TermsPage() {
 
               <section className="space-y-2.5">
                 <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-[#0033FF] font-mono">06.</span> Contact &amp; Grievance Redressal
+                  <span className="text-black font-mono">06.</span> Contact &amp; Grievance Redressal
                 </h2>
                 <p>
                   For any billing inquiries, account questions, or legal notices, contact our support desk directly at{' '}
                   <a
                     href={`mailto:${siteConfig.supportEmail}`}
-                    className="font-bold underline text-[#0033FF] hover:underline"
+                    className="font-bold underline text-black hover:underline"
                   >
                     {siteConfig.supportEmail}
                   </a>{' '}
                   or visit our{' '}
-                  <Link href="/contact" className="font-bold underline text-[#0033FF] hover:underline">
+                  <Link href="/contact" className="font-bold underline text-black hover:underline">
                     Contact Support
                   </Link>{' '}
                   page.

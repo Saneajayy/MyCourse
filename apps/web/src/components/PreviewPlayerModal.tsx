@@ -256,7 +256,7 @@ export function PreviewPlayerModal({
 
       {/* Modal Dialog Card */}
       <div
-        className="relative z-10 w-full max-w-4xl bg-gradient-to-b from-[#0033FF] via-[#002be8] to-[#001fb8] border border-white/25 rounded-lg sm:rounded-xl p-5 sm:p-7 md:p-8 max-h-[92vh] overflow-y-auto font-reddit text-white shadow-[0_25px_80px_rgba(0,0,0,0.65)] select-none"
+        className="relative z-10 w-full max-w-4xl bg-gradient-to-b from-[#000000] via-[#171717] to-[#000000] border border-white/25 rounded-lg sm:rounded-xl p-5 sm:p-7 md:p-8 max-h-[92vh] overflow-y-auto font-reddit text-white shadow-[0_25px_80px_rgba(0,0,0,0.65)] select-none"
       >
         {/* Modal Header: Big standalone FREE PREVIEW heading & standalone rotating cross mark */}
         <div className="flex items-start justify-between gap-4 mb-4 sm:mb-5">
@@ -309,7 +309,7 @@ export function PreviewPlayerModal({
               <p className="text-sm font-semibold text-white/90 mb-4">{errorMsg}</p>
               <button
                 type="button"
-                className="px-4 py-1.5 rounded-md bg-white text-[#0033FF] font-bold text-xs uppercase tracking-wider hover:bg-white/90 active:scale-95 transition-all shadow-sm cursor-pointer"
+                className="px-4 py-1.5 rounded-md bg-white text-black font-bold text-xs uppercase tracking-wider hover:bg-white/90 active:scale-95 transition-all shadow-sm cursor-pointer"
                 onClick={onClose}
               >
                 Close Preview
@@ -365,7 +365,7 @@ export function PreviewPlayerModal({
                       type="button"
                       onClick={togglePlay}
                       aria-label={isPlaying ? 'Pause video' : 'Play video'}
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg bg-white text-[#0033FF] flex items-center justify-center hover:bg-white/90 active:scale-95 transition-all shadow-md cursor-pointer"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg bg-white text-black flex items-center justify-center hover:bg-white/90 active:scale-95 transition-all shadow-md cursor-pointer"
                     >
                       {isPlaying ? (
                         <Pause className="w-4 h-4 fill-current" />
@@ -421,7 +421,7 @@ export function PreviewPlayerModal({
               onClose();
               window.location.href = '/checkout';
             }}
-            className="w-full sm:w-auto min-w-[240px] px-8 py-3.5 sm:px-10 sm:py-4 rounded-md sm:rounded-lg bg-white text-[#0033FF] font-black text-lg sm:text-xl md:text-2xl uppercase tracking-wide shadow-md hover:bg-white/95 active:scale-95 transition-all cursor-pointer leading-none flex items-center justify-center gap-2.5"
+            className="w-full sm:w-auto min-w-[240px] px-8 py-3.5 sm:px-10 sm:py-4 rounded-md sm:rounded-lg bg-white text-black font-black text-lg sm:text-xl md:text-2xl uppercase tracking-wide shadow-md hover:bg-white/95 active:scale-95 transition-all cursor-pointer leading-none flex items-center justify-center gap-2.5"
           >
             <span>ENROLL NOW</span>
             <span className="text-xl sm:text-2xl leading-none">→</span>

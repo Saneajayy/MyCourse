@@ -21,7 +21,7 @@
 
 :root {
   --foreground: #ffffff;
-  --background: #0033FF;
+  --background: #000000;
 }
 
 * {
@@ -30,7 +30,7 @@
 
 html {
   scroll-behavior: smooth;
-  background-color: #0033FF;
+  background-color: #000000;
 }
 
 body {
@@ -177,9 +177,9 @@ body {
   outline-offset: 1px;
 }
 
-/* Landing Page: #0033FF Background */
+/* Landing Page: #000000 Background */
 .landing-gradient-bg {
-  background-color: #0033FF;
+  background-color: #000000;
 }
 
 .noise-texture {

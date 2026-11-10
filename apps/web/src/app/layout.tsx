@@ -83,7 +83,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-[#0033FF]" suppressHydrationWarning>
+    <html lang="en" className="bg-[#000000]" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -94,7 +94,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${redditSans.className} ${redditSans.variable} ${shalimar.variable} min-h-screen flex flex-col bg-[#0033FF] text-white font-sans antialiased`}
+        className={`${redditSans.className} ${redditSans.variable} ${shalimar.variable} min-h-screen flex flex-col bg-[#000000] text-white font-sans antialiased`}
       >
         <a href="#main-content" className="skip-link">
           Skip to main content

@@ -226,13 +226,13 @@ function VerifyEmailForm() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="bg-neutral-50 border border-neutral-300 rounded px-2.5 py-1 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-[#0033FF] text-center font-normal"
+                  className="bg-neutral-50 border border-neutral-300 rounded px-2.5 py-1 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-black text-center font-normal"
                   autoFocus
                 />
                 <button
                   type="button"
                   onClick={() => setIsEditingEmail(false)}
-                  className="text-xs font-bold text-white bg-[#0033FF] hover:bg-[#0028D6] px-2.5 py-1 rounded transition-colors cursor-pointer"
+                  className="text-xs font-bold text-white bg-black hover:bg-[#262626] px-2.5 py-1 rounded transition-colors cursor-pointer"
                 >
                   Save
                 </button>
@@ -241,7 +241,7 @@ function VerifyEmailForm() {
               <div>
                 <span
                   onClick={() => setIsEditingEmail(true)}
-                  className="text-neutral-900 font-medium cursor-pointer break-all hover:text-[#0033FF] transition-colors inline-block"
+                  className="text-neutral-900 font-medium cursor-pointer break-all hover:text-black transition-colors inline-block"
                   title="Click to edit email"
                 >
                   {email || 'your email address'}
@@ -284,7 +284,7 @@ function VerifyEmailForm() {
                 onChange={(e) => handleDigitChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 disabled={status === 'verifying' || status === 'success'}
-                className="w-[38px] h-[44px] sm:w-[42px] sm:h-[48px] text-center text-xl sm:text-2xl font-bold text-neutral-900 bg-white border border-neutral-300 focus:border-[#0033FF] focus:ring-1 focus:ring-[#0033FF] caret-[#0033FF] rounded-[4px] focus:outline-none transition-all disabled:opacity-50 select-none"
+                className="w-[38px] h-[44px] sm:w-[42px] sm:h-[48px] text-center text-xl sm:text-2xl font-bold text-neutral-900 bg-white border border-neutral-300 focus:border-black focus:ring-1 focus:ring-black caret-black rounded-[4px] focus:outline-none transition-all disabled:opacity-50 select-none"
                 aria-label={`Digit ${index + 1}`}
               />
             ))}
@@ -295,7 +295,7 @@ function VerifyEmailForm() {
             <button
               type="submit"
               disabled={!isComplete || status === 'verifying' || status === 'success'}
-              className="w-full h-[46px] sm:h-[48px] bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {status === 'verifying' ? (
                 <>
@@ -327,9 +327,9 @@ function VerifyEmailForm() {
                 type="button"
                 onClick={handleResendOtp}
                 disabled={isResending}
-                className="font-semibold text-[#0033FF] hover:text-[#0028D6] underline underline-offset-2 inline-flex items-center gap-1 cursor-pointer disabled:opacity-50 transition-colors"
+                className="font-semibold text-black hover:text-[#262626] underline underline-offset-2 inline-flex items-center gap-1 cursor-pointer disabled:opacity-50 transition-colors"
               >
-                {isResending && <RotateCw className="w-3 h-3 animate-spin text-[#0033FF]" />}
+                {isResending && <RotateCw className="w-3 h-3 animate-spin text-black" />}
                 <span>Resend Code</span>
               </button>
             )}
@@ -341,7 +341,7 @@ function VerifyEmailForm() {
           Wrong account?{' '}
           <Link
             href="/register"
-            className="font-bold text-[#0033FF] underline hover:text-[#0028D6] ml-1 cursor-pointer"
+            className="font-bold text-black underline hover:text-[#262626] ml-1 cursor-pointer"
           >
             Try another email
           </Link>
@@ -374,9 +374,9 @@ export default function VerifyEmailPage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-white font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col lg:flex-row overflow-hidden">
+    <div className="fixed inset-0 w-full h-full bg-white font-reddit selection:bg-black selection:text-white flex flex-col lg:flex-row overflow-hidden">
       {/* Left Column (Desktop Only): Signature Dot Halftone Graphic on Deep Cobalt Blue */}
-      <div className="hidden lg:relative lg:flex lg:w-1/2 h-full bg-[#00186B] overflow-hidden select-none">
+      <div className="hidden lg:relative lg:flex lg:w-1/2 h-full bg-black overflow-hidden select-none">
         <Image
           src="/login-pixelated.png"
           alt="HydroBasics Industrial Hydraulic Engineer"
@@ -387,7 +387,7 @@ export default function VerifyEmailPage() {
         />
         {/* Soft overlay gradient for subtle depth */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/80 via-transparent to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-t from-[#000000]/80 via-transparent to-transparent pointer-events-none"
           aria-hidden="true"
         />
       </div>
@@ -398,7 +398,7 @@ export default function VerifyEmailPage() {
         <header className="w-full flex items-center justify-end px-5 pt-5 sm:px-8 sm:pt-8 shrink-0 z-20">
           <Link
             href="/"
-            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-black hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
             aria-label="HYDRO BASICS Home - Back to Course"
           >
             <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
