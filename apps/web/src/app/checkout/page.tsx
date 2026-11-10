@@ -1113,28 +1113,26 @@ function CheckoutContent() {
           </div>
 
           {/* Payment Methods and Security Guarantee */}
-          <div className="border-t border-neutral-200/80 pt-4 space-y-2.5 text-center">
-            <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-500 px-0.5">
-              <span>Accepted Payment Methods</span>
-              <div className="flex items-center gap-1.5 normal-case tracking-normal">
-                <span className="text-[11px] text-neutral-500 font-medium">Secured by</span>
-                <RazorpayLogo className="h-3.5 sm:h-4 w-auto" />
-              </div>
+          <div className="border-t border-neutral-200/80 pt-4 space-y-3 text-center">
+            {/* Secured by Razorpay in Center */}
+            <div className="flex items-center justify-center gap-1.5 text-neutral-500 text-xs sm:text-[13px] font-medium">
+              <span>Secured by</span>
+              <RazorpayLogo className="h-4 sm:h-[18px] w-auto" />
             </div>
 
-            {/* Real Brand Logos in One Single Row: GPay, Visa, Mastercard, Paytm (No blocks, tightly together) */}
-            <div className="flex items-center justify-center gap-4 sm:gap-6 py-1 flex-nowrap">
+            {/* Real Brand Logos in One Single Row: GPay, Visa, Mastercard, Paytm */}
+            <div className="flex items-center justify-center gap-3.5 sm:gap-4.5 py-0.5 flex-nowrap">
               <div title="Google Pay (GPay)" className="shrink-0 flex items-center justify-center">
-                <GPayLogo className="h-3.5 sm:h-4 w-auto" />
+                <GPayLogo className="h-[18px] sm:h-[22px] w-auto" />
               </div>
               <div title="Visa" className="shrink-0 flex items-center justify-center">
-                <VisaLogo className="h-3 sm:h-3.5 w-auto" />
+                <VisaLogo className="h-[15px] sm:h-[18px] w-auto" />
               </div>
               <div title="Mastercard" className="shrink-0 flex items-center justify-center">
-                <MastercardLogo className="h-3.5 sm:h-4 w-auto" />
+                <MastercardLogo className="h-[19px] sm:h-[22px] w-auto" />
               </div>
               <div title="Paytm" className="shrink-0 flex items-center justify-center">
-                <PaytmLogo className="h-3.5 sm:h-4 w-auto" />
+                <PaytmLogo className="h-[18px] sm:h-[22px] w-auto" />
               </div>
             </div>
           </div>
