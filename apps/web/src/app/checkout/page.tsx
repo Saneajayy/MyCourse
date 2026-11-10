@@ -863,10 +863,25 @@ function CheckoutContent() {
           </div>
         </div>
 
-        {/* Footer Guarantee */}
-        <div className="relative z-10 pt-8 mt-8 border-t border-white/15 text-center lg:text-left text-xs text-blue-100/60">
+        {/* Footer Guarantee & Terms */}
+        <div className="relative z-10 pt-8 mt-8 border-t border-white/15 text-center lg:text-left text-xs text-blue-100/60 space-y-2.5">
           <p>
             Official course curriculum by <strong className="text-white">{siteConfig.instructor.name}</strong>. Certified for plant engineers, diploma holders, and maintenance technicians.
+          </p>
+          <p className="text-blue-100/70">
+            By completing this payment, you agree to the{' '}
+            <Link href="/terms" className="underline text-white hover:text-cyan-200">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link href="/refunds" className="underline text-white hover:text-cyan-200">
+              Refund Policy
+            </Link>
+            . Need assistance? Contact{' '}
+            <a href={`mailto:${siteConfig.supportEmail}`} className="underline text-white hover:text-cyan-200">
+              {siteConfig.supportEmail}
+            </a>
+            .
           </p>
         </div>
       </div>
@@ -1131,23 +1146,6 @@ function CheckoutContent() {
               </div>
             </div>
           </div>
-
-          {/* Footer Terms & Policy Links - shifted up directly below card */}
-          <p className="text-center text-xs text-neutral-500 leading-normal px-2 pt-1">
-            By completing this payment, you agree to the{' '}
-            <Link href="/terms" className="underline hover:text-neutral-800">
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link href="/refunds" className="underline hover:text-neutral-800">
-              Refund Policy
-            </Link>
-            . Need assistance? Contact{' '}
-            <a href={`mailto:${siteConfig.supportEmail}`} className="underline hover:text-neutral-800">
-              {siteConfig.supportEmail}
-            </a>
-            .
-          </p>
         </div>
       </div>
     </div>
