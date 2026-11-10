@@ -915,7 +915,7 @@ function CheckoutContent() {
         </header>
 
         {/* Centered Billing & Checkout Container */}
-        <div className="w-full max-w-lg mx-auto px-6 sm:px-8 py-6 sm:py-8 my-auto space-y-6">
+        <div className="w-full max-w-lg mx-auto px-4 sm:px-6 py-6 sm:py-8 my-auto space-y-4">
           {/* Email Verification Warning Alert Gate */}
           {isAuthenticated && !user?.emailVerifiedAt && (
             <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-xl p-5 shadow-sm text-amber-950">
@@ -966,8 +966,10 @@ function CheckoutContent() {
             </div>
           )}
 
-          {/* Simple Billing Information Headline */}
-          <div className="space-y-1">
+          {/* Billing Info Card Box - Identical styling to Login / Signup / Verify-Email cards */}
+          <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-8 select-none overflow-hidden space-y-6">
+            {/* Simple Billing Information Headline */}
+            <div className="space-y-1">
             <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
               Billing Information
             </h1>
@@ -1030,38 +1032,35 @@ function CheckoutContent() {
               />
             </div>
 
-            {/* Phone Number & Company GSTIN in one single row */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-3.5">
-              {/* Phone Number */}
-              <div className="space-y-1.5 text-left">
-                <label htmlFor="checkout-phone" className="text-sm font-bold text-neutral-900 block truncate" title="Phone Number">
-                  Phone Number <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  id="checkout-phone"
-                  type="tel"
-                  required
-                  placeholder="+91 98765 43210"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono"
-                />
-              </div>
+            {/* Phone Number */}
+            <div className="space-y-1.5 text-left">
+              <label htmlFor="checkout-phone" className="text-sm font-bold text-neutral-900 block">
+                Phone Number <span className="text-rose-500">*</span>
+              </label>
+              <input
+                id="checkout-phone"
+                type="tel"
+                required
+                placeholder="+91 98765 43210"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono"
+              />
+            </div>
 
-              {/* Company GSTIN */}
-              <div className="space-y-1.5 text-left">
-                <label htmlFor="checkout-gstin" className="text-sm font-bold text-neutral-900 block truncate" title="Company GSTIN (Optional)">
-                  GSTIN (Optional)
-                </label>
-                <input
-                  id="checkout-gstin"
-                  type="text"
-                  placeholder="22AAAAA0000A1Z5"
-                  value={gstin}
-                  onChange={(e) => setGstin(e.target.value.toUpperCase())}
-                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono uppercase"
-                />
-              </div>
+            {/* Company GSTIN */}
+            <div className="space-y-1.5 text-left">
+              <label htmlFor="checkout-gstin" className="text-sm font-bold text-neutral-900 block">
+                Company GSTIN (Optional)
+              </label>
+              <input
+                id="checkout-gstin"
+                type="text"
+                placeholder="22AAAAA0000A1Z5"
+                value={gstin}
+                onChange={(e) => setGstin(e.target.value.toUpperCase())}
+                className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono uppercase"
+              />
             </div>
           </div>
 
@@ -1110,15 +1109,20 @@ function CheckoutContent() {
           </div>
 
           {/* Payment Methods and Security Guarantee */}
-          <div className="border-t border-neutral-200/80 pt-4 space-y-3 text-center">
+          <div className="border-t border-neutral-200/80 pt-4 space-y-2 text-center">
             {/* Secured by Razorpay in Center */}
-            <div className="flex items-center justify-center gap-1.5 text-neutral-500 text-xs sm:text-[13px] font-medium">
+            <div className="flex items-center justify-center gap-1.5 text-neutral-600 text-xs sm:text-[13px] font-medium">
               <span>Secured by</span>
               <RazorpayLogo className="h-4 sm:h-[18px] w-auto" />
             </div>
 
+            {/* Accepted Payment Methods under Secured by Razorpay */}
+            <div className="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider text-neutral-400">
+              Accepted Payment Methods
+            </div>
+
             {/* Real Brand Logos in One Single Row: GPay, Visa, Mastercard, Paytm */}
-            <div className="flex items-center justify-center gap-5 sm:gap-6 py-0.5 flex-nowrap">
+            <div className="flex items-center justify-center gap-5 sm:gap-6 pt-0.5 pb-0.5 flex-nowrap">
               <div title="Google Pay (GPay)" className="shrink-0 flex items-center justify-center">
                 <GPayLogo className="h-[18px] sm:h-[21px] w-auto" />
               </div>
@@ -1133,6 +1137,7 @@ function CheckoutContent() {
               </div>
             </div>
           </div>
+        </div>
         </div>
 
         {/* Footer Terms & Policy Links */}
