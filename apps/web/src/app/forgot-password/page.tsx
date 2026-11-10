@@ -147,7 +147,7 @@ function ForgotPasswordContent() {
     setIsVerifying(true);
 
     try {
-      const res = await apiClient<{ success: boolean; data: { resetToken: string } }>(
+      const res = await apiClient<{ success?: boolean; resetToken?: string; data?: { resetToken?: string } }>(
         '/auth/verify-reset-otp',
         {
           method: 'POST',
@@ -159,8 +159,12 @@ function ForgotPasswordContent() {
         },
       );
 
+      const token = res?.resetToken || res?.data?.resetToken;
+      if (!token) {
+        throw new Error('Reset token was not received. Please request a new code.');
+      }
+
       toastSuccess('Code Verified', 'Please enter your new password.');
-      const token = res.data?.resetToken;
       router.push(`/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email.trim().toLowerCase())}`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Invalid or expired reset code';

@@ -31,12 +31,14 @@ function ResetPasswordForm() {
     }
   }, [initialToken]);
 
+  const isTokenInvalid = !token?.trim() || token === 'undefined' || token === 'null';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
 
-    if (!token.trim()) {
-      setErrorMsg('Reset token is missing. Please request a verification code.');
+    if (isTokenInvalid) {
+      setErrorMsg('Reset token is missing or invalid. Please request a verification code.');
       return;
     }
 
@@ -99,7 +101,7 @@ function ResetPasswordForm() {
               </button>
             </div>
           </div>
-        ) : !token && !initialToken ? (
+        ) : isTokenInvalid ? (
           <div className="text-center py-4 space-y-4">
             <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
               Verification Code Required
