@@ -212,7 +212,9 @@ function ForgotPasswordContent() {
             <h1 className="text-2xl sm:text-[28px] md:text-[30px] font-bold text-neutral-900 tracking-tight">
               Forgot your Password?
             </h1>
-
+            <p className="text-xs sm:text-sm text-neutral-600 mt-1.5 leading-relaxed">
+              Enter the email address associated with your account to receive a 6-digit reset code.
+            </p>
           </div>
 
           {/* Error Message Alert Banner */}
