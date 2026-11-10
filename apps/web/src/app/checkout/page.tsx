@@ -902,9 +902,8 @@ function CheckoutContent() {
           <div className="space-y-4 pt-1">
             {/* Full Name */}
             <div className="space-y-1.5 text-left">
-              <label htmlFor="checkout-name" className="text-sm font-bold text-neutral-900 flex items-center justify-between">
-                <span>Full Name <span className="text-rose-500">*</span></span>
-                <span className="text-[11px] font-normal text-neutral-500">For Certificate &amp; Invoice</span>
+              <label htmlFor="checkout-name" className="text-sm font-bold text-neutral-900 block">
+                Full Name <span className="text-rose-500">*</span>
               </label>
               <input
                 id="checkout-name"
@@ -919,11 +918,8 @@ function CheckoutContent() {
 
             {/* Email Address */}
             <div className="space-y-1.5 text-left">
-              <label htmlFor="checkout-email" className="text-sm font-bold text-neutral-900 flex items-center justify-between">
-                <span>Email Address <span className="text-rose-500">*</span></span>
-                <span className="text-[11px] font-normal text-neutral-500">
-                  {isAuthenticated ? 'Linked account' : 'Login will be sent here'}
-                </span>
+              <label htmlFor="checkout-email" className="text-sm font-bold text-neutral-900 block">
+                Email Address <span className="text-rose-500">*</span>
               </label>
               <input
                 id="checkout-email"
@@ -939,9 +935,8 @@ function CheckoutContent() {
 
             {/* Phone Number */}
             <div className="space-y-1.5 text-left">
-              <label htmlFor="checkout-phone" className="text-sm font-bold text-neutral-900 flex items-center justify-between">
-                <span>Phone Number <span className="text-rose-500">*</span></span>
-                <span className="text-[11px] font-normal text-neutral-500">SMS &amp; WhatsApp Receipt</span>
+              <label htmlFor="checkout-phone" className="text-sm font-bold text-neutral-900 block">
+                Phone Number <span className="text-rose-500">*</span>
               </label>
               <input
                 id="checkout-phone"
@@ -956,9 +951,8 @@ function CheckoutContent() {
 
             {/* Company GSTIN */}
             <div className="space-y-1.5 text-left">
-              <label htmlFor="checkout-gstin" className="text-sm font-bold text-neutral-900 flex items-center justify-between">
-                <span>Company GSTIN (Optional)</span>
-                <span className="text-[11px] font-normal text-neutral-500">For Business Input Credit</span>
+              <label htmlFor="checkout-gstin" className="text-sm font-bold text-neutral-900 block">
+                Company GSTIN (Optional)
               </label>
               <input
                 id="checkout-gstin"
