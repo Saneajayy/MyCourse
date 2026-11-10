@@ -61,35 +61,33 @@ export function PaymentSuccessCard({
         </p>
       </div>
 
-      {/* 2. Order Summary Section */}
-      <div className="pt-1 space-y-3">
+      {/* 2. Order Summary Section (Course, Validity, and Price in Same Tab without grey fill) */}
+      <div className="pt-1 space-y-2.5">
         <div className="text-center sm:text-left font-bold text-sm sm:text-base text-neutral-900">
           Order Summary
         </div>
 
-        {/* Course Details Block */}
-        <div className="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-neutral-50/80 border border-neutral-100">
+        {/* Combined Course & Price Block */}
+        <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl border border-neutral-200">
+          {/* Left: Course Name & Validity */}
           <div className="min-w-0 flex-1 space-y-0.5">
-            <span className="font-bold text-neutral-900 text-sm block truncate">
+            <span className="font-bold text-neutral-900 text-sm sm:text-base block truncate">
               {displayCourse}
             </span>
-            <span className="text-[11px] font-semibold text-neutral-500 block">
+            <span className="text-xs font-semibold text-neutral-500 block">
               {validityLabel}
             </span>
           </div>
-        </div>
 
-        {/* Amount Paid Block (Only Final Price + Taxes Note) */}
-        <div className="flex flex-col items-end pt-1">
-          <span className="text-xs font-semibold text-neutral-500">
-            Amount Paid
-          </span>
-          <span className="text-3xl sm:text-4xl font-black text-neutral-900 font-mono tracking-tight leading-none my-1">
-            ₹{formattedAmount}
-          </span>
-          <span className="text-[11px] text-neutral-400 font-medium">
-            Including all taxes &amp; GST
-          </span>
+          {/* Right: Price & Taxes note */}
+          <div className="shrink-0 text-right space-y-0.5">
+            <span className="text-2xl sm:text-3xl font-black text-neutral-900 font-mono tracking-tight leading-none block">
+              ₹{formattedAmount}
+            </span>
+            <span className="text-[10px] sm:text-[11px] text-neutral-400 font-medium block">
+              Including all taxes &amp; GST
+            </span>
+          </div>
         </div>
       </div>
 
