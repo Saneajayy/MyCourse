@@ -870,8 +870,8 @@ function CheckoutContent() {
           </Link>
         </header>
 
-        {/* Mobile Upper Part: Full-bleed edge-to-edge halftone image taking up whole upper screen */}
-        <div className="lg:hidden relative w-full h-[250px] sm:h-[280px] bg-[#00186B] shrink-0 overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5">
+        {/* Mobile Upper Part: Fixed full-bleed edge-to-edge halftone header */}
+        <div className="lg:hidden fixed top-0 inset-x-0 z-30 w-full h-[250px] sm:h-[280px] bg-[#00186B] overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5 shadow-sm touch-none">
           {/* Full-Bleed Signature Dot Halftone Graphic */}
           <Image
             src="/login-pixelated.png"
@@ -888,7 +888,7 @@ function CheckoutContent() {
           />
 
           {/* Top Bar inside Mobile Upper Part */}
-          <div className="relative z-10 w-full flex items-center justify-between">
+          <div className="relative z-10 w-full flex items-center justify-between pointer-events-auto touch-auto">
             <div>
               {!isAuthenticated && (
                 <div className="text-xs text-blue-100 font-medium">
@@ -917,7 +917,7 @@ function CheckoutContent() {
           </div>
 
           {/* Bottom Controls inside Mobile Upper Part */}
-          <div className="relative z-10 w-full">
+          <div className="relative z-10 w-full pointer-events-auto touch-auto">
             <div className="flex items-end justify-between gap-3">
               {/* Coupon Code Entry: Apply button then input bar extending horizontally */}
               <div className="flex-1 min-w-0">
@@ -981,10 +981,10 @@ function CheckoutContent() {
           </div>
         </div>
 
-        {/* Scrollable Billing Section (Perfect vertical center on desktop, smooth scroll on mobile) */}
-        <div className="flex-1 w-full min-h-0 overflow-y-auto relative flex flex-col justify-center items-center">
+        {/* Scrollable Billing Section (Pinned below fixed header on mobile, perfectly centered on desktop) */}
+        <div className="flex-1 w-full h-full min-h-0 overflow-y-auto overscroll-contain relative flex flex-col items-center pt-[250px] sm:pt-[280px] pb-12 sm:pb-16 lg:pt-0 lg:pb-0 lg:justify-center">
           {/* Centered Order & Billing Container */}
-          <div className="my-auto w-full max-w-lg px-4 sm:px-6 py-6 sm:py-8 relative z-10 space-y-4">
+          <div className="w-full max-w-lg px-4 sm:px-6 py-6 sm:py-8 relative z-10 space-y-4 lg:my-auto">
           {/* Email Verification Warning Alert Gate */}
           {isAuthenticated && !user?.emailVerifiedAt && (
             <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-xl p-5 text-amber-950">
@@ -1253,10 +1253,10 @@ export default function CheckoutPage() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-white font-reddit selection:bg-[#0033FF] selection:text-white">
+    <div className="fixed inset-0 w-full h-full overflow-hidden bg-white font-reddit selection:bg-[#0033FF] selection:text-white">
       <Suspense
         fallback={
-          <div className="w-full min-h-screen flex flex-col items-center justify-center py-28 space-y-4 bg-white">
+          <div className="w-full h-full flex flex-col items-center justify-center space-y-4 bg-white">
             <Loader2 className="w-10 h-10 animate-spin text-[#0033FF]" />
             <p className="text-sm font-semibold tracking-wider uppercase text-neutral-600">
               Loading Checkout Session...
