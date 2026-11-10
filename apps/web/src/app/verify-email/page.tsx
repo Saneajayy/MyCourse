@@ -80,14 +80,6 @@ function VerifyEmailForm() {
     if (index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
-
-    // Auto submit if all 6 digits are filled
-    const combined = newDigits.join('');
-    if (combined.length === 6 && newDigits.every((d) => d !== '')) {
-      if (email.trim()) {
-        executeVerification(email.trim(), combined);
-      }
-    }
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -119,10 +111,6 @@ function VerifyEmailForm() {
 
     const nextIndex = Math.min(cleanNumbers.length, 5);
     inputRefs.current[nextIndex]?.focus();
-
-    if (cleanNumbers.length === 6 && email.trim()) {
-      executeVerification(email.trim(), cleanNumbers);
-    }
   };
 
   const executeVerification = async (targetEmail: string, otpCode: string) => {
