@@ -1123,7 +1123,7 @@ function CheckoutContent() {
 
               {/* Real Brand Logos in One Single Row: GPay, Visa, Mastercard, Paytm */}
               <div className="flex items-center justify-center gap-5 sm:gap-6 pt-0.5 pb-0.5 flex-nowrap">
-                <div title="Google Pay (GPay)" className="shrink-0 flex items-center justify-center">
+                <div title="Google Pay (GPay)" className="shrink-0 flex items-center justify-center translate-x-1">
                   <GPayLogo className="h-[18px] sm:h-[21px] w-auto" />
                 </div>
                 <div title="Visa" className="shrink-0 flex items-center justify-center">
