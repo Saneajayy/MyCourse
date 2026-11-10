@@ -122,7 +122,7 @@ function LoginForm() {
 
         {/* Error Alert */}
         {errorMsg && (
-          <div className="mt-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium text-center">
+          <div className="mt-4 p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
             <span>{errorMsg}</span>
           </div>
         )}

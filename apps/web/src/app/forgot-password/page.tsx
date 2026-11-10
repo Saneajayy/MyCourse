@@ -208,14 +208,12 @@ function ForgotPasswordContent() {
             <h1 className="text-2xl sm:text-[28px] md:text-[30px] font-bold text-neutral-900 tracking-tight">
               Forgot your Password?
             </h1>
-            <p className="text-xs sm:text-sm text-neutral-600 mt-1.5 leading-relaxed">
-              Enter your registered email address to receive a 6-digit verification code.
-            </p>
+
           </div>
 
           {/* Error Message Alert Banner */}
           {errorMsg && (
-            <div className="mb-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium text-center">
+            <div className="mb-4 p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
               <span>{errorMsg}</span>
             </div>
           )}
@@ -292,25 +290,14 @@ function ForgotPasswordContent() {
               Please check your email
             </h1>
             <div className="text-neutral-600 text-[13px] sm:text-[14px] font-normal mt-1.5 space-y-0.5">
-              <p>Enter the 6 digit OTP we sent you to</p>
-              <div>
-                <span
-                  onClick={() => {
-                    setStep('email');
-                    setErrorMsg(null);
-                  }}
-                  className="text-neutral-900 font-semibold cursor-pointer break-all hover:opacity-80 inline-block"
-                  title="Click to change email"
-                >
-                  {email || 'your email address'}
-                </span>
-              </div>
+              <p>Enter the 6 digit OTP we sent to your email.</p>
+
             </div>
           </div>
 
           {/* Error Message Alert Banner */}
           {errorMsg && (
-            <div className="mb-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium text-center">
+            <div className="mb-4 p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
               <span>{errorMsg}</span>
             </div>
           )}

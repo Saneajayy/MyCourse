@@ -126,7 +126,7 @@ function ResetPasswordForm() {
               </h1>
               <p className="text-xs sm:text-sm text-neutral-600 mt-1.5 leading-relaxed">
                 {initialEmail ? (
-                  <>Setting new password for <strong className="text-neutral-900 font-semibold">{initialEmail}</strong></>
+                  <>Create a new password for your account.</>
                 ) : (
                   'Choose a secure new password of at least 10 characters'
                 )}
@@ -135,7 +135,7 @@ function ResetPasswordForm() {
 
             {/* Error Banner */}
             {errorMsg && (
-              <div className="mb-4 p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium text-center">
+              <div className="mb-4 p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
                 <span>{errorMsg}</span>
               </div>
             )}

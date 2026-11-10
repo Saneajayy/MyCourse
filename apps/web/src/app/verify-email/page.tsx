@@ -261,8 +261,8 @@ function VerifyEmailForm() {
 
       {/* Error Message Alert Banner */}
       {errorMessage && (
-        <div className="mb-5 px-3.5 py-2 rounded bg-rose-600 text-white text-xs font-medium shadow-md max-w-[300px] w-full animate-in fade-in duration-200">
-          {errorMessage}
+        <div className="mb-5 px-3.5 py-2.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center max-w-[320px] w-full animate-in fade-in duration-200">
+          <span>{errorMessage}</span>
         </div>
       )}
 

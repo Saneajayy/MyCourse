@@ -979,10 +979,9 @@ function CheckoutContent() {
             </div>
           </div>
 
-          {/* Error Alert Banner: Solid Red with X icon (matching Login/Register) */}
+          {/* Error Alert Banner: Translucent Red (matching Login/Register) */}
           {checkoutError && (
-            <div className="p-3.5 rounded-lg bg-red-600 text-white text-xs sm:text-[13px] font-medium shadow-sm flex items-center gap-2.5 animate-in fade-in">
-              <X className="w-4 h-4 text-white shrink-0 stroke-[2.5]" />
+            <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium flex items-center justify-center text-center animate-in fade-in">
               <span>{checkoutError}</span>
             </div>
           )}
