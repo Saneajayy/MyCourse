@@ -456,8 +456,8 @@ function StudentDashboardContent() {
       {/* 1. LEFT BLUE COLUMN (Solid #000000, embedded image, clean tabs) */}
       {/* ============================================================== */}
 
-      {/* Mobile Top Header: Solid Black Bar with Brand Logo & Floating Dropdown Overlay */}
-      <div className="md:hidden sticky top-0 inset-x-0 w-full bg-black border-b border-white/50 select-none z-40 shrink-0 relative shadow-none">
+      {/* Mobile Top Header: Fixed on top of screen, expands & collapses smoothly without affecting content */}
+      <header className="md:hidden fixed top-0 inset-x-0 w-full bg-black border-b border-white/50 select-none z-50 shrink-0 shadow-none">
         {/* Mobile Header Bar */}
         <div className="w-full h-16 sm:h-20 px-5 sm:px-6 flex items-center justify-between relative z-50 bg-black">
           <Link
@@ -473,96 +473,110 @@ function StudentDashboardContent() {
             </span>
           </Link>
 
-          {/* Three bars toggle button in top right corner */}
+          {/* Three bars toggle button in top right corner with smooth icon rotation */}
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             aria-expanded={isMobileMenuOpen}
-            className="h-10 w-10 flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-colors focus:outline-none cursor-pointer"
+            className="h-10 w-10 relative flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-colors focus:outline-none cursor-pointer"
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6 stroke-[2.5]" /> : <Menu className="w-6 h-6 stroke-[2.5]" />}
+            <Menu
+              className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${
+                isMobileMenuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
+              }`}
+            />
+            <X
+              className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${
+                isMobileMenuOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'
+              }`}
+            />
           </button>
         </div>
 
-        {/* Dropping Column when opened (Floats on top of screen, never pushes main body) */}
-        {isMobileMenuOpen && (
-          <>
-            {/* Soft backdrop overlay to capture outside clicks and dim content behind */}
-            <div
-              className="fixed inset-0 top-16 sm:top-20 bg-black/60 z-40 backdrop-blur-[2px] transition-opacity duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-              aria-hidden="true"
-            />
-
-            {/* Floating Dropdown Column on top of screen */}
-            <div className="absolute top-full inset-x-0 bg-black border-t border-white/50 z-50 overflow-hidden shadow-2xl transition-all animate-in slide-in-from-top-2 duration-150">
-              {/* Background halftone image shifted to the right, full-bleed with no left cut-off */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-15">
-                <Image
-                  src="/login-pixelated.png"
-                  alt=""
-                  fill
-                  sizes="100vw"
-                  style={{ objectPosition: '35% center' }}
-                  className="object-cover mix-blend-screen select-none"
-                />
-              </div>
-
-              {/* Column of Full-Width Tabs with Thin White Dividing Borders */}
-              <nav
-                aria-label="Student Mobile Navigation Column"
-                className="relative z-10 flex flex-col w-full"
-              >
-                {navTabs.map((tab) => {
-                  const isActive = activeTab === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => {
-                        handleTabChange(tab.id);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className={`w-full text-left px-6 py-4 text-[15px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
-                        isActive
-                          ? 'bg-white text-black font-extrabold'
-                          : 'bg-transparent text-white hover:bg-white/10'
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  );
-                })}
-
-                {/* Log Out Button */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    logout();
-                  }}
-                  className="w-full text-left px-6 py-4 text-[15px] font-bold text-white border-b border-white/50 hover:bg-white/10 active:bg-rose-500/20 transition-colors cursor-pointer select-none"
-                >
-                  Log Out
-                </button>
-
-                {/* Admin Switch Link (if admin) */}
-                {user?.role === 'ADMIN' && (
-                  <Link
-                    href="/admin"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="w-full text-left px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-emerald-200 border-b border-white/50 hover:bg-white/10 flex items-center gap-2"
-                  >
-                    <ShieldCheck className="w-4 h-4 text-emerald-300" />
-                    <span>Admin Console</span>
-                  </Link>
-                )}
-              </nav>
+        {/* Dropping Column when opened: Expands on top of screen and collapses smoothly without affecting content */}
+        <div
+          className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
+            isMobileMenuOpen
+              ? 'grid-rows-[1fr] opacity-100 pointer-events-auto visible'
+              : 'grid-rows-[0fr] opacity-0 pointer-events-none invisible'
+          }`}
+        >
+          <div className="overflow-hidden relative bg-black border-t border-white/50">
+            {/* Background halftone image shifted to the right, full-bleed with no left cut-off */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-15">
+              <Image
+                src="/login-pixelated.png"
+                alt=""
+                fill
+                sizes="100vw"
+                style={{ objectPosition: '35% center' }}
+                className="object-cover mix-blend-screen select-none"
+              />
             </div>
-          </>
-        )}
-      </div>
+
+            {/* Column of Full-Width Tabs with Thin White Dividing Borders */}
+            <nav
+              aria-label="Student Mobile Navigation Column"
+              className="relative z-10 flex flex-col w-full max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5rem)] overflow-y-auto"
+            >
+              {navTabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => {
+                      handleTabChange(tab.id);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full text-left px-6 py-4 text-[15px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
+                      isActive
+                        ? 'bg-white text-black font-extrabold'
+                        : 'bg-transparent text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+
+              {/* Log Out Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  logout();
+                }}
+                className="w-full text-left px-6 py-4 text-[15px] font-bold text-white border-b border-white/50 hover:bg-white/10 active:bg-rose-500/20 transition-colors cursor-pointer select-none"
+              >
+                Log Out
+              </button>
+
+              {/* Admin Switch Link (if admin) */}
+              {user?.role === 'ADMIN' && (
+                <Link
+                  href="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full text-left px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-emerald-200 border-b border-white/50 hover:bg-white/10 flex items-center gap-2"
+                >
+                  <ShieldCheck className="w-4 h-4 text-emerald-300" />
+                  <span>Admin Console</span>
+                </Link>
+              )}
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      {/* Dimming Backdrop Overlay: Fixed over the screen behind the header */}
+      <div
+        className={`md:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-[2px] transition-opacity duration-300 ease-in-out ${
+          isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
 
       {/* Desktop Sidebar: Solid Blue Column with Embedded Image & Contrasting Tabs */}
       <aside className="hidden md:flex md:fixed md:top-0 md:bottom-0 md:left-0 md:w-64 lg:w-72 bg-black text-white flex-col shrink-0 z-30 select-none border-r border-white/50 overflow-y-auto relative shadow-none">
@@ -643,7 +657,7 @@ function StudentDashboardContent() {
       {/* ============================================================== */}
       {/* 2. RIGHT WHITE WORKSPACE (Left-aligned, Zero Shadows)          */}
       {/* ============================================================== */}
-      <main className="flex-1 md:pl-64 lg:pl-72 w-full min-h-screen bg-white flex flex-col">
+      <main className="flex-1 md:pl-64 lg:pl-72 w-full min-h-screen bg-white flex flex-col pt-16 sm:pt-20 md:pt-0">
         <div className="w-full max-w-4xl p-6 sm:p-8 lg:p-10 space-y-6 text-left">
 
           {/* TAB 1: MY COURSES */}

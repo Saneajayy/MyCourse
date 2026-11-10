@@ -82,65 +82,86 @@ export function LandingNavbar() {
             )}
           </div>
 
-          {/* Mobile Menu Toggle Button */}
+          {/* Mobile Menu Toggle Button with Smooth Icon Morph */}
           <div className="lg:hidden figma-glass-divider h-full flex items-center">
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label={isMobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
               aria-expanded={isMobileMenuOpen}
-              className="h-full px-4 sm:px-5 flex items-center justify-center text-white hover:bg-white/10 transition-colors focus:outline-none"
+              className="h-full px-4 sm:px-5 relative flex items-center justify-center text-white hover:bg-white/10 transition-colors focus:outline-none cursor-pointer"
             >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              <Menu
+                className={`w-5 h-5 absolute transition-all duration-300 ease-in-out ${
+                  isMobileMenuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
+                }`}
+              />
+              <X
+                className={`w-5 h-5 absolute transition-all duration-300 ease-in-out ${
+                  isMobileMenuOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'
+                }`}
+              />
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Mobile Menu Dropdown (Frosted Glass, No Shadows) */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden figma-glass-nav border-t border-white/15 px-6 py-5 transition-all">
-          <div className="flex flex-col space-y-4">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-white/90 hover:text-white font-semibold text-base py-1 border-b border-white/10 transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+      {/* Mobile Menu Dropdown (Frosted Glass, Expands & Collapses Smoothly On Top) */}
+      <div
+        className={`lg:hidden figma-glass-nav border-t border-white/15 transition-all duration-300 ease-in-out ${
+          isMobileMenuOpen
+            ? 'opacity-100 pointer-events-auto visible'
+            : 'opacity-0 pointer-events-none invisible border-t-transparent'
+        }`}
+      >
+        <div
+          className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+            isMobileMenuOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+          }`}
+        >
+          <div className="overflow-hidden">
+            <div className="px-6 py-5 flex flex-col space-y-4">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-white/90 hover:text-white font-semibold text-base py-1 border-b border-white/10 transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
 
-            <div className="pt-2 flex flex-col gap-2.5">
-              <Link
-                href="/#pricing"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full py-2.5 text-center font-semibold text-white bg-white/15 hover:bg-white/25 rounded-md border border-white/20 transition-all text-sm"
-              >
-                Buy Now
-              </Link>
-              {isAuthenticated ? (
+              <div className="pt-2 flex flex-col gap-2.5">
                 <Link
-                  href="/my-courses"
+                  href="/#pricing"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full py-2.5 text-center font-semibold text-white bg-white/10 hover:bg-white/20 rounded-md border border-white/15 transition-all text-sm"
+                  className="w-full py-2.5 text-center font-semibold text-white bg-white/15 hover:bg-white/25 rounded-md border border-white/20 transition-all text-sm"
                 >
-                  My Courses
+                  Buy Now
                 </Link>
-              ) : (
-                <Link
-                  href="/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full py-2.5 text-center font-semibold text-white bg-white/10 hover:bg-white/20 rounded-md border border-white/15 transition-all text-sm"
-                >
-                  Log In
-                </Link>
-              )}
+                {isAuthenticated ? (
+                  <Link
+                    href="/my-courses"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full py-2.5 text-center font-semibold text-white bg-white/10 hover:bg-white/20 rounded-md border border-white/15 transition-all text-sm"
+                  >
+                    My Courses
+                  </Link>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full py-2.5 text-center font-semibold text-white bg-white/10 hover:bg-white/20 rounded-md border border-white/15 transition-all text-sm"
+                  >
+                    Log In
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }
