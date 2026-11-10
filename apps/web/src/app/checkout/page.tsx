@@ -642,12 +642,12 @@ function CheckoutContent() {
 
 
   return (
-    <div className="w-full min-h-screen flex flex-col lg:flex-row">
+    <div className="w-full min-h-screen lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row">
       {/* ============================================================== */}
       {/* LEFT COLUMN: Product Summary, Course Card, Perks, Order Details */}
       {/* (Brand Deep Blue #00186B, High-Contrast White & Cyan Typography)  */}
       {/* ============================================================== */}
-      <div className="w-full lg:w-1/2 lg:min-h-screen bg-[#00186B] text-white flex flex-col justify-between relative overflow-y-auto p-6 sm:p-9 md:p-12 xl:p-16 border-b lg:border-b-0 lg:border-r border-white/10 select-none">
+      <div className="w-full lg:w-1/2 lg:h-full bg-[#00186B] text-white flex flex-col justify-between relative overflow-y-auto p-6 sm:p-8 lg:p-8 xl:p-12 border-b lg:border-b-0 lg:border-r border-white/10 select-none">
         {/* Subtle decorative mesh gradient in the background */}
         <div
           className="absolute -top-32 -left-32 w-96 h-96 bg-[#0033FF]/30 rounded-full blur-3xl pointer-events-none"
@@ -658,7 +658,7 @@ function CheckoutContent() {
           aria-hidden="true"
         />
 
-        <div className="relative z-10 space-y-8 max-w-xl mx-auto lg:mx-0 w-full">
+        <div className="relative z-10 space-y-6 sm:space-y-7 max-w-xl mx-auto lg:mx-0 w-full">
           {/* Top Escape Link */}
           <div className="flex items-center justify-start pb-2 border-b border-white/15">
             <Link
@@ -864,7 +864,7 @@ function CheckoutContent() {
         </div>
 
         {/* Footer Guarantee & Terms */}
-        <div className="relative z-10 pt-8 mt-8 border-t border-white/15 text-center lg:text-left text-xs text-blue-100/60 space-y-2.5">
+        <div className="relative z-10 pt-5 mt-5 sm:pt-6 sm:mt-6 border-t border-white/15 text-center lg:text-left text-xs text-blue-100/60 space-y-2.5">
           <p>
             Official course curriculum by <strong className="text-white">{siteConfig.instructor.name}</strong>. Certified for plant engineers, diploma holders, and maintenance technicians.
           </p>
@@ -889,9 +889,9 @@ function CheckoutContent() {
       {/* ============================================================== */}
       {/* RIGHT COLUMN: Clean White Background, Billing Info & Checkout  */}
       {/* ============================================================== */}
-      <div className="w-full lg:w-1/2 lg:min-h-screen bg-white text-neutral-900 flex flex-col justify-between relative overflow-y-auto">
+      <div className="w-full lg:w-1/2 lg:h-full bg-white text-neutral-900 flex flex-col relative overflow-y-auto">
         {/* Top Header Bar: Pinned deeply into top-left and top-right corners with NO separation line */}
-        <header className="w-full flex items-center justify-between px-6 pt-6 sm:px-8 sm:pt-8 md:px-10 md:pt-8 shrink-0 z-20">
+        <header className="w-full flex items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 shrink-0 z-20">
           {/* Top-Left Corner: Already Enrolled / Sign In (hidden when signed in) */}
           <div>
             {!isAuthenticated && (
@@ -923,7 +923,8 @@ function CheckoutContent() {
         </header>
 
         {/* Centered Billing & Checkout Container */}
-        <div className="w-full max-w-lg mx-auto px-4 sm:px-6 py-6 sm:py-8 my-auto space-y-4">
+        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 w-full my-auto">
+          <div className="w-full max-w-lg space-y-4">
           {/* Email Verification Warning Alert Gate */}
           {isAuthenticated && !user?.emailVerifiedAt && (
             <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-xl p-5 shadow-sm text-amber-950">
@@ -1149,6 +1150,7 @@ function CheckoutContent() {
         </div>
       </div>
     </div>
+  </div>
   );
 }
 
