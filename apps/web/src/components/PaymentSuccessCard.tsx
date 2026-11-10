@@ -26,6 +26,182 @@ interface PaymentSuccessCardProps {
   onClose?: () => void;
 }
 
+interface ConfettiParticle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  width: number;
+  height: number;
+  color: string;
+  rotation: number;
+  vRotation: number;
+  flutterSpeed: number;
+  opacity: number;
+  life: number;
+  maxLife: number;
+  shape: 'rect' | 'circle' | 'sparkle';
+}
+
+const CONFETTI_COLORS = [
+  '#0033FF', // royal blue
+  '#3B82F6', // sky blue
+  '#10B981', // emerald
+  '#F59E0B', // gold
+  '#FBBF24', // yellow amber
+  '#EF4444', // coral red
+  '#EC4899', // hot pink
+  '#8B5CF6', // purple
+  '#06B6D4', // cyan teal
+];
+
+function createBurstParticles(cx: number, cy: number, count = 28): ConfettiParticle[] {
+  const particles: ConfettiParticle[] = [];
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+    const spawnDist = 18 + Math.random() * 8;
+    const speed = 2.4 + Math.random() * 3.8;
+    const randType = Math.random();
+    const shape: 'rect' | 'circle' | 'sparkle' =
+      randType > 0.4 ? 'rect' : randType > 0.15 ? 'circle' : 'sparkle';
+
+    const color =
+      CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)] ?? '#0033FF';
+
+    particles.push({
+      x: cx + Math.cos(angle) * spawnDist,
+      y: cy + Math.sin(angle) * spawnDist,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 0.4,
+      width: shape === 'rect' ? 6 + Math.random() * 4 : shape === 'sparkle' ? 7 : 4.5,
+      height: shape === 'rect' ? 3 + Math.random() * 2 : shape === 'sparkle' ? 7 : 4.5,
+      color,
+      rotation: Math.random() * Math.PI * 2,
+      vRotation: (Math.random() - 0.5) * 0.25,
+      flutterSpeed: 0.08 + Math.random() * 0.1,
+      opacity: 1,
+      life: 0,
+      maxLife: 55 + Math.random() * 35,
+      shape,
+    });
+  }
+  return particles;
+}
+
+function ConfettiBurst() {
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId: number;
+    let burstInterval: ReturnType<typeof setInterval>;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const particles: ConfettiParticle[] = [];
+
+    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+    const width = 260;
+    const height = 190;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
+
+    const cx = width / 2;
+    const cy = height / 2;
+
+    // Initial festive burst waves
+    particles.push(...createBurstParticles(cx, cy, 38));
+    timers.push(
+      setTimeout(() => {
+        particles.push(...createBurstParticles(cx, cy, 22));
+      }, 350)
+    );
+    timers.push(
+      setTimeout(() => {
+        particles.push(...createBurstParticles(cx, cy, 20));
+      }, 750)
+    );
+
+    // Continuous celebratory bursts
+    burstInterval = setInterval(() => {
+      particles.push(...createBurstParticles(cx, cy, 26));
+    }, 2500);
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        if (!p) continue;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.95;
+        p.vy *= 0.95;
+        p.vy += 0.04;
+        p.rotation += p.vRotation;
+        p.life++;
+        p.opacity = Math.max(0, 1 - p.life / p.maxLife);
+
+        if (p.opacity <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.scale(Math.cos(p.life * p.flutterSpeed), 1);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.opacity;
+
+        if (p.shape === 'rect') {
+          ctx.fillRect(-p.width / 2, -p.height / 2, p.width, p.height);
+        } else if (p.shape === 'circle') {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.width / 2, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // Diamond sparkle
+          ctx.beginPath();
+          ctx.moveTo(0, -p.height / 2);
+          ctx.lineTo(p.width / 4, -p.height / 4);
+          ctx.lineTo(p.width / 2, 0);
+          ctx.lineTo(p.width / 4, p.height / 4);
+          ctx.lineTo(0, p.height / 2);
+          ctx.lineTo(-p.width / 4, p.height / 4);
+          ctx.lineTo(-p.width / 2, 0);
+          ctx.lineTo(-p.width / 4, -p.height / 4);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      animId = requestAnimationFrame(render);
+    };
+
+    animId = requestAnimationFrame(render);
+
+    return () => {
+      timers.forEach(clearTimeout);
+      clearInterval(burstInterval);
+      cancelAnimationFrame(animId);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-0"
+      style={{ width: '260px', height: '190px' }}
+      aria-hidden="true"
+    />
+  );
+}
+
 export function PaymentSuccessCard({
   data,
   onDownloadInvoice,
@@ -51,62 +227,12 @@ export function PaymentSuccessCard({
 
   return (
     <div className="relative w-full max-w-[420px] sm:max-w-[440px] mx-auto bg-white rounded-2xl sm:rounded-[24px] p-6 sm:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-neutral-100 select-none font-reddit text-left space-y-4">
-      <style>{`
-        @keyframes confetti-burst {
-          0% {
-            transform: scale(0.5);
-            opacity: 0;
-          }
-          60% {
-            transform: scale(1.1);
-            opacity: 1;
-          }
-          100% {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-        .animate-confetti-burst {
-          animation: confetti-burst 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.25) forwards;
-          transform-origin: center;
-        }
-      `}</style>
-
       {/* 1. Header: Blue Circle with White Tick Above Title + Confetti Burst from Behind */}
       <div className="flex flex-col items-center text-center space-y-3 pb-1">
         {/* Circle with Confetti Burst */}
         <div className="relative flex items-center justify-center">
-          {/* Confetti coming out from behind the circle */}
-          <svg
-            className="absolute w-28 h-28 pointer-events-none z-0 animate-confetti-burst"
-            viewBox="0 0 120 120"
-            fill="none"
-            aria-hidden="true"
-          >
-            {/* Colorful Confetti Ribbons */}
-            <rect x="88" y="48" width="7" height="3" rx="1.5" transform="rotate(25 91.5 49.5)" fill="#FF3B30" />
-            <rect x="80" y="22" width="7" height="3" rx="1.5" transform="rotate(-30 83.5 23.5)" fill="#FF9500" />
-            <rect x="48" y="12" width="7" height="3" rx="1.5" transform="rotate(20 51.5 13.5)" fill="#0033FF" />
-            <rect x="22" y="28" width="7" height="3" rx="1.5" transform="rotate(-40 25.5 29.5)" fill="#34C759" />
-            <rect x="14" y="58" width="7" height="3" rx="1.5" transform="rotate(15 17.5 59.5)" fill="#AF52DE" />
-            <rect x="26" y="86" width="7" height="3" rx="1.5" transform="rotate(45 29.5 87.5)" fill="#FFCC00" />
-            <rect x="58" y="104" width="7" height="3" rx="1.5" transform="rotate(-15 61.5 105.5)" fill="#00C7BE" />
-            <rect x="88" y="86" width="7" height="3" rx="1.5" transform="rotate(35 91.5 87.5)" fill="#FF2D55" />
-
-            {/* Confetti Dots */}
-            <circle cx="98" cy="36" r="2.5" fill="#34C759" />
-            <circle cx="72" cy="12" r="2" fill="#FF2D55" />
-            <circle cx="36" cy="16" r="2.5" fill="#FF9500" />
-            <circle cx="12" cy="44" r="2" fill="#0033FF" />
-            <circle cx="16" cy="76" r="2.5" fill="#FFCC00" />
-            <circle cx="44" cy="108" r="2" fill="#AF52DE" />
-            <circle cx="76" cy="108" r="2.5" fill="#34C759" />
-            <circle cx="104" cy="68" r="2" fill="#FF9500" />
-
-            {/* Sparkles */}
-            <path d="M96 22 L97 25 L100 26 L97 27 L96 30 L95 27 L92 26 L95 25 Z" fill="#FFCC00" />
-            <path d="M22 72 L23 74 L25 75 L23 76 L22 78 L21 76 L19 75 L21 74 Z" fill="#00C7BE" />
-          </svg>
+          {/* Confetti continuously bursting outward from behind the circle */}
+          <ConfettiBurst />
 
           {/* Blue Circle with White Tick */}
           <div className="relative z-10 w-12 h-12 rounded-full bg-[#0033FF] text-white flex items-center justify-center shrink-0">
