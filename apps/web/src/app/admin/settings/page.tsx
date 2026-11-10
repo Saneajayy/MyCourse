@@ -213,7 +213,7 @@ export default function AdminSettingsPage() {
               required
               value={supportEmail}
               onChange={(e) => setSupportEmail(e.target.value)}
-              placeholder="support@hydrauliccourse.com"
+              placeholder="support@hydrobasics.com"
               className="w-full border border-black p-2 text-sm font-mono"
             />
             <p className="text-[11px] text-gray-500 mt-0.5">

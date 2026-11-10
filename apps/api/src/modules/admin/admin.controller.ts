@@ -800,7 +800,7 @@ export class AdminController {
       const businessProfile = settingsMap['business_profile'] || {
         businessName: 'Hydro Basics',
         businessAddress: '123 Industrial Area, Phase 2, New Delhi, India',
-        supportEmail: 'support@hydrauliccourse.com',
+        supportEmail: 'support@hydrobasics.com',
       };
 
       const taxConfig = settingsMap['tax_config'] || {

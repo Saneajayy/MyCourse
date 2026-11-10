@@ -116,7 +116,7 @@ async function main() {
         businessName: process.env.BUSINESS_NAME || 'Hydro Basics',
         businessAddress:
           process.env.BUSINESS_ADDRESS || '123 Industrial Area, Phase 2, New Delhi, India',
-        supportEmail: process.env.EMAIL_FROM || 'support@hydrauliccourse.com',
+        supportEmail: process.env.EMAIL_FROM || 'support@hydrobasics.com',
       },
       description: 'Business name, address, and contact details for invoices and receipts',
     },

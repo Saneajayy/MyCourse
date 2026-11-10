@@ -27,8 +27,8 @@ export const siteConfig = {
       process.env.NEXT_PUBLIC_YOUTUBE_URL || 'https://www.youtube.com/[TODO_REPLACE_CHANNEL]',
   },
 
-  // [TODO_REPLACE: Replace with official support email]
-  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@[TODO_REPLACE_DOMAIN].com',
+  // Official support email
+  supportEmail: process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@hydrobasics.com',
 
   // Logo configuration: Text wordmark for now, easy to swap for an image later
   logo: {

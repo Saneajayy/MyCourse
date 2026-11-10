@@ -24,7 +24,7 @@ const appOrigin = isProd
 const cdnHostname =
   process.env.NEXT_PUBLIC_BUNNY_CDN_HOSTNAME ||
   process.env.BUNNY_STREAM_CDN_HOSTNAME ||
-  'video.hydrauliccourse.com';
+  'video.hydrobasics.com';
 
 function buildContentSecurityPolicy() {
   const defaultSrc = ["'self'"];

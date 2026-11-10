@@ -104,6 +104,6 @@ When an entitlement is revoked (via admin action, dispute, or payment refund):
 ## 4. Reporting Security Vulnerabilities
 
 If you discover a security vulnerability within this project, please notify the engineering team immediately at:
-**security@hydrauliccourse.com**
+**security@hydrobasics.com**
 
 Please do not disclose vulnerabilities publicly until an official patch has been deployed.

@@ -1052,7 +1052,7 @@ export const openApiSpec = generator.generateDocument({
       'High-performance production REST API for Course Management, Video Delivery (Bunny Stream TUS), and Razorpay payments. Generated directly from Zod domain schemas.',
     contact: {
       name: 'Engineering Support',
-      email: 'support@hydrauliccourse.com',
+      email: 'support@hydrobasics.com',
     },
   },
   servers: [
@@ -1061,7 +1061,7 @@ export const openApiSpec = generator.generateDocument({
       description: 'Local Development Server',
     },
     {
-      url: 'https://api.hydrauliccourse.com/api/v1',
+      url: 'https://api.hydrobasics.com/api/v1',
       description: 'Production API',
     },
   ],

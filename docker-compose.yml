@@ -51,7 +51,7 @@ services:
       REFRESH_TOKEN_TTL_DAYS: 30
       COOKIE_DOMAIN: localhost
       CORS_ORIGINS: http://localhost:3000
-      ADMIN_EMAIL: admin@hydrauliccourse.com
+      ADMIN_EMAIL: admin@hydrobasics.com
       ADMIN_PASSWORD: ChangeMeInProd!2026Hydraulics
       ADMIN_NAME: Admin User
       RAZORPAY_KEY_ID: rzp_test_placeholder_key_id
@@ -60,11 +60,11 @@ services:
       BUNNY_STREAM_API_KEY: placeholder_bunny_api_key
       BUNNY_STREAM_LIBRARY_ID: placeholder_bunny_library_id
       BUNNY_STREAM_TOKEN_AUTH_KEY: placeholder_bunny_token_auth_key
-      BUNNY_STREAM_CDN_HOSTNAME: video.hydrauliccourse.com
+      BUNNY_STREAM_CDN_HOSTNAME: video.hydrobasics.com
       MAX_CONCURRENT_STREAMS: 2
       EMAIL_PROVIDER: console
       EMAIL_API_KEY: placeholder_email_api_key
-      EMAIL_FROM: support@hydrauliccourse.com
+      EMAIL_FROM: support@hydrobasics.com
       BUSINESS_NAME: Hydro Basics
       BUSINESS_ADDRESS: 123 Industrial Area, Phase 2, New Delhi, India
       GSTIN: ''

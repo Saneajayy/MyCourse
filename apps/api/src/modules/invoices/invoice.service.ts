@@ -270,7 +270,7 @@ export class InvoiceService {
       if (taxConfig.gstin) {
         doc.text(`GSTIN: ${taxConfig.gstin}`, 50, 90);
       }
-      doc.text(`Support: ${business.supportEmail || 'support@hydrauliccourse.com'}`, 50, 105);
+      doc.text(`Support: ${business.supportEmail || 'support@hydrobasics.com'}`, 50, 105);
 
       // Invoice Meta Header
       doc.fontSize(18).font('Helvetica-Bold').text('TAX INVOICE', 400, 50, { align: 'right' });

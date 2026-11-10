@@ -39,7 +39,7 @@ export function assertNoTodoMarkers(content: string): void {
  */
 export function buildEmailHtml(options: EmailLayoutOptions): string {
   const brandName = options.brandName || 'Hydro Basics';
-  const supportEmail = options.supportEmail || 'support@hydrauliccourse.com';
+  const supportEmail = options.supportEmail || 'support@hydrobasics.com';
   const year = new Date().getFullYear();
 
   const ctaButtonHtml = options.cta
@@ -181,7 +181,7 @@ If you did not create an account, you can safely ignore this email.
 
 Best regards,
 ${brandName} Team
-Support: ${data.supportEmail || 'support@hydrauliccourse.com'}`;
+Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
 
   const contentHtml = `
     <p style="margin: 0 0 14px 0;">Hello <strong>${data.name}</strong>,</p>
@@ -243,7 +243,7 @@ If you did not request this password reset, please ignore this email. Your passw
 
 Best regards,
 ${brandName} Team
-Support: ${data.supportEmail || 'support@hydrauliccourse.com'}`;
+Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
 
   const contentHtml = `
     <p style="margin: 0 0 14px 0;">Hello <strong>${data.name}</strong>,</p>
@@ -287,7 +287,7 @@ export function getPasswordChangedTemplate(data: {
   supportEmail?: string;
 }): { subject: string; html: string; text: string } {
   const brandName = data.brandName || 'Hydro Basics';
-  const supportEmail = data.supportEmail || 'support@hydrauliccourse.com';
+  const supportEmail = data.supportEmail || 'support@hydrobasics.com';
   const formattedDate = (data.changedAt || new Date()).toUTCString();
   const loginUrl = `${env.APP_URL}/login`;
   const subject = `Security Notice: Your password was changed - ${brandName}`;
@@ -371,7 +371,7 @@ ${invoiceDownloadUrl}
 
 Happy Learning,
 ${brandName} Team
-Support: ${data.supportEmail || 'support@hydrauliccourse.com'}`;
+Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
 
   const contentHtml = `
     <p style="margin: 0 0 14px 0;">Hello <strong>${data.name}</strong>,</p>
@@ -459,7 +459,7 @@ If you do not see the credit in your account after 7 working days, please reply 
 
 Best regards,
 ${brandName} Team
-Support: ${data.supportEmail || 'support@hydrauliccourse.com'}`;
+Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
 
   const contentHtml = `
     <p style="margin: 0 0 14px 0;">Hello <strong>${data.name}</strong>,</p>
@@ -475,7 +475,7 @@ Support: ${data.supportEmail || 'support@hydrauliccourse.com'}`;
   `;
 
   const footerHtml = `
-    <p style="margin: 0;">If you have any questions regarding your refund, contact our support team at <a href="mailto:${data.supportEmail || 'support@hydrauliccourse.com'}">${data.supportEmail || 'support@hydrauliccourse.com'}</a>.</p>
+    <p style="margin: 0;">If you have any questions regarding your refund, contact our support team at <a href="mailto:${data.supportEmail || 'support@hydrobasics.com'}">${data.supportEmail || 'support@hydrobasics.com'}</a>.</p>
   `;
 
   const html = buildEmailHtml({
@@ -522,7 +522,7 @@ ${courseUrl}
 
 Happy Learning,
 ${brandName} Team
-Support: ${data.supportEmail || 'support@hydrauliccourse.com'}`;
+Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
 
   const contentHtml = `
     <p style="margin: 0 0 14px 0;">Hello <strong>${data.name}</strong>,</p>
@@ -576,7 +576,7 @@ If you did NOT attempt this, you can safely ignore this email. Your existing acc
 
 Best regards,
 ${brandName} Security Team
-Support: ${data.supportEmail || 'support@hydrauliccourse.com'}`;
+Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
 
   const contentHtml = `
     <p style="margin: 0 0 14px 0;">Hello <strong>${data.name}</strong>,</p>

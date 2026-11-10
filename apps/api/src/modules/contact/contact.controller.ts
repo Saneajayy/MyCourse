@@ -130,7 +130,7 @@ export class ContactController {
       });
 
       // 4. Send notification email to course support desk
-      const supportEmail = env.EMAIL_FROM || 'support@hydrauliccourse.com';
+      const supportEmail = env.EMAIL_FROM || 'support@hydrobasics.com';
       const notificationSubject = `New Contact Form Inquiry: ${input.subject} - [${input.name}]`;
       const notificationText = `New contact form submission received on ${new Date().toUTCString()}
 

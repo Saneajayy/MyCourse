@@ -32,7 +32,7 @@ const envSchema = z.object({
     .default('dev_totp_encryption_key_32_bytes_long_min_len!'),
 
   // Admin seed
-  ADMIN_EMAIL: z.string().email().default('admin@hydrauliccourse.com'),
+  ADMIN_EMAIL: z.string().email().default('admin@hydrobasics.com'),
   ADMIN_PASSWORD: z.string().min(12).default('ChangeMeInProd!2026Hydraulics'),
   ADMIN_NAME: z.string().default('Administrator'),
 
@@ -48,14 +48,14 @@ const envSchema = z.object({
   BUNNY_STREAM_LIBRARY_ID: z.string().default('placeholder_bunny_library_id'),
   BUNNY_STREAM_TOKEN_AUTH_KEY: z.string().default('placeholder_bunny_token_auth_key'),
   BUNNY_STREAM_WEBHOOK_SECRET: z.string().optional(),
-  BUNNY_STREAM_CDN_HOSTNAME: z.string().default('video.hydrauliccourse.com'),
+  BUNNY_STREAM_CDN_HOSTNAME: z.string().default('video.hydrobasics.com'),
   VIDEO_PROVIDER: z.enum(['bunny', 'fake']).default('fake'),
   MAX_CONCURRENT_STREAMS: z.coerce.number().default(2),
 
   // Email
   EMAIL_PROVIDER: z.enum(['console', 'resend', 'ses']).default('console'),
   EMAIL_API_KEY: z.string().default('placeholder_email_api_key'),
-  EMAIL_FROM: z.string().email().default('support@hydrauliccourse.com'),
+  EMAIL_FROM: z.string().email().default('support@hydrobasics.com'),
 
   // Optional
   GOOGLE_CLIENT_ID: z.string().optional(),

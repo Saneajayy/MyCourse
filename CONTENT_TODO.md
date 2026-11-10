@@ -38,11 +38,11 @@ Before launching the course website to production, review and replace all items 
 
 ## 2. Business & Contact Information (Tax & Legal Compliance)
 
-- [ ] **Official Support Email**
+- [x] **Official Support Email**
   - **Environment Variable:** `NEXT_PUBLIC_SUPPORT_EMAIL` & `EMAIL_FROM` (Backend)
   - **Config File:** `apps/web/src/config/site.ts` (`siteConfig.supportEmail`)
-  - **Current Marker:** `support@[TODO_REPLACE_DOMAIN].com`
-  - **Required Value:** Dedicated inbox monitored for student inquiries and payment confirmation.
+  - **Configured Value:** `support@hydrobasics.com`
+  - **Status:** Dedicated inbox monitored for student inquiries and payment confirmation.
 
 - [ ] **Registered Business Physical Address**
   - **Environment Variable:** `NEXT_PUBLIC_BUSINESS_ADDRESS` & `BUSINESS_ADDRESS` (Backend)
