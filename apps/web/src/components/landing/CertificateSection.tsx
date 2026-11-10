@@ -95,19 +95,19 @@ export function CertificateSection() {
 
                 {/* 6. Bottom Row: QR Code (Left) and Signature (Right) */}
                 <div className="w-full flex items-end justify-between mt-6 sm:mt-8 pt-1">
-                  {/* Verification QR Code */}
+                  {/* Verification QR Code: Saturation 0 to render in black */}
                   <div className="relative w-[110px] h-[110px] sm:w-[124px] sm:h-[124px] flex-shrink-0">
                     <Image
                       src="/cert-qr-blue-exact.png"
                       alt="Certificate Verification QR Code"
                       fill
                       sizes="124px"
-                      className="object-contain"
+                      className="object-contain saturate-0 grayscale contrast-200"
                       priority
                     />
                   </div>
 
-                  {/* Instructor Signature: Exact signature image */}
+                  {/* Instructor Signature: Saturation 0 to render in black */}
                   <div className="flex flex-col items-start select-none">
                     <div className="relative w-[82px] sm:w-[94px] h-[29px] sm:h-[33px]">
                       <Image
@@ -115,7 +115,7 @@ export function CertificateSection() {
                         alt="HiraLal Signature"
                         fill
                         sizes="94px"
-                        className="object-contain object-left"
+                        className="object-contain object-left saturate-0 grayscale contrast-200"
                         priority
                       />
                     </div>
