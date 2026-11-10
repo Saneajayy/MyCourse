@@ -785,7 +785,7 @@ function CheckoutContent() {
         </header>
 
         {/* Mobile Upper Part: Full-bleed edge-to-edge halftone image taking up whole upper screen */}
-        <div className="lg:hidden relative w-full h-[320px] sm:h-[360px] bg-[#00186B] shrink-0 overflow-hidden select-none flex flex-col justify-between p-5 sm:p-6 pb-6">
+        <div className="lg:hidden relative w-full h-[250px] sm:h-[280px] bg-[#00186B] shrink-0 overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5">
           {/* Full-Bleed Signature Dot Halftone Graphic */}
           <Image
             src="/login-pixelated.png"
@@ -832,9 +832,9 @@ function CheckoutContent() {
 
           {/* Bottom Controls inside Mobile Upper Part */}
           <div className="relative z-10 w-full">
-            <div className="flex items-end justify-between gap-2.5">
-              {/* Coupon Code Entry: Apply button then input bar */}
-              <div className="shrink-0 max-w-[62%]">
+            <div className="flex items-end justify-between gap-3">
+              {/* Coupon Code Entry: Apply button then input bar extending horizontally */}
+              <div className="flex-1 min-w-0">
                 {appliedCoupon ? (
                   <div className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs">
                     <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -845,18 +845,18 @@ function CheckoutContent() {
                     <button
                       type="button"
                       onClick={handleRemoveCoupon}
-                      className="text-white hover:text-rose-200 underline text-[11px] font-bold cursor-pointer shrink-0 ml-1.5"
+                      className="text-white hover:text-rose-200 underline text-[11px] font-bold cursor-pointer shrink-0 ml-auto"
                     >
                       Remove
                     </button>
                   </div>
                 ) : (
-                  <form onSubmit={handleApplyCoupon} className="relative">
-                    <div className="flex items-center gap-2">
+                  <form onSubmit={handleApplyCoupon} className="relative w-full">
+                    <div className="flex items-center gap-2 w-full">
                       <button
                         type="submit"
                         disabled={couponLoading}
-                        className="h-10 px-4 bg-white hover:bg-blue-50 active:bg-blue-100 text-[#00186B] font-extrabold text-xs sm:text-sm rounded-md transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
+                        className="h-9.5 px-3.5 bg-white hover:bg-blue-50 active:bg-blue-100 text-[#00186B] font-extrabold text-xs sm:text-sm rounded-md transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
                       >
                         {couponLoading ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-[#00186B]" />
@@ -869,7 +869,7 @@ function CheckoutContent() {
                         placeholder="COUPON CODE"
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                        className="h-10 w-32 sm:w-38 rounded-md border border-white/45 bg-transparent px-3 text-xs sm:text-[13px] font-mono uppercase text-white placeholder:text-blue-200/60 focus:border-white focus:outline-none transition-all"
+                        className="h-9.5 flex-1 min-w-0 rounded-md border border-white/45 bg-transparent px-3 text-xs sm:text-[13px] font-mono uppercase text-white placeholder:text-blue-200/60 focus:border-white focus:outline-none transition-all"
                       />
                     </div>
                     {couponError && (
