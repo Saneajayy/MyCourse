@@ -67,13 +67,37 @@ declare global {
   }
 }
 
-function UpiLogo({ className = 'h-5 w-auto' }: { className?: string }) {
+function GPayLogo({ className = 'h-5 w-auto' }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 60 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="UPI">
-      <path d="M12.8 1L4 11.5H9.2L6.5 21L17 11.5H11.5L12.8 1Z" fill="#097939" />
-      <path d="M17.5 5.5L23.5 11.5L17.5 17.5" stroke="#F47920" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
-      <text x="27" y="15" fill="#1F2937" fontSize="12" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="0.04em">
-        UPI
+    <svg className={className} viewBox="0 0 64 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Google Pay">
+      <g transform="translate(1, 2) scale(0.75)">
+        <path
+          fill="#4285F4"
+          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+        />
+        <path
+          fill="#34A853"
+          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+        />
+        <path
+          fill="#FBBC05"
+          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+        />
+        <path
+          fill="#EA4335"
+          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+        />
+      </g>
+      <text
+        x="22"
+        y="16"
+        fill="#5F6368"
+        fontSize="14.5"
+        fontWeight="600"
+        fontFamily="system-ui, -apple-system, 'Google Sans', Roboto, sans-serif"
+        letterSpacing="-0.02em"
+      >
+        Pay
       </text>
     </svg>
   );
@@ -104,14 +128,31 @@ function MastercardLogo({ className = 'h-5 w-auto' }: { className?: string }) {
   );
 }
 
-function RuPayLogo({ className = 'h-5 w-auto' }: { className?: string }) {
+function PaytmLogo({ className = 'h-5 w-auto' }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 54 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="RuPay">
-      <text x="2" y="15" fill="#0C2340" fontSize="13" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" fontStyle="italic" letterSpacing="-0.02em">
-        RuPay
+    <svg className={className} viewBox="0 0 66 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Paytm">
+      <text
+        x="2"
+        y="16.5"
+        fill="#002970"
+        fontSize="17"
+        fontWeight="900"
+        fontFamily="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+        letterSpacing="-0.03em"
+      >
+        Pay
       </text>
-      <path d="M38 3L41.5 10L38 17H34.5L38 10L34.5 3H38Z" fill="#008037" />
-      <path d="M42 3L45.5 10L42 17H38.5L42 10L38.5 3H42Z" fill="#F47920" />
+      <text
+        x="35"
+        y="16.5"
+        fill="#00BAF2"
+        fontSize="17"
+        fontWeight="900"
+        fontFamily="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+        letterSpacing="-0.03em"
+      >
+        tm
+      </text>
     </svg>
   );
 }
@@ -1054,10 +1095,10 @@ function CheckoutContent() {
               <span className="text-[#0033FF] font-semibold lowercase">powered by razorpay</span>
             </div>
 
-            {/* Grid of Real Brand Logos: UPI, Visa, Mastercard, RuPay (Debit/Credit) */}
+            {/* Grid of Real Brand Logos: GPay, Visa, Mastercard, Paytm */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="UPI (GPay, PhonePe, Paytm, BHIM)">
-                <UpiLogo className="h-4.5 w-auto" />
+              <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="Google Pay (GPay)">
+                <GPayLogo className="h-4.5 w-auto" />
               </div>
               <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="Visa Credit and Debit Cards">
                 <VisaLogo className="h-4 w-auto" />
@@ -1065,8 +1106,8 @@ function CheckoutContent() {
               <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="Mastercard Credit and Debit Cards">
                 <MastercardLogo className="h-5 w-auto" />
               </div>
-              <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="RuPay Domestic Indian Debit and Credit Cards">
-                <RuPayLogo className="h-4 w-auto" />
+              <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="Paytm UPI, Wallet & Cards">
+                <PaytmLogo className="h-4.5 w-auto" />
               </div>
             </div>
 
