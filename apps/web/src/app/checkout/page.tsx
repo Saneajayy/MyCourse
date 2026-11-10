@@ -15,7 +15,6 @@ import {
   MailCheck,
   RefreshCw,
   Loader2,
-  Check,
   X,
   ArrowLeft,
 } from 'lucide-react';
@@ -642,11 +641,27 @@ function CheckoutContent() {
   return (
     <div className="w-full min-h-screen lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row">
       {/* ============================================================== */}
-      {/* LEFT COLUMN: Clean Minimal White Card on Brand Pure Blue #0033FF */}
+      {/* LEFT COLUMN: Signature Halftone Graphic on Deep Cobalt Blue   */}
+      {/* (Identical styling to Login & Register split view)             */}
       {/* ============================================================== */}
-      <div className="w-full lg:w-1/2 lg:h-full bg-[#0033FF] text-white flex flex-col justify-between relative overflow-y-auto p-4 sm:p-6 md:p-8 select-none">
+      <div className="w-full lg:w-1/2 lg:h-full bg-[#00186B] text-white flex flex-col justify-between relative overflow-y-auto p-5 sm:p-7 md:p-8 select-none">
+        {/* Full-Bleed Signature Dot Halftone Graphic */}
+        <Image
+          src="/login-pixelated.png"
+          alt="HydroBasics Industrial Hydraulic Engineer"
+          fill
+          priority
+          sizes="(max-width: 1024px) 100vw, 50vw"
+          className="object-cover object-center mix-blend-screen opacity-95 pointer-events-none select-none"
+        />
+        {/* Soft overlay gradient for subtle depth */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/85 via-transparent to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
+
         {/* Top Escape Link */}
-        <div className="flex items-center justify-start pb-2">
+        <div className="relative z-10 flex items-center justify-start pb-2">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-white/80 hover:text-white text-xs sm:text-sm font-semibold transition-colors group cursor-pointer"
@@ -656,55 +671,29 @@ function CheckoutContent() {
           </Link>
         </div>
 
-        {/* Centered Minimal Course & Order Card */}
-        <div className="flex-1 flex items-center justify-center py-2 sm:py-3 w-full my-auto">
-          <div className="relative w-full max-w-[430px] sm:max-w-[460px] bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 select-none overflow-hidden space-y-3.5 sm:space-y-4 text-neutral-900">
-            {/* Course Landscape Image */}
-            <div className="relative aspect-[16/10] w-full rounded-xl sm:rounded-2xl overflow-hidden bg-neutral-900 border border-neutral-100">
-              <Image
-                src="/course-hydraulic-basics.jpg"
-                alt={course?.title || 'Hydraulic System Basics'}
-                fill
-                sizes="(max-width: 640px) 100vw, 460px"
-                className="object-cover object-center"
-                priority
-              />
-            </div>
-
-            {/* Course Title matching reference image */}
-            <div className="pt-0.5">
-              <h2 className="font-extrabold text-lg sm:text-xl md:text-2xl text-[#0033FF] tracking-tight uppercase leading-snug">
-                HYDRAULIC SYSTEM BASICS.
+        {/* Centered Order Breakdown Card (Style A) */}
+        <div className="relative z-10 flex-1 flex items-center justify-center py-4 w-full my-auto">
+          <div className="relative w-full max-w-[420px] sm:max-w-[460px] bg-white rounded-xl sm:rounded-2xl border border-neutral-200/80 p-5 sm:p-7 select-none overflow-hidden space-y-4 text-neutral-900">
+            {/* Header: Course Title & Access badge */}
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#0033FF] block">
+                Course Enrollment
+              </span>
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight leading-snug">
+                {course?.title || 'Hydraulic System Basics'}
               </h2>
+              <p className="text-xs text-neutral-500 font-medium">
+                1 Year Full Access • Self-Paced Masterclass • Hindi + Eng
+              </p>
             </div>
 
             {/* Fine Divider Line */}
-            <div className="w-full border-t border-[#0033FF]/15" />
+            <div className="-mx-5 sm:-mx-7 border-t border-neutral-200/80" />
 
-            {/* Perks List with Royal Blue Check Circles */}
-            <div className="space-y-2 sm:space-y-2.5 pt-0.5">
-              {[
-                '60 video lessons in Hindi.',
-                'Certificate of completion.',
-                'Track your progress.',
-                'Stream in HD Quality.',
-              ].map((perk) => (
-                <div key={perk} className="flex items-center gap-2.5 text-xs sm:text-sm font-medium text-[#0033FF]">
-                  <span className="w-4 h-4 rounded-full bg-[#0033FF] flex items-center justify-center text-white shrink-0">
-                    <Check className="w-2.5 h-2.5 stroke-[3]" />
-                  </span>
-                  <span>{perk}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Divider between Perks and Order Breakdown */}
-            <div className="-mx-4 sm:-mx-6 border-t border-neutral-200/80" />
-
-            {/* Order Breakdown & Pricing Container */}
-            <div className="space-y-3 pt-0.5">
+            {/* Order Breakdown Rows */}
+            <div className="space-y-3.5 pt-0.5">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+                <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
                   Order Breakdown
                 </span>
                 <span className="text-[11px] font-mono text-neutral-400">
@@ -822,7 +811,7 @@ function CheckoutContent() {
         </div>
 
         {/* Footer Guarantee & Terms */}
-        <div className="pt-2 text-center text-xs text-blue-100/70 space-y-1 shrink-0">
+        <div className="relative z-10 pt-2 text-center text-xs text-blue-100/70 space-y-1 shrink-0">
           <p>
             By completing this payment, you agree to the{' '}
             <Link href="/terms" className="underline text-white hover:text-cyan-200">
