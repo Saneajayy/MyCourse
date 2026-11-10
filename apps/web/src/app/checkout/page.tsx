@@ -412,7 +412,6 @@ function CheckoutContent() {
 
   // Read price and tax breakdown
   const basePricePaise = quote?.basePricePaise ?? course?.pricePaise ?? 499900;
-  const compareAtPricePaise = course?.compareAtPricePaise ?? 999900;
   const discountPaise = quote?.discountPaise ?? 0;
   const finalPricePaise = quote?.totalPaise ?? basePricePaise;
 
@@ -714,19 +713,14 @@ function CheckoutContent() {
               )}
             </div>
 
-            {/* Final Price & Actual Price on the Right */}
+            {/* Final Price on the Right */}
             <div className="flex flex-col items-end shrink-0 text-right">
               <span className="text-[11px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
                 Final Price
               </span>
-              <div className="flex items-baseline gap-2.5">
-                <span className="text-xl sm:text-2xl font-bold font-mono text-blue-200/60 line-through drop-shadow">
-                  ₹{((appliedCoupon ? basePricePaise : compareAtPricePaise) / 100).toLocaleString('en-IN')}
-                </span>
-                <span className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
-                  ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
-                </span>
-              </div>
+              <span className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
+                ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
+              </span>
             </div>
           </div>
         </div>
@@ -758,8 +752,8 @@ function CheckoutContent() {
       {/* RIGHT COLUMN: Clean Single Scroll (Mobile & Desktop)           */}
       {/* ============================================================== */}
       <div className="w-full lg:w-1/2 min-h-screen lg:min-h-0 lg:h-full bg-white text-neutral-900 flex flex-col relative overflow-y-auto">
-        {/* Top Header Bar: Pinned into top corners */}
-        <header className="w-full flex items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 shrink-0 z-20">
+        {/* Desktop Top Header Bar: Pinned into top corners */}
+        <header className="hidden lg:flex w-full items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 shrink-0 z-20">
           {/* Top-Left Corner: Already Enrolled / Sign In (hidden when signed in) */}
           <div>
             {!isAuthenticated && (
@@ -789,6 +783,117 @@ function CheckoutContent() {
             </span>
           </Link>
         </header>
+
+        {/* Mobile Upper Part: Full-bleed edge-to-edge halftone image taking up whole upper screen */}
+        <div className="lg:hidden relative w-full h-[250px] sm:h-[280px] bg-[#00186B] shrink-0 overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5">
+          {/* Full-Bleed Signature Dot Halftone Graphic */}
+          <Image
+            src="/login-pixelated.png"
+            alt="HydroBasics Industrial Hydraulic Engineer"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center mix-blend-screen opacity-95 select-none"
+          />
+          {/* Soft overlay gradient for subtle depth */}
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/95 via-[#000c3b]/35 to-[#000c3b]/45 pointer-events-none"
+            aria-hidden="true"
+          />
+
+          {/* Top Bar inside Mobile Upper Part */}
+          <div className="relative z-10 w-full flex items-center justify-between">
+            <div>
+              {!isAuthenticated && (
+                <div className="text-xs text-blue-100 font-medium">
+                  Already enrolled?{' '}
+                  <Link
+                    href="/login?redirect=/checkout"
+                    className="font-bold text-white underline hover:text-cyan-200 ml-0.5"
+                  >
+                    Sign In &rarr;
+                  </Link>
+                </div>
+              )}
+            </div>
+            <Link
+              href="/"
+              className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+              aria-label="HYDRO BASICS Home - Back to Course"
+            >
+              <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+                HYDRO
+              </span>
+              <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+                BASICS
+              </span>
+            </Link>
+          </div>
+
+          {/* Bottom Controls inside Mobile Upper Part */}
+          <div className="relative z-10 w-full">
+            <div className="flex items-end justify-between gap-2">
+              {/* Coupon Code Entry: Apply button then input bar */}
+              <div className="shrink-0 max-w-[58%]">
+                {appliedCoupon ? (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs">
+                    <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span className="font-mono font-bold tracking-wide truncate">{appliedCoupon.code}</span>
+                    <span className="text-emerald-300 font-semibold text-[11px] shrink-0">
+                      (-₹{(discountPaise / 100).toLocaleString('en-IN')})
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="text-white hover:text-rose-200 underline text-[10px] font-bold cursor-pointer shrink-0 ml-1"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleApplyCoupon} className="relative">
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="submit"
+                        disabled={couponLoading}
+                        className="h-8.5 px-3 bg-white hover:bg-blue-50 active:bg-blue-100 text-[#00186B] font-extrabold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
+                      >
+                        {couponLoading ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-[#00186B]" />
+                        ) : (
+                          'Apply'
+                        )}
+                      </button>
+                      <input
+                        type="text"
+                        placeholder="COUPON"
+                        value={couponInput}
+                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                        className="h-8.5 w-24 sm:w-32 rounded-lg border border-white/30 bg-black/35 backdrop-blur-sm px-2 text-xs font-mono uppercase text-white placeholder:text-blue-200/50 focus:border-white focus:bg-black/50 focus:outline-none transition-all shadow-inner"
+                      />
+                    </div>
+                    {couponError && (
+                      <p className="absolute -bottom-4.5 left-0 text-[10px] font-semibold text-rose-300 flex items-center gap-0.5 drop-shadow truncate max-w-full">
+                        <X className="w-3 h-3 stroke-[2.5] shrink-0" />
+                        <span className="truncate">{couponError}</span>
+                      </p>
+                    )}
+                  </form>
+                )}
+              </div>
+
+              {/* Final Price on the Right (No 9,999) */}
+              <div className="flex flex-col items-end shrink-0 text-right">
+                <span className="text-[9px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
+                  Final Price
+                </span>
+                <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
+                  ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Centered Order & Billing Container */}
         <div className="m-auto w-full max-w-lg px-4 sm:px-6 py-6 sm:py-8 relative z-10 space-y-4">
@@ -841,92 +946,6 @@ function CheckoutContent() {
               </div>
             </div>
           )}
-
-          {/* Mobile Only: Halftone Graphic Banner with Direct Price & Coupon Controls */}
-          <div className="lg:hidden relative w-full h-44 sm:h-52 rounded-xl sm:rounded-2xl overflow-hidden bg-[#00186B] flex flex-col justify-end p-3.5 sm:p-4 select-none shadow-md">
-            {/* Full-Bleed Signature Dot Halftone Graphic */}
-            <Image
-              src="/login-pixelated.png"
-              alt="HydroBasics Industrial Hydraulic Engineer"
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover object-center mix-blend-screen opacity-95 select-none"
-            />
-            {/* Soft overlay gradient for subtle depth */}
-            <div
-              className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/95 via-[#000c3b]/45 to-transparent pointer-events-none"
-              aria-hidden="true"
-            />
-
-            {/* Controls directly on image */}
-            <div className="relative z-10 w-full">
-              <div className="flex items-end justify-between gap-2">
-                {/* Coupon Code Entry: Apply button then input bar */}
-                <div className="shrink-0 max-w-[58%]">
-                  {appliedCoupon ? (
-                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs">
-                      <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span className="font-mono font-bold tracking-wide truncate">{appliedCoupon.code}</span>
-                      <span className="text-emerald-300 font-semibold text-[11px] shrink-0">
-                        (-₹{(discountPaise / 100).toLocaleString('en-IN')})
-                      </span>
-                      <button
-                        type="button"
-                        onClick={handleRemoveCoupon}
-                        className="text-white hover:text-rose-200 underline text-[10px] font-bold cursor-pointer shrink-0 ml-1"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleApplyCoupon} className="relative">
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="submit"
-                          disabled={couponLoading}
-                          className="h-8.5 px-3 bg-white hover:bg-blue-50 active:bg-blue-100 text-[#00186B] font-extrabold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
-                        >
-                          {couponLoading ? (
-                            <Loader2 className="w-3 h-3 animate-spin text-[#00186B]" />
-                          ) : (
-                            'Apply'
-                          )}
-                        </button>
-                        <input
-                          type="text"
-                          placeholder="COUPON"
-                          value={couponInput}
-                          onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                          className="h-8.5 w-24 sm:w-32 rounded-lg border border-white/30 bg-black/35 backdrop-blur-sm px-2 text-xs font-mono uppercase text-white placeholder:text-blue-200/50 focus:border-white focus:bg-black/50 focus:outline-none transition-all shadow-inner"
-                        />
-                      </div>
-                      {couponError && (
-                        <p className="absolute -bottom-4.5 left-0 text-[10px] font-semibold text-rose-300 flex items-center gap-0.5 drop-shadow truncate max-w-full">
-                          <X className="w-3 h-3 stroke-[2.5] shrink-0" />
-                          <span className="truncate">{couponError}</span>
-                        </p>
-                      )}
-                    </form>
-                  )}
-                </div>
-
-                {/* Final Price & Actual Price on the Right */}
-                <div className="flex flex-col items-end shrink-0 text-right">
-                  <span className="text-[9px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
-                    Final Price
-                  </span>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-xs sm:text-sm font-bold font-mono text-blue-200/60 line-through drop-shadow">
-                      ₹{((appliedCoupon ? basePricePaise : compareAtPricePaise) / 100).toLocaleString('en-IN')}
-                    </span>
-                    <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
-                      ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Billing Info Card Box - Identical styling to Login / Signup / Verify-Email cards */}
           <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-7 select-none overflow-hidden space-y-5">
