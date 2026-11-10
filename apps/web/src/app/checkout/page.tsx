@@ -730,10 +730,10 @@ function CheckoutContent() {
       {/* RIGHT COLUMN: Desktop Split / Mobile View                      */}
       {/* ============================================================== */}
       <div className="w-full lg:w-1/2 h-full bg-white text-neutral-900 flex flex-col relative overflow-hidden">
-        {/* Desktop Top Header Bar: Pinned into top corners */}
-        <header className="hidden lg:flex w-full items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 shrink-0 z-20">
+        {/* Desktop Top Header Bar: Absolute in top corners so it doesn't offset vertical center */}
+        <header className="hidden lg:flex absolute top-0 inset-x-0 w-full items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 z-20 pointer-events-none">
           {/* Top-Left Corner: Already Enrolled / Sign In (hidden when signed in) */}
-          <div>
+          <div className="pointer-events-auto">
             {!isAuthenticated && (
               <div className="text-xs sm:text-sm text-neutral-600">
                 Already enrolled?{' '}
@@ -750,7 +750,7 @@ function CheckoutContent() {
           {/* Top-Right Corner: Brand Logo deeply in corner */}
           <Link
             href="/"
-            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+            className="pointer-events-auto flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
             aria-label="HYDRO BASICS Home - Back to Course"
           >
             <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
@@ -873,10 +873,10 @@ function CheckoutContent() {
           </div>
         </div>
 
-        {/* Scrollable Billing Section (Scrolls smoothly below fixed mobile upper section) */}
-        <div className="flex-1 w-full min-h-0 overflow-y-auto relative flex flex-col">
+        {/* Scrollable Billing Section (Perfect vertical center on desktop, smooth scroll on mobile) */}
+        <div className="flex-1 w-full min-h-0 overflow-y-auto relative flex flex-col justify-center items-center">
           {/* Centered Order & Billing Container */}
-          <div className="my-auto w-full max-w-lg px-4 sm:px-6 py-5 sm:py-8 relative z-10 space-y-4">
+          <div className="my-auto w-full max-w-lg px-4 sm:px-6 py-6 sm:py-8 relative z-10 space-y-4">
           {/* Email Verification Warning Alert Gate */}
           {isAuthenticated && !user?.emailVerifiedAt && (
             <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-xl p-5 text-amber-950">
