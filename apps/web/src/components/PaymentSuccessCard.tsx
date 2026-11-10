@@ -51,9 +51,9 @@ export function PaymentSuccessCard({
 
   return (
     <div className="relative w-full max-w-[420px] sm:max-w-[440px] mx-auto bg-white rounded-2xl sm:rounded-[24px] p-6 sm:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-neutral-100 select-none font-reddit text-left space-y-4">
-      {/* 1. Header: Blue Circle with White Tick Above Title & Tagline */}
+      {/* 1. Header: Blue Circle with White Tick Above Title & Tagline (No shadow) */}
       <div className="flex flex-col items-center text-center space-y-3 pb-1">
-        <div className="w-12 h-12 rounded-full bg-[#0033FF] text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/20">
+        <div className="w-12 h-12 rounded-full bg-[#0033FF] text-white flex items-center justify-center shrink-0">
           <svg
             className="w-6 h-6"
             viewBox="0 0 24 24"
@@ -78,14 +78,14 @@ export function PaymentSuccessCard({
         </div>
       </div>
 
-      {/* 2. Order Summary Section (Course, Validity, and Price in Same Tab without grey fill) */}
+      {/* 2. Order Summary Section (Combined Tab with Blue Boundary) */}
       <div className="pt-1 space-y-2.5">
         <div className="text-left font-bold text-sm sm:text-base text-neutral-900">
           Order Summary
         </div>
 
         {/* Combined Course & Price Block */}
-        <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl border border-neutral-200">
+        <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl border border-[#0033FF]">
           {/* Left: Course Name & Validity */}
           <div className="min-w-0 flex-1 space-y-0.5">
             <span className="font-bold text-neutral-900 text-sm sm:text-base block truncate">
@@ -108,24 +108,24 @@ export function PaymentSuccessCard({
         </div>
       </div>
 
-      {/* 3. Confirmation Notice (Clean text, no icons) */}
-      <div className="pt-1 text-center">
-        <p className="text-xs text-neutral-500 leading-relaxed font-normal">
-          Payment receipt has been sent to{' '}
-          <strong className="font-semibold text-neutral-800 break-all">
-            {data.studentEmail || 'your email'}
-          </strong>
+      {/* 3. Confirmation Notice (Email on second line) */}
+      <div className="pt-1 text-center space-y-0.5">
+        <p className="text-xs text-neutral-500 font-normal">
+          Payment receipt has been sent to
+        </p>
+        <p className="text-xs font-semibold text-neutral-800 break-all">
+          {data.studentEmail || 'your email'}
         </p>
       </div>
 
-      {/* 4. Action Buttons */}
-      <div className="space-y-2 pt-2">
+      {/* 4. Action Buttons (Identical dimensions, no arrow) */}
+      <div className="space-y-2.5 pt-2">
         {/* Primary CTA */}
         <Link
           href={`/learn/${data.courseSlug || 'hydraulic-engineering-mastery'}`}
-          className="w-full h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-sm sm:text-[15px] rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer tracking-wide"
+          className="w-full h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-sm sm:text-[15px] rounded-xl shadow-sm hover:shadow transition-all flex items-center justify-center cursor-pointer tracking-wide"
         >
-          <span>Start learning &rarr;</span>
+          <span>Start learning</span>
         </Link>
 
         {/* Secondary CTA */}
@@ -134,7 +134,7 @@ export function PaymentSuccessCard({
             type="button"
             onClick={onDownloadInvoice}
             disabled={downloadingInvoice}
-            className="w-full h-10 border border-neutral-200 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-neutral-600 font-semibold text-xs sm:text-[13px] rounded-xl transition-all cursor-pointer disabled:opacity-60 block text-center"
+            className="w-full h-12 border border-neutral-200 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-neutral-700 font-bold text-sm sm:text-[15px] rounded-xl transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center text-center"
           >
             {downloadingInvoice ? 'Downloading Receipt...' : 'Download Receipt'}
           </button>
