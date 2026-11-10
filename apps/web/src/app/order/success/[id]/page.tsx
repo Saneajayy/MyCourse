@@ -5,16 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { apiClient, getAccessToken } from '../../../../lib/api-client';
-import { formatDisplayOrderId } from '../../../../lib/order';
 import { siteConfig } from '../../../../config/site';
-import {
-  Download,
-  Play,
-  Loader2,
-  ArrowRight,
-  BookOpen,
-  CheckCircle2,
-} from 'lucide-react';
+import { Loader2, BookOpen, CheckCircle2 } from 'lucide-react';
+import { PaymentSuccessCard } from '../../../../components/PaymentSuccessCard';
 
 interface OrderSuccessData {
   id: string;
@@ -33,6 +26,15 @@ interface OrderSuccessData {
     id: string;
     invoiceNumber: string;
   } | null;
+  payments?: Array<{
+    id: string;
+    razorpayPaymentId?: string;
+    method?: string;
+  }>;
+  user?: {
+    name?: string;
+    email?: string;
+  };
 }
 
 export default function OrderSuccessPage() {
@@ -164,10 +166,8 @@ export default function OrderSuccessPage() {
     <div className="w-full h-screen h-[100dvh] overflow-hidden bg-white font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col lg:flex-row">
       {/* ============================================================== */}
       {/* LEFT COLUMN (Desktop Only): Signature Halftone Graphic         */}
-      {/* (100% identical styling to Checkout & Login split view)        */}
       {/* ============================================================== */}
       <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-end lg:w-1/2 h-full bg-[#00186B] overflow-hidden select-none p-6 sm:p-8">
-        {/* Full-Bleed Signature Dot Halftone Graphic */}
         <Image
           src="/login-pixelated.png"
           alt="HydroBasics Industrial Hydraulic Engineer"
@@ -176,7 +176,6 @@ export default function OrderSuccessPage() {
           sizes="50vw"
           className="object-cover object-center mix-blend-screen opacity-95 select-none"
         />
-        {/* Soft overlay gradient for subtle depth */}
         <div
           className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/95 via-[#000c3b]/45 to-transparent pointer-events-none"
           aria-hidden="true"
@@ -185,7 +184,6 @@ export default function OrderSuccessPage() {
         {/* Confirmation Badge & Amount Paid Directly on Image */}
         <div className="relative z-10 w-full mb-1 select-none">
           <div className="flex items-end justify-between gap-4">
-            {/* Status confirmation pill */}
             <div className="shrink-0">
               <div className="h-11 flex items-center gap-2 px-4 rounded-md bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-sm font-mono font-bold tracking-wide shadow-md">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -193,7 +191,6 @@ export default function OrderSuccessPage() {
               </div>
             </div>
 
-            {/* Amount Paid on the Right */}
             <div className="flex flex-col items-end shrink-0 text-right">
               <span className="text-[11px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
                 Amount Paid
@@ -207,12 +204,11 @@ export default function OrderSuccessPage() {
       </div>
 
       {/* ============================================================== */}
-      {/* RIGHT COLUMN: Desktop Split / Mobile View                      */}
+      {/* RIGHT COLUMN: Clean White Card & Navigation                    */}
       {/* ============================================================== */}
       <div className="w-full lg:w-1/2 h-full bg-white text-neutral-900 flex flex-col relative overflow-hidden">
-        {/* Desktop Top Header Bar: Absolute in top corners */}
+        {/* Desktop Top Header Bar */}
         <header className="hidden lg:flex absolute top-0 inset-x-0 w-full items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 z-20 pointer-events-none">
-          {/* Top-Left Corner: My Courses Navigation Link */}
           <div className="pointer-events-auto">
             <Link
               href="/my-courses"
@@ -223,7 +219,6 @@ export default function OrderSuccessPage() {
             </Link>
           </div>
 
-          {/* Top-Right Corner: Brand Logo deeply in corner */}
           <Link
             href="/"
             className="pointer-events-auto flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
@@ -238,8 +233,8 @@ export default function OrderSuccessPage() {
           </Link>
         </header>
 
-        {/* Mobile Upper Part: Full-bleed edge-to-edge halftone image taking up upper screen */}
-        <div className="lg:hidden relative w-full h-[250px] sm:h-[280px] bg-[#00186B] shrink-0 overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5">
+        {/* Mobile Upper Part: Fixed Halftone Graphic */}
+        <div className="lg:hidden relative w-full h-[220px] sm:h-[250px] bg-[#00186B] shrink-0 overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5">
           <Image
             src="/login-pixelated.png"
             alt="HydroBasics Industrial Hydraulic Engineer"
@@ -253,7 +248,6 @@ export default function OrderSuccessPage() {
             aria-hidden="true"
           />
 
-          {/* Top Bar inside Mobile Upper Part */}
           <div className="relative z-10 w-full flex items-center justify-between">
             <Link
               href="/my-courses"
@@ -265,7 +259,7 @@ export default function OrderSuccessPage() {
             <Link
               href="/"
               className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
-              aria-label="HYDRO BASICS Home - Back to Course"
+              aria-label="HYDRO BASICS Home"
             >
               <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
                 HYDRO
@@ -276,17 +270,15 @@ export default function OrderSuccessPage() {
             </Link>
           </div>
 
-          {/* Bottom Confirmation inside Mobile Upper Part */}
           <div className="relative z-10 w-full">
             <div className="flex items-end justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <div className="h-11 flex items-center gap-1.5 px-3 rounded-md bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs font-mono font-bold tracking-wide">
+                <div className="h-10 flex items-center gap-1.5 px-3 rounded-md bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs font-mono font-bold tracking-wide">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span className="truncate">PAYMENT CONFIRMED</span>
                 </div>
               </div>
 
-              {/* Final Amount Paid */}
               <div className="flex flex-col items-end shrink-0 text-right">
                 <span className="text-[10px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
                   Amount Paid
@@ -299,102 +291,28 @@ export default function OrderSuccessPage() {
           </div>
         </div>
 
-        {/* Scrollable Receipt Section (Centered vertically on desktop, smooth scroll on mobile) */}
-        <div className="flex-1 w-full min-h-0 overflow-y-auto relative flex flex-col justify-center items-center">
-          <div className="my-auto w-full max-w-lg px-4 sm:px-6 py-6 sm:py-8 relative z-10 space-y-4">
-            {/* Payment Confirmed Card - Identical styling to Checkout Billing card */}
-            <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-7 select-none overflow-hidden space-y-5 shadow-sm">
-              {/* Header Title & Subtitle */}
-              <div className="space-y-1.5 text-left">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-wider border border-emerald-200/60">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Enrolled Successfully</span>
-                </div>
-                <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight uppercase">
-                  PAYMENT CONFIRMED.
-                </h1>
-                <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed font-normal">
-                  Welcome to the course. Your course access has been activated and your official tax invoice is generated below.
-                </p>
-              </div>
-
-              {/* Receipt Information Box */}
-              <div className="w-full bg-neutral-50/70 border border-neutral-200/80 rounded-xl divide-y divide-neutral-200/70 overflow-hidden text-left">
-                <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5 gap-2">
-                  <span className="font-bold text-neutral-500 text-xs uppercase tracking-wider">
-                    Order ID
-                  </span>
-                  <span className="font-mono font-bold text-neutral-900 text-xs sm:text-sm break-all">
-                    {formatDisplayOrderId(order.orderNumber || order.id)}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5 gap-2">
-                  <span className="font-bold text-neutral-500 text-xs uppercase tracking-wider">
-                    Course
-                  </span>
-                  <span className="font-bold text-neutral-900 text-xs sm:text-sm text-right uppercase">
-                    {displayCourseTitle}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5 gap-2">
-                  <span className="font-bold text-neutral-500 text-xs uppercase tracking-wider">
-                    Access Period
-                  </span>
-                  <span className="font-bold text-neutral-900 text-xs sm:text-sm text-right uppercase">
-                    {order.product.validityDays} Days (1 Year)
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5 gap-2 bg-neutral-100/50">
-                  <span className="font-bold text-neutral-700 text-xs uppercase tracking-wider">
-                    Amount Paid
-                  </span>
-                  <span className="font-mono text-xl sm:text-2xl font-black text-[#0033FF]">
-                    ₹{formattedAmount}
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons: Start Learning Now & Download Tax Invoice */}
-              <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <Link
-                  href={`/learn/${order.product.slug}`}
-                  className="w-full sm:flex-1 h-12 min-h-[48px] bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-sm rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer uppercase tracking-wider shrink-0"
-                >
-                  <Play className="w-4 h-4 fill-white text-white" />
-                  <span>Start Learning Now</span>
-                </Link>
-
-                {order.invoice && (
-                  <button
-                    type="button"
-                    onClick={handleDownloadInvoice}
-                    disabled={downloading}
-                    className="w-full sm:flex-1 h-12 min-h-[48px] px-4 rounded-lg border border-neutral-300 hover:border-black bg-white hover:bg-neutral-50 text-neutral-900 font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer disabled:opacity-60 shrink-0"
-                  >
-                    {downloading ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-[#0033FF]" />
-                    ) : (
-                      <Download className="w-4 h-4 text-[#0033FF]" />
-                    )}
-                    <span>{downloading ? 'Downloading...' : 'Download Tax Invoice'}</span>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Footer Navigation Link */}
-            <div className="text-center pt-1">
-              <Link
-                href="/my-courses"
-                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-900 transition-colors"
-              >
-                <span>View all your courses in My Courses</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
+        {/* Scrollable Center Section with Clean White Card (Reference Design) */}
+        <div className="flex-1 w-full min-h-0 overflow-y-auto relative flex flex-col justify-center items-center py-6 sm:py-8 px-4">
+          <div className="my-auto w-full max-w-[500px]">
+            <PaymentSuccessCard
+              data={{
+                orderId: order.id,
+                orderNumber: order.orderNumber,
+                transactionId: order.payments?.[0]?.razorpayPaymentId || order.id.slice(-8).toUpperCase(),
+                invoiceId: order.invoice?.invoiceNumber,
+                invoiceDbId: order.invoice?.id,
+                courseTitle: displayCourseTitle,
+                courseSlug: order.product.slug,
+                validityDays: order.product.validityDays,
+                amountPaise: amountPaise,
+                studentName: order.user?.name || 'Student',
+                studentEmail: order.user?.email,
+                paymentMethod: order.payments?.[0]?.method || 'Online / Razorpay',
+                paymentTime: order.createdAt,
+              }}
+              onDownloadInvoice={order.invoice ? handleDownloadInvoice : undefined}
+              downloadingInvoice={downloading}
+            />
           </div>
         </div>
       </div>

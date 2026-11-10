@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/auth-context';
-import { apiClient } from '../../lib/api-client';
+import { apiClient, getAccessToken } from '../../lib/api-client';
 import { siteConfig } from '../../config/site';
 import { useToast } from '../../components/ui';
 import {
@@ -18,6 +18,10 @@ import {
   X,
 } from 'lucide-react';
 import { computeOrderTotals, TaxConfig } from '../../lib/tax';
+import {
+  PaymentSuccessModal,
+  PaymentSuccessData,
+} from '../../components/PaymentSuccessModal';
 
 interface CourseProduct {
   id: string;
@@ -207,6 +211,49 @@ function CheckoutContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [resendingVerification, setResendingVerification] = useState(false);
   const [checkingVerification, setCheckingVerification] = useState(false);
+
+  // Payment Success Popup Modal State
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [paymentModalStatus, setPaymentModalStatus] = useState<'verifying' | 'success'>('verifying');
+  const [paymentSuccessData, setPaymentSuccessData] = useState<PaymentSuccessData | null>(null);
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
+
+  const handleDownloadInvoiceModal = async (e: React.MouseEvent) => {
+    if (!paymentSuccessData?.invoiceDbId) return;
+    e.preventDefault();
+    try {
+      setDownloadingInvoice(true);
+      const token = getAccessToken();
+      const invoiceUrl = `${siteConfig.urls.api}/api/v1/invoices/${paymentSuccessData.invoiceDbId}/download${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+
+      const res = await fetch(invoiceUrl, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        window.open(invoiceUrl, '_blank');
+        return;
+      }
+
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `Invoice-${(paymentSuccessData.invoiceId || 'Receipt').replace(/[\/\\]/g, '_')}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error('Invoice download failed:', err);
+      const token = getAccessToken();
+      const fallbackUrl = `${siteConfig.urls.api}/api/v1/invoices/${paymentSuccessData.invoiceDbId}/download${token ? `?token=${encodeURIComponent(token)}` : ''}`;
+      window.open(fallbackUrl, '_blank');
+    } finally {
+      setDownloadingInvoice(false);
+    }
+  };
 
   // Load Razorpay Checkout Script
   useEffect(() => {
@@ -549,7 +596,23 @@ function CheckoutContent() {
       if (orderData.status === 'PAID') {
         sessionStorage.removeItem('checkout_idempotency_key');
         toastSuccess('Order Complete', 'Access granted to course.');
-        router.push(`/order/success/${orderData.id}`);
+        setPaymentSuccessData({
+          orderId: orderData.id,
+          orderNumber: (orderData as any).orderNumber,
+          invoiceId: (orderData as any).invoice?.invoiceNumber,
+          invoiceDbId: (orderData as any).invoice?.id,
+          courseTitle: course.title,
+          courseSlug: course.slug,
+          validityDays: course.validityDays || 365,
+          amountPaise: 0,
+          studentName: user?.name || fullName,
+          studentEmail: user?.email || email,
+          paymentMethod: 'Free / Coupon Access',
+          paymentTime: new Date().toISOString(),
+        });
+        setPaymentModalStatus('success');
+        setPaymentModalOpen(true);
+        setIsSubmitting(false);
         return;
       }
 
@@ -591,6 +654,10 @@ function CheckoutContent() {
           razorpay_order_id: string;
           razorpay_signature: string;
         }) => {
+          setPaymentModalStatus('verifying');
+          setPaymentModalOpen(true);
+          setIsSubmitting(false);
+
           try {
             await apiClient('/payments/verify', {
               method: 'POST',
@@ -600,8 +667,49 @@ function CheckoutContent() {
                 razorpaySignature: response.razorpay_signature,
               }),
             });
-
             sessionStorage.removeItem('checkout_idempotency_key');
+          } catch (err) {
+            console.error('Verify call non-fatal error:', err);
+          }
+
+          // Poll order until PAID or timeout
+          try {
+            let attempts = 0;
+            while (attempts < 15) {
+              const res = await apiClient<{
+                id: string;
+                orderNumber?: string;
+                status: string;
+                totalPaise?: number;
+                amountPaise?: number;
+                paidAt?: string;
+                createdAt?: string;
+                product?: { title: string; slug: string; validityDays: number };
+                invoice?: { id: string; invoiceNumber: string } | null;
+              }>(`/orders/${orderData.id}`);
+
+              if (res && res.status === 'PAID') {
+                setPaymentSuccessData({
+                  orderId: res.id,
+                  orderNumber: res.orderNumber,
+                  transactionId: response.razorpay_payment_id,
+                  invoiceId: res.invoice?.invoiceNumber,
+                  invoiceDbId: res.invoice?.id,
+                  courseTitle: res.product?.title || course.title,
+                  courseSlug: res.product?.slug || course.slug,
+                  validityDays: res.product?.validityDays || 365,
+                  amountPaise: res.totalPaise ?? res.amountPaise ?? finalPricePaise,
+                  studentName: user?.name || fullName,
+                  studentEmail: user?.email || email,
+                  paymentMethod: 'Online / Razorpay',
+                  paymentTime: res.paidAt || res.createdAt || new Date().toISOString(),
+                });
+                setPaymentModalStatus('success');
+                return;
+              }
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+              attempts++;
+            }
             router.push(`/order/pending/${orderData.id}`);
           } catch {
             router.push(`/order/pending/${orderData.id}`);
@@ -1120,7 +1228,16 @@ function CheckoutContent() {
         </div>
       </div>
     </div>
-  </div>
+      {/* Payment Success Popup Modal */}
+      <PaymentSuccessModal
+        isOpen={paymentModalOpen}
+        onClose={() => setPaymentModalOpen(false)}
+        status={paymentModalStatus}
+        data={paymentSuccessData}
+        onDownloadInvoice={paymentSuccessData?.invoiceDbId ? handleDownloadInvoiceModal : undefined}
+        downloadingInvoice={downloadingInvoice}
+      />
+    </div>
   );
 }
 
