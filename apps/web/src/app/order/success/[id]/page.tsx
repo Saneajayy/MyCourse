@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { apiClient, getAccessToken } from '../../../../lib/api-client';
@@ -12,6 +13,7 @@ import {
   Loader2,
   ArrowRight,
   BookOpen,
+  CheckCircle2,
 } from 'lucide-react';
 
 interface OrderSuccessData {
@@ -33,53 +35,6 @@ interface OrderSuccessData {
   } | null;
 }
 
-function OrderSuccessNavbar() {
-  return (
-    <header className="fixed top-0 inset-x-0 z-50 w-full figma-glass-nav font-reddit select-none">
-      <nav
-        aria-label="Order Confirmation Navigation"
-        className="w-full h-20 md:h-[84px] flex items-stretch justify-between"
-      >
-        {/* Left: Brand Logo + Quick Links */}
-        <div className="flex items-center pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 gap-6 sm:gap-8 lg:gap-12">
-          <Link
-            href="/"
-            className="flex flex-col justify-center -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity"
-            aria-label="HYDRO BASICS Home"
-          >
-            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-              HYDRO
-            </span>
-            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-              BASICS
-            </span>
-          </Link>
-
-          <div className="hidden sm:flex items-center gap-6">
-            <Link
-              href="/#syllabus"
-              className="text-white/80 hover:text-white font-semibold text-sm tracking-normal transition-colors py-2"
-            >
-              Course Overview
-            </Link>
-          </div>
-        </div>
-
-        {/* Right: Student Dashboard Action */}
-        <div className="flex items-stretch">
-          <Link
-            href="/my-courses"
-            className="figma-glass-divider border-r border-white/20 h-full flex items-center justify-center px-6 sm:px-8 text-white font-bold text-sm sm:text-[15px] hover:bg-white/10 transition-colors gap-2"
-          >
-            <BookOpen className="w-4 h-4 text-white/80" />
-            <span>My Courses</span>
-          </Link>
-        </div>
-      </nav>
-    </header>
-  );
-}
-
 export default function OrderSuccessPage() {
   const params = useParams();
   const router = useRouter();
@@ -89,6 +44,15 @@ export default function OrderSuccessPage() {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
+
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = '#FFFFFF';
+    document.body.style.backgroundColor = '#FFFFFF';
+    return () => {
+      document.documentElement.style.backgroundColor = '';
+      document.body.style.backgroundColor = '';
+    };
+  }, []);
 
   useEffect(() => {
     if (!orderId) return;
@@ -153,38 +117,30 @@ export default function OrderSuccessPage() {
 
   if (loading) {
     return (
-      <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
-        <div className="noise-texture" aria-hidden="true" />
-        <OrderSuccessNavbar />
-        <div className="w-full flex-1 flex flex-col items-center justify-center py-28 space-y-4">
-          <Loader2 className="w-10 h-10 animate-spin text-white" />
-          <p className="text-sm font-semibold tracking-wider uppercase text-white/80">
-            Loading Order Receipt...
-          </p>
-        </div>
+      <div className="w-full h-screen h-[100dvh] flex flex-col items-center justify-center space-y-4 bg-white font-reddit">
+        <Loader2 className="w-10 h-10 animate-spin text-[#0033FF]" />
+        <p className="text-sm font-semibold tracking-wider uppercase text-neutral-600">
+          Loading Order Receipt...
+        </p>
       </div>
     );
   }
 
   if (errorMsg || !order) {
     return (
-      <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
-        <div className="noise-texture" aria-hidden="true" />
-        <OrderSuccessNavbar />
-        <main className="relative z-10 flex-1 w-full max-w-[1440px] mx-auto py-12 sm:py-16 px-4 flex items-center justify-center">
-          <div className="max-w-md bg-white p-8 rounded-lg text-neutral-900 space-y-4 text-center">
-            <h2 className="text-xl font-bold text-rose-600">Order Notice</h2>
-            <p className="text-sm text-neutral-600">
-              {errorMsg || 'Order details not found.'}
-            </p>
-            <Link
-              href="/my-courses"
-              className="inline-flex items-center justify-center h-11 px-6 bg-[#0033FF] text-white font-bold text-sm uppercase rounded-md hover:bg-[#0028D6] transition-colors"
-            >
-              Go to My Courses
-            </Link>
-          </div>
-        </main>
+      <div className="w-full h-screen h-[100dvh] flex flex-col items-center justify-center p-4 bg-white font-reddit">
+        <div className="max-w-md w-full bg-white border border-neutral-200/80 rounded-2xl p-8 text-neutral-900 space-y-4 text-center shadow-sm">
+          <h2 className="text-xl font-bold text-rose-600">Order Notice</h2>
+          <p className="text-sm text-neutral-600">
+            {errorMsg || 'Order details not found.'}
+          </p>
+          <Link
+            href="/my-courses"
+            className="inline-flex items-center justify-center h-11 px-6 bg-[#0033FF] text-white font-bold text-sm uppercase rounded-lg hover:bg-[#0028D6] transition-colors"
+          >
+            Go to My Courses
+          </Link>
+        </div>
       </div>
     );
   }
@@ -198,148 +154,239 @@ export default function OrderSuccessPage() {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         });
+
   const displayCourseTitle =
     order.product.title === 'Industrial Hydraulic Systems & Circuit Design'
       ? 'Hydraulic System Basics'
       : order.product.title || 'Hydraulic System Basics';
 
   return (
-    <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
-      {/* Background Noise Texture Overlay */}
-      <div className="noise-texture" aria-hidden="true" />
+    <div className="w-full h-screen h-[100dvh] overflow-hidden bg-white font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col lg:flex-row">
+      {/* ============================================================== */}
+      {/* LEFT COLUMN (Desktop Only): Signature Halftone Graphic         */}
+      {/* (100% identical styling to Checkout & Login split view)        */}
+      {/* ============================================================== */}
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-end lg:w-1/2 h-full bg-[#00186B] overflow-hidden select-none p-6 sm:p-8">
+        {/* Full-Bleed Signature Dot Halftone Graphic */}
+        <Image
+          src="/login-pixelated.png"
+          alt="HydroBasics Industrial Hydraulic Engineer"
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover object-center mix-blend-screen opacity-95 select-none"
+        />
+        {/* Soft overlay gradient for subtle depth */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/95 via-[#000c3b]/45 to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
 
-      {/* Floating Glass Navbar */}
-      <OrderSuccessNavbar />
-
-      {/* SVG Filters for Deckled Torn-Paper Texture Effect */}
-      <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
-        <defs>
-          <filter
-            id="figma-texture-order-success"
-            x="-10%"
-            y="-15%"
-            width="120%"
-            height="130%"
-            filterUnits="objectBoundingBox"
-            primitiveUnits="userSpaceOnUse"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.25"
-              numOctaves="3"
-              result="noise"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="noise"
-              scale="5.5"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-        </defs>
-      </svg>
-
-      {/* Main Content Area: Centered horizontally and vertically */}
-      <main className="relative z-10 flex-1 w-full max-w-[1440px] mx-auto py-10 sm:py-14 md:py-16 pb-16 sm:pb-24 px-4 sm:px-6 md:px-8 flex flex-col items-center justify-center">
-        {/* Signature Deckled Torn-Paper Receipt Card Centered on Screen */}
-        <div className="relative w-full max-w-xl sm:max-w-2xl p-7 sm:p-9 md:p-10 select-none drop-shadow-[0_20px_35px_rgba(0,0,60,0.35)] my-auto">
-          {/* Textured White Card Background via SVG Filter */}
-          <div className="absolute inset-0 pointer-events-none overflow-visible">
-            <svg className="w-full h-full overflow-visible" xmlns="http://www.w3.org/2000/svg">
-              <rect
-                x="0"
-                y="0"
-                width="100%"
-                height="100%"
-                rx="5.1"
-                ry="5.1"
-                fill="white"
-                filter="url(#figma-texture-order-success)"
-              />
-            </svg>
-          </div>
-
-          {/* Card Content in Clean Dark Typography */}
-          <div className="relative z-10 w-full text-neutral-900 space-y-6 text-left">
-            {/* Top Title: Blue PAYMENT CONFIRMED. */}
-            <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0033FF] uppercase tracking-tight">
-                PAYMENT CONFIRMED.
-              </h1>
-              <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
-                Welcome to the course. Your course access has been activated and your official tax invoice is generated below.
-              </p>
+        {/* Confirmation Badge & Amount Paid Directly on Image */}
+        <div className="relative z-10 w-full mb-1 select-none">
+          <div className="flex items-end justify-between gap-4">
+            {/* Status confirmation pill */}
+            <div className="shrink-0">
+              <div className="h-11 flex items-center gap-2 px-4 rounded-md bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-sm font-mono font-bold tracking-wide shadow-md">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>PAYMENT CONFIRMED</span>
+              </div>
             </div>
 
-            {/* Receipt Table: Plain White with Edge-to-Edge Border Lines & Square Corners */}
-            <div className="w-full border border-neutral-300 bg-white rounded-none">
-              <div className="flex flex-col px-4 py-3 sm:px-5 sm:py-3.5 border-b border-neutral-300 gap-1">
-                <span className="font-bold text-neutral-500 uppercase tracking-wider text-xs">
-                  Order ID
-                </span>
-                <span className="font-mono font-bold text-neutral-900 text-xs sm:text-sm break-all">
-                  {formatDisplayOrderId(order.orderNumber || order.id)}
-                </span>
+            {/* Amount Paid on the Right */}
+            <div className="flex flex-col items-end shrink-0 text-right">
+              <span className="text-[11px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
+                Amount Paid
+              </span>
+              <span className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
+                ₹{formattedAmount}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ============================================================== */}
+      {/* RIGHT COLUMN: Desktop Split / Mobile View                      */}
+      {/* ============================================================== */}
+      <div className="w-full lg:w-1/2 h-full bg-white text-neutral-900 flex flex-col relative overflow-hidden">
+        {/* Desktop Top Header Bar: Absolute in top corners */}
+        <header className="hidden lg:flex absolute top-0 inset-x-0 w-full items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 z-20 pointer-events-none">
+          {/* Top-Left Corner: My Courses Navigation Link */}
+          <div className="pointer-events-auto">
+            <Link
+              href="/my-courses"
+              className="text-xs sm:text-sm font-bold text-neutral-600 hover:text-[#0033FF] flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <BookOpen className="w-4 h-4 text-[#0033FF]" />
+              <span>My Courses &rarr;</span>
+            </Link>
+          </div>
+
+          {/* Top-Right Corner: Brand Logo deeply in corner */}
+          <Link
+            href="/"
+            className="pointer-events-auto flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+            aria-label="HYDRO BASICS Home - Back to Course"
+          >
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+              BASICS
+            </span>
+          </Link>
+        </header>
+
+        {/* Mobile Upper Part: Full-bleed edge-to-edge halftone image taking up upper screen */}
+        <div className="lg:hidden relative w-full h-[250px] sm:h-[280px] bg-[#00186B] shrink-0 overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5">
+          <Image
+            src="/login-pixelated.png"
+            alt="HydroBasics Industrial Hydraulic Engineer"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center mix-blend-screen opacity-95 select-none"
+          />
+          <div
+            className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/95 via-[#000c3b]/35 to-[#000c3b]/45 pointer-events-none"
+            aria-hidden="true"
+          />
+
+          {/* Top Bar inside Mobile Upper Part */}
+          <div className="relative z-10 w-full flex items-center justify-between">
+            <Link
+              href="/my-courses"
+              className="text-xs text-blue-100 font-semibold flex items-center gap-1 hover:text-white"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>My Courses &rarr;</span>
+            </Link>
+            <Link
+              href="/"
+              className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+              aria-label="HYDRO BASICS Home - Back to Course"
+            >
+              <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+                HYDRO
+              </span>
+              <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+                BASICS
+              </span>
+            </Link>
+          </div>
+
+          {/* Bottom Confirmation inside Mobile Upper Part */}
+          <div className="relative z-10 w-full">
+            <div className="flex items-end justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="h-11 flex items-center gap-1.5 px-3 rounded-md bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs font-mono font-bold tracking-wide">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="truncate">PAYMENT CONFIRMED</span>
+                </div>
               </div>
 
-              <div className="flex flex-col px-4 py-3 sm:px-5 sm:py-3.5 border-b border-neutral-300 gap-1">
-                <span className="font-bold text-neutral-500 uppercase tracking-wider text-xs">
-                  Course
-                </span>
-                <span className="font-bold text-neutral-900 text-xs sm:text-sm text-left uppercase">
-                  {displayCourseTitle}
-                </span>
-              </div>
-
-              <div className="flex flex-col px-4 py-3 sm:px-5 sm:py-3.5 border-b border-neutral-300 gap-1">
-                <span className="font-bold text-neutral-500 uppercase tracking-wider text-xs">
-                  Access Period
-                </span>
-                <span className="font-bold text-neutral-900 text-xs sm:text-sm text-left uppercase">
-                  {order.product.validityDays} Days (1 Year)
-                </span>
-              </div>
-
-              <div className="flex flex-col px-4 py-3 sm:px-5 sm:py-3.5 gap-1">
-                <span className="font-bold text-neutral-500 uppercase tracking-wider text-xs">
+              {/* Final Amount Paid */}
+              <div className="flex flex-col items-end shrink-0 text-right">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
                   Amount Paid
                 </span>
-                <span className="font-mono text-xl sm:text-2xl font-black text-[#0033FF]">
+                <span className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
                   ₹{formattedAmount}
                 </span>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Action Buttons: Equal full-width heights and solid proportions on mobile & desktop */}
-            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <Link
-                href={`/learn/${order.product.slug}`}
-                className="w-full sm:flex-1 h-12 min-h-[48px] bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-sm rounded-md sm:rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer uppercase tracking-wider shrink-0"
-              >
-                <Play className="w-4 h-4 fill-white text-white" />
-                <span>Start Learning Now</span>
-              </Link>
+        {/* Scrollable Receipt Section (Centered vertically on desktop, smooth scroll on mobile) */}
+        <div className="flex-1 w-full min-h-0 overflow-y-auto relative flex flex-col justify-center items-center">
+          <div className="my-auto w-full max-w-lg px-4 sm:px-6 py-6 sm:py-8 relative z-10 space-y-4">
+            {/* Payment Confirmed Card - Identical styling to Checkout Billing card */}
+            <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-7 select-none overflow-hidden space-y-5 shadow-sm">
+              {/* Header Title & Subtitle */}
+              <div className="space-y-1.5 text-left">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-wider border border-emerald-200/60">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Enrolled Successfully</span>
+                </div>
+                <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight uppercase">
+                  PAYMENT CONFIRMED.
+                </h1>
+                <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed font-normal">
+                  Welcome to the course. Your course access has been activated and your official tax invoice is generated below.
+                </p>
+              </div>
 
-              {order.invoice && (
-                <button
-                  type="button"
-                  onClick={handleDownloadInvoice}
-                  disabled={downloading}
-                  className="w-full sm:flex-1 h-12 min-h-[48px] px-6 rounded-md sm:rounded-lg border border-neutral-300 hover:border-black bg-white hover:bg-neutral-50 text-neutral-900 font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer disabled:opacity-60 shrink-0"
+              {/* Receipt Information Box */}
+              <div className="w-full bg-neutral-50/70 border border-neutral-200/80 rounded-xl divide-y divide-neutral-200/70 overflow-hidden text-left">
+                <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5 gap-2">
+                  <span className="font-bold text-neutral-500 text-xs uppercase tracking-wider">
+                    Order ID
+                  </span>
+                  <span className="font-mono font-bold text-neutral-900 text-xs sm:text-sm break-all">
+                    {formatDisplayOrderId(order.orderNumber || order.id)}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5 gap-2">
+                  <span className="font-bold text-neutral-500 text-xs uppercase tracking-wider">
+                    Course
+                  </span>
+                  <span className="font-bold text-neutral-900 text-xs sm:text-sm text-right uppercase">
+                    {displayCourseTitle}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5 gap-2">
+                  <span className="font-bold text-neutral-500 text-xs uppercase tracking-wider">
+                    Access Period
+                  </span>
+                  <span className="font-bold text-neutral-900 text-xs sm:text-sm text-right uppercase">
+                    {order.product.validityDays} Days (1 Year)
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5 gap-2 bg-neutral-100/50">
+                  <span className="font-bold text-neutral-700 text-xs uppercase tracking-wider">
+                    Amount Paid
+                  </span>
+                  <span className="font-mono text-xl sm:text-2xl font-black text-[#0033FF]">
+                    ₹{formattedAmount}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons: Start Learning Now & Download Tax Invoice */}
+              <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <Link
+                  href={`/learn/${order.product.slug}`}
+                  className="w-full sm:flex-1 h-12 min-h-[48px] bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-sm rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer uppercase tracking-wider shrink-0"
                 >
-                  {downloading ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-[#0033FF]" />
-                  ) : (
-                    <Download className="w-4 h-4 text-[#0033FF]" />
-                  )}
-                  <span>{downloading ? 'Downloading...' : 'Download Tax Invoice'}</span>
-                </button>
-              )}
+                  <Play className="w-4 h-4 fill-white text-white" />
+                  <span>Start Learning Now</span>
+                </Link>
+
+                {order.invoice && (
+                  <button
+                    type="button"
+                    onClick={handleDownloadInvoice}
+                    disabled={downloading}
+                    className="w-full sm:flex-1 h-12 min-h-[48px] px-4 rounded-lg border border-neutral-300 hover:border-black bg-white hover:bg-neutral-50 text-neutral-900 font-bold text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer disabled:opacity-60 shrink-0"
+                  >
+                    {downloading ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-[#0033FF]" />
+                    ) : (
+                      <Download className="w-4 h-4 text-[#0033FF]" />
+                    )}
+                    <span>{downloading ? 'Downloading...' : 'Download Tax Invoice'}</span>
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* Quick Link to My Courses */}
-            <div className="pt-1">
+            {/* Footer Navigation Link */}
+            <div className="text-center pt-1">
               <Link
                 href="/my-courses"
                 className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-neutral-500 hover:text-neutral-900 transition-colors"
@@ -350,7 +397,7 @@ export default function OrderSuccessPage() {
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
