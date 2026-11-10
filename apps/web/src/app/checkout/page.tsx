@@ -641,12 +641,13 @@ function CheckoutContent() {
 
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-white font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col lg:flex-row overflow-hidden">
+    <div className="w-full min-h-screen lg:h-screen lg:overflow-hidden bg-white font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col lg:flex-row">
       {/* ============================================================== */}
       {/* LEFT COLUMN (Desktop Only): Signature Halftone Graphic         */}
       {/* (100% identical styling to Login & Register split view)       */}
       {/* ============================================================== */}
-      <div className="hidden lg:relative lg:flex lg:w-1/2 h-full bg-[#00186B] overflow-hidden select-none">
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-end lg:w-1/2 h-full bg-[#00186B] overflow-hidden select-none p-6 sm:p-8">
+        {/* Full-Bleed Signature Dot Halftone Graphic */}
         <Image
           src="/login-pixelated.png"
           alt="HydroBasics Industrial Hydraulic Engineer"
@@ -657,15 +658,37 @@ function CheckoutContent() {
         />
         {/* Soft overlay gradient for subtle depth */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/80 via-transparent to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/90 via-[#000c3b]/35 to-transparent pointer-events-none"
           aria-hidden="true"
         />
+
+        {/* Terms & Refund Disclaimer (Desktop Only - Bottom of Left Section) */}
+        <div className="relative z-10 text-center text-xs text-blue-100/75 space-y-1">
+          <p>
+            By completing this payment, you agree to the{' '}
+            <Link href="/terms" className="underline text-white hover:text-cyan-200">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link href="/refunds" className="underline text-white hover:text-cyan-200">
+              Refund Policy
+            </Link>
+            .
+          </p>
+          <p className="text-[11px] text-blue-100/60">
+            Need assistance? Contact{' '}
+            <a href={`mailto:${siteConfig.supportEmail}`} className="underline text-white hover:text-cyan-200">
+              {siteConfig.supportEmail}
+            </a>
+            .
+          </p>
+        </div>
       </div>
 
       {/* ============================================================== */}
-      {/* RIGHT COLUMN: Clean White Background, Order Summary & Checkout */}
+      {/* RIGHT COLUMN: Clean Single Scroll (Mobile & Desktop)           */}
       {/* ============================================================== */}
-      <div className="w-full lg:w-1/2 h-full bg-white text-neutral-900 flex flex-col relative overflow-y-auto">
+      <div className="w-full lg:w-1/2 min-h-screen lg:min-h-0 lg:h-full bg-white text-neutral-900 flex flex-col relative overflow-y-auto">
         {/* Top Header Bar: Pinned into top corners */}
         <header className="w-full flex items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 shrink-0 z-20">
           {/* Top-Left Corner: Already Enrolled / Sign In (hidden when signed in) */}
@@ -1046,8 +1069,8 @@ function CheckoutContent() {
             </div>
           </div>
 
-          {/* Terms & Refund Disclaimer */}
-          <div className="pt-1 text-center text-xs text-neutral-500 space-y-1">
+          {/* Terms & Refund Disclaimer (Mobile Only - Below Billing Info) */}
+          <div className="lg:hidden pt-1 text-center text-xs text-neutral-500 space-y-1">
             <p>
               By completing this payment, you agree to the{' '}
               <Link href="/terms" className="underline hover:text-neutral-800">
