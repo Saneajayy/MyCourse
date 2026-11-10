@@ -842,71 +842,88 @@ function CheckoutContent() {
             </div>
           )}
 
-          {/* Mobile Only: Compact Price & Coupon Strip */}
-          <div className="lg:hidden relative w-full bg-neutral-50 border border-neutral-200/90 rounded-xl p-3.5 select-none space-y-2">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex flex-col justify-center shrink-0">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-500">
-                  Final Price
-                </span>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-xs font-bold text-neutral-400 line-through font-mono">
-                    ₹{((appliedCoupon ? basePricePaise : compareAtPricePaise) / 100).toLocaleString('en-IN')}
-                  </span>
-                  <span className="text-2xl font-black font-mono tracking-tight text-[#0033FF] leading-none">
-                    ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
-                  </span>
-                </div>
-              </div>
+          {/* Mobile Only: Halftone Graphic Banner with Direct Price & Coupon Controls */}
+          <div className="lg:hidden relative w-full h-44 sm:h-52 rounded-xl sm:rounded-2xl overflow-hidden bg-[#00186B] flex flex-col justify-end p-3.5 sm:p-4 select-none shadow-md">
+            {/* Full-Bleed Signature Dot Halftone Graphic */}
+            <Image
+              src="/login-pixelated.png"
+              alt="HydroBasics Industrial Hydraulic Engineer"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover object-center mix-blend-screen opacity-95 select-none"
+            />
+            {/* Soft overlay gradient for subtle depth */}
+            <div
+              className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/95 via-[#000c3b]/45 to-transparent pointer-events-none"
+              aria-hidden="true"
+            />
 
-              <div className="flex-1 max-w-[240px]">
-                {appliedCoupon ? (
-                  <div className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs">
-                    <div className="flex items-center gap-1 truncate">
-                      <Tag className="w-3 h-3 text-emerald-600 shrink-0" />
-                      <span className="font-mono font-bold">{appliedCoupon.code}</span>
-                      <span className="text-emerald-700 text-[11px]">
+            {/* Controls directly on image */}
+            <div className="relative z-10 w-full">
+              <div className="flex items-end justify-between gap-2">
+                {/* Coupon Code Entry: Apply button then input bar */}
+                <div className="shrink-0 max-w-[58%]">
+                  {appliedCoupon ? (
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs">
+                      <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span className="font-mono font-bold tracking-wide truncate">{appliedCoupon.code}</span>
+                      <span className="text-emerald-300 font-semibold text-[11px] shrink-0">
                         (-₹{(discountPaise / 100).toLocaleString('en-IN')})
                       </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleRemoveCoupon}
-                      className="text-rose-600 hover:text-rose-800 underline text-[11px] font-semibold cursor-pointer shrink-0"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleApplyCoupon} className="space-y-1">
-                    <div className="flex gap-1.5">
-                      <input
-                        type="text"
-                        placeholder="COUPON"
-                        value={couponInput}
-                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                        className="w-full h-9 rounded-lg border border-neutral-300 bg-white px-2.5 text-xs font-mono uppercase text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:outline-none transition-all"
-                      />
                       <button
-                        type="submit"
-                        disabled={couponLoading}
-                        className="h-9 px-3 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0"
+                        type="button"
+                        onClick={handleRemoveCoupon}
+                        className="text-white hover:text-rose-200 underline text-[10px] font-bold cursor-pointer shrink-0 ml-1"
                       >
-                        {couponLoading ? (
-                          <Loader2 className="w-3 h-3 animate-spin text-white" />
-                        ) : (
-                          'Apply'
-                        )}
+                        Remove
                       </button>
                     </div>
-                    {couponError && (
-                      <p className="text-[10px] font-semibold text-rose-600 flex items-center gap-1">
-                        <X className="w-3 h-3 stroke-[2.5]" />
-                        <span>{couponError}</span>
-                      </p>
-                    )}
-                  </form>
-                )}
+                  ) : (
+                    <form onSubmit={handleApplyCoupon} className="relative">
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="submit"
+                          disabled={couponLoading}
+                          className="h-8.5 px-3 bg-white hover:bg-blue-50 active:bg-blue-100 text-[#00186B] font-extrabold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
+                        >
+                          {couponLoading ? (
+                            <Loader2 className="w-3 h-3 animate-spin text-[#00186B]" />
+                          ) : (
+                            'Apply'
+                          )}
+                        </button>
+                        <input
+                          type="text"
+                          placeholder="COUPON"
+                          value={couponInput}
+                          onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                          className="h-8.5 w-24 sm:w-32 rounded-lg border border-white/30 bg-black/35 backdrop-blur-sm px-2 text-xs font-mono uppercase text-white placeholder:text-blue-200/50 focus:border-white focus:bg-black/50 focus:outline-none transition-all shadow-inner"
+                        />
+                      </div>
+                      {couponError && (
+                        <p className="absolute -bottom-4.5 left-0 text-[10px] font-semibold text-rose-300 flex items-center gap-0.5 drop-shadow truncate max-w-full">
+                          <X className="w-3 h-3 stroke-[2.5] shrink-0" />
+                          <span className="truncate">{couponError}</span>
+                        </p>
+                      )}
+                    </form>
+                  )}
+                </div>
+
+                {/* Final Price & Actual Price on the Right */}
+                <div className="flex flex-col items-end shrink-0 text-right">
+                  <span className="text-[9px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
+                    Final Price
+                  </span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xs sm:text-sm font-bold font-mono text-blue-200/60 line-through drop-shadow">
+                      ₹{((appliedCoupon ? basePricePaise : compareAtPricePaise) / 100).toLocaleString('en-IN')}
+                    </span>
+                    <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
+                      ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
