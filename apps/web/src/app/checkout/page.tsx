@@ -836,7 +836,7 @@ function CheckoutContent() {
               {/* Coupon Code Entry: Apply button then input bar extending horizontally */}
               <div className="flex-1 min-w-0">
                 {appliedCoupon ? (
-                  <div className="flex items-center gap-1.5 px-3 py-2 rounded-md bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs">
+                  <div className="h-11 flex items-center gap-1.5 px-3 rounded-md bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs">
                     <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span className="font-mono font-bold tracking-wide truncate">{appliedCoupon.code}</span>
                     <span className="text-emerald-300 font-semibold text-[11px] shrink-0">
@@ -856,7 +856,7 @@ function CheckoutContent() {
                       <button
                         type="submit"
                         disabled={couponLoading}
-                        className="h-9.5 px-3.5 bg-white hover:bg-blue-50 active:bg-blue-100 text-[#00186B] font-extrabold text-xs sm:text-sm rounded-md transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
+                        className="h-11 px-4 bg-white hover:bg-blue-50 active:bg-blue-100 text-[#00186B] font-extrabold text-xs sm:text-sm rounded-md transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
                       >
                         {couponLoading ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-[#00186B]" />
@@ -869,7 +869,7 @@ function CheckoutContent() {
                         placeholder="COUPON CODE"
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                        className="h-9.5 flex-1 min-w-0 rounded-md border border-white/45 bg-transparent px-3 text-xs sm:text-[13px] font-mono uppercase text-white placeholder:text-blue-200/60 focus:border-white focus:outline-none transition-all"
+                        className="h-11 flex-1 min-w-0 rounded-md border border-white/45 bg-transparent px-3 text-xs sm:text-sm font-mono uppercase text-white placeholder:text-blue-200/60 focus:border-white focus:outline-none transition-all"
                       />
                     </div>
                     {couponError && (
