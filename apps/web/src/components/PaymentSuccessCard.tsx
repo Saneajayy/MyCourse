@@ -51,14 +51,31 @@ export function PaymentSuccessCard({
 
   return (
     <div className="relative w-full max-w-[420px] sm:max-w-[440px] mx-auto bg-white rounded-2xl sm:rounded-[24px] p-6 sm:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-neutral-100 select-none font-reddit text-left space-y-4">
-      {/* 1. Header: Bright Blue PAYMENT SUCCESSFUL & Subtitle */}
-      <div className="text-center space-y-1 pb-1">
-        <h2 className="text-xl sm:text-[22px] font-black text-[#0033FF] tracking-tight uppercase">
-          PAYMENT SUCCESSFUL
-        </h2>
-        <p className="text-xs sm:text-[13px] text-[#0055FF]/90 font-medium">
-          Your course access has been activated.
-        </p>
+      {/* 1. Header: Blue Circle with White Tick on Left + Title & Tagline */}
+      <div className="flex items-center gap-3.5 pb-1">
+        <div className="w-11 h-11 rounded-full bg-[#0033FF] text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/20">
+          <svg
+            className="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={3}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+
+        <div className="min-w-0 flex-1 space-y-0.5">
+          <h2 className="text-lg sm:text-xl font-bold text-neutral-900 tracking-tight leading-tight">
+            Payment Successful
+          </h2>
+          <p className="text-xs sm:text-sm text-neutral-500 font-normal leading-normal">
+            Your course access has been activated.
+          </p>
+        </div>
       </div>
 
       {/* 2. Order Summary Section (Course, Validity, and Price in Same Tab without grey fill) */}
