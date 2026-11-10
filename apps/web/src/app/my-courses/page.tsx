@@ -488,17 +488,16 @@ function StudentDashboardContent() {
         {/* Dropping Column when opened (just like in home page mobile view) */}
         {isMobileMenuOpen && (
           <div className="w-full bg-[#0033FF] border-t border-white/50 relative overflow-hidden transition-all animate-in slide-in-from-top-2 duration-150">
-            {/* Background halftone image shifted to the right */}
+            {/* Background halftone image shifted to the right, full-bleed with no left cut-off */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-25">
-              <div className="absolute inset-0 translate-x-8 sm:translate-x-12 scale-110">
-                <Image
-                  src="/login-pixelated.png"
-                  alt=""
-                  fill
-                  sizes="100vw"
-                  className="object-cover object-center mix-blend-screen select-none"
-                />
-              </div>
+              <Image
+                src="/login-pixelated.png"
+                alt=""
+                fill
+                sizes="100vw"
+                style={{ objectPosition: '35% center' }}
+                className="object-cover mix-blend-screen select-none"
+              />
             </div>
 
             {/* Column of Full-Width Tabs with Thin White Dividing Borders */}
@@ -557,18 +556,17 @@ function StudentDashboardContent() {
 
       {/* Desktop Sidebar: Solid Blue Column with Embedded Image & Contrasting Tabs */}
       <aside className="hidden md:flex md:fixed md:top-0 md:bottom-0 md:left-0 md:w-64 lg:w-72 bg-[#0033FF] text-white flex-col shrink-0 z-30 select-none border-r border-white/50 overflow-y-auto relative shadow-none">
-        {/* Previous Image Embedded on Column Back (Shifted to the Right, Not Glassy) */}
+        {/* Previous Image Embedded on Column Back (Shifted to the Right, Full-Bleed with No Left Cut-Off) */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-          <div className="absolute inset-0 translate-x-8 lg:translate-x-12 scale-110">
-            <Image
-              src="/login-pixelated.png"
-              alt="Hydraulic System Graphic"
-              fill
-              sizes="300px"
-              priority
-              className="object-cover object-center mix-blend-screen opacity-35 select-none"
-            />
-          </div>
+          <Image
+            src="/login-pixelated.png"
+            alt="Hydraulic System Graphic"
+            fill
+            sizes="300px"
+            priority
+            style={{ objectPosition: '35% center' }}
+            className="object-cover mix-blend-screen opacity-35 select-none"
+          />
         </div>
 
         {/* Top: Brand Logo with Bottom Dividing Line */}
