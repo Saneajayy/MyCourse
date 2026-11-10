@@ -692,13 +692,13 @@ function StudentDashboardContent() {
                             </span>
                           </div>
 
-                          {/* Course Thumbnail Image */}
-                          <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden mb-3 sm:mb-3.5 select-none bg-neutral-100 border border-neutral-100">
+                          {/* Course Thumbnail Image: Desaturated Halftone Dot Effect */}
+                          <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden mb-3 sm:mb-3.5 select-none bg-black border border-neutral-200">
                             <img
-                              src="/course.jpg"
+                              src="/course-halftone.jpg"
                               alt={c.product.title}
                               onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).src = '/course-hydraulic-basics.jpg';
+                                (e.currentTarget as HTMLImageElement).src = '/course.jpg';
                               }}
                               className="w-full h-full object-cover select-none"
                             />
