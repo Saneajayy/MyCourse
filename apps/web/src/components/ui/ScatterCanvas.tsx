@@ -113,6 +113,7 @@ export interface ScatterCanvasProps {
   opacityClass?: string;
   priority?: boolean;
   craterRadius?: number;
+  interactive?: boolean;
 }
 
 export function ScatterCanvas({
@@ -128,6 +129,7 @@ export function ScatterCanvas({
   opacityClass = 'opacity-70',
   priority = false,
   craterRadius = 120,
+  interactive = false,
 }: ScatterCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -182,6 +184,9 @@ export function ScatterCanvas({
         const uStrengthLoc = gl.getUniformLocation(program, 'u_strength');
 
         gl.uniform2f(uResLoc, CANVAS_W, CANVAS_H);
+        gl.uniform2f(uMouseLoc, -9999, -9999);
+        gl.uniform1f(uRadiusLoc, 0.0);
+        gl.uniform1f(uStrengthLoc, 0.0);
 
         const posBufferData = new Float32Array(count * 2);
         const sizeBufferData = new Float32Array(count);
@@ -235,6 +240,13 @@ export function ScatterCanvas({
         gl.drawArrays(gl.POINTS, 0, count);
 
         setIsReady(true);
+
+        if (!interactive) {
+          // Static dot matrix rendering without cursor interaction effect
+          return () => {
+            isDestroyed = true;
+          };
+        }
 
         const mouse = {
           x: -9999,
@@ -375,7 +387,7 @@ export function ScatterCanvas({
       isDestroyed = true;
       if (animId) cancelAnimationFrame(animId);
     };
-  }, [dotsUrl, CANVAS_W, CANVAS_H, rotationDeg, flipH, craterRadius]);
+  }, [dotsUrl, CANVAS_W, CANVAS_H, rotationDeg, flipH, craterRadius, interactive]);
 
   return (
     <div className={`relative select-none ${containerClassName}`}>
