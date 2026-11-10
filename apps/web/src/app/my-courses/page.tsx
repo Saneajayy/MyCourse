@@ -11,9 +11,7 @@ import { siteConfig } from '../../config/site';
 import { useToast } from '../../components/ui';
 import {
   BookOpen,
-  Award,
   User as UserIcon,
-  Receipt,
   Search,
   Menu,
   X,
@@ -647,9 +645,6 @@ function StudentDashboardContent() {
               {/* Empty State: No Courses Enrolled */}
               {courses.length === 0 && !coursesError && (
                 <div className="bg-white border border-neutral-200 rounded-xl p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
-                  <div className="w-12 h-12 rounded-lg bg-neutral-100 text-black flex items-center justify-center">
-                    <BookOpen className="w-6 h-6" />
-                  </div>
                   <div className="space-y-1">
                     <h2 className="text-lg font-bold text-neutral-900">NO ACTIVE COURSES.</h2>
                     <p className="text-xs text-neutral-500 leading-relaxed">
@@ -753,9 +748,6 @@ function StudentDashboardContent() {
 
               {completedCourses.length === 0 ? (
                 <div className="bg-white border border-neutral-200 rounded-xl p-8 text-left space-y-4 max-w-md shadow-none">
-                  <div className="w-12 h-12 rounded-lg bg-neutral-100 text-black flex items-center justify-center">
-                    <Award className="w-6 h-6" />
-                  </div>
                   <div className="space-y-1">
                     <h2 className="text-lg font-bold text-neutral-900">No Certificates Earned Yet</h2>
                     <p className="text-xs text-neutral-500 leading-relaxed">
@@ -1031,9 +1023,6 @@ function StudentDashboardContent() {
                 </div>
               ) : orders.length === 0 ? (
                 <div className="bg-white border border-neutral-200 rounded-xl p-8 text-left space-y-4 max-w-md shadow-none">
-                  <div className="w-12 h-12 rounded-lg bg-neutral-100 text-black flex items-center justify-center">
-                    <Receipt className="w-6 h-6" />
-                  </div>
                   <div className="space-y-1">
                     <h2 className="text-lg font-bold text-neutral-900">No Previous Orders</h2>
                     <p className="text-xs text-neutral-500 leading-relaxed">
