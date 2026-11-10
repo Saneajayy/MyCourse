@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/auth-context';
 import { apiClient, ApiError } from '../../lib/api-client';
@@ -16,7 +15,6 @@ import {
   Laptop,
   Smartphone,
   Receipt,
-  LogOut,
   Search,
   X,
   Check,
@@ -390,113 +388,127 @@ function StudentDashboardContent() {
     );
   }
 
-  const navTabs: { id: DashboardTab; label: string; icon: React.ElementType }[] = [
-    { id: 'courses', label: 'My Courses', icon: BookOpen },
-    { id: 'certificates', label: 'My Certificates', icon: Award },
-    { id: 'profile', label: 'Profile', icon: UserIcon },
-    { id: 'devices', label: 'Devices', icon: Laptop },
-    { id: 'orders', label: 'Payment Orders', icon: Receipt },
+  const navTabs: { id: DashboardTab; label: string }[] = [
+    { id: 'courses', label: 'My Courses' },
+    { id: 'certificates', label: 'My Certificates' },
+    { id: 'profile', label: 'Profile' },
+    { id: 'orders', label: 'Payment Orders' },
+    { id: 'devices', label: 'Devices' },
   ];
 
   return (
     <div className="min-h-screen w-full bg-[#F8FAFC] font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col md:flex-row">
       {/* ============================================================== */}
-      {/* 1. LEFT BLUE COLUMN (Sidebar)                                  */}
+      {/* 1. LEFT BLUE COLUMN (Sidebar matching reference design)         */}
       {/* ============================================================== */}
-      <aside className="w-full md:w-64 lg:w-72 md:fixed md:top-0 md:bottom-0 md:left-0 bg-[#00186B] text-white flex flex-col justify-between shrink-0 z-30 select-none shadow-lg overflow-y-auto">
-        {/* Subtle signature halftone watermark texture */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-10">
-          <Image
-            src="/login-pixelated.png"
-            alt=""
-            fill
-            sizes="300px"
-            className="object-cover object-top mix-blend-screen"
-          />
-        </div>
 
-        {/* Top: Brand Logo + Navigation Items */}
-        <div className="relative z-10 p-5 sm:p-6 pb-2">
-          {/* Brand Logo in Pure White */}
-          <div className="pb-6 pt-1">
-            <Link
-              href="/"
-              className="flex flex-col -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity select-none"
-              aria-label="HYDRO BASICS Home - Back to Course"
-            >
-              <span className="font-extrabold text-[22px] sm:text-[24px] tracking-[0.02em] uppercase leading-[0.92]">
-                HYDRO
-              </span>
-              <span className="font-extrabold text-[22px] sm:text-[24px] tracking-[0.02em] uppercase leading-[0.92]">
-                BASICS
-              </span>
-            </Link>
-          </div>
-
-          {/* Navigation Tabs (Vertical on desktop, scrollable row on mobile) */}
-          <nav
-            aria-label="Student Dashboard Navigation"
-            className="flex md:flex-col gap-1.5 overflow-x-auto md:overflow-visible pb-2 md:pb-0 no-scrollbar"
+      {/* Mobile Top Header + Horizontal Thin-Border Tab Strip */}
+      <div className="md:hidden w-full bg-[#0033FF] border-b border-white/50 select-none z-30 shrink-0">
+        {/* Mobile Brand Logo Bar */}
+        <div className="px-5 py-4 border-b border-white/50 flex items-center justify-between">
+          <Link
+            href="/"
+            className="flex flex-col -space-y-0.5 leading-[0.92] text-white hover:opacity-90 select-none"
+            aria-label="HYDRO BASICS Home - Back to Course"
           >
-            {navTabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => handleTabChange(tab.id)}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer shrink-0 text-left ${isActive
-                    ? 'bg-white text-[#00186B] shadow-md'
-                    : 'text-blue-100/80 hover:text-white hover:bg-white/10 active:bg-white/15'
-                    }`}
-                >
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#00186B]' : 'text-blue-200'}`} />
-                  <span className="whitespace-nowrap">{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
+            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+              BASICS
+            </span>
+          </Link>
         </div>
 
-        {/* Bottom: Student Profile Cell + Log Out Action */}
-        <div className="relative z-10 p-5 sm:p-6 pt-3 border-t border-white/10 mt-auto">
-          {/* Quick User Info */}
-          <div className="flex items-center gap-3 px-1 py-2 mb-2">
-            <div className="w-9 h-9 rounded-full bg-white/15 text-white font-black text-xs flex items-center justify-center shrink-0 border border-white/20 uppercase">
-              {user?.name ? user.name.slice(0, 2) : 'ST'}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-white truncate">
-                {user?.name || 'Student'}
-              </p>
-              <p className="text-[11px] text-blue-200/70 truncate">
-                {user?.email || ''}
-              </p>
-            </div>
-          </div>
+        {/* Mobile Scrollable Tabs with Thin White Vertical Separators */}
+        <nav
+          aria-label="Student Mobile Tabs"
+          className="flex items-stretch overflow-x-auto no-scrollbar"
+        >
+          {navTabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleTabChange(tab.id)}
+                className={`px-4 py-3 text-xs sm:text-sm font-bold text-white border-r border-white/50 shrink-0 transition-colors cursor-pointer ${
+                  isActive ? 'bg-white/20 font-extrabold' : 'hover:bg-white/10'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="px-4 py-3 text-xs sm:text-sm font-bold text-white shrink-0 hover:bg-white/10 transition-colors cursor-pointer"
+          >
+            Log Out
+          </button>
+        </nav>
+      </div>
 
-          {/* Admin Switch Link (only for admins) */}
-          {user?.role === 'ADMIN' && (
-            <Link
-              href="/admin"
-              className="w-full mb-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-white/15 hover:bg-white/25 text-white font-bold text-xs uppercase tracking-wider transition-colors"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Admin Console</span>
-            </Link>
-          )}
+      {/* Desktop Sidebar: Clean Solid Blue Column with Thin White Border Tabs */}
+      <aside className="hidden md:flex md:fixed md:top-0 md:bottom-0 md:left-0 md:w-64 lg:w-72 bg-[#0033FF] text-white flex-col shrink-0 z-30 select-none border-r border-white/50 overflow-y-auto">
+        {/* Top: Brand Logo with Bottom Dividing Line */}
+        <div className="w-full px-6 sm:px-7 py-6 sm:py-7 border-b border-white/50">
+          <Link
+            href="/"
+            className="flex flex-col -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity select-none"
+            aria-label="HYDRO BASICS Home - Back to Course"
+          >
+            <span className="font-extrabold text-[22px] sm:text-[24px] tracking-[0.02em] uppercase leading-[0.92]">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[22px] sm:text-[24px] tracking-[0.02em] uppercase leading-[0.92]">
+              BASICS
+            </span>
+          </Link>
+        </div>
+
+        {/* Navigation Tabs with Thin White Dividing Borders */}
+        <nav aria-label="Student Dashboard Navigation" className="flex flex-col w-full">
+          {navTabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleTabChange(tab.id)}
+                className={`w-full text-left px-6 sm:px-7 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold text-white border-b border-white/50 transition-colors cursor-pointer select-none ${
+                  isActive ? 'bg-white/20 font-extrabold' : 'hover:bg-white/10'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
 
           {/* Log Out Tab Button */}
           <button
             type="button"
             onClick={() => logout()}
-            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-rose-200 hover:text-white hover:bg-rose-500/20 font-bold text-xs sm:text-sm transition-colors cursor-pointer text-left"
+            className="w-full text-left px-6 sm:px-7 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold text-white border-b border-white/50 hover:bg-white/10 active:bg-rose-500/20 transition-colors cursor-pointer select-none"
           >
-            <LogOut className="w-4 h-4 shrink-0" />
-            <span>Log Out</span>
+            Log Out
           </button>
-        </div>
+
+          {/* Admin Switch Link (visible only for admins) */}
+          {user?.role === 'ADMIN' && (
+            <Link
+              href="/admin"
+              className="w-full text-left px-6 sm:px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-emerald-200 border-b border-white/50 hover:bg-white/10 flex items-center gap-2"
+            >
+              <ShieldCheck className="w-4 h-4 text-emerald-300" />
+              <span>Admin Console</span>
+            </Link>
+          )}
+        </nav>
+
+        {/* Empty Solid Blue Column Continuing Down */}
+        <div className="flex-1 w-full bg-[#0033FF]" />
       </aside>
 
       {/* ============================================================== */}
