@@ -456,10 +456,10 @@ function StudentDashboardContent() {
       {/* 1. LEFT BLUE COLUMN (Solid #000000, embedded image, clean tabs) */}
       {/* ============================================================== */}
 
-      {/* Mobile Top Header: Solid Blue Bar with Brand Logo & Three Bars Dropdown */}
+      {/* Mobile Top Header: Solid Black Bar with Brand Logo & Floating Dropdown Overlay */}
       <div className="md:hidden sticky top-0 inset-x-0 w-full bg-black border-b border-white/50 select-none z-40 shrink-0 relative shadow-none">
         {/* Mobile Header Bar */}
-        <div className="w-full h-16 sm:h-20 px-5 sm:px-6 flex items-center justify-between">
+        <div className="w-full h-16 sm:h-20 px-5 sm:px-6 flex items-center justify-between relative z-50 bg-black">
           <Link
             href="/"
             className="flex flex-col -space-y-0.5 leading-[0.92] text-white hover:opacity-90 select-none"
@@ -485,72 +485,82 @@ function StudentDashboardContent() {
           </button>
         </div>
 
-        {/* Dropping Column when opened (just like in home page mobile view) */}
+        {/* Dropping Column when opened (Floats on top of screen, never pushes main body) */}
         {isMobileMenuOpen && (
-          <div className="w-full bg-black border-t border-white/50 relative overflow-hidden transition-all animate-in slide-in-from-top-2 duration-150">
-            {/* Background halftone image shifted to the right, full-bleed with no left cut-off */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-15">
-              <Image
-                src="/login-pixelated.png"
-                alt=""
-                fill
-                sizes="100vw"
-                style={{ objectPosition: '35% center' }}
-                className="object-cover mix-blend-screen select-none"
-              />
-            </div>
+          <>
+            {/* Soft backdrop overlay to capture outside clicks and dim content behind */}
+            <div
+              className="fixed inset-0 top-16 sm:top-20 bg-black/60 z-40 backdrop-blur-[2px] transition-opacity duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+              aria-hidden="true"
+            />
 
-            {/* Column of Full-Width Tabs with Thin White Dividing Borders */}
-            <nav
-              aria-label="Student Mobile Navigation Column"
-              className="relative z-10 flex flex-col w-full"
-            >
-              {navTabs.map((tab) => {
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => {
-                      handleTabChange(tab.id);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-6 py-4 text-[15px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
-                      isActive
-                        ? 'bg-white text-black font-extrabold'
-                        : 'bg-transparent text-white hover:bg-white/10'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
+            {/* Floating Dropdown Column on top of screen */}
+            <div className="absolute top-full inset-x-0 bg-black border-t border-white/50 z-50 overflow-hidden shadow-2xl transition-all animate-in slide-in-from-top-2 duration-150">
+              {/* Background halftone image shifted to the right, full-bleed with no left cut-off */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-15">
+                <Image
+                  src="/login-pixelated.png"
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  style={{ objectPosition: '35% center' }}
+                  className="object-cover mix-blend-screen select-none"
+                />
+              </div>
 
-              {/* Log Out Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  logout();
-                }}
-                className="w-full text-left px-6 py-4 text-[15px] font-bold text-white border-b border-white/50 hover:bg-white/10 active:bg-rose-500/20 transition-colors cursor-pointer select-none"
+              {/* Column of Full-Width Tabs with Thin White Dividing Borders */}
+              <nav
+                aria-label="Student Mobile Navigation Column"
+                className="relative z-10 flex flex-col w-full"
               >
-                Log Out
-              </button>
+                {navTabs.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => {
+                        handleTabChange(tab.id);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className={`w-full text-left px-6 py-4 text-[15px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
+                        isActive
+                          ? 'bg-white text-black font-extrabold'
+                          : 'bg-transparent text-white hover:bg-white/10'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
 
-              {/* Admin Switch Link (if admin) */}
-              {user?.role === 'ADMIN' && (
-                <Link
-                  href="/admin"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full text-left px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-emerald-200 border-b border-white/50 hover:bg-white/10 flex items-center gap-2"
+                {/* Log Out Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    logout();
+                  }}
+                  className="w-full text-left px-6 py-4 text-[15px] font-bold text-white border-b border-white/50 hover:bg-white/10 active:bg-rose-500/20 transition-colors cursor-pointer select-none"
                 >
-                  <ShieldCheck className="w-4 h-4 text-emerald-300" />
-                  <span>Admin Console</span>
-                </Link>
-              )}
-            </nav>
-          </div>
+                  Log Out
+                </button>
+
+                {/* Admin Switch Link (if admin) */}
+                {user?.role === 'ADMIN' && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full text-left px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-emerald-200 border-b border-white/50 hover:bg-white/10 flex items-center gap-2"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-emerald-300" />
+                    <span>Admin Console</span>
+                  </Link>
+                )}
+              </nav>
+            </div>
+          </>
         )}
       </div>
 
