@@ -560,27 +560,14 @@ function CheckoutContent() {
         />
 
         <div className="relative z-10 space-y-8 max-w-xl mx-auto lg:mx-0 w-full">
-          {/* Top Brand Bar */}
-          <div className="flex items-center justify-between pb-2 border-b border-white/15">
+          {/* Top Escape Link */}
+          <div className="flex items-center justify-start pb-2 border-b border-white/15">
             <Link
               href="/"
               className="inline-flex items-center gap-2 text-white/80 hover:text-white text-xs sm:text-sm font-semibold transition-colors group cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 stroke-[2.5] transition-transform group-hover:-translate-x-1" />
               <span>Back to Course</span>
-            </Link>
-
-            <Link
-              href="/"
-              className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity text-right select-none"
-              aria-label="HYDRO BASICS Home"
-            >
-              <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-                HYDRO
-              </span>
-              <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-                BASICS
-              </span>
             </Link>
           </div>
 
@@ -788,20 +775,20 @@ function CheckoutContent() {
       {/* ============================================================== */}
       {/* RIGHT COLUMN: Clean White Background, Billing Info & Checkout  */}
       {/* ============================================================== */}
-      <div className="w-full lg:w-1/2 lg:min-h-screen bg-white text-neutral-900 flex flex-col justify-between relative overflow-y-auto p-6 sm:p-9 md:p-12 xl:p-16">
-        {/* Top Header Bar: Top-Left Account Status & Top-Right Brand Logo */}
-        <div className="w-full max-w-lg mx-auto flex items-center justify-between pb-5 border-b border-neutral-200 mb-6 sm:mb-8">
-          {/* Top-Left: Already Signed In / Enrolled Status */}
+      <div className="w-full lg:w-1/2 lg:min-h-screen bg-white text-neutral-900 flex flex-col justify-between relative overflow-y-auto">
+        {/* Top Header Bar: Pinned deeply into top-left and top-right corners with NO separation line */}
+        <header className="w-full flex items-center justify-between px-6 pt-6 sm:px-8 sm:pt-8 md:px-10 md:pt-8 shrink-0 z-20">
+          {/* Top-Left Corner: Already Enrolled / Signed In */}
           <div>
             {isAuthenticated ? (
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-100 border border-neutral-200 text-xs text-neutral-700">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                <span className="truncate max-w-[150px] sm:max-w-[200px] font-medium" title={user?.email}>
+                <span className="truncate max-w-[160px] sm:max-w-[220px] font-medium" title={user?.email}>
                   {user?.email}
                 </span>
               </div>
             ) : (
-              <div className="text-xs text-neutral-600">
+              <div className="text-xs sm:text-sm text-neutral-600">
                 Already enrolled?{' '}
                 <Link
                   href="/login?redirect=/checkout"
@@ -813,23 +800,23 @@ function CheckoutContent() {
             )}
           </div>
 
-          {/* Top-Right: Brand Logo */}
+          {/* Top-Right Corner: Brand Logo deeply in corner */}
           <Link
             href="/"
             className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
             aria-label="HYDRO BASICS Home - Back to Course"
           >
-            <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
               HYDRO
             </span>
-            <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
               BASICS
             </span>
           </Link>
-        </div>
+        </header>
 
         {/* Centered Billing & Checkout Container */}
-        <div className="w-full max-w-lg mx-auto my-auto space-y-6">
+        <div className="w-full max-w-lg mx-auto px-6 sm:px-8 py-6 sm:py-8 my-auto space-y-6">
           {/* Email Verification Warning Alert Gate */}
           {isAuthenticated && !user?.emailVerifiedAt && (
             <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-xl p-5 shadow-sm text-amber-950">
@@ -974,7 +961,7 @@ function CheckoutContent() {
             {!isAuthenticated ? (
               <Link
                 href="/login?redirect=/checkout"
-                className="w-full h-13 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base rounded-xl transition-all shadow-lg shadow-[#0033FF]/25 hover:shadow-xl hover:shadow-[#0033FF]/30 flex items-center justify-center cursor-pointer text-center"
+                className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all shadow-md shadow-[#0033FF]/20 hover:shadow-lg hover:shadow-[#0033FF]/30 flex items-center justify-center cursor-pointer text-center select-none"
               >
                 Sign In to Continue Checkout &rarr;
               </Link>
@@ -982,7 +969,7 @@ function CheckoutContent() {
               <button
                 type="button"
                 disabled
-                className="w-full h-13 bg-neutral-200 text-neutral-500 font-bold text-sm uppercase tracking-wider rounded-xl opacity-75 cursor-not-allowed flex items-center justify-center text-center"
+                className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-neutral-200 text-neutral-500 font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg opacity-75 cursor-not-allowed flex items-center justify-center text-center select-none"
               >
                 Verify Email to Enable Payment
               </button>
@@ -991,7 +978,7 @@ function CheckoutContent() {
                 type="button"
                 onClick={handleProceedToPayment}
                 disabled={quoteLoading || isSubmitting}
-                className="w-full h-13 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base rounded-xl transition-all shadow-lg shadow-[#0033FF]/25 hover:shadow-xl hover:shadow-[#0033FF]/30 disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer"
+                className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all shadow-md shadow-[#0033FF]/20 hover:shadow-lg hover:shadow-[#0033FF]/30 disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer select-none"
               >
                 {isSubmitting || quoteLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin text-white" />
@@ -1050,7 +1037,7 @@ function CheckoutContent() {
         </div>
 
         {/* Footer Terms & Policy Links */}
-        <div className="w-full max-w-lg mx-auto pt-6 mt-6 border-t border-neutral-200 text-center text-xs text-neutral-500 leading-normal">
+        <div className="w-full max-w-lg mx-auto px-6 sm:px-8 pb-6 sm:pb-8 pt-4 text-center text-xs text-neutral-500 leading-normal">
           <p>
             By completing this payment, you agree to the{' '}
             <Link href="/terms" className="underline hover:text-neutral-800">
