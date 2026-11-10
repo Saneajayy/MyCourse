@@ -489,7 +489,7 @@ function StudentDashboardContent() {
         {isMobileMenuOpen && (
           <div className="w-full bg-[#0033FF] border-t border-white/50 relative overflow-hidden transition-all animate-in slide-in-from-top-2 duration-150">
             {/* Background halftone image shifted to the right, full-bleed with no left cut-off */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-25">
+            <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-15">
               <Image
                 src="/login-pixelated.png"
                 alt=""
@@ -565,7 +565,7 @@ function StudentDashboardContent() {
             sizes="300px"
             priority
             style={{ objectPosition: '35% center' }}
-            className="object-cover mix-blend-screen opacity-35 select-none"
+            className="object-cover mix-blend-screen opacity-15 select-none"
           />
         </div>
 
