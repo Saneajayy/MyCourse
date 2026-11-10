@@ -640,7 +640,7 @@ function StudentDashboardContent() {
               {courses.length === 0 && !coursesError && (
                 <div className="bg-white border border-neutral-200 rounded-xl p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
                   <div className="space-y-1">
-                    <h2 className="text-lg font-bold text-neutral-900">NO ACTIVE COURSES.</h2>
+                    <h2 className="text-lg font-bold text-neutral-900 uppercase">NO ACTIVE COURSES.</h2>
                     <p className="text-xs text-neutral-500 leading-relaxed">
                       You are not currently enrolled in any courses. Explore our masterclass to start learning.
                     </p>
@@ -741,14 +741,14 @@ function StudentDashboardContent() {
               </div>
 
               {completedCourses.length === 0 ? (
-                <div className="bg-white border border-neutral-200 rounded-xl p-8 text-left space-y-4 max-w-md shadow-none">
+                <div className="bg-white border border-neutral-200 rounded-xl p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
                   <div className="space-y-1">
-                    <h2 className="text-lg font-bold text-neutral-900">No Certificates Earned Yet</h2>
+                    <h2 className="text-lg font-bold text-neutral-900 uppercase">NO CERTIFICATES EARNED YET.</h2>
                     <p className="text-xs text-neutral-500 leading-relaxed">
                       Complete all lesson modules and practical evaluations in your enrolled courses to automatically unlock your verified certificate.
                     </p>
                   </div>
-                  <div className="pt-1">
+                  <div>
                     <button
                       type="button"
                       onClick={() => handleTabChange('courses')}
@@ -1016,9 +1016,9 @@ function StudentDashboardContent() {
                   <span>Loading payment orders...</span>
                 </div>
               ) : orders.length === 0 ? (
-                <div className="bg-white border border-neutral-200 rounded-xl p-8 text-left space-y-4 max-w-md shadow-none">
+                <div className="bg-white border border-neutral-200 rounded-xl p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
                   <div className="space-y-1">
-                    <h2 className="text-lg font-bold text-neutral-900">No Previous Orders</h2>
+                    <h2 className="text-lg font-bold text-neutral-900 uppercase">NO PREVIOUS ORDERS.</h2>
                     <p className="text-xs text-neutral-500 leading-relaxed">
                       You haven&apos;t made any course purchases yet.
                     </p>
