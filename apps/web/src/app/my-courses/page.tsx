@@ -1,23 +1,39 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/auth-context';
 import { apiClient, ApiError } from '../../lib/api-client';
+import { formatDisplayOrderId } from '../../lib/order';
+import { siteConfig } from '../../config/site';
+import { useToast } from '../../components/ui';
 import {
-  Loader2,
+  BookOpen,
+  Award,
   User as UserIcon,
-  ArrowRight,
-  Sparkles,
+  Laptop,
+  Smartphone,
+  Receipt,
+  LogOut,
   Search,
   X,
-  Award,
-  BookOpen,
   Check,
+  CheckCircle2,
+  AlertCircle,
   ShieldCheck,
+  Download,
+  Loader2,
+  Sparkles,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Calendar,
+  Lock,
 } from 'lucide-react';
-import { ScatterCanvas } from '../../components/ui';
+
+export type DashboardTab = 'courses' | 'certificates' | 'profile' | 'devices' | 'orders';
 
 interface EnrolledCourse {
   product: {
@@ -45,112 +61,30 @@ interface EnrolledCourse {
   } | null;
 }
 
-function MyCoursesNavbar({
-  searchQuery,
-  setSearchQuery,
-}: {
-  searchQuery: string;
-  setSearchQuery: (q: string) => void;
-}) {
-  const { user, logout } = useAuth();
+interface SessionData {
+  id: string;
+  userAgent: string | null;
+  ipAddress: string | null;
+  lastUsedAt: string;
+  createdAt: string;
+  isCurrent: boolean;
+}
 
-  return (
-    <header className="fixed top-0 inset-x-0 z-50 w-full figma-glass-nav font-reddit select-none">
-      <nav
-        aria-label="Student Learning Navigation"
-        className="w-full h-20 md:h-[84px] flex items-stretch justify-between"
-      >
-        {/* Left Side: Brand Logo + Search Bar Right Next to HYDRO BASICS */}
-        <div className="flex items-center pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 gap-4 sm:gap-6 lg:gap-8 flex-1 min-w-0 pr-4">
-          <Link
-            href="/"
-            className="flex flex-col justify-center -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity shrink-0"
-            aria-label="HYDRO BASICS Home"
-          >
-            <span className="font-extrabold text-[19px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-              HYDRO
-            </span>
-            <span className="font-extrabold text-[19px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-              BASICS
-            </span>
-          </Link>
-
-          {/* Search Bar Right Next to HYDRO BASICS */}
-          <div className="relative w-full max-w-[170px] xs:max-w-[210px] sm:max-w-[280px] md:max-w-[340px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search courses..."
-              aria-label="Search courses"
-              className="w-full h-9 sm:h-10 pl-9 pr-7 rounded-lg bg-white/10 hover:bg-white/15 focus:bg-white/20 border border-white/20 focus:border-white text-white placeholder-white/60 text-xs sm:text-sm font-medium focus:outline-none transition-all"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-white/60 hover:text-white p-1 cursor-pointer"
-                aria-label="Clear search"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Right Side: Account & Logout Action Cells (My Courses button removed) */}
-        <div className="flex items-stretch shrink-0">
-          {/* Admin Panel Quick Link (Visible only to Admin users) */}
-          {user?.role === 'ADMIN' && (
-            <Link
-              href="/admin"
-              className="flex items-center gap-2 self-center px-3.5 py-1.5 mr-3 rounded-lg bg-white/15 hover:bg-white/25 border border-white/30 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm"
-              title="Open Admin Console"
-            >
-              <ShieldCheck className="w-4 h-4 text-emerald-400 stroke-[2.5]" />
-              <span>Admin Panel</span>
-            </Link>
-          )}
-          {/* Account Profile Icon Cell */}
-          <Link
-            href="/account"
-            className="figma-glass-divider h-full flex items-center justify-center px-4 sm:px-6 lg:px-8 text-white/90 hover:text-white hover:bg-white/10 transition-colors"
-            aria-label="Student Account Profile"
-            title="Account"
-          >
-            <UserIcon className="w-5 h-5 text-white stroke-[2]" />
-          </Link>
-
-          {/* Logout Action Cell */}
-          <div className="figma-glass-divider border-r border-white/20 h-full flex items-stretch">
-            <button
-              type="button"
-              onClick={() => logout()}
-              className="h-full flex items-center justify-center px-4 sm:px-6 lg:px-8 text-white/90 hover:text-white hover:bg-white/10 transition-colors cursor-pointer focus:outline-none"
-              title="Log out"
-              aria-label="Log out"
-            >
-              <svg
-                className="w-5 h-5 text-white"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </nav>
-    </header>
-  );
+interface OrderHistoryItem {
+  id: string;
+  orderNumber?: string;
+  status: string;
+  amountPaise: number;
+  currency: string;
+  createdAt: string;
+  product: {
+    title: string;
+    slug: string;
+  };
+  invoice?: {
+    id: string;
+    invoiceNumber: string;
+  } | null;
 }
 
 function formatExpiryDate(expiresAt: string | null | undefined, isLifetime?: boolean): string {
@@ -172,438 +106,1051 @@ function formatExpiryDate(expiresAt: string | null | undefined, isLifetime?: boo
     }
   };
   const monthNames = [
-    'JANUARY',
-    'FEBRUARY',
-    'MARCH',
-    'APRIL',
-    'MAY',
-    'JUNE',
-    'JULY',
-    'AUGUST',
-    'SEPTEMBER',
-    'OCTOBER',
-    'NOVEMBER',
-    'DECEMBER',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
-  return `EXPIRES ON ${day}${suffix(day)} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+  return `Expires ${day}${suffix(day)} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-function formatCourseTitle(title?: string): string {
-  if (!title) return 'UNTITLED COURSE.';
-  const t = title.trim().toUpperCase();
-  return t.endsWith('.') ? t : `${t}.`;
-}
-
-function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
-  const clamped = Math.max(0, Math.min(100, Math.round(percent)));
-
-  return (
-    <div
-      className="w-full flex items-center h-[18px] sm:h-5 select-none my-3 sm:my-3.5 overflow-hidden"
-      aria-label={`Course progress: ${clamped}%`}
-      role="progressbar"
-      aria-valuenow={clamped}
-      aria-valuemin={0}
-      aria-valuemax={100}
-    >
-      {/* Completed portion with dense electric blue vertical bars */}
-      {clamped > 0 && (
-        <div
-          className="h-full shrink-0"
-          style={{
-            width: clamped >= 100 ? '100%' : `calc(${clamped}% - 14px)`,
-            minWidth: clamped > 0 && clamped < 100 ? '8px' : undefined,
-            backgroundImage:
-              'repeating-linear-gradient(to right, #0033FF 0px, #0033FF 1.5px, transparent 1.5px, transparent 4px)',
-          }}
-        />
-      )}
-
-      {/* Percentage Label */}
-      <span
-        className={`text-[#0033FF] font-medium text-[11px] sm:text-xs leading-none shrink-0 select-none ${clamped === 0 ? 'pr-1.5' : clamped === 100 ? 'pl-1.5' : 'px-1.5'
-          }`}
-      >
-        {clamped}%
-      </span>
-
-      {/* Uncompleted portion with faint lavender-gray vertical bars */}
-      {clamped < 100 && (
-        <div
-          className="flex-1 h-full"
-          style={{
-            backgroundImage:
-              'repeating-linear-gradient(to right, #DFE4FA 0px, #DFE4FA 1.5px, transparent 1.5px, transparent 4px)',
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
-export default function MyCoursesPage() {
+function StudentDashboardContent() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
+  const searchParams = useSearchParams();
+  const { user, isAuthenticated, isLoading: authLoading, refreshUser, logout } = useAuth();
+  const { error: toastError, success: toastSuccess } = useToast();
 
+  const tabParam = searchParams.get('tab') as DashboardTab | null;
+  const [activeTab, setActiveTab] = useState<DashboardTab>(
+    tabParam && ['courses', 'certificates', 'profile', 'devices', 'orders'].includes(tabParam)
+      ? tabParam
+      : 'courses',
+  );
+
+  // Sync tab with URL query parameter without full reloads
+  const handleTabChange = (newTab: DashboardTab) => {
+    setActiveTab(newTab);
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', newTab);
+    window.history.replaceState({}, '', url.toString());
+  };
+
+  // Courses state
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'courses' | 'certificates'>('courses');
+  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [coursesError, setCoursesError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Profile state
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [resendingVerification, setResendingVerification] = useState(false);
+
+  // Password state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  // Sessions state
+  const [sessions, setSessions] = useState<SessionData[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [revokingSessionId, setRevokingSessionId] = useState<string | null>(null);
+  const [loggingOutAll, setLoggingOutAll] = useState(false);
+
+  // Orders state
+  const [orders, setOrders] = useState<OrderHistoryItem[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+
+  // Auth guard
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login?redirect=/my-courses');
       return;
     }
-
-    if (!isAuthenticated) return;
-
-    // Admin users must never see the student dashboard - redirect immediately to /admin
     if (user?.role === 'ADMIN') {
       router.replace('/admin');
+    }
+  }, [authLoading, isAuthenticated, user, router]);
+
+  // Sync user profile fields
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setPhone(user.phone || '');
+    }
+  }, [user]);
+
+  // 1. Fetch Enrolled Courses
+  const fetchMyCourses = useCallback(async () => {
+    setCoursesLoading(true);
+    setCoursesError(null);
+    try {
+      const res = await apiClient<EnrolledCourse[]>('/me/courses');
+      setCourses(res);
+    } catch (err: unknown) {
+      if (
+        (err instanceof ApiError && (err.status === 401 || err.status === 403)) ||
+        (err instanceof Error &&
+          (err.message.toLowerCase().includes('authentication') ||
+            err.message.toLowerCase().includes('token') ||
+            err.message.toLowerCase().includes('session') ||
+            err.message.toLowerCase().includes('unauthorized')))
+      ) {
+        await logout();
+        router.push('/login?redirect=/my-courses&message=session-expired');
+        return;
+      }
+      setCoursesError(err instanceof Error ? err.message : 'Failed to load courses');
+    } finally {
+      setCoursesLoading(false);
+    }
+  }, [logout, router]);
+
+  // 2. Fetch Sessions
+  const loadSessions = useCallback(async () => {
+    setSessionsLoading(true);
+    try {
+      const data = await apiClient<{ sessions: SessionData[] }>('/sessions');
+      setSessions(data.sessions || []);
+    } catch (err: unknown) {
+      toastError('Failed to load devices', err instanceof Error ? err.message : 'Error');
+    } finally {
+      setSessionsLoading(false);
+    }
+  }, [toastError]);
+
+  // 3. Fetch Orders
+  const loadOrders = useCallback(async () => {
+    setOrdersLoading(true);
+    try {
+      const data = await apiClient<OrderHistoryItem[]>('/orders');
+      setOrders(data);
+    } catch (err: unknown) {
+      toastError('Failed to load orders', err instanceof Error ? err.message : 'Error');
+    } finally {
+      setOrdersLoading(false);
+    }
+  }, [toastError]);
+
+  // Initial load
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchMyCourses();
+    }
+  }, [isAuthenticated, fetchMyCourses]);
+
+  // Lazy load tab data on switch
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (activeTab === 'devices' && sessions.length === 0) {
+        loadSessions();
+      } else if (activeTab === 'orders' && orders.length === 0) {
+        loadOrders();
+      }
+    }
+  }, [activeTab, isAuthenticated, sessions.length, orders.length, loadSessions, loadOrders]);
+
+  // Profile save handler
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileSaving(true);
+    try {
+      await apiClient('/auth/me', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: name.trim() || undefined,
+          phone: phone.trim() || undefined,
+        }),
+      });
+      await refreshUser();
+      toastSuccess('Profile Updated', 'Your profile details have been saved.');
+    } catch (err: unknown) {
+      toastError('Update Failed', err instanceof Error ? err.message : 'Failed to update profile');
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
+  // Change password handler
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+    if (newPassword.length < 8) {
+      setPasswordError('Password must be at least 8 characters long');
       return;
     }
 
-    async function fetchMyCourses() {
-      try {
-        const res = await apiClient<EnrolledCourse[]>('/me/courses');
-        setCourses(res);
-      } catch (err: unknown) {
-        if (
-          (err instanceof ApiError && (err.status === 401 || err.status === 403)) ||
-          (err instanceof Error &&
-            (err.message.toLowerCase().includes('authentication') ||
-              err.message.toLowerCase().includes('token') ||
-              err.message.toLowerCase().includes('session') ||
-              err.message.toLowerCase().includes('unauthorized')))
-        ) {
-          await logout();
-          router.push('/login?redirect=/my-courses&message=session-expired');
-          return;
-        }
-        setErrorMsg(err instanceof Error ? err.message : 'Failed to load courses');
-      } finally {
-        setLoading(false);
-      }
+    setPasswordSaving(true);
+    try {
+      await apiClient('/auth/change-password', {
+        method: 'POST',
+        body: JSON.stringify({
+          currentPassword,
+          newPassword,
+        }),
+      });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      toastSuccess('Password Changed', 'Password updated successfully. Please log in again.');
+      await logout();
+      router.push('/login?message=password-changed');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to change password';
+      setPasswordError(msg);
+      toastError('Password Change Failed', msg);
+    } finally {
+      setPasswordSaving(false);
     }
+  };
 
-    fetchMyCourses();
-  }, [isAuthenticated, authLoading, router, logout]);
+  // Resend verification email
+  const handleResendVerification = async () => {
+    setResendingVerification(true);
+    try {
+      await apiClient('/auth/resend-verification', { method: 'POST' });
+      toastSuccess('Verification Sent', 'Please check your inbox for the code.');
+    } catch (err: unknown) {
+      toastError('Error', err instanceof Error ? err.message : 'Could not send verification email');
+    } finally {
+      setResendingVerification(false);
+    }
+  };
 
-  // Filter courses based on user's search query in the main navbar
-  const filteredCourses = courses.filter((c) => {
-    if (!searchQuery.trim()) return true;
+  // Revoke individual device session
+  const handleRevokeSession = async (sessionId: string) => {
+    setRevokingSessionId(sessionId);
+    try {
+      await apiClient(`/sessions/${sessionId}`, { method: 'DELETE' });
+      setSessions((prev) => prev.filter((s) => s.id !== sessionId));
+      toastSuccess('Session Revoked', 'Device has been signed out.');
+    } catch (err: unknown) {
+      toastError('Error', err instanceof Error ? err.message : 'Failed to revoke session');
+    } finally {
+      setRevokingSessionId(null);
+    }
+  };
+
+  // Log out all devices
+  const handleLogoutEverywhere = async () => {
+    setLoggingOutAll(true);
+    try {
+      await apiClient('/auth/logout-all', { method: 'POST' });
+      toastSuccess('Logged Out Everywhere', 'All active sessions have been invalidated.');
+      await logout();
+      router.push('/login');
+    } catch (err: unknown) {
+      toastError('Error', err instanceof Error ? err.message : 'Failed to logout everywhere');
+      setLoggingOutAll(false);
+    }
+  };
+
+  // Search filtered courses
+  const filteredCourses = useMemo(() => {
+    if (!searchQuery.trim()) return courses;
     const q = searchQuery.toLowerCase().trim();
-    return (
-      c.product.title.toLowerCase().includes(q) ||
-      c.product.slug.toLowerCase().includes(q)
+    return courses.filter(
+      (c) =>
+        c.product.title.toLowerCase().includes(q) ||
+        c.product.slug.toLowerCase().includes(q),
     );
-  });
+  }, [courses, searchQuery]);
 
-  // Calculate completed courses for certificates tab
-  const completedCourses = courses.filter(
-    (c) => (c.progress?.percentComplete ?? 0) >= 100,
-  );
+  // Completed courses with certificates
+  const completedCourses = useMemo(() => {
+    return courses.filter((c) => (c.progress?.percentComplete ?? 0) >= 100);
+  }, [courses]);
 
-  // Admin users must never see student dashboard content
-  if (user?.role === 'ADMIN') {
+  if (authLoading || (coursesLoading && courses.length === 0)) {
     return (
-      <div className="bg-[#00186B] min-h-screen text-white font-reddit flex items-center justify-center">
-        <div className="text-white text-sm font-bold flex items-center gap-3">
-          <Loader2 className="w-5 h-5 animate-spin" />
-          <span>Redirecting to Admin Console...</span>
-        </div>
+      <div className="fixed inset-0 w-full h-full bg-[#00186B] text-white font-reddit flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="w-10 h-10 animate-spin text-white" />
+        <p className="text-sm font-bold tracking-wider uppercase text-blue-200">
+          Loading Student Portal...
+        </p>
       </div>
     );
   }
 
-  if (authLoading || loading) {
-    return (
-      <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
-        <div className="noise-texture" aria-hidden="true" />
-        <MyCoursesNavbar searchQuery="" setSearchQuery={() => { }} />
-        <div className="w-full flex-1 flex flex-col items-center justify-center py-28 space-y-4">
-          <Loader2 className="w-10 h-10 animate-spin text-white" />
-          <p className="text-sm font-semibold tracking-wider uppercase text-white/80">
-            Loading Enrolled Courses...
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const navTabs: { id: DashboardTab; label: string; icon: React.ElementType }[] = [
+    { id: 'courses', label: 'My Courses', icon: BookOpen },
+    { id: 'certificates', label: 'My Certificates', icon: Award },
+    { id: 'profile', label: 'Profile', icon: UserIcon },
+    { id: 'devices', label: 'Devices', icon: Laptop },
+    { id: 'orders', label: 'Payment Orders', icon: Receipt },
+  ];
 
   return (
-    <div className="bg-[#0033FF] min-h-screen text-white font-reddit relative selection:bg-white selection:text-[#0033FF] overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
-      {/* Background Noise Texture Overlay */}
-      <div className="noise-texture" aria-hidden="true" />
-
-      {/* 3D Hydraulic Mechanism Halftone Graphic in the Right Bottom Corner (Enlarged +30%, Flipped Horizontally) */}
-      <div className="absolute right-0 bottom-0 w-[117vw] sm:w-[98vw] md:w-[80vw] lg:w-[68vw] xl:w-[60vw] max-w-[1320px] min-w-[490px] pointer-events-none flex items-end justify-end z-0 translate-x-[8%] sm:translate-x-[4%] lg:translate-x-0">
-        <ScatterCanvas
-          dotsUrl="/mycourse2-dots.json"
-          fallbackSrc="/mycourse2-pixelated.png"
-          alt="Hydraulic System 3D Mechanism"
-          width={3072}
-          height={2048}
-          rotationDeg={0}
-          flipH={true}
-          containerClassName="w-full h-auto aspect-[1536/1024] flex items-end justify-end -scale-x-100"
-          imgClassName="w-full h-auto object-contain object-bottom-right"
-          opacityClass="opacity-75 sm:opacity-85"
-          priority
-        />
-      </div>
-
-      {/* Spacious Floating Glass Navbar with Search Bar Right Next to Logo */}
-      <MyCoursesNavbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-
-
-      {/* Main Student Portal Content - Aligned directly under the navbar logo */}
-      <main className="relative z-10 flex-1 w-full py-8 sm:py-10 md:py-12 pb-16 sm:pb-24 pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 pr-6 sm:pr-8 md:pr-12 lg:pr-16">
-        {/* Header Block: STUDENT DASHBOARD. */}
-        <div className="mb-5 sm:mb-6 select-none">
-          <h1 className="font-extrabold text-white uppercase leading-[0.88] tracking-[-0.02em] text-4xl sm:text-5xl md:text-6xl lg:text-[72px] select-none">
-            <span className="block">STUDENT</span>
-            <span className="block">DASHBOARD.</span>
-          </h1>
+    <div className="min-h-screen w-full bg-[#F8FAFC] font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col md:flex-row">
+      {/* ============================================================== */}
+      {/* 1. LEFT BLUE COLUMN (Sidebar)                                  */}
+      {/* ============================================================== */}
+      <aside className="w-full md:w-64 lg:w-72 md:fixed md:top-0 md:bottom-0 md:left-0 bg-[#00186B] text-white flex flex-col justify-between shrink-0 z-30 select-none shadow-lg overflow-y-auto">
+        {/* Subtle signature halftone watermark texture */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-10">
+          <Image
+            src="/login-pixelated.png"
+            alt=""
+            fill
+            sizes="300px"
+            className="object-cover object-top mix-blend-screen"
+          />
         </div>
 
-        {/* Sub-Navbar Under Title: My Courses & My Certificates */}
-        <div className="flex items-center select-none mb-8 sm:mb-10">
-          <div
-            role="tablist"
+        {/* Top: Brand Logo + Navigation Items */}
+        <div className="relative z-10 p-5 sm:p-6 pb-2">
+          {/* Brand Logo in Pure White */}
+          <div className="pb-6 pt-1">
+            <Link
+              href="/"
+              className="flex flex-col -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity select-none"
+              aria-label="HYDRO BASICS Home - Back to Course"
+            >
+              <span className="font-extrabold text-[22px] sm:text-[24px] tracking-[0.02em] uppercase leading-[0.92]">
+                HYDRO
+              </span>
+              <span className="font-extrabold text-[22px] sm:text-[24px] tracking-[0.02em] uppercase leading-[0.92]">
+                BASICS
+              </span>
+            </Link>
+          </div>
+
+          {/* Navigation Tabs (Vertical on desktop, scrollable row on mobile) */}
+          <nav
             aria-label="Student Dashboard Navigation"
-            className="inline-flex items-stretch rounded-lg sm:rounded-xl overflow-hidden border border-white bg-transparent"
+            className="flex md:flex-col gap-1.5 overflow-x-auto md:overflow-visible pb-2 md:pb-0 no-scrollbar"
           >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === 'courses'}
-              onClick={() => setActiveTab('courses')}
-              className={`h-10 sm:h-11 px-5 sm:px-7 text-xs sm:text-sm font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 ${activeTab === 'courses'
-                ? 'bg-white text-[#0033FF]'
-                : 'bg-transparent text-white hover:bg-white/10 active:bg-white/20'
-                }`}
-            >
-              <BookOpen className="w-4 h-4 shrink-0 -translate-x-1 sm:-translate-x-1.5" />
-              <span>My Courses</span>
-            </button>
-
-            {/* Vertical Partition Line Touching the Buttons */}
-            <div className="w-px bg-white self-stretch shrink-0" aria-hidden="true" />
-
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activeTab === 'certificates'}
-              onClick={() => setActiveTab('certificates')}
-              className={`h-10 sm:h-11 px-5 sm:px-7 text-xs sm:text-sm font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 ${activeTab === 'certificates'
-                ? 'bg-white text-[#0033FF]'
-                : 'bg-transparent text-white hover:bg-white/10 active:bg-white/20'
-                }`}
-            >
-              <Award className="w-4 h-4 shrink-0 -translate-x-1 sm:-translate-x-1.5" />
-              <span>My Certificates</span>
-            </button>
-          </div>
+            {navTabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer shrink-0 text-left ${isActive
+                    ? 'bg-white text-[#00186B] shadow-md'
+                    : 'text-blue-100/80 hover:text-white hover:bg-white/10 active:bg-white/15'
+                    }`}
+                >
+                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#00186B]' : 'text-blue-200'}`} />
+                  <span className="whitespace-nowrap">{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
         </div>
 
-        {/* Error Banner */}
-        {errorMsg && (
-          <div className="mb-8 p-4 rounded-lg bg-rose-500/20 border border-rose-400/40 text-rose-100 text-sm font-bold">
-            {errorMsg}
+        {/* Bottom: Student Profile Cell + Log Out Action */}
+        <div className="relative z-10 p-5 sm:p-6 pt-3 border-t border-white/10 mt-auto">
+          {/* Quick User Info */}
+          <div className="flex items-center gap-3 px-1 py-2 mb-2">
+            <div className="w-9 h-9 rounded-full bg-white/15 text-white font-black text-xs flex items-center justify-center shrink-0 border border-white/20 uppercase">
+              {user?.name ? user.name.slice(0, 2) : 'ST'}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold text-white truncate">
+                {user?.name || 'Student'}
+              </p>
+              <p className="text-[11px] text-blue-200/70 truncate">
+                {user?.email || ''}
+              </p>
+            </div>
           </div>
-        )}
 
-        {/* TAB 1: MY COURSES */}
-        {activeTab === 'courses' && (
-          <>
-            {/* Empty State: No Enrolled Courses */}
-            {courses.length === 0 && !errorMsg && (
-              <div className="relative w-full max-w-[420px] sm:max-w-[450px] bg-white rounded-lg sm:rounded-xl p-5 sm:p-6 select-none flex flex-col justify-between my-4">
-                <div className="w-full flex flex-col justify-between text-neutral-900">
-                  <div className="my-2 sm:my-3">
-                    <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0033FF] tracking-tight leading-tight uppercase">
-                      NO ACTIVE COURSES.
-                    </h2>
-                    <p className="mt-2 text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
-                      You are not currently enrolled in any courses. Explore our hydraulic system basics masterclass to start learning.
+          {/* Admin Switch Link (only for admins) */}
+          {user?.role === 'ADMIN' && (
+            <Link
+              href="/admin"
+              className="w-full mb-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-white/15 hover:bg-white/25 text-white font-bold text-xs uppercase tracking-wider transition-colors"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Admin Console</span>
+            </Link>
+          )}
+
+          {/* Log Out Tab Button */}
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-rose-200 hover:text-white hover:bg-rose-500/20 font-bold text-xs sm:text-sm transition-colors cursor-pointer text-left"
+          >
+            <LogOut className="w-4 h-4 shrink-0" />
+            <span>Log Out</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* ============================================================== */}
+      {/* 2. RIGHT WHITE WORKSPACE (Minimal Cards Content)               */}
+      {/* ============================================================== */}
+      <main className="flex-1 md:pl-64 lg:pl-72 w-full min-h-screen bg-[#F8FAFC] flex flex-col">
+        <div className="w-full max-w-5xl mx-auto p-5 sm:p-8 lg:p-10 space-y-6">
+
+          {/* TAB 1: MY COURSES */}
+          {activeTab === 'courses' && (
+            <div className="space-y-6">
+              {/* Header with Title + Search Filter */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
+                    My Courses
+                  </h1>
+                  <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+                    Continue learning and master industrial hydraulic systems.
+                  </p>
+                </div>
+
+                {/* Minimal Search Bar */}
+                {courses.length > 0 && (
+                  <div className="relative w-full sm:w-72">
+                    <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder="Search courses..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full h-10 pl-9 pr-8 bg-white border border-neutral-200 rounded-xl text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:outline-none transition-all shadow-sm"
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1"
+                        aria-label="Clear search"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Error Notice */}
+              {coursesError && (
+                <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-semibold flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <span>{coursesError}</span>
+                </div>
+              )}
+
+              {/* Empty State: No Courses Enrolled */}
+              {courses.length === 0 && !coursesError && (
+                <div className="bg-white border border-neutral-200/90 rounded-2xl p-8 sm:p-12 text-center space-y-4 max-w-lg mx-auto shadow-sm">
+                  <div className="w-14 h-14 rounded-full bg-blue-50 text-[#0033FF] flex items-center justify-center mx-auto">
+                    <BookOpen className="w-7 h-7" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <h2 className="text-xl font-bold text-neutral-900">No Enrolled Courses Yet</h2>
+                    <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed max-w-sm mx-auto">
+                      You are not currently enrolled in any course. Explore our industrial hydraulic engineering masterclass to get started.
                     </p>
                   </div>
-
-                  <div className="w-full mt-4">
+                  <div className="pt-2">
                     <Link
                       href="/#pricing"
-                      className="w-full h-11 sm:h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020B8] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase rounded-md sm:rounded-lg flex items-center justify-center transition-colors select-none gap-2"
+                      className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-sm"
                     >
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>EXPLORE MASTERCLASS</span>
-                      <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <Sparkles className="w-4 h-4" />
+                      <span>Explore Masterclass</span>
                     </Link>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Empty Search Filter State */}
-            {courses.length > 0 && filteredCourses.length === 0 && (
-              <div className="relative w-full max-w-[420px] sm:max-w-[450px] bg-white rounded-lg sm:rounded-xl p-5 sm:p-6 select-none flex flex-col justify-between my-4">
-                <div className="w-full flex flex-col justify-between text-neutral-900">
-                  <div className="my-2 sm:my-3">
-                    <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0033FF] tracking-tight leading-tight uppercase">
-                      NO MATCHING COURSES.
-                    </h2>
-                    <p className="mt-2 text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
-                      No courses match &ldquo;{searchQuery}&rdquo;. Try another search term or clear the search.
+              {/* Empty Search Filter State */}
+              {courses.length > 0 && filteredCourses.length === 0 && (
+                <div className="bg-white border border-neutral-200/90 rounded-2xl p-8 text-center space-y-3 shadow-sm">
+                  <p className="text-sm font-bold text-neutral-800">
+                    No courses match &ldquo;{searchQuery}&rdquo;
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="text-xs font-bold text-[#0033FF] hover:underline cursor-pointer"
+                  >
+                    Clear Search
+                  </button>
+                </div>
+              )}
+
+              {/* Courses Grid: Minimal White Cards */}
+              {filteredCourses.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                  {filteredCourses.map((c) => {
+                    const percent = Math.min(100, Math.max(0, Math.round(c.progress?.percentComplete ?? 0)));
+                    const completed = c.progress?.completedLessons ?? 0;
+                    const total = c.progress?.totalLessons ?? 24;
+
+                    return (
+                      <div
+                        key={c.product.id}
+                        className="bg-white border border-neutral-200/90 hover:border-neutral-300 rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4 group"
+                      >
+                        <div className="space-y-3.5">
+                          {/* Top Row: Expiry Badge & Status */}
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-[#0033FF] text-[11px] font-bold tracking-wide uppercase">
+                              <Calendar className="w-3 h-3 text-[#0033FF]" />
+                              <span>{formatExpiryDate(c.entitlement?.expiresAt, c.entitlement?.isLifetime)}</span>
+                            </span>
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                              <span>Active</span>
+                            </span>
+                          </div>
+
+                          {/* Thumbnail Image */}
+                          <div className="relative w-full aspect-[16/10] rounded-xl overflow-hidden bg-neutral-100 border border-neutral-100">
+                            <img
+                              src={c.product.thumbnailUrl || '/course.jpg'}
+                              alt={c.product.title}
+                              className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300 select-none"
+                            />
+                          </div>
+
+                          {/* Course Title */}
+                          <h2 className="font-bold text-neutral-900 text-lg sm:text-xl tracking-tight leading-snug group-hover:text-[#0033FF] transition-colors">
+                            {c.product.title}
+                          </h2>
+
+                          {/* Progress Bar with Clean Numeric Info */}
+                          <div className="space-y-1.5 pt-1">
+                            <div className="flex items-center justify-between text-xs text-neutral-500 font-semibold">
+                              <span>{percent}% Complete</span>
+                              <span>{completed} of {total} lessons</span>
+                            </div>
+                            <div className="w-full h-2 bg-neutral-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-[#0033FF] rounded-full transition-all duration-300"
+                                style={{ width: `${percent}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Full Width Primary CTA */}
+                        <div className="pt-2">
+                          <Link
+                            href={`/learn/${c.product.slug}`}
+                            className="w-full h-11 sm:h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-xs sm:text-sm tracking-wide uppercase rounded-xl flex items-center justify-center gap-2 transition-all shadow-sm"
+                          >
+                            <span>Continue learning</span>
+                            <ArrowRight className="w-4 h-4" />
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 2: MY CERTIFICATES */}
+          {activeTab === 'certificates' && (
+            <div className="space-y-6">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
+                  My Certificates
+                </h1>
+                <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+                  Official verifiable certificates of completion signed by instructor HiraLal.
+                </p>
+              </div>
+
+              {completedCourses.length === 0 ? (
+                <div className="bg-white border border-neutral-200/90 rounded-2xl p-8 sm:p-12 text-center space-y-4 max-w-lg mx-auto shadow-sm">
+                  <div className="w-14 h-14 rounded-full bg-blue-50 text-[#0033FF] flex items-center justify-center mx-auto">
+                    <Award className="w-7 h-7" />
+                  </div>
+                  <div className="space-y-1.5">
+                    <h2 className="text-xl font-bold text-neutral-900">No Certificates Earned Yet</h2>
+                    <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed max-w-sm mx-auto">
+                      Complete all lesson modules and practical evaluations in your enrolled courses to automatically unlock your verified certificate.
                     </p>
                   </div>
-
-                  <div className="w-full mt-4">
+                  <div className="pt-2">
                     <button
                       type="button"
-                      onClick={() => setSearchQuery('')}
-                      className="w-full h-11 sm:h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020B8] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase rounded-md sm:rounded-lg flex items-center justify-center transition-colors select-none cursor-pointer"
+                      onClick={() => handleTabChange('courses')}
+                      className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-sm cursor-pointer"
                     >
-                      CLEAR SEARCH
+                      <BookOpen className="w-4 h-4" />
+                      <span>Go to My Courses</span>
                     </button>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Enrolled Courses Grid: Clean White Card with Subtle Rounded Edges */}
-            {filteredCourses.length > 0 && (
-              <div className="flex flex-wrap gap-6 sm:gap-8 items-start">
-                {filteredCourses.map((c) => {
-                  const displayPercent = c.progress?.percentComplete ?? 0;
-
-                  return (
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {completedCourses.map((c) => (
                     <div
                       key={c.product.id}
-                      className="relative w-full max-w-[420px] sm:max-w-[450px] bg-white rounded-lg sm:rounded-xl p-5 sm:p-6 pt-5 pb-6 select-none flex flex-col justify-between"
+                      className="bg-white border border-neutral-200/90 rounded-2xl p-6 shadow-sm space-y-4"
                     >
-                      {/* Card Interior Content */}
-                      <div className="w-full flex flex-col">
-                        {/* Expiration Date Header */}
-                        <div className="mb-2 sm:mb-2.5">
-                          <span className="text-[#0033FF] text-[11px] sm:text-[12px] font-medium tracking-wider uppercase select-none block">
-                            {formatExpiryDate(c.entitlement?.expiresAt, c.entitlement?.isLifetime)}
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200">
+                          <CheckCircle2 className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 block">
+                            Course Completed
                           </span>
+                          <h2 className="text-base font-bold text-neutral-900 truncate">
+                            {c.product.title}
+                          </h2>
                         </div>
-
-                        {/* Course Thumbnail Image */}
-                        <div className="relative w-full aspect-[16/10] rounded-md sm:rounded-lg overflow-hidden mb-3 sm:mb-3.5 select-none bg-neutral-100">
-                          <img
-                            src="/course.jpg"
-                            alt={c.product.title}
-                            className="w-full h-full object-cover select-none"
-                          />
-                        </div>
-
-                        {/* Course Title: HYDRAULIC SYSTEM BASICS. */}
-                        <h2 className="font-extrabold text-[#0033FF] uppercase text-[20px] sm:text-[22px] md:text-[23px] tracking-tight leading-tight select-none">
-                          {formatCourseTitle(c.product.title)}
-                        </h2>
-
-                        {/* Progress Bar with Close Vertical Bars and Percentage Label */}
-                        <CloseBarsProgressBar percent={displayPercent} />
-
-                        {/* Full-Width Solid Blue Continue Learning Action Button */}
-                        <Link
-                          href={`/learn/${c.product.slug}`}
-                          className="w-full h-11 sm:h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020B8] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase rounded-md sm:rounded-lg flex items-center justify-center transition-colors select-none"
-                        >
-                          <span>CONTINUE LEARNING</span>
-                        </Link>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </>
-        )}
 
-        {/* TAB 2: MY CERTIFICATES */}
-        {activeTab === 'certificates' && (
-          <>
-            {completedCourses.length === 0 ? (
-              <div className="relative w-full max-w-[450px] sm:max-w-[480px] bg-white rounded-lg sm:rounded-xl p-5 sm:p-7 select-none flex flex-col justify-between my-4">
-                <div className="w-full flex flex-col justify-between text-neutral-900">
-                  <div className="my-2 sm:my-3">
-                    <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0033FF] tracking-tight leading-tight uppercase">
-                      NO CERTIFICATES YET.
-                    </h2>
-                    <p className="mt-2 text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
-                      Complete all modules of your enrolled course to automatically unlock your verified certificate of completion signed by instructor HiraLal.
-                    </p>
+                      <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-100 text-xs text-neutral-600 space-y-1">
+                        <p><strong className="text-neutral-900">Credential:</strong> Verified Certificate of Completion</p>
+                        <p><strong className="text-neutral-900">Instructor:</strong> HiraLal</p>
+                      </div>
+
+                      <Link
+                        href={`/learn/${c.product.slug}`}
+                        className="w-full h-11 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Download Certificate</span>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 3: PROFILE */}
+          {activeTab === 'profile' && (
+            <div className="space-y-6">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
+                  Profile &amp; Account
+                </h1>
+                <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+                  Manage your personal details, email verification, and security credentials.
+                </p>
+              </div>
+
+              {/* Personal Details Card */}
+              <div className="bg-white border border-neutral-200/90 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+                <div className="flex items-center gap-3 pb-2 border-b border-neutral-100">
+                  <UserIcon className="w-5 h-5 text-[#0033FF]" />
+                  <h2 className="text-lg font-bold text-neutral-900">Personal Information</h2>
+                </div>
+
+                <form onSubmit={handleSaveProfile} className="space-y-4 max-w-xl">
+                  {/* Name Input */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-neutral-700 uppercase tracking-wide">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Your name"
+                      className="w-full h-11 px-3.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none transition-all shadow-sm"
+                    />
                   </div>
 
-                  <div className="w-full mt-4">
+                  {/* Email & Verification Badge */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-neutral-700 uppercase tracking-wide">
+                        Email Address
+                      </label>
+                      {user?.emailVerifiedAt ? (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                          <Check className="w-3 h-3 stroke-[3]" />
+                          <span>Verified</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+                          <AlertCircle className="w-3 h-3 stroke-[2.5]" />
+                          <span>Unverified</span>
+                        </span>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        disabled
+                        value={user?.email || ''}
+                        className="w-full h-11 px-3.5 bg-neutral-100 border border-neutral-200 rounded-xl text-sm text-neutral-600 cursor-not-allowed select-none"
+                      />
+                    </div>
+                    {!user?.emailVerifiedAt && (
+                      <div className="flex items-center gap-3 pt-1">
+                        <Link
+                          href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
+                          className="text-xs font-bold text-[#0033FF] hover:underline"
+                        >
+                          Enter 6-digit OTP &rarr;
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={handleResendVerification}
+                          disabled={resendingVerification}
+                          className="text-xs font-bold text-neutral-600 hover:text-black underline cursor-pointer disabled:opacity-50"
+                        >
+                          {resendingVerification ? 'Sending...' : 'Resend OTP'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Phone Input */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-neutral-700 uppercase tracking-wide">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+91 98765 43210"
+                      className="w-full h-11 px-3.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none transition-all shadow-sm"
+                    />
+                  </div>
+
+                  <div className="pt-2">
                     <button
-                      type="button"
-                      onClick={() => setActiveTab('courses')}
-                      className="w-full h-11 sm:h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020B8] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase rounded-md sm:rounded-lg flex items-center justify-center transition-colors select-none gap-2 cursor-pointer"
+                      type="submit"
+                      disabled={profileSaving}
+                      className="h-11 px-6 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                     >
-                      <div className="w-3.5 h-3.5" />
-                      <span>VIEW MY COURSES</span>
-                      <div className="w-3.5 h-3.5 stroke-[1.5]" />
+                      {profileSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                      <span>{profileSaving ? 'Saving...' : 'Save Profile'}</span>
                     </button>
                   </div>
-                </div>
+                </form>
               </div>
-            ) : (
-              <div className="flex flex-wrap gap-6 sm:gap-8 items-start">
-                {completedCourses.map((c) => (
-                  <div
-                    key={c.product.id}
-                    className="relative w-full max-w-[420px] sm:max-w-[450px] bg-white rounded-lg sm:rounded-xl p-5 sm:p-6 pt-5 pb-6 select-none flex flex-col justify-between"
-                  >
-                    <div className="w-full flex flex-col">
-                      <div className="flex items-center justify-between mb-2.5">
-                        <span className="text-[#0033FF] text-[11px] sm:text-[12px] font-medium tracking-wider uppercase select-none block">
-                          CERTIFICATE OF COMPLETION
-                        </span>
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase tracking-wider border border-emerald-200">
-                          <Check className="w-3 h-3 stroke-[3]" />
-                          ISSUED
-                        </span>
-                      </div>
 
-                      <div className="relative w-full aspect-[16/10] rounded-md sm:rounded-lg overflow-hidden mb-3 sm:mb-3.5 select-none bg-neutral-900 border border-[#0033FF]/15">
-                        <img
-                          src="/certificate.png"
-                          alt="Certificate of Completion"
-                          className="w-full h-full object-cover select-none"
-                        />
-                      </div>
+              {/* Change Password Card */}
+              <div className="bg-white border border-neutral-200/90 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+                <div className="flex items-center gap-3 pb-2 border-b border-neutral-100">
+                  <Lock className="w-5 h-5 text-[#0033FF]" />
+                  <h2 className="text-lg font-bold text-neutral-900">Security &amp; Password</h2>
+                </div>
 
-                      <h2 className="font-extrabold text-[#0033FF] uppercase text-[20px] sm:text-[22px] md:text-[23px] tracking-tight leading-tight select-none">
-                        {formatCourseTitle(c.product.title)}
-                      </h2>
-                      <p className="text-xs text-neutral-600 mt-1 font-medium">
-                        Awarded to {user?.name || 'Verified Student'} for passing all course modules.
-                      </p>
+                <form onSubmit={handleChangePassword} className="space-y-4 max-w-xl">
+                  {passwordError && (
+                    <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold">
+                      {passwordError}
+                    </div>
+                  )}
 
-                      <div className="mt-4 pt-3 border-t border-neutral-200">
-                        <Link
-                          href={`/learn/${c.product.slug}`}
-                          className="w-full h-11 sm:h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020B8] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase rounded-md sm:rounded-lg flex items-center justify-center transition-colors select-none gap-2"
-                        >
-                          <Award className="w-4 h-4" />
-                          <span>REVIEW COURSE &amp; CREDENTIALS</span>
-                        </Link>
-                      </div>
+                  {/* Current Password */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-neutral-700 uppercase tracking-wide">
+                      Current Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showCurrentPassword ? 'text' : 'password'}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        required
+                        placeholder="••••••••"
+                        className="w-full h-11 px-3.5 pr-10 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none transition-all shadow-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1"
+                        aria-label="Toggle password visibility"
+                      >
+                        {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
                   </div>
-                ))}
+
+                  {/* New Password */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-neutral-700 uppercase tracking-wide">
+                      New Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showNewPassword ? 'text' : 'password'}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                        placeholder="At least 8 characters"
+                        className="w-full h-11 px-3.5 pr-10 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none transition-all shadow-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1"
+                        aria-label="Toggle password visibility"
+                      >
+                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Confirm Password */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-neutral-700 uppercase tracking-wide">
+                      Confirm New Password
+                    </label>
+                    <input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      placeholder="Repeat new password"
+                      className="w-full h-11 px-3.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-900 focus:border-[#0033FF] focus:outline-none transition-all shadow-sm"
+                    />
+                  </div>
+
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={passwordSaving}
+                      className="h-11 px-6 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-sm rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                    >
+                      {passwordSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                      <span>{passwordSaving ? 'Updating...' : 'Update Password'}</span>
+                    </button>
+                  </div>
+                </form>
               </div>
-            )}
-          </>
-        )}
+            </div>
+          )}
+
+          {/* TAB 4: DEVICES */}
+          {activeTab === 'devices' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
+                    Logged-in Devices
+                  </h1>
+                  <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+                    Manage your active browser sessions across desktop, tablet, and mobile devices.
+                  </p>
+                </div>
+
+                {sessions.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={handleLogoutEverywhere}
+                    disabled={loggingOutAll}
+                    className="h-10 px-4 rounded-xl border border-rose-300 bg-white hover:bg-rose-50 text-rose-700 font-bold text-xs transition-colors cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
+                  >
+                    {loggingOutAll ? 'Signing out...' : 'Sign Out Other Devices'}
+                  </button>
+                )}
+              </div>
+
+              {sessionsLoading ? (
+                <div className="bg-white border border-neutral-200/90 rounded-2xl p-12 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-sm">
+                  <Loader2 className="w-6 h-6 animate-spin text-[#0033FF]" />
+                  <span>Loading active sessions...</span>
+                </div>
+              ) : sessions.length === 0 ? (
+                <div className="bg-white border border-neutral-200/90 rounded-2xl p-8 text-center text-sm text-neutral-500 shadow-sm">
+                  No active session information available.
+                </div>
+              ) : (
+                <div className="bg-white border border-neutral-200/90 rounded-2xl divide-y divide-neutral-100 shadow-sm overflow-hidden">
+                  {sessions.map((sess) => {
+                    const isMobile = sess.userAgent?.toLowerCase().includes('mobile');
+                    return (
+                      <div key={sess.id} className="p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-neutral-50/50 transition-colors">
+                        <div className="flex items-center gap-3.5 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#0033FF] flex items-center justify-center shrink-0 border border-blue-100">
+                            {isMobile ? <Smartphone className="w-5 h-5" /> : <Laptop className="w-5 h-5" />}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-bold text-neutral-900 truncate">
+                                {sess.userAgent || 'Web Browser'}
+                              </p>
+                              {sess.isCurrent && (
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 shrink-0">
+                                  Current Device
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-neutral-500 mt-0.5 truncate">
+                              IP: {sess.ipAddress || 'Hidden'} • Active {new Date(sess.lastUsedAt).toLocaleDateString('en-IN')}
+                            </p>
+                          </div>
+                        </div>
+
+                        {!sess.isCurrent && (
+                          <button
+                            type="button"
+                            onClick={() => handleRevokeSession(sess.id)}
+                            disabled={revokingSessionId === sess.id}
+                            className="h-9 px-3.5 rounded-lg border border-neutral-200 hover:border-rose-300 hover:bg-rose-50 text-neutral-600 hover:text-rose-700 font-bold text-xs transition-colors cursor-pointer shrink-0 disabled:opacity-50"
+                          >
+                            {revokingSessionId === sess.id ? 'Revoking...' : 'Sign Out'}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 5: PAYMENT ORDERS */}
+          {activeTab === 'orders' && (
+            <div className="space-y-6">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
+                  Payment Orders &amp; Invoices
+                </h1>
+                <p className="text-xs sm:text-sm text-neutral-500 mt-1">
+                  Download official GST tax invoices in PDF format for company or personal reimbursement.
+                </p>
+              </div>
+
+              {ordersLoading ? (
+                <div className="bg-white border border-neutral-200/90 rounded-2xl p-12 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-sm">
+                  <Loader2 className="w-6 h-6 animate-spin text-[#0033FF]" />
+                  <span>Loading payment orders...</span>
+                </div>
+              ) : orders.length === 0 ? (
+                <div className="bg-white border border-neutral-200/90 rounded-2xl p-8 sm:p-12 text-center space-y-4 max-w-lg mx-auto shadow-sm">
+                  <div className="w-14 h-14 rounded-full bg-blue-50 text-[#0033FF] flex items-center justify-center mx-auto">
+                    <Receipt className="w-7 h-7" />
+                  </div>
+                  <div className="space-y-1">
+                    <h2 className="text-xl font-bold text-neutral-900">No Previous Orders</h2>
+                    <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
+                      You haven&apos;t made any course purchases yet.
+                    </p>
+                  </div>
+                  <div className="pt-2">
+                    <Link
+                      href="/#pricing"
+                      className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-sm"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      <span>View Courses</span>
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white border border-neutral-200/90 rounded-2xl overflow-hidden shadow-sm">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs sm:text-sm border-collapse">
+                      <thead className="bg-neutral-50 text-neutral-600 uppercase font-bold text-[11px] border-b border-neutral-200">
+                        <tr>
+                          <th className="py-4 px-5">Order ID</th>
+                          <th className="py-4 px-5">Date</th>
+                          <th className="py-4 px-5">Course</th>
+                          <th className="py-4 px-5">Amount</th>
+                          <th className="py-4 px-5">Status</th>
+                          <th className="py-4 px-5 text-right">Invoice</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-neutral-100">
+                        {orders.map((ord) => (
+                          <tr key={ord.id} className="hover:bg-neutral-50/70 transition-colors">
+                            <td className="py-4 px-5 font-mono font-bold text-neutral-900">
+                              {formatDisplayOrderId(ord.orderNumber || ord.id)}
+                            </td>
+                            <td className="py-4 px-5 font-mono text-neutral-600">
+                              {new Date(ord.createdAt).toLocaleDateString('en-IN')}
+                            </td>
+                            <td className="py-4 px-5 font-bold text-neutral-900">
+                              {ord.product.title}
+                            </td>
+                            <td className="py-4 px-5 font-mono font-bold text-neutral-900">
+                              ₹{(ord.amountPaise / 100).toLocaleString('en-IN')}
+                            </td>
+                            <td className="py-4 px-5">
+                              <span
+                                className={`px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full ${ord.status === 'PAID'
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  : ord.status === 'FAILED'
+                                    ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                    : 'bg-neutral-100 text-neutral-700 border border-neutral-200'
+                                  }`}
+                              >
+                                {ord.status}
+                              </span>
+                            </td>
+                            <td className="py-4 px-5 text-right">
+                              {ord.invoice ? (
+                                <a
+                                  href={`${siteConfig.urls.api}/api/v1/invoices/${ord.invoice.id}/download`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs font-bold py-1.5 px-3 bg-[#0033FF] hover:bg-[#0028D6] text-white rounded-lg transition-colors inline-flex items-center gap-1.5 shadow-sm"
+                                >
+                                  <Download className="w-3.5 h-3.5" />
+                                  <span>PDF</span>
+                                </a>
+                              ) : (
+                                <span className="text-neutral-400 font-mono text-xs">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+        </div>
       </main>
     </div>
   );
 }
 
+export default function MyCoursesPage() {
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = '#F8FAFC';
+    document.body.style.backgroundColor = '#F8FAFC';
+    return () => {
+      document.documentElement.style.backgroundColor = '';
+      document.body.style.backgroundColor = '';
+    };
+  }, []);
+
+  return (
+    <Suspense
+      fallback={
+        <div className="fixed inset-0 w-full h-full bg-[#00186B] text-white font-reddit flex flex-col items-center justify-center space-y-4">
+          <Loader2 className="w-10 h-10 animate-spin text-white" />
+          <p className="text-sm font-bold tracking-wider uppercase text-blue-200">
+            Loading Student Portal...
+          </p>
+        </div>
+      }
+    >
+      <StudentDashboardContent />
+    </Suspense>
+  );
+}
