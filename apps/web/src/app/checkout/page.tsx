@@ -652,7 +652,7 @@ function CheckoutContent() {
           fill
           priority
           sizes="(max-width: 1024px) 100vw, 50vw"
-          className="object-cover object-center mix-blend-screen opacity-95 pointer-events-none select-none"
+          className="object-cover object-center mix-blend-screen opacity-40 pointer-events-none select-none"
         />
         {/* Soft overlay gradient for subtle depth */}
         <div
