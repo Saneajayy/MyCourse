@@ -19,12 +19,6 @@ import {
   Check,
   X,
   ArrowLeft,
-  Video,
-  Clock,
-  Award,
-  FileText,
-  Wrench,
-  MessageCircleQuestion,
   Star,
   Sparkles,
 } from 'lucide-react';
@@ -71,6 +65,55 @@ declare global {
   interface Window {
     Razorpay?: unknown;
   }
+}
+
+function UpiLogo({ className = 'h-5 w-auto' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 60 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="UPI">
+      <path d="M12.8 1L4 11.5H9.2L6.5 21L17 11.5H11.5L12.8 1Z" fill="#097939" />
+      <path d="M17.5 5.5L23.5 11.5L17.5 17.5" stroke="#F47920" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+      <text x="27" y="15" fill="#1F2937" fontSize="12" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="0.04em">
+        UPI
+      </text>
+    </svg>
+  );
+}
+
+function VisaLogo({ className = 'h-5 w-auto' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 50 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Visa">
+      <path
+        d="M19.4 16.5L21.8 1.5H25.6L23.2 16.5H19.4ZM35.8 1.8C35 1.5 33.7 1.2 32.1 1.2C28.4 1.2 25.8 3.2 25.8 6C25.8 8.1 27.6 9.3 28.9 10C30.2 10.7 30.7 11.1 30.7 11.8C30.7 12.9 29.5 13.4 28.3 13.4C26.8 13.4 25.9 13.1 24.6 12.4L24.1 12.1L23.4 15.3C24.4 15.8 26.2 16.2 28.1 16.2C32.1 16.2 34.7 14.2 34.7 11.4C34.7 9 32.7 7.7 31.1 6.9C29.9 6.3 29.4 5.9 29.4 5.2C29.4 4.5 30.1 3.9 31.5 3.9C32.7 3.9 33.7 4.2 34.6 4.6L35 4.8L35.8 1.8ZM43 1.5H40C39.1 1.5 38.3 1.8 38 2.6L32.4 16.5H36.4L37.2 14.1H42.1L42.6 16.5H46.3L43 1.5ZM38.3 11.1L40.3 5.3L41.5 11.1H38.3ZM16.2 1.5L12.5 11.8L12.1 9.9C11.4 7.5 10 5 8 3.7L11.5 16.5H15.5L20.2 1.5H16.2Z"
+        fill="#1A1F71"
+      />
+      <path d="M9.6 1.5H3.6L3.5 1.8C8.2 3 11.8 6.1 13.1 9.5L11.9 3.1C11.7 2 10.7 1.5 9.6 1.5Z" fill="#F7B600" />
+    </svg>
+  );
+}
+
+function MastercardLogo({ className = 'h-5 w-auto' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Mastercard">
+      <circle cx="12" cy="12" r="10" fill="#EB001B" />
+      <circle cx="26" cy="12" r="10" fill="#F79E1B" />
+      <path
+        d="M19 5.35C20.9 6.9 22.1 9.3 22.1 12C22.1 14.7 20.9 17.1 19 18.65C17.1 17.1 15.9 14.7 15.9 12C15.9 9.3 17.1 6.9 19 5.35Z"
+        fill="#FF5F00"
+      />
+    </svg>
+  );
+}
+
+function RuPayLogo({ className = 'h-5 w-auto' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 54 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="RuPay">
+      <text x="2" y="15" fill="#0C2340" fontSize="13" fontWeight="900" fontFamily="system-ui, -apple-system, sans-serif" fontStyle="italic" letterSpacing="-0.02em">
+        RuPay
+      </text>
+      <path d="M38 3L41.5 10L38 17H34.5L38 10L34.5 3H38Z" fill="#008037" />
+      <path d="M42 3L45.5 10L42 17H38.5L42 10L38.5 3H42Z" fill="#F47920" />
+    </svg>
+  );
 }
 
 function CheckoutContent() {
@@ -497,39 +540,7 @@ function CheckoutContent() {
     );
   }
 
-  // Perks list for "What we get with it"
-  const coursePerks = [
-    {
-      icon: Video,
-      title: '60 In-Depth HD Video Lessons',
-      description: 'Step-by-step Hindi explanations with industrial English technical terminology.',
-    },
-    {
-      icon: Clock,
-      title: '12 Months Unlimited 24/7 Access',
-      description: 'Learn at your own pace with synchronized progress across laptop, tablet, and mobile.',
-    },
-    {
-      icon: Award,
-      title: 'Official Verifiable Certificate',
-      description: 'Industry-standard credential with a unique tamper-proof QR verification link.',
-    },
-    {
-      icon: FileText,
-      title: 'Schematic Blueprints & Cheat Sheets',
-      description: 'Downloadable high-res PDF circuit diagrams, ISO symbol sheets, and formula guides.',
-    },
-    {
-      icon: Wrench,
-      title: 'Real Factory Troubleshooting Cases',
-      description: 'Practical breakdown diagnostics: cylinder drift, pump cavitation, and heat dissipation.',
-    },
-    {
-      icon: MessageCircleQuestion,
-      title: 'Direct Instructor Q&A Support',
-      description: 'Dedicated discussion section for clarifying real-world industrial hydraulic questions.',
-    },
-  ];
+
 
   return (
     <div className="w-full min-h-screen flex flex-col lg:flex-row">
@@ -580,10 +591,10 @@ function CheckoutContent() {
               <span>Industrial Masterclass Enrollment</span>
             </div>
             <h1 className="text-3xl sm:text-4xl xl:text-5xl font-black tracking-tight text-white leading-tight">
-              Order Summary &amp; Benefits.
+              Order Summary.
             </h1>
             <p className="text-sm text-blue-100/75 mt-2 leading-relaxed">
-              Review your course enrollment, included learning materials, and certified deliverables below.
+              Review your course enrollment, syllabus validity, and tax-inclusive breakdown below.
             </p>
           </div>
 
@@ -628,42 +639,6 @@ function CheckoutContent() {
                   </span>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* "What You Get With It" Section */}
-          <div className="space-y-4 pt-2">
-            <div className="flex items-center justify-between border-b border-white/15 pb-2">
-              <h3 className="text-sm sm:text-base font-extrabold uppercase tracking-wider text-white">
-                What You Get With This Course
-              </h3>
-              <span className="text-xs font-semibold text-cyan-300">
-                All-Inclusive Package
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3">
-              {coursePerks.map((perk, idx) => {
-                const IconComponent = perk.icon;
-                return (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.09] border border-white/10 transition-colors"
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-[#0033FF]/40 border border-white/20 flex items-center justify-center shrink-0 mt-0.5 text-cyan-300 shadow-sm">
-                      <IconComponent className="w-4 h-4" />
-                    </div>
-                    <div className="space-y-0.5">
-                      <h4 className="text-xs sm:text-sm font-bold text-white tracking-tight leading-snug">
-                        {perk.title}
-                      </h4>
-                      <p className="text-[11px] sm:text-xs text-blue-100/75 leading-relaxed">
-                        {perk.description}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
             </div>
           </div>
 
@@ -814,35 +789,43 @@ function CheckoutContent() {
       {/* RIGHT COLUMN: Clean White Background, Billing Info & Checkout  */}
       {/* ============================================================== */}
       <div className="w-full lg:w-1/2 lg:min-h-screen bg-white text-neutral-900 flex flex-col justify-between relative overflow-y-auto p-6 sm:p-9 md:p-12 xl:p-16">
-        {/* Top Header / Account Status */}
-        <div className="w-full max-w-lg mx-auto flex items-center justify-between pb-6 border-b border-neutral-200 mb-6 sm:mb-8">
+        {/* Top Header Bar: Top-Left Account Status & Top-Right Brand Logo */}
+        <div className="w-full max-w-lg mx-auto flex items-center justify-between pb-5 border-b border-neutral-200 mb-6 sm:mb-8">
+          {/* Top-Left: Already Signed In / Enrolled Status */}
           <div>
-            <span className="text-xs uppercase tracking-wider font-bold text-neutral-500 block">
-              Step 2 of 2
-            </span>
-            <span className="text-sm font-semibold text-neutral-900">
-              Payment &amp; Billing
-            </span>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-100 border border-neutral-200 text-xs text-neutral-700">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                <span className="truncate max-w-[150px] sm:max-w-[200px] font-medium" title={user?.email}>
+                  {user?.email}
+                </span>
+              </div>
+            ) : (
+              <div className="text-xs text-neutral-600">
+                Already enrolled?{' '}
+                <Link
+                  href="/login?redirect=/checkout"
+                  className="font-bold text-[#0033FF] hover:underline hover:text-[#0028D6] ml-0.5"
+                >
+                  Sign In &rarr;
+                </Link>
+              </div>
+            )}
           </div>
 
-          {isAuthenticated ? (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-100 border border-neutral-200 text-xs text-neutral-700">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-              <span className="truncate max-w-[140px] sm:max-w-[180px] font-medium" title={user?.email}>
-                {user?.email}
-              </span>
-            </div>
-          ) : (
-            <div className="text-xs text-neutral-600">
-              Already enrolled?{' '}
-              <Link
-                href="/login?redirect=/checkout"
-                className="font-bold text-[#0033FF] hover:underline hover:text-[#0028D6]"
-              >
-                Sign In &rarr;
-              </Link>
-            </div>
-          )}
+          {/* Top-Right: Brand Logo */}
+          <Link
+            href="/"
+            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+            aria-label="HYDRO BASICS Home - Back to Course"
+          >
+            <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+              BASICS
+            </span>
+          </Link>
         </div>
 
         {/* Centered Billing & Checkout Container */}
@@ -897,11 +880,11 @@ function CheckoutContent() {
             </div>
           )}
 
-          {/* Form Header */}
+          {/* Simple Billing Information Headline */}
           <div className="space-y-1">
-            <h2 className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
               Billing Information
-            </h2>
+            </h1>
             <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
               Enter your student contact and tax invoice information. Your course access will be unlocked instantly.
             </p>
@@ -1028,22 +1011,38 @@ function CheckoutContent() {
             </div>
           </div>
 
-          {/* Payment Methods and Guarantees */}
-          <div className="border-t border-neutral-200 pt-5 space-y-3 text-center">
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500">
-              Accepted Payment Modes
+          {/* Payment Methods and Guarantees with Authentic Logos */}
+          <div className="border-t border-neutral-200 pt-5 space-y-3.5 text-center">
+            <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-500 px-1">
+              <span>Accepted Payment Methods</span>
+              <span className="text-[#0033FF] font-semibold lowercase">powered by razorpay</span>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-neutral-600 font-medium">
-              <span className="px-2.5 py-1 rounded-md bg-neutral-100 border border-neutral-200">
-                UPI (GPay, PhonePe, Paytm)
+
+            {/* Grid of Real Brand Logos: UPI, Visa, Mastercard, RuPay (Debit/Credit) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="UPI (GPay, PhonePe, Paytm, BHIM)">
+                <UpiLogo className="h-4.5 w-auto" />
+              </div>
+              <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="Visa Credit and Debit Cards">
+                <VisaLogo className="h-4 w-auto" />
+              </div>
+              <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="Mastercard Credit and Debit Cards">
+                <MastercardLogo className="h-5 w-auto" />
+              </div>
+              <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="RuPay Domestic Indian Debit and Credit Cards">
+                <RuPayLogo className="h-4 w-auto" />
+              </div>
+            </div>
+
+            {/* Additional payment coverage pills */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px] text-neutral-600 font-medium">
+              <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 border border-neutral-200">
+                All Major Debit &amp; Credit Cards
               </span>
-              <span className="px-2.5 py-1 rounded-md bg-neutral-100 border border-neutral-200">
-                Credit &amp; Debit Cards
+              <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 border border-neutral-200">
+                Net Banking (50+ Banks)
               </span>
-              <span className="px-2.5 py-1 rounded-md bg-neutral-100 border border-neutral-200">
-                Net Banking
-              </span>
-              <span className="px-2.5 py-1 rounded-md bg-neutral-100 border border-neutral-200">
+              <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 border border-neutral-200">
                 EMI Available
               </span>
             </div>
