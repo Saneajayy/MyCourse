@@ -412,7 +412,6 @@ function CheckoutContent() {
 
   // Read price and tax breakdown
   const basePricePaise = quote?.basePricePaise ?? course?.pricePaise ?? 499900;
-  const compareAtPricePaise = course?.compareAtPricePaise ?? 999900;
   const discountPaise = quote?.discountPaise ?? 0;
   const finalPricePaise = quote?.totalPaise ?? basePricePaise;
 
@@ -714,19 +713,14 @@ function CheckoutContent() {
               )}
             </div>
 
-            {/* Final Price & Actual Price on the Right */}
+            {/* Final Price on the Right */}
             <div className="flex flex-col items-end shrink-0 text-right">
               <span className="text-[11px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
                 Final Price
               </span>
-              <div className="flex items-baseline gap-2.5">
-                <span className="text-xl sm:text-2xl font-bold font-mono text-blue-200/60 line-through drop-shadow">
-                  ₹{((appliedCoupon ? basePricePaise : compareAtPricePaise) / 100).toLocaleString('en-IN')}
-                </span>
-                <span className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
-                  ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
-                </span>
-              </div>
+              <span className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
+                ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
+              </span>
             </div>
           </div>
         </div>
@@ -888,19 +882,14 @@ function CheckoutContent() {
                 )}
               </div>
 
-              {/* Final Price & Actual Price on the Right */}
+              {/* Final Price on the Right */}
               <div className="flex flex-col items-end shrink-0 text-right">
                 <span className="text-[10px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
                   Final Price
                 </span>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-sm sm:text-base font-bold font-mono text-blue-200/60 line-through drop-shadow">
-                    ₹{((appliedCoupon ? basePricePaise : compareAtPricePaise) / 100).toLocaleString('en-IN')}
-                  </span>
-                  <span className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
-                    ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
-                  </span>
-                </div>
+                <span className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
+                  ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
+                </span>
               </div>
             </div>
           </div>
