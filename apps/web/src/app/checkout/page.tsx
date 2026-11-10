@@ -128,7 +128,8 @@ function CheckoutContent() {
   const [courseLoading, setCourseLoading] = useState(true);
 
   // Billing Form State
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [gstin, setGstin] = useState('');
@@ -225,7 +226,11 @@ function CheckoutContent() {
   // Sync user details to form
   useEffect(() => {
     if (user) {
-      setName(user.name || '');
+      if (user.name) {
+        const parts = user.name.trim().split(/\s+/);
+        setFirstName(parts[0] || '');
+        setLastName(parts.slice(1).join(' ') || '');
+      }
       setEmail(user.email || '');
       if (user.phone) {
         setPhone(user.phone);
@@ -396,12 +401,21 @@ function CheckoutContent() {
       return;
     }
 
-    if (!name.trim()) {
-      const msg = 'Please enter your full name for certificate and invoicing.';
+    if (!firstName.trim()) {
+      const msg = 'Please enter your first name.';
       setCheckoutError(msg);
-      toastError('Name Required', msg);
+      toastError('First Name Required', msg);
       return;
     }
+
+    if (!lastName.trim()) {
+      const msg = 'Please enter your last name.';
+      setCheckoutError(msg);
+      toastError('Last Name Required', msg);
+      return;
+    }
+
+    const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
 
     if (!phone.trim()) {
       const msg = 'Please enter your mobile phone number to receive your course receipt.';
@@ -456,7 +470,7 @@ function CheckoutContent() {
           productId: course.id,
           couponCode: appliedCoupon?.code?.trim() || undefined,
           billingDetails: {
-            name: name.trim(),
+            name: fullName,
             email: email.trim(),
             phone: phone.trim(),
             gstin: gstin.trim() ? gstin.trim().toUpperCase() : undefined,
@@ -504,7 +518,7 @@ function CheckoutContent() {
         description: orderData.product?.title || course.title,
         order_id: gatewayOrderId,
         prefill: {
-          name: name.trim(),
+          name: fullName,
           email: email.trim(),
           contact: phone.trim(),
         },
@@ -900,20 +914,39 @@ function CheckoutContent() {
 
           {/* Billing Form Fields */}
           <div className="space-y-4 pt-1">
-            {/* Full Name */}
-            <div className="space-y-1.5 text-left">
-              <label htmlFor="checkout-name" className="text-sm font-bold text-neutral-900 block">
-                Full Name <span className="text-rose-500">*</span>
-              </label>
-              <input
-                id="checkout-name"
-                type="text"
-                required
-                placeholder="Ramesh Kumar"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
-              />
+            {/* First Name & Last Name in one single row */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-3.5">
+              {/* First Name */}
+              <div className="space-y-1.5 text-left">
+                <label htmlFor="checkout-first-name" className="text-sm font-bold text-neutral-900 block">
+                  First Name <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  id="checkout-first-name"
+                  type="text"
+                  required
+                  placeholder="Ramesh"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
+                />
+              </div>
+
+              {/* Last Name */}
+              <div className="space-y-1.5 text-left">
+                <label htmlFor="checkout-last-name" className="text-sm font-bold text-neutral-900 block">
+                  Last Name <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  id="checkout-last-name"
+                  type="text"
+                  required
+                  placeholder="Kumar"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
+                />
+              </div>
             </div>
 
             {/* Email Address */}
