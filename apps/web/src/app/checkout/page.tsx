@@ -16,7 +16,6 @@ import {
   RefreshCw,
   Loader2,
   X,
-  ArrowLeft,
 } from 'lucide-react';
 import { computeOrderTotals, TaxConfig } from '../../lib/tax';
 
@@ -642,72 +641,140 @@ function CheckoutContent() {
 
 
   return (
-    <div className="w-full min-h-screen lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row">
+    <div className="fixed inset-0 w-full h-full bg-white font-reddit selection:bg-[#0033FF] selection:text-white flex flex-col lg:flex-row overflow-hidden">
       {/* ============================================================== */}
-      {/* LEFT COLUMN: Signature Halftone Graphic on Deep Cobalt Blue   */}
-      {/* (Identical styling to Login & Register split view)             */}
+      {/* LEFT COLUMN (Desktop Only): Signature Halftone Graphic         */}
+      {/* (100% identical styling to Login & Register split view)       */}
       {/* ============================================================== */}
-      <div className="w-full lg:w-1/2 lg:h-full bg-[#00186B] text-white flex flex-col justify-between relative overflow-y-auto p-5 sm:p-7 md:p-8 select-none">
-        {/* Full-Bleed Signature Dot Halftone Graphic */}
+      <div className="hidden lg:relative lg:flex lg:w-1/2 h-full bg-[#00186B] overflow-hidden select-none">
         <Image
           src="/login-pixelated.png"
           alt="HydroBasics Industrial Hydraulic Engineer"
           fill
           priority
-          sizes="(max-width: 1024px) 100vw, 50vw"
-          className="object-cover object-center mix-blend-screen opacity-20 pointer-events-none select-none"
+          sizes="50vw"
+          className="object-cover object-center mix-blend-screen opacity-95 select-none"
         />
         {/* Soft overlay gradient for subtle depth */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/85 via-transparent to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/80 via-transparent to-transparent pointer-events-none"
           aria-hidden="true"
         />
+      </div>
 
-        {/* Top Escape Link */}
-        <div className="relative z-10 flex items-center justify-start pb-2">
+      {/* ============================================================== */}
+      {/* RIGHT COLUMN: Clean White Background, Order Summary & Checkout */}
+      {/* ============================================================== */}
+      <div className="w-full lg:w-1/2 h-full bg-white text-neutral-900 flex flex-col relative overflow-y-auto">
+        {/* Top Header Bar: Pinned into top corners */}
+        <header className="w-full flex items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 shrink-0 z-20">
+          {/* Top-Left Corner: Already Enrolled / Sign In (hidden when signed in) */}
+          <div>
+            {!isAuthenticated && (
+              <div className="text-xs sm:text-sm text-neutral-600">
+                Already enrolled?{' '}
+                <Link
+                  href="/login?redirect=/checkout"
+                  className="font-bold text-[#0033FF] hover:underline hover:text-[#0028D6] ml-0.5"
+                >
+                  Sign In &rarr;
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Top-Right Corner: Brand Logo deeply in corner */}
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-white/80 hover:text-white text-xs sm:text-sm font-semibold transition-colors group cursor-pointer"
+            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+            aria-label="HYDRO BASICS Home - Back to Course"
           >
-            <ArrowLeft className="w-4 h-4 stroke-[2.5] transition-transform group-hover:-translate-x-1" />
-            <span>Back to Course</span>
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+              BASICS
+            </span>
           </Link>
-        </div>
+        </header>
 
-        {/* Centered Order Breakdown Card (Style A) */}
-        <div className="relative z-10 flex-1 flex items-center justify-center py-4 w-full my-auto">
-          <div className="relative w-full max-w-[420px] sm:max-w-[460px] bg-white rounded-xl sm:rounded-2xl border border-neutral-200/80 p-5 sm:p-7 select-none overflow-hidden space-y-4 text-neutral-900">
-            {/* Header: Course Title & Description */}
-            <div className="space-y-1.5">
-              <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight leading-snug">
-                {course?.title || 'Hydraulic System Basics'}
-              </h2>
-              <p className="text-xs text-neutral-600 leading-relaxed">
-                {course?.description ||
-                  'Comprehensive industrial hydraulic engineering: valve schematics, pump selection, fluid power, and field troubleshooting.'}
-              </p>
-              <p className="text-xs font-medium text-neutral-500 pt-0.5">
-                1 Year Full Access • Self-Paced Masterclass
-              </p>
+        {/* Centered Order & Billing Container */}
+        <div className="m-auto w-full max-w-lg px-4 sm:px-6 py-6 sm:py-8 relative z-10 space-y-4">
+          {/* Email Verification Warning Alert Gate */}
+          {isAuthenticated && !user?.emailVerifiedAt && (
+            <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-xl p-5 text-amber-950">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 font-bold text-sm text-amber-900">
+                  <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0" />
+                  <span>Action Required: Email Verification</span>
+                </div>
+                <p className="text-xs text-amber-900/90 leading-relaxed">
+                  Before purchasing, RBI/tax compliance requires a verified email address. We sent a
+                  verification code to <strong className="font-semibold text-black">{user?.email}</strong>.
+                </p>
+                <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                  <Link
+                    href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
+                    className="h-9 px-3.5 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer"
+                  >
+                    Enter 6-Digit OTP
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleResendVerification}
+                    disabled={resendingVerification}
+                    className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-lg transition-all flex items-center cursor-pointer disabled:opacity-60"
+                  >
+                    {resendingVerification ? (
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                    ) : (
+                      <MailCheck className="w-3.5 h-3.5 mr-1.5" />
+                    )}
+                    Resend Email
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCheckVerification}
+                    disabled={checkingVerification}
+                    className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-lg transition-all flex items-center cursor-pointer disabled:opacity-60"
+                  >
+                    {checkingVerification ? (
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                    ) : (
+                      <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                    )}
+                    I&apos;ve Verified • Refresh
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Order Summary & Coupon Card - Styled identically to Billing Information */}
+          <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-7 select-none overflow-hidden space-y-4">
+            {/* Header: Title */}
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
+                  Order Summary
+                </h2>
+                <p className="text-xs text-neutral-500">
+                  Course Base Enrollment &amp; Invoicing
+                </p>
+              </div>
+              <span className="text-xs font-mono text-neutral-400">
+                INR (₹)
+              </span>
             </div>
 
-            {/* Fine Divider Line */}
+            {/* Fine Divider */}
             <div className="-mx-5 sm:-mx-7 border-t border-neutral-200/80" />
 
-            {/* Order Breakdown Rows */}
-            <div className="space-y-3.5 pt-0.5">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
-                  Order Breakdown
-                </h3>
-                <span className="text-xs font-mono text-neutral-500">
-                  INR (₹) Invoicing
-                </span>
-              </div>
-
-              {/* Base Course Price */}
+            {/* Price Breakdown Rows */}
+            <div className="space-y-3">
+              {/* Base Price */}
               <div className="flex justify-between items-center text-xs sm:text-sm">
-                <span className="text-neutral-600">Course Base Enrollment</span>
+                <span className="text-neutral-600 font-medium">Course Base Enrollment</span>
                 <span className="font-mono font-bold text-neutral-900">
                   ₹{(basePricePaise / 100).toLocaleString('en-IN')}
                 </span>
@@ -744,12 +811,12 @@ function CheckoutContent() {
                       placeholder="ENTER COUPON CODE"
                       value={couponInput}
                       onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                      className="w-full h-9 rounded-lg border border-neutral-300 bg-white px-3 text-xs font-mono uppercase text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-1 focus:ring-[#0033FF]/20 focus:outline-none transition-all flex-1"
+                      className="w-full h-10 rounded-lg border border-neutral-300 bg-white px-3 text-xs font-mono uppercase text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-1 focus:ring-[#0033FF]/20 focus:outline-none transition-all flex-1"
                     />
                     <button
                       type="submit"
                       disabled={couponLoading}
-                      className="h-9 px-3.5 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0"
+                      className="h-10 px-4 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0"
                     >
                       {couponLoading ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
@@ -759,7 +826,7 @@ function CheckoutContent() {
                     </button>
                   </div>
                   {couponError && (
-                    <p className="text-[11px] font-semibold text-rose-600 mt-1 flex items-center gap-1">
+                    <p className="text-[11px] font-semibold text-rose-600 mt-1.5 flex items-center gap-1">
                       <X className="w-3.5 h-3.5 stroke-[2.5]" />
                       <span>{couponError}</span>
                     </p>
@@ -769,24 +836,21 @@ function CheckoutContent() {
 
               {/* GST Tax Breakdown */}
               {isTaxApplicable && taxPaise > 0 && (
-                <div className="border-t border-neutral-200/80 pt-2 space-y-1 text-xs text-neutral-600">
+                <div className="border-t border-neutral-200/80 pt-2.5 space-y-1 text-xs text-neutral-600">
                   <div className="flex justify-between">
                     <span>Net Taxable Value</span>
                     <span className="font-mono text-neutral-900 font-medium">
-                      ₹
-                      {(subtotalPaise / 100).toLocaleString('en-IN', {
+                      ₹{(subtotalPaise / 100).toLocaleString('en-IN', {
                         minimumFractionDigits: 2,
                       })}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span>
-                      GST ({taxRatePercent}%{' '}
-                      {pricesTaxInclusive ? 'Inclusive' : 'Exclusive'})
+                      GST ({taxRatePercent}% {pricesTaxInclusive ? 'Inclusive' : 'Exclusive'})
                     </span>
                     <span className="font-mono text-neutral-900 font-medium">
-                      ₹
-                      {(taxPaise / 100).toLocaleString('en-IN', {
+                      ₹{(taxPaise / 100).toLocaleString('en-IN', {
                         minimumFractionDigits: 2,
                       })}
                     </span>
@@ -812,292 +876,196 @@ function CheckoutContent() {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Footer Guarantee & Terms */}
-        <div className="relative z-10 pt-2 text-center text-xs text-blue-100/70 space-y-1 shrink-0">
-          <p>
-            By completing this payment, you agree to the{' '}
-            <Link href="/terms" className="underline text-white hover:text-cyan-200">
-              Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link href="/refunds" className="underline text-white hover:text-cyan-200">
-              Refund Policy
-            </Link>
-            .
-          </p>
-          <p className="text-[11px] text-blue-100/60">
-            Need assistance? Contact{' '}
-            <a href={`mailto:${siteConfig.supportEmail}`} className="underline text-white hover:text-cyan-200">
-              {siteConfig.supportEmail}
-            </a>
-            .
-          </p>
-        </div>
-      </div>
+          {/* Billing Info Card Box - Identical styling to Login / Signup / Verify-Email cards */}
+          <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-7 select-none overflow-hidden space-y-5">
+            {/* Simple Billing Information Headline */}
+            <div className="space-y-1">
+              <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
+                Billing Information
+              </h1>
+              <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
+                Enter your student contact and tax invoice information.
+              </p>
+            </div>
 
-      {/* ============================================================== */}
-      {/* RIGHT COLUMN: Clean White Background, Billing Info & Checkout  */}
-      {/* ============================================================== */}
-      <div className="w-full lg:w-1/2 lg:h-full bg-white text-neutral-900 flex flex-col relative overflow-y-auto">
-        {/* Top Header Bar: Pinned deeply into top-left and top-right corners with NO separation line */}
-        <header className="w-full flex items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 shrink-0 z-20">
-          {/* Top-Left Corner: Already Enrolled / Sign In (hidden when signed in) */}
-          <div>
-            {!isAuthenticated && (
-              <div className="text-xs sm:text-sm text-neutral-600">
-                Already enrolled?{' '}
+            {/* Billing Form Fields */}
+            <div className="space-y-4 pt-0.5">
+              {/* First Name & Last Name in one single row */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-3.5">
+                <div className="space-y-1.5 text-left">
+                  <label htmlFor="checkout-first-name" className="text-sm font-bold text-neutral-900 block">
+                    First Name <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    id="checkout-first-name"
+                    type="text"
+                    required
+                    placeholder="Ramesh"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-1.5 text-left">
+                  <label htmlFor="checkout-last-name" className="text-sm font-bold text-neutral-900 block">
+                    Last Name <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    id="checkout-last-name"
+                    type="text"
+                    required
+                    placeholder="Kumar"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Email Address */}
+              <div className="space-y-1.5 text-left">
+                <label htmlFor="checkout-email" className="text-sm font-bold text-neutral-900 block">
+                  Email Address <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  id="checkout-email"
+                  type="email"
+                  required
+                  disabled={isAuthenticated}
+                  placeholder="engineer@plant.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
+                />
+              </div>
+
+              {/* Phone Number */}
+              <div className="space-y-1.5 text-left">
+                <label htmlFor="checkout-phone" className="text-sm font-bold text-neutral-900 block">
+                  Phone Number <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  id="checkout-phone"
+                  type="tel"
+                  required
+                  placeholder="+91 98765 43210"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono"
+                />
+              </div>
+
+              {/* Company GSTIN */}
+              <div className="space-y-1.5 text-left">
+                <label htmlFor="checkout-gstin" className="text-sm font-bold text-neutral-900 block">
+                  Company GSTIN
+                </label>
+                <input
+                  id="checkout-gstin"
+                  type="text"
+                  placeholder="22AAAAA0000A1Z5"
+                  value={gstin}
+                  onChange={(e) => setGstin(e.target.value.toUpperCase())}
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono uppercase"
+                />
+              </div>
+            </div>
+
+            {/* Error Alert Banner: Translucent Red (matching Login/Register) */}
+            {checkoutError && (
+              <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium flex items-center justify-center text-center animate-in fade-in">
+                <span>{checkoutError}</span>
+              </div>
+            )}
+
+            {/* Primary Checkout CTA */}
+            <div className="pt-2">
+              {!isAuthenticated ? (
                 <Link
                   href="/login?redirect=/checkout"
-                  className="font-bold text-[#0033FF] hover:underline hover:text-[#0028D6] ml-0.5"
+                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all flex items-center justify-center cursor-pointer text-center select-none"
                 >
-                  Sign In &rarr;
+                  Sign In to Continue Checkout &rarr;
                 </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Top-Right Corner: Brand Logo deeply in corner */}
-          <Link
-            href="/"
-            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-[#0033FF] hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
-            aria-label="HYDRO BASICS Home - Back to Course"
-          >
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
-              HYDRO
-            </span>
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
-              BASICS
-            </span>
-          </Link>
-        </header>
-
-        {/* Centered Billing & Checkout Container */}
-        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 w-full my-auto">
-          <div className="w-full max-w-lg space-y-4">
-            {/* Email Verification Warning Alert Gate */}
-            {isAuthenticated && !user?.emailVerifiedAt && (
-              <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-xl p-5 text-amber-950">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 font-bold text-sm text-amber-900">
-                    <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0" />
-                    <span>Action Required: Email Verification</span>
-                  </div>
-                  <p className="text-xs text-amber-900/90 leading-relaxed">
-                    Before purchasing, RBI/tax compliance requires a verified email address. We sent a
-                    verification code to <strong className="font-semibold text-black">{user?.email}</strong>.
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2.5 pt-1">
-                    <Link
-                      href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
-                      className="h-9 px-3.5 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer"
-                    >
-                      Enter 6-Digit OTP
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={handleResendVerification}
-                      disabled={resendingVerification}
-                      className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-lg transition-all flex items-center cursor-pointer disabled:opacity-60"
-                    >
-                      {resendingVerification ? (
-                        <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                      ) : (
-                        <MailCheck className="w-3.5 h-3.5 mr-1.5" />
-                      )}
-                      Resend Email
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleCheckVerification}
-                      disabled={checkingVerification}
-                      className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-lg transition-all flex items-center cursor-pointer disabled:opacity-60"
-                    >
-                      {checkingVerification ? (
-                        <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
-                      ) : (
-                        <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
-                      )}
-                      I&apos;ve Verified • Refresh
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Billing Info Card Box - Identical styling to Login / Signup / Verify-Email cards */}
-            <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-8 select-none overflow-hidden space-y-6">
-              {/* Simple Billing Information Headline */}
-              <div className="space-y-1">
-                <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
-                  Billing Information
-                </h1>
-                <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
-                  Enter your student contact and tax invoice information.
-                </p>
-              </div>
-
-              {/* Billing Form Fields */}
-              <div className="space-y-4 pt-1">
-                {/* First Name & Last Name in one single row */}
-                <div className="grid grid-cols-2 gap-3 sm:gap-3.5">
-                  {/* First Name */}
-                  <div className="space-y-1.5 text-left">
-                    <label htmlFor="checkout-first-name" className="text-sm font-bold text-neutral-900 block">
-                      First Name <span className="text-rose-500">*</span>
-                    </label>
-                    <input
-                      id="checkout-first-name"
-                      type="text"
-                      required
-                      placeholder="Ramesh"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
-                    />
-                  </div>
-
-                  {/* Last Name */}
-                  <div className="space-y-1.5 text-left">
-                    <label htmlFor="checkout-last-name" className="text-sm font-bold text-neutral-900 block">
-                      Last Name <span className="text-rose-500">*</span>
-                    </label>
-                    <input
-                      id="checkout-last-name"
-                      type="text"
-                      required
-                      placeholder="Kumar"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* Email Address */}
-                <div className="space-y-1.5 text-left">
-                  <label htmlFor="checkout-email" className="text-sm font-bold text-neutral-900 block">
-                    Email Address <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    id="checkout-email"
-                    type="email"
-                    required
-                    disabled={isAuthenticated}
-                    placeholder="engineer@plant.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
-                  />
-                </div>
-
-                {/* Phone Number */}
-                <div className="space-y-1.5 text-left">
-                  <label htmlFor="checkout-phone" className="text-sm font-bold text-neutral-900 block">
-                    Phone Number <span className="text-rose-500">*</span>
-                  </label>
-                  <input
-                    id="checkout-phone"
-                    type="tel"
-                    required
-                    placeholder="+91 98765 43210"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono"
-                  />
-                </div>
-
-                {/* Company GSTIN */}
-                <div className="space-y-1.5 text-left">
-                  <label htmlFor="checkout-gstin" className="text-sm font-bold text-neutral-900 block">
-                    Company GSTIN
-                  </label>
-                  <input
-                    id="checkout-gstin"
-                    type="text"
-                    placeholder="22AAAAA0000A1Z5"
-                    value={gstin}
-                    onChange={(e) => setGstin(e.target.value.toUpperCase())}
-                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono uppercase"
-                  />
-                </div>
-              </div>
-
-              {/* Error Alert Banner: Translucent Red (matching Login/Register) */}
-              {checkoutError && (
-                <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium flex items-center justify-center text-center animate-in fade-in">
-                  <span>{checkoutError}</span>
-                </div>
+              ) : !user?.emailVerifiedAt ? (
+                <button
+                  type="button"
+                  disabled
+                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-neutral-200 text-neutral-500 font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg opacity-75 cursor-not-allowed flex items-center justify-center text-center select-none"
+                >
+                  Verify Email to Enable Payment
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleProceedToPayment}
+                  disabled={quoteLoading || isSubmitting}
+                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer select-none"
+                >
+                  {isSubmitting || quoteLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin text-white" />
+                  ) : (
+                    <Lock className="w-4.5 h-4.5 text-white stroke-[2.5]" />
+                  )}
+                  <span>
+                    Pay ₹{(finalPricePaise / 100).toLocaleString('en-IN')} with Razorpay
+                  </span>
+                </button>
               )}
+            </div>
 
-              {/* Primary Checkout CTA */}
-              <div className="pt-2">
-                {!isAuthenticated ? (
-                  <Link
-                    href="/login?redirect=/checkout"
-                    className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all flex items-center justify-center cursor-pointer text-center select-none"
-                  >
-                    Sign In to Continue Checkout &rarr;
-                  </Link>
-                ) : !user?.emailVerifiedAt ? (
-                  <button
-                    type="button"
-                    disabled
-                    className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-neutral-200 text-neutral-500 font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg opacity-75 cursor-not-allowed flex items-center justify-center text-center select-none"
-                  >
-                    Verify Email to Enable Payment
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleProceedToPayment}
-                    disabled={quoteLoading || isSubmitting}
-                    className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer select-none"
-                  >
-                    {isSubmitting || quoteLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin text-white" />
-                    ) : (
-                      <Lock className="w-4.5 h-4.5 text-white stroke-[2.5]" />
-                    )}
-                    <span>
-                      Pay ₹{(finalPricePaise / 100).toLocaleString('en-IN')} with Razorpay
-                    </span>
-                  </button>
-                )}
-
+            {/* Payment Methods and Security Guarantee */}
+            <div className="-mx-5 sm:-mx-7 border-t border-neutral-200/80 pt-4 px-5 sm:px-7 space-y-2 text-center">
+              {/* Secured by Razorpay in Center */}
+              <div className="flex items-center justify-center gap-1.5 text-neutral-600 text-xs sm:text-[13px] font-medium">
+                <span>Secured by</span>
+                <RazorpayLogo className="h-4 sm:h-[18px] w-auto" />
               </div>
 
-              {/* Payment Methods and Security Guarantee */}
-              <div className="-mx-5 sm:-mx-8 border-t border-neutral-200/80 pt-4 px-5 sm:px-8 space-y-2 text-center">
-                {/* Secured by Razorpay in Center */}
-                <div className="flex items-center justify-center gap-1.5 text-neutral-600 text-xs sm:text-[13px] font-medium">
-                  <span>Secured by</span>
-                  <RazorpayLogo className="h-4 sm:h-[18px] w-auto" />
-                </div>
+              {/* Accepted Payment Methods under Secured by Razorpay */}
+              <div className="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider text-neutral-400">
+                Accepted Payment Methods
+              </div>
 
-                {/* Accepted Payment Methods under Secured by Razorpay */}
-                <div className="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider text-neutral-400">
-                  Accepted Payment Methods
+              {/* Real Brand Logos in One Single Row: GPay, Visa, Mastercard, Paytm */}
+              <div className="flex items-center justify-center gap-5 sm:gap-6 pt-0.5 pb-0.5 flex-nowrap">
+                <div title="Google Pay (GPay)" className="shrink-0 flex items-center justify-center translate-x-1">
+                  <GPayLogo className="h-[18px] sm:h-[21px] w-auto" />
                 </div>
-
-                {/* Real Brand Logos in One Single Row: GPay, Visa, Mastercard, Paytm */}
-                <div className="flex items-center justify-center gap-5 sm:gap-6 pt-0.5 pb-0.5 flex-nowrap">
-                  <div title="Google Pay (GPay)" className="shrink-0 flex items-center justify-center translate-x-1">
-                    <GPayLogo className="h-[18px] sm:h-[21px] w-auto" />
-                  </div>
-                  <div title="Visa" className="shrink-0 flex items-center justify-center">
-                    <VisaLogo className="h-[14px] sm:h-[16px] w-auto" />
-                  </div>
-                  <div title="Mastercard" className="shrink-0 flex items-center justify-center">
-                    <MastercardLogo className="h-[18px] sm:h-[21px] w-auto" />
-                  </div>
-                  <div title="Paytm" className="shrink-0 flex items-center justify-center">
-                    <PaytmLogo className="h-[17px] sm:h-[20px] w-auto" />
-                  </div>
+                <div title="Visa" className="shrink-0 flex items-center justify-center">
+                  <VisaLogo className="h-[14px] sm:h-[16px] w-auto" />
+                </div>
+                <div title="Mastercard" className="shrink-0 flex items-center justify-center">
+                  <MastercardLogo className="h-[18px] sm:h-[21px] w-auto" />
+                </div>
+                <div title="Paytm" className="shrink-0 flex items-center justify-center">
+                  <PaytmLogo className="h-[17px] sm:h-[20px] w-auto" />
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Terms & Refund Disclaimer */}
+          <div className="pt-1 text-center text-xs text-neutral-500 space-y-1">
+            <p>
+              By completing this payment, you agree to the{' '}
+              <Link href="/terms" className="underline hover:text-neutral-800">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link href="/refunds" className="underline hover:text-neutral-800">
+                Refund Policy
+              </Link>
+              .
+            </p>
+            <p className="text-[11px] text-neutral-400">
+              Need assistance? Contact{' '}
+              <a href={`mailto:${siteConfig.supportEmail}`} className="underline hover:text-neutral-700">
+                {siteConfig.supportEmail}
+              </a>
+              .
+            </p>
           </div>
         </div>
       </div>
