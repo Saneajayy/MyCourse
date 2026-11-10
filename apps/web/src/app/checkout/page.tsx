@@ -874,9 +874,9 @@ function CheckoutContent() {
         </div>
 
         {/* Scrollable Billing Section (Scrolls smoothly below fixed mobile upper section) */}
-        <div className="flex-1 w-full min-h-0 overflow-y-auto relative">
+        <div className="flex-1 w-full min-h-0 overflow-y-auto relative flex flex-col">
           {/* Centered Order & Billing Container */}
-          <div className="m-auto w-full max-w-lg px-4 sm:px-6 py-5 sm:py-8 relative z-10 space-y-4">
+          <div className="my-auto w-full max-w-lg px-4 sm:px-6 py-5 sm:py-8 relative z-10 space-y-4">
           {/* Email Verification Warning Alert Gate */}
           {isAuthenticated && !user?.emailVerifiedAt && (
             <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-xl p-5 text-amber-950">
