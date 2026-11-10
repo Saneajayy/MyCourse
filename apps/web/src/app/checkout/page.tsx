@@ -904,7 +904,7 @@ function CheckoutContent() {
 
           {/* Simple Billing Information Headline */}
           <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
               Billing Information
             </h1>
             <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
