@@ -293,7 +293,7 @@ export default function OrderSuccessPage() {
 
         {/* Scrollable Center Section with Clean White Card (Reference Design) */}
         <div className="flex-1 w-full min-h-0 overflow-y-auto relative flex flex-col justify-center items-center py-6 sm:py-8 px-4">
-          <div className="my-auto w-full max-w-[500px]">
+          <div className="my-auto w-full max-w-[460px]">
             <PaymentSuccessCard
               data={{
                 orderId: order.id,

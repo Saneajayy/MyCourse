@@ -1,9 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
-import { Play, Download, Loader2, Check, ArrowRight } from 'lucide-react';
-import { formatDisplayOrderId } from '../lib/order';
 
 export interface PaymentSuccessData {
   orderId: string;
@@ -28,16 +26,67 @@ interface PaymentSuccessCardProps {
   onClose?: () => void;
 }
 
-function MastercardIcon({ className = 'h-5 w-auto' }: { className?: string }) {
+// Subtle, delightful CSS confetti burst around the top celebration badge
+function ConfettiParticles() {
+  const particles = useMemo(() => {
+    const colors = ['#0033FF', '#10B981', '#38BDF8', '#F59E0B', '#EC4899', '#8B5CF6'];
+    const angles = [
+      -150, -125, -100, -75, -50, -25, 0, 25, 50, 75, 100, 125, 150, 175, -175,
+      -135, -90, -45, 45, 90, 135,
+    ];
+    return angles.map((deg, i) => {
+      const rad = (deg * Math.PI) / 180;
+      const distance = 45 + (i % 3) * 22;
+      const dx = Math.cos(rad) * distance;
+      const dy = Math.sin(rad) * distance;
+      const color = colors[i % colors.length];
+      const isRect = i % 2 === 0;
+      const size = isRect ? (i % 3 === 0 ? 'w-2 h-1' : 'w-2.5 h-1.5') : 'w-2 h-2 rounded-full';
+      const delay = (i % 4) * 0.04;
+      return { id: i, dx, dy, color, isRect, size, delay, dr: (i % 2 === 0 ? 1 : -1) * (180 + i * 30) };
+    });
+  }, []);
+
   return (
-    <svg className={className} viewBox="2 2 34 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Mastercard">
-      <circle cx="12" cy="12" r="10" fill="#EB001B" />
-      <circle cx="26" cy="12" r="10" fill="#F79E1B" />
-      <path
-        d="M19 5.35C20.9 6.9 22.1 9.3 22.1 12C22.1 14.7 20.9 17.1 19 18.65C17.1 17.1 15.9 14.7 15.9 12C15.9 9.3 17.1 6.9 19 5.35Z"
-        fill="#FF5F00"
-      />
-    </svg>
+    <div className="absolute inset-0 pointer-events-none overflow-hidden flex items-start justify-center pt-8" aria-hidden="true">
+      <style>{`
+        @keyframes confetti-burst {
+          0% {
+            transform: translate(0, 0) scale(0) rotate(0deg);
+            opacity: 0;
+          }
+          25% {
+            opacity: 1;
+            transform: translate(calc(var(--dx) * 0.5px), calc(var(--dy) * 0.5px)) scale(1.2) rotate(calc(var(--dr) * 0.4deg));
+          }
+          85% {
+            opacity: 0.9;
+          }
+          100% {
+            transform: translate(calc(var(--dx) * 1px), calc(var(--dy) * 1px + 12px)) scale(0.9) rotate(calc(var(--dr) * 1deg));
+            opacity: 0;
+          }
+        }
+      `}</style>
+      <div className="relative w-1 h-1">
+        {particles.map((p) => (
+          <div
+            key={p.id}
+            className={`absolute ${p.size}`}
+            style={
+              {
+                backgroundColor: p.color,
+                '--dx': p.dx,
+                '--dy': p.dy,
+                '--dr': p.dr,
+                animation: `confetti-burst 1.3s cubic-bezier(0.2, 0.8, 0.3, 1) forwards`,
+                animationDelay: `${p.delay}s`,
+              } as React.CSSProperties
+            }
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -55,192 +104,110 @@ export function PaymentSuccessCard({
           maximumFractionDigits: 2,
         });
 
-  // Format validity dates: e.g. "12 Aug, 2026 to 12 Aug, 2027"
-  const createdDate = data.paymentTime ? new Date(data.paymentTime) : new Date();
-  const validDays = data.validityDays || 365;
-  const expiryDate = new Date(createdDate.getTime() + validDays * 24 * 60 * 60 * 1000);
-
-  const formatDateShort = (d: Date) =>
-    d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-
-  const formatPaymentDateTime = (d: Date) => {
-    try {
-      const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-      const weekday = d.toLocaleDateString('en-US', { weekday: 'long' });
-      const datePart = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-      return `${timeStr}, ${weekday}, ${datePart}`;
-    } catch {
-      return formatDateShort(d);
-    }
-  };
-
   const displayCourse =
     data.courseTitle === 'Industrial Hydraulic Systems & Circuit Design'
       ? 'Hydraulic System Basics'
       : data.courseTitle || 'Hydraulic System Basics';
 
-  const refId = formatDisplayOrderId(data.orderNumber || data.orderId || 'ORD-000000');
-  const txId = data.transactionId
-    ? data.transactionId.length > 14
-      ? data.transactionId.slice(-10).toUpperCase()
-      : data.transactionId
-    : data.orderId ? data.orderId.slice(-8).toUpperCase() : '2342138';
-  const invId = data.invoiceId || (data.orderNumber ? `INV-${data.orderNumber.replace(/[^0-9A-Z]/gi, '')}` : 'INV-345467');
+  const validityLabel = data.validityDays
+    ? `${data.validityDays} Days Access`
+    : '365 Days Access';
+
+  const firstLetter = displayCourse.charAt(0).toUpperCase() || 'H';
 
   return (
-    <div className="w-full max-w-[500px] mx-auto select-none font-reddit text-center">
-      {/* Top Header Badge & Text */}
-      <div className="mb-4 sm:mb-5">
-        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20 mx-auto mb-3">
-          <Check className="w-6 h-6 sm:w-7 sm:h-7 stroke-[3]" />
+    <div className="relative w-full max-w-[440px] sm:max-w-[460px] mx-auto bg-white rounded-[28px] p-6 sm:p-8 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18)] border border-neutral-100 select-none font-reddit text-left overflow-hidden">
+      {/* Confetti Particles radiating from celebration top */}
+      <ConfettiParticles />
+
+      {/* 1. Header Section (INSIDE the card with confetti) */}
+      <div className="text-center relative z-10 space-y-1.5 pb-4">
+        {/* Pulsing Success Ring + Blue Circle with Checkmark */}
+        <div className="relative inline-flex items-center justify-center mb-1">
+          <div className="w-14 h-14 rounded-full bg-[#0033FF] text-white flex items-center justify-center shadow-lg shadow-blue-500/25">
+            <svg
+              className="w-7 h-7"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={3}
+              aria-hidden="true"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
         </div>
-        <h1 className="text-2xl sm:text-[28px] font-extrabold text-neutral-900 tracking-tight">
-          Payment Success
-        </h1>
-        <p className="text-xs sm:text-sm text-neutral-500 mt-1 max-w-sm mx-auto font-normal">
-          You have successfully subscribed to {displayCourse}
+
+        <h2 className="text-2xl sm:text-[26px] font-extrabold text-neutral-900 tracking-tight">
+          Payment Successful!
+        </h2>
+        <p className="text-xs sm:text-sm text-neutral-500 font-normal">
+          Your course access has been activated.
         </p>
       </div>
 
-      {/* Clean White Card */}
-      <div className="bg-white rounded-[24px] sm:rounded-[28px] p-5 sm:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-neutral-100 text-left space-y-4 sm:space-y-5">
-        {/* Course Tier Banner (Pro Highlight with Crown and Cyan Checkmark) */}
-        <div className="bg-gradient-to-r from-[#e0f7fa]/70 via-[#e0f2fe]/60 to-[#f0f9ff]/80 border border-sky-100 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-3 shadow-xs">
-          <div className="space-y-0.5 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <span className="text-base select-none" role="img" aria-label="Crown">
-                👑
-              </span>
-              <span className="font-bold text-sky-600 text-sm sm:text-base truncate">
-                {displayCourse}
-              </span>
-            </div>
-            <p className="text-[11px] sm:text-xs text-neutral-500 font-medium truncate">
-              Effective from {formatDateShort(createdDate)} to {formatDateShort(expiryDate)}
-            </p>
-          </div>
-          <div className="w-7 h-7 rounded-full bg-[#06b6d4] text-white flex items-center justify-center shrink-0 shadow-sm">
-            <Check className="w-4 h-4 stroke-[3]" />
+      {/* 2. Course Details Row (Letter Avatar + Title + Validity Badge, NO icons) */}
+      <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-neutral-50/80 border border-neutral-100 my-2">
+        {/* Blue Initial Letter Badge */}
+        <div className="w-12 h-12 rounded-xl bg-[#0033FF] text-white font-extrabold text-xl flex items-center justify-center shrink-0 shadow-xs">
+          {firstLetter}
+        </div>
+        <div className="min-w-0 flex-1 space-y-1">
+          <h3 className="font-bold text-neutral-900 text-sm sm:text-base leading-snug truncate">
+            {displayCourse}
+          </h3>
+          <div className="inline-block px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0033FF] text-[11px] font-bold tracking-tight">
+            {validityLabel}
           </div>
         </div>
+      </div>
 
-        {/* Metadata Grid */}
-        <div className="space-y-3.5 pt-1">
-          {/* Row 1: Reference ID, Transaction ID, Invoice ID */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-3">
-            <div className="space-y-1 min-w-0">
-              <span className="text-[11px] font-medium text-neutral-400 block tracking-tight">
-                Reference ID
-              </span>
-              <span className="text-xs sm:text-[13px] font-bold text-neutral-900 block truncate font-mono">
-                {refId}
-              </span>
-            </div>
-
-            <div className="space-y-1 min-w-0">
-              <span className="text-[11px] font-medium text-neutral-400 block tracking-tight">
-                Transaction ID
-              </span>
-              <span className="text-xs sm:text-[13px] font-bold text-neutral-900 block truncate font-mono">
-                {txId}
-              </span>
-            </div>
-
-            <div className="space-y-1 min-w-0">
-              <span className="text-[11px] font-medium text-neutral-400 block tracking-tight">
-                Invoice ID
-              </span>
-              <span className="text-xs sm:text-[13px] font-bold text-neutral-900 block truncate font-mono">
-                {invId}
-              </span>
-            </div>
-          </div>
-
-          {/* Row 2: Payment Method, Payment Time */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-0.5">
-            <div className="space-y-1 min-w-0">
-              <span className="text-[11px] font-medium text-neutral-400 block tracking-tight">
-                Payment Method
-              </span>
-              <span className="text-xs sm:text-[13px] font-bold text-neutral-900 block truncate">
-                {data.paymentMethod || 'Online / Razorpay'}
-              </span>
-            </div>
-
-            <div className="space-y-1 min-w-0">
-              <span className="text-[11px] font-medium text-neutral-400 block tracking-tight">
-                Payment Time
-              </span>
-              <span className="text-xs sm:text-[13px] font-bold text-neutral-900 block truncate">
-                {formatPaymentDateTime(createdDate)}
-              </span>
-            </div>
-          </div>
+      {/* 3. Final Price Box (Show ONLY final price + Inclusive of all taxes & GST) */}
+      <div className="p-4 rounded-2xl bg-blue-50/60 border border-blue-100/70 my-3">
+        <div className="flex items-baseline justify-between">
+          <span className="font-bold text-neutral-700 text-sm sm:text-base">
+            Total Paid
+          </span>
+          <span className="font-mono text-2xl sm:text-[28px] font-black text-[#0033FF] tracking-tight">
+            ₹{formattedAmount}
+          </span>
         </div>
-
-        {/* Divider Line */}
-        <div className="border-t border-neutral-100 my-1" />
-
-        {/* Bottom Row: Student Card / Account & Amount Paid */}
-        <div className="flex items-center justify-between gap-3 pt-0.5">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <MastercardIcon className="h-6 w-auto shrink-0" />
-            <div className="min-w-0">
-              <span className="text-xs sm:text-sm font-bold text-neutral-900 block truncate leading-tight">
-                {data.studentName || 'Student'}
-              </span>
-              <span className="text-[11px] text-neutral-500 font-mono block truncate">
-                {data.studentEmail ? `**** ${data.studentEmail.slice(-14)}` : '**** **** 9087'}
-              </span>
-            </div>
-          </div>
-
-          <div className="shrink-0 text-right">
-            <span className="text-[11px] font-medium text-neutral-400 block tracking-tight">
-              Paid
-            </span>
-            <span className="text-base sm:text-lg font-black text-neutral-900 block tracking-tight">
-              ₹{formattedAmount}
-            </span>
-          </div>
+        <div className="text-[11px] text-neutral-500 font-medium mt-0.5 text-right">
+          Including all taxes &amp; GST
         </div>
+      </div>
 
-        {/* Action Buttons: Start Learning Now & Download Tax Invoice */}
-        <div className="pt-2 sm:pt-3 space-y-2.5">
-          <Link
-            href={`/learn/${data.courseSlug || 'hydraulic-engineering-mastery'}`}
-            className="w-full h-11 sm:h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-xs sm:text-sm rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 uppercase tracking-wider cursor-pointer"
+      {/* 4. Confirmation Email Notice (Clean text, NO icons) */}
+      <div className="my-4 text-center">
+        <p className="text-xs sm:text-[13px] text-neutral-500 font-normal leading-relaxed">
+          Payment receipt has been sent to{' '}
+          <strong className="font-semibold text-neutral-900 break-all">
+            {data.studentEmail || 'your email'}
+          </strong>
+        </p>
+      </div>
+
+      {/* 5. Minimal Action Buttons */}
+      <div className="space-y-2 pt-1">
+        {/* Primary Button: Go to My Courses */}
+        <Link
+          href="/my-courses"
+          className="w-full h-12 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 tracking-wide cursor-pointer uppercase"
+        >
+          <span>Go to My Courses &rarr;</span>
+        </Link>
+
+        {/* Secondary Button: Download Receipt */}
+        {onDownloadInvoice && (
+          <button
+            type="button"
+            onClick={onDownloadInvoice}
+            disabled={downloadingInvoice}
+            className="w-full h-11 border border-neutral-200 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-neutral-700 font-semibold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60"
           >
-            <Play className="w-4 h-4 fill-white text-white" />
-            <span>Start Learning Now</span>
-          </Link>
-
-          {onDownloadInvoice && (
-            <button
-              type="button"
-              onClick={onDownloadInvoice}
-              disabled={downloadingInvoice}
-              className="w-full h-11 sm:h-12 border border-neutral-200 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-neutral-800 font-bold text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer disabled:opacity-60 uppercase tracking-wider"
-            >
-              {downloadingInvoice ? (
-                <Loader2 className="w-4 h-4 animate-spin text-[#0033FF]" />
-              ) : (
-                <Download className="w-4 h-4 text-[#0033FF]" />
-              )}
-              <span>{downloadingInvoice ? 'Downloading...' : 'Download Tax Invoice'}</span>
-            </button>
-          )}
-
-          <div className="pt-1 text-center">
-            <Link
-              href="/my-courses"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors"
-            >
-              <span>View all your courses in My Courses</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </div>
+            <span>{downloadingInvoice ? 'Downloading Receipt...' : 'Download Receipt'}</span>
+          </button>
+        )}
       </div>
     </div>
   );

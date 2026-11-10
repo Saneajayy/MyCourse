@@ -52,7 +52,7 @@ export function PaymentSuccessModal({
       <div className="fixed inset-0" aria-hidden="true" onClick={onClose} />
 
       {/* Modal Dialog Content */}
-      <div className="relative z-10 w-full max-w-[520px] my-auto">
+      <div className="relative z-10 w-full max-w-[460px] my-auto">
         {/* Close Button in Top Right */}
         <button
           type="button"
