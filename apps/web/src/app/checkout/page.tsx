@@ -386,11 +386,11 @@ function CheckoutContent() {
             pricesTaxInclusive: taxConfig?.pricesTaxInclusive !== false,
             coupon: appliedCoupon
               ? {
-                  code: appliedCoupon.code,
-                  discountPaise: disc,
-                  type: appliedCoupon.type,
-                  value: appliedCoupon.value,
-                }
+                code: appliedCoupon.code,
+                discountPaise: disc,
+                type: appliedCoupon.type,
+                value: appliedCoupon.value,
+              }
               : null,
           });
         }
@@ -970,179 +970,177 @@ function CheckoutContent() {
           <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-8 select-none overflow-hidden space-y-6">
             {/* Simple Billing Information Headline */}
             <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
-              Billing Information
-            </h1>
-            <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
-              Enter your student contact and tax invoice information. Your course access will be unlocked instantly.
-            </p>
-          </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
+                Billing Information
+              </h1>
+              <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
+                Enter your student contact and tax invoice information.
+              </p>
+            </div>
 
-          {/* Billing Form Fields */}
-          <div className="space-y-4 pt-1">
-            {/* First Name & Last Name in one single row */}
-            <div className="grid grid-cols-2 gap-3 sm:gap-3.5">
-              {/* First Name */}
+            {/* Billing Form Fields */}
+            <div className="space-y-4 pt-1">
+              {/* First Name & Last Name in one single row */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-3.5">
+                {/* First Name */}
+                <div className="space-y-1.5 text-left">
+                  <label htmlFor="checkout-first-name" className="text-sm font-bold text-neutral-900 block">
+                    First Name <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    id="checkout-first-name"
+                    type="text"
+                    required
+                    placeholder="Ramesh"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
+                  />
+                </div>
+
+                {/* Last Name */}
+                <div className="space-y-1.5 text-left">
+                  <label htmlFor="checkout-last-name" className="text-sm font-bold text-neutral-900 block">
+                    Last Name <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    id="checkout-last-name"
+                    type="text"
+                    required
+                    placeholder="Kumar"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Email Address */}
               <div className="space-y-1.5 text-left">
-                <label htmlFor="checkout-first-name" className="text-sm font-bold text-neutral-900 block">
-                  First Name <span className="text-rose-500">*</span>
+                <label htmlFor="checkout-email" className="text-sm font-bold text-neutral-900 block">
+                  Email Address <span className="text-rose-500">*</span>
                 </label>
                 <input
-                  id="checkout-first-name"
-                  type="text"
+                  id="checkout-email"
+                  type="email"
                   required
-                  placeholder="Ramesh"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
+                  disabled={isAuthenticated}
+                  placeholder="engineer@plant.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
                 />
               </div>
 
-              {/* Last Name */}
+              {/* Phone Number */}
               <div className="space-y-1.5 text-left">
-                <label htmlFor="checkout-last-name" className="text-sm font-bold text-neutral-900 block">
-                  Last Name <span className="text-rose-500">*</span>
+                <label htmlFor="checkout-phone" className="text-sm font-bold text-neutral-900 block">
+                  Phone Number <span className="text-rose-500">*</span>
                 </label>
                 <input
-                  id="checkout-last-name"
-                  type="text"
+                  id="checkout-phone"
+                  type="tel"
                   required
-                  placeholder="Kumar"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all"
+                  placeholder="+91 98765 43210"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono"
+                />
+              </div>
+
+              {/* Company GSTIN */}
+              <div className="space-y-1.5 text-left">
+                <label htmlFor="checkout-gstin" className="text-sm font-bold text-neutral-900 block">
+                  Company GSTIN
+                </label>
+                <input
+                  id="checkout-gstin"
+                  type="text"
+                  placeholder="22AAAAA0000A1Z5"
+                  value={gstin}
+                  onChange={(e) => setGstin(e.target.value.toUpperCase())}
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono uppercase"
                 />
               </div>
             </div>
 
-            {/* Email Address */}
-            <div className="space-y-1.5 text-left">
-              <label htmlFor="checkout-email" className="text-sm font-bold text-neutral-900 block">
-                Email Address <span className="text-rose-500">*</span>
-              </label>
-              <input
-                id="checkout-email"
-                type="email"
-                required
-                disabled={isAuthenticated}
-                placeholder="engineer@plant.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
-              />
-            </div>
-
-            {/* Phone Number */}
-            <div className="space-y-1.5 text-left">
-              <label htmlFor="checkout-phone" className="text-sm font-bold text-neutral-900 block">
-                Phone Number <span className="text-rose-500">*</span>
-              </label>
-              <input
-                id="checkout-phone"
-                type="tel"
-                required
-                placeholder="+91 98765 43210"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono"
-              />
-            </div>
-
-            {/* Company GSTIN */}
-            <div className="space-y-1.5 text-left">
-              <label htmlFor="checkout-gstin" className="text-sm font-bold text-neutral-900 block">
-                Company GSTIN (Optional)
-              </label>
-              <input
-                id="checkout-gstin"
-                type="text"
-                placeholder="22AAAAA0000A1Z5"
-                value={gstin}
-                onChange={(e) => setGstin(e.target.value.toUpperCase())}
-                className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono uppercase"
-              />
-            </div>
-          </div>
-
-          {/* Error Alert Banner: Translucent Red (matching Login/Register) */}
-          {checkoutError && (
-            <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium flex items-center justify-center text-center animate-in fade-in">
-              <span>{checkoutError}</span>
-            </div>
-          )}
-
-          {/* Primary Checkout CTA */}
-          <div className="pt-2">
-            {!isAuthenticated ? (
-              <Link
-                href="/login?redirect=/checkout"
-                className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all flex items-center justify-center cursor-pointer text-center select-none"
-              >
-                Sign In to Continue Checkout &rarr;
-              </Link>
-            ) : !user?.emailVerifiedAt ? (
-              <button
-                type="button"
-                disabled
-                className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-neutral-200 text-neutral-500 font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg opacity-75 cursor-not-allowed flex items-center justify-center text-center select-none"
-              >
-                Verify Email to Enable Payment
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleProceedToPayment}
-                disabled={quoteLoading || isSubmitting}
-                className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer select-none"
-              >
-                {isSubmitting || quoteLoading ? (
-                  <Loader2 className="w-5 h-5 animate-spin text-white" />
-                ) : (
-                  <Lock className="w-4.5 h-4.5 text-white stroke-[2.5]" />
-                )}
-                <span>
-                  Pay ₹{(finalPricePaise / 100).toLocaleString('en-IN')} with Razorpay
-                </span>
-              </button>
+            {/* Error Alert Banner: Translucent Red (matching Login/Register) */}
+            {checkoutError && (
+              <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium flex items-center justify-center text-center animate-in fade-in">
+                <span>{checkoutError}</span>
+              </div>
             )}
 
+            {/* Primary Checkout CTA */}
+            <div className="pt-2">
+              {!isAuthenticated ? (
+                <Link
+                  href="/login?redirect=/checkout"
+                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all flex items-center justify-center cursor-pointer text-center select-none"
+                >
+                  Sign In to Continue Checkout &rarr;
+                </Link>
+              ) : !user?.emailVerifiedAt ? (
+                <button
+                  type="button"
+                  disabled
+                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-neutral-200 text-neutral-500 font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg opacity-75 cursor-not-allowed flex items-center justify-center text-center select-none"
+                >
+                  Verify Email to Enable Payment
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleProceedToPayment}
+                  disabled={quoteLoading || isSubmitting}
+                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-[#0033FF] hover:bg-[#0028D6] active:bg-[#0020b8] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer select-none"
+                >
+                  {isSubmitting || quoteLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin text-white" />
+                  ) : (
+                    <Lock className="w-4.5 h-4.5 text-white stroke-[2.5]" />
+                  )}
+                  <span>
+                    Pay ₹{(finalPricePaise / 100).toLocaleString('en-IN')} with Razorpay
+                  </span>
+                </button>
+              )}
+
+            </div>
+
+            {/* Payment Methods and Security Guarantee */}
+            <div className="-mx-5 sm:-mx-8 border-t border-neutral-200/80 pt-4 px-5 sm:px-8 space-y-2 text-center">
+              {/* Secured by Razorpay in Center */}
+              <div className="flex items-center justify-center gap-1.5 text-neutral-600 text-xs sm:text-[13px] font-medium">
+                <span>Secured by</span>
+                <RazorpayLogo className="h-4 sm:h-[18px] w-auto" />
+              </div>
+
+              {/* Accepted Payment Methods under Secured by Razorpay */}
+              <div className="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider text-neutral-400">
+                Accepted Payment Methods
+              </div>
+
+              {/* Real Brand Logos in One Single Row: GPay, Visa, Mastercard, Paytm */}
+              <div className="flex items-center justify-center gap-5 sm:gap-6 pt-0.5 pb-0.5 flex-nowrap">
+                <div title="Google Pay (GPay)" className="shrink-0 flex items-center justify-center">
+                  <GPayLogo className="h-[18px] sm:h-[21px] w-auto" />
+                </div>
+                <div title="Visa" className="shrink-0 flex items-center justify-center">
+                  <VisaLogo className="h-[14px] sm:h-[16px] w-auto" />
+                </div>
+                <div title="Mastercard" className="shrink-0 flex items-center justify-center">
+                  <MastercardLogo className="h-[18px] sm:h-[21px] w-auto" />
+                </div>
+                <div title="Paytm" className="shrink-0 flex items-center justify-center">
+                  <PaytmLogo className="h-[17px] sm:h-[20px] w-auto" />
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Payment Methods and Security Guarantee */}
-          <div className="border-t border-neutral-200/80 pt-4 space-y-2 text-center">
-            {/* Secured by Razorpay in Center */}
-            <div className="flex items-center justify-center gap-1.5 text-neutral-600 text-xs sm:text-[13px] font-medium">
-              <span>Secured by</span>
-              <RazorpayLogo className="h-4 sm:h-[18px] w-auto" />
-            </div>
-
-            {/* Accepted Payment Methods under Secured by Razorpay */}
-            <div className="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider text-neutral-400">
-              Accepted Payment Methods
-            </div>
-
-            {/* Real Brand Logos in One Single Row: GPay, Visa, Mastercard, Paytm */}
-            <div className="flex items-center justify-center gap-5 sm:gap-6 pt-0.5 pb-0.5 flex-nowrap">
-              <div title="Google Pay (GPay)" className="shrink-0 flex items-center justify-center">
-                <GPayLogo className="h-[18px] sm:h-[21px] w-auto" />
-              </div>
-              <div title="Visa" className="shrink-0 flex items-center justify-center">
-                <VisaLogo className="h-[14px] sm:h-[16px] w-auto" />
-              </div>
-              <div title="Mastercard" className="shrink-0 flex items-center justify-center">
-                <MastercardLogo className="h-[18px] sm:h-[21px] w-auto" />
-              </div>
-              <div title="Paytm" className="shrink-0 flex items-center justify-center">
-                <PaytmLogo className="h-[17px] sm:h-[20px] w-auto" />
-              </div>
-            </div>
-          </div>
-        </div>
-        </div>
-
-        {/* Footer Terms & Policy Links */}
-        <div className="w-full max-w-lg mx-auto px-6 sm:px-8 pb-6 sm:pb-8 pt-4 text-center text-xs text-neutral-500 leading-normal">
-          <p>
+          {/* Footer Terms & Policy Links - shifted up directly below card */}
+          <p className="text-center text-xs text-neutral-500 leading-normal px-2 pt-1">
             By completing this payment, you agree to the{' '}
             <Link href="/terms" className="underline hover:text-neutral-800">
               Terms of Service
