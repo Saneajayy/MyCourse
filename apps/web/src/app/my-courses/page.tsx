@@ -17,6 +17,7 @@ import {
   Smartphone,
   Receipt,
   Search,
+  Menu,
   X,
   Check,
   CheckCircle2,
@@ -185,10 +186,12 @@ function StudentDashboardContent() {
       ? tabParam
       : 'courses',
   );
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Sync tab with URL query parameter
   const handleTabChange = (newTab: DashboardTab) => {
     setActiveTab(newTab);
+    setIsMobileMenuOpen(false);
     const url = new URL(window.location.href);
     url.searchParams.set('tab', newTab);
     window.history.replaceState({}, '', url.toString());
@@ -453,20 +456,10 @@ function StudentDashboardContent() {
       {/* 1. LEFT BLUE COLUMN (Solid #0033FF, embedded image, clean tabs) */}
       {/* ============================================================== */}
 
-      {/* Mobile Top Header + Horizontal Scroll Strip */}
-      <div className="md:hidden w-full bg-[#0033FF] border-b border-white/50 select-none z-30 shrink-0 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-25">
-          <Image
-            src="/login-pixelated.png"
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover object-center mix-blend-screen select-none"
-          />
-        </div>
-
-        {/* Mobile Brand Logo Bar */}
-        <div className="relative z-10 px-5 py-4 border-b border-white/50 flex items-center justify-between">
+      {/* Mobile Top Header: Solid Blue Bar with Brand Logo & Three Bars Dropdown */}
+      <div className="md:hidden sticky top-0 inset-x-0 w-full bg-[#0033FF] border-b border-white/50 select-none z-40 shrink-0 relative shadow-none">
+        {/* Mobile Header Bar */}
+        <div className="w-full h-16 sm:h-20 px-5 sm:px-6 flex items-center justify-between">
           <Link
             href="/"
             className="flex flex-col -space-y-0.5 leading-[0.92] text-white hover:opacity-90 select-none"
@@ -479,52 +472,103 @@ function StudentDashboardContent() {
               BASICS
             </span>
           </Link>
-        </div>
 
-        {/* Mobile Scrollable Tabs with Thin White Vertical Separators */}
-        <nav
-          aria-label="Student Mobile Tabs"
-          className="relative z-10 flex items-stretch overflow-x-auto no-scrollbar"
-        >
-          {navTabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => handleTabChange(tab.id)}
-                className={`px-4 py-3 text-xs sm:text-sm font-bold border-r border-white/50 shrink-0 transition-colors cursor-pointer ${
-                  isActive
-                    ? 'bg-white text-[#0033FF] font-extrabold'
-                    : 'text-white hover:bg-white/10'
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
+          {/* Three bars toggle button in top right corner */}
           <button
             type="button"
-            onClick={() => logout()}
-            className="px-4 py-3 text-xs sm:text-sm font-bold text-white shrink-0 hover:bg-white/10 transition-colors cursor-pointer"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
+            aria-expanded={isMobileMenuOpen}
+            className="h-10 w-10 flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-colors focus:outline-none cursor-pointer"
           >
-            Log Out
+            {isMobileMenuOpen ? <X className="w-6 h-6 stroke-[2.5]" /> : <Menu className="w-6 h-6 stroke-[2.5]" />}
           </button>
-        </nav>
+        </div>
+
+        {/* Dropping Column when opened (just like in home page mobile view) */}
+        {isMobileMenuOpen && (
+          <div className="w-full bg-[#0033FF] border-t border-white/50 relative overflow-hidden transition-all animate-in slide-in-from-top-2 duration-150">
+            {/* Background halftone image shifted to the right */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-25">
+              <div className="absolute inset-0 translate-x-8 sm:translate-x-12 scale-110">
+                <Image
+                  src="/login-pixelated.png"
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  className="object-cover object-center mix-blend-screen select-none"
+                />
+              </div>
+            </div>
+
+            {/* Column of Full-Width Tabs with Thin White Dividing Borders */}
+            <nav
+              aria-label="Student Mobile Navigation Column"
+              className="relative z-10 flex flex-col w-full"
+            >
+              {navTabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => {
+                      handleTabChange(tab.id);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full text-left px-6 py-4 text-[15px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
+                      isActive
+                        ? 'bg-white text-[#0033FF] font-extrabold'
+                        : 'bg-transparent text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+
+              {/* Log Out Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  logout();
+                }}
+                className="w-full text-left px-6 py-4 text-[15px] font-bold text-white border-b border-white/50 hover:bg-white/10 active:bg-rose-500/20 transition-colors cursor-pointer select-none"
+              >
+                Log Out
+              </button>
+
+              {/* Admin Switch Link (if admin) */}
+              {user?.role === 'ADMIN' && (
+                <Link
+                  href="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full text-left px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-emerald-200 border-b border-white/50 hover:bg-white/10 flex items-center gap-2"
+                >
+                  <ShieldCheck className="w-4 h-4 text-emerald-300" />
+                  <span>Admin Console</span>
+                </Link>
+              )}
+            </nav>
+          </div>
+        )}
       </div>
 
       {/* Desktop Sidebar: Solid Blue Column with Embedded Image & Contrasting Tabs */}
       <aside className="hidden md:flex md:fixed md:top-0 md:bottom-0 md:left-0 md:w-64 lg:w-72 bg-[#0033FF] text-white flex-col shrink-0 z-30 select-none border-r border-white/50 overflow-y-auto relative shadow-none">
-        {/* Previous Image Embedded on Column Back (Not Glassy, Clean Halftone) */}
+        {/* Previous Image Embedded on Column Back (Shifted to the Right, Not Glassy) */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-          <Image
-            src="/login-pixelated.png"
-            alt="Hydraulic System Graphic"
-            fill
-            sizes="300px"
-            priority
-            className="object-cover object-center mix-blend-screen opacity-35 select-none"
-          />
+          <div className="absolute inset-0 translate-x-8 lg:translate-x-12 scale-110">
+            <Image
+              src="/login-pixelated.png"
+              alt="Hydraulic System Graphic"
+              fill
+              sizes="300px"
+              priority
+              className="object-cover object-center mix-blend-screen opacity-35 select-none"
+            />
+          </div>
         </div>
 
         {/* Top: Brand Logo with Bottom Dividing Line */}
