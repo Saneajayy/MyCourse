@@ -410,12 +410,7 @@ function CheckoutContent() {
   // Read price and tax breakdown
   const basePricePaise = quote?.basePricePaise ?? course?.pricePaise ?? 499900;
   const discountPaise = quote?.discountPaise ?? 0;
-  const subtotalPaise = quote?.subtotalPaise ?? basePricePaise;
-  const taxPaise = quote?.taxPaise ?? 0;
   const finalPricePaise = quote?.totalPaise ?? basePricePaise;
-  const isTaxApplicable = quote?.isTaxApplicable ?? false;
-  const taxRatePercent = quote?.taxRatePercent ?? 0;
-  const pricesTaxInclusive = quote?.pricesTaxInclusive ?? taxConfig?.pricesTaxInclusive !== false;
 
   // Resend verification email
   const handleResendVerification = async () => {
@@ -661,6 +656,78 @@ function CheckoutContent() {
           className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/90 via-[#000c3b]/35 to-transparent pointer-events-none"
           aria-hidden="true"
         />
+        {/* Strip: Final Price & Coupon Entry Bar */}
+        <div className="relative z-10 w-full mb-3 bg-[#000d3b]/85 backdrop-blur-md border border-white/20 rounded-xl p-3.5 sm:p-4 text-white shadow-2xl">
+          <div className="flex items-center justify-between gap-3">
+            {/* Final Price */}
+            <div className="flex flex-col justify-center shrink-0">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-blue-200/80">
+                Final Price
+              </span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
+                  ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
+                </span>
+                {appliedCoupon && (
+                  <span className="text-xs text-blue-200/60 line-through font-mono">
+                    ₹{(basePricePaise / 100).toLocaleString('en-IN')}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Coupon Code Entry Bar or Applied Badge */}
+            <div className="flex-1 max-w-[280px]">
+              {appliedCoupon ? (
+                <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs">
+                  <div className="flex items-center gap-1.5 truncate">
+                    <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span className="font-mono font-bold tracking-wide">{appliedCoupon.code}</span>
+                    <span className="text-emerald-300 text-[11px]">
+                      (-₹{(discountPaise / 100).toLocaleString('en-IN')})
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-white/80 hover:text-white underline text-[11px] font-semibold cursor-pointer shrink-0"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleApplyCoupon} className="space-y-1">
+                  <div className="flex gap-1.5">
+                    <input
+                      type="text"
+                      placeholder="COUPON CODE"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                      className="w-full h-9.5 rounded-lg border border-white/20 bg-white/10 px-3 text-xs font-mono uppercase text-white placeholder:text-blue-200/50 focus:border-white focus:bg-white/20 focus:outline-none transition-all"
+                    />
+                    <button
+                      type="submit"
+                      disabled={couponLoading}
+                      className="h-9.5 px-3.5 bg-white hover:bg-blue-50 text-[#00186B] font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
+                    >
+                      {couponLoading ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-[#00186B]" />
+                      ) : (
+                        'Apply'
+                      )}
+                    </button>
+                  </div>
+                  {couponError && (
+                    <p className="text-[11px] font-semibold text-rose-300 flex items-center gap-1">
+                      <X className="w-3 h-3 stroke-[2.5]" />
+                      <span>{couponError}</span>
+                    </p>
+                  )}
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
 
         {/* Terms & Refund Disclaimer (Desktop Only - Bottom of Left Section) */}
         <div className="relative z-10 text-center text-xs text-blue-100/75 space-y-1">
@@ -773,129 +840,73 @@ function CheckoutContent() {
             </div>
           )}
 
-          {/* Order Summary & Coupon Card - Styled identically to Billing Information */}
-          <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-7 select-none overflow-hidden space-y-4">
-            {/* Header: Title */}
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
-                  Order Summary
-                </h2>
-                <p className="text-xs text-neutral-500">
-                  Course Base Enrollment &amp; Invoicing
-                </p>
-              </div>
-              <span className="text-xs font-mono text-neutral-400">
-                INR (₹)
-              </span>
-            </div>
-
-            {/* Fine Divider */}
-            <div className="-mx-5 sm:-mx-7 border-t border-neutral-200/80" />
-
-            {/* Price Breakdown Rows */}
-            <div className="space-y-3">
-              {/* Base Price */}
-              <div className="flex justify-between items-center text-xs sm:text-sm">
-                <span className="text-neutral-600 font-medium">Course Base Enrollment</span>
-                <span className="font-mono font-bold text-neutral-900">
-                  ₹{(basePricePaise / 100).toLocaleString('en-IN')}
+          {/* Mobile Only: Compact Price & Coupon Strip */}
+          <div className="lg:hidden relative w-full bg-neutral-50 border border-neutral-200/90 rounded-xl p-3.5 select-none space-y-2">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-col justify-center shrink-0">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-500">
+                  Final Price
                 </span>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-black font-mono tracking-tight text-[#0033FF] leading-none">
+                    ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
+                  </span>
+                  {appliedCoupon && (
+                    <span className="text-xs text-neutral-400 line-through font-mono">
+                      ₹{(basePricePaise / 100).toLocaleString('en-IN')}
+                    </span>
+                  )}
+                </div>
               </div>
 
-              {/* Applied Coupon Display */}
-              {appliedCoupon && (
-                <div className="flex justify-between items-center text-xs font-bold text-emerald-700 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
-                  <div className="flex items-center gap-1.5">
-                    <Tag className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Coupon ({appliedCoupon.code})</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono">
-                      -₹{(discountPaise / 100).toLocaleString('en-IN')}
-                    </span>
+              <div className="flex-1 max-w-[240px]">
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs">
+                    <div className="flex items-center gap-1 truncate">
+                      <Tag className="w-3 h-3 text-emerald-600 shrink-0" />
+                      <span className="font-mono font-bold">{appliedCoupon.code}</span>
+                      <span className="text-emerald-700 text-[11px]">
+                        (-₹{(discountPaise / 100).toLocaleString('en-IN')})
+                      </span>
+                    </div>
                     <button
                       type="button"
                       onClick={handleRemoveCoupon}
-                      className="text-rose-600 hover:text-rose-800 underline text-xs font-semibold ml-1 cursor-pointer"
+                      className="text-rose-600 hover:text-rose-800 underline text-[11px] font-semibold cursor-pointer shrink-0"
                     >
                       Remove
                     </button>
                   </div>
-                </div>
-              )}
-
-              {/* Coupon Code Input */}
-              {!appliedCoupon && (
-                <form onSubmit={handleApplyCoupon} className="pt-0.5">
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="ENTER COUPON CODE"
-                      value={couponInput}
-                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                      className="w-full h-10 rounded-lg border border-neutral-300 bg-white px-3 text-xs font-mono uppercase text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-1 focus:ring-[#0033FF]/20 focus:outline-none transition-all flex-1"
-                    />
-                    <button
-                      type="submit"
-                      disabled={couponLoading}
-                      className="h-10 px-4 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0"
-                    >
-                      {couponLoading ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                      ) : (
-                        'Apply'
-                      )}
-                    </button>
-                  </div>
-                  {couponError && (
-                    <p className="text-[11px] font-semibold text-rose-600 mt-1.5 flex items-center gap-1">
-                      <X className="w-3.5 h-3.5 stroke-[2.5]" />
-                      <span>{couponError}</span>
-                    </p>
-                  )}
-                </form>
-              )}
-
-              {/* GST Tax Breakdown */}
-              {isTaxApplicable && taxPaise > 0 && (
-                <div className="border-t border-neutral-200/80 pt-2.5 space-y-1 text-xs text-neutral-600">
-                  <div className="flex justify-between">
-                    <span>Net Taxable Value</span>
-                    <span className="font-mono text-neutral-900 font-medium">
-                      ₹{(subtotalPaise / 100).toLocaleString('en-IN', {
-                        minimumFractionDigits: 2,
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>
-                      GST ({taxRatePercent}% {pricesTaxInclusive ? 'Inclusive' : 'Exclusive'})
-                    </span>
-                    <span className="font-mono text-neutral-900 font-medium">
-                      ₹{(taxPaise / 100).toLocaleString('en-IN', {
-                        minimumFractionDigits: 2,
-                      })}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Total Amount Due */}
-              <div className="border-t border-neutral-200/80 pt-3 flex justify-between items-end">
-                <div>
-                  <span className="text-[11px] uppercase tracking-wider text-neutral-500 block font-bold">
-                    Total Amount Due
-                  </span>
-                  <span className="text-[10px] text-neutral-400">
-                    {pricesTaxInclusive ? 'All GST & taxes included' : '+ Applicable taxes calculated'}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-[#0033FF] leading-none block">
-                    ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
-                  </span>
-                </div>
+                ) : (
+                  <form onSubmit={handleApplyCoupon} className="space-y-1">
+                    <div className="flex gap-1.5">
+                      <input
+                        type="text"
+                        placeholder="COUPON"
+                        value={couponInput}
+                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                        className="w-full h-9 rounded-lg border border-neutral-300 bg-white px-2.5 text-xs font-mono uppercase text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:outline-none transition-all"
+                      />
+                      <button
+                        type="submit"
+                        disabled={couponLoading}
+                        className="h-9 px-3 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0"
+                      >
+                        {couponLoading ? (
+                          <Loader2 className="w-3 h-3 animate-spin text-white" />
+                        ) : (
+                          'Apply'
+                        )}
+                      </button>
+                    </div>
+                    {couponError && (
+                      <p className="text-[10px] font-semibold text-rose-600 flex items-center gap-1">
+                        <X className="w-3 h-3 stroke-[2.5]" />
+                        <span>{couponError}</span>
+                      </p>
+                    )}
+                  </form>
+                )}
               </div>
             </div>
           </div>
