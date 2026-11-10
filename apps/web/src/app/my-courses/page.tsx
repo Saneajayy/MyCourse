@@ -13,8 +13,6 @@ import {
   BookOpen,
   Award,
   User as UserIcon,
-  Laptop,
-  Smartphone,
   Receipt,
   Search,
   Menu,
@@ -31,7 +29,7 @@ import {
   Lock,
 } from 'lucide-react';
 
-export type DashboardTab = 'courses' | 'certificates' | 'profile' | 'devices' | 'orders';
+export type DashboardTab = 'courses' | 'certificates' | 'profile' | 'orders';
 
 interface EnrolledCourse {
   product: {
@@ -57,15 +55,6 @@ interface EnrolledCourse {
     lessonId: string;
     title: string;
   } | null;
-}
-
-interface SessionData {
-  id: string;
-  userAgent: string | null;
-  ipAddress: string | null;
-  lastUsedAt: string;
-  createdAt: string;
-  isCurrent: boolean;
 }
 
 interface OrderHistoryItem {
@@ -182,7 +171,7 @@ function StudentDashboardContent() {
 
   const tabParam = searchParams.get('tab') as DashboardTab | null;
   const [activeTab, setActiveTab] = useState<DashboardTab>(
-    tabParam && ['courses', 'certificates', 'profile', 'devices', 'orders'].includes(tabParam)
+    tabParam && ['courses', 'certificates', 'profile', 'orders'].includes(tabParam)
       ? tabParam
       : 'courses',
   );
@@ -217,12 +206,6 @@ function StudentDashboardContent() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [passwordSaving, setPasswordSaving] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
-
-  // Sessions state
-  const [sessions, setSessions] = useState<SessionData[]>([]);
-  const [sessionsLoading, setSessionsLoading] = useState(false);
-  const [revokingSessionId, setRevokingSessionId] = useState<string | null>(null);
-  const [loggingOutAll, setLoggingOutAll] = useState(false);
 
   // Orders state
   const [orders, setOrders] = useState<OrderHistoryItem[]>([]);
@@ -273,19 +256,6 @@ function StudentDashboardContent() {
     }
   }, [logout, router]);
 
-  // Fetch Sessions
-  const loadSessions = useCallback(async () => {
-    setSessionsLoading(true);
-    try {
-      const data = await apiClient<{ sessions: SessionData[] }>('/sessions');
-      setSessions(data.sessions || []);
-    } catch (err: unknown) {
-      toastError('Failed to load devices', err instanceof Error ? err.message : 'Error');
-    } finally {
-      setSessionsLoading(false);
-    }
-  }, [toastError]);
-
   // Fetch Orders
   const loadOrders = useCallback(async () => {
     setOrdersLoading(true);
@@ -307,13 +277,11 @@ function StudentDashboardContent() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      if (activeTab === 'devices' && sessions.length === 0) {
-        loadSessions();
-      } else if (activeTab === 'orders' && orders.length === 0) {
+      if (activeTab === 'orders' && orders.length === 0) {
         loadOrders();
       }
     }
-  }, [activeTab, isAuthenticated, sessions.length, orders.length, loadSessions, loadOrders]);
+  }, [activeTab, isAuthenticated, orders.length, loadOrders]);
 
   // Profile save
   const handleSaveProfile = async (e: React.FormEvent) => {
@@ -387,34 +355,6 @@ function StudentDashboardContent() {
     }
   };
 
-  // Revoke session
-  const handleRevokeSession = async (sessionId: string) => {
-    setRevokingSessionId(sessionId);
-    try {
-      await apiClient(`/sessions/${sessionId}`, { method: 'DELETE' });
-      setSessions((prev) => prev.filter((s) => s.id !== sessionId));
-      toastSuccess('Session Revoked', 'Device has been signed out.');
-    } catch (err: unknown) {
-      toastError('Error', err instanceof Error ? err.message : 'Failed to revoke session');
-    } finally {
-      setRevokingSessionId(null);
-    }
-  };
-
-  // Logout all
-  const handleLogoutEverywhere = async () => {
-    setLoggingOutAll(true);
-    try {
-      await apiClient('/auth/logout-all', { method: 'POST' });
-      toastSuccess('Logged Out Everywhere', 'All active sessions have been invalidated.');
-      await logout();
-      router.push('/login');
-    } catch (err: unknown) {
-      toastError('Error', err instanceof Error ? err.message : 'Failed to logout everywhere');
-      setLoggingOutAll(false);
-    }
-  };
-
   // Filtered courses
   const filteredCourses = useMemo(() => {
     if (!searchQuery.trim()) return courses;
@@ -447,7 +387,6 @@ function StudentDashboardContent() {
     { id: 'certificates', label: 'My Certificates' },
     { id: 'profile', label: 'Profile' },
     { id: 'orders', label: 'Payment Orders' },
-    { id: 'devices', label: 'Devices' },
   ];
 
   return (
@@ -1073,86 +1012,7 @@ function StudentDashboardContent() {
             </div>
           )}
 
-          {/* TAB 4: DEVICES */}
-          {activeTab === 'devices' && (
-            <div className="space-y-6 text-left">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-left">
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
-                    Logged-in Devices
-                  </h1>
-                  <p className="text-xs sm:text-sm text-neutral-500 mt-1">
-                    Manage your active browser sessions across desktop, tablet, and mobile devices.
-                  </p>
-                </div>
-
-                {sessions.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={handleLogoutEverywhere}
-                    disabled={loggingOutAll}
-                    className="h-9 px-3.5 rounded-lg border border-rose-300 bg-white hover:bg-rose-50 text-rose-700 font-bold text-xs transition-colors cursor-pointer disabled:opacity-60 shrink-0 shadow-none"
-                  >
-                    {loggingOutAll ? 'Signing out...' : 'Sign Out Other Devices'}
-                  </button>
-                )}
-              </div>
-
-              {sessionsLoading ? (
-                <div className="bg-white border border-neutral-200 rounded-xl p-10 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-none">
-                  <Loader2 className="w-5 h-5 animate-spin text-black" />
-                  <span>Loading active sessions...</span>
-                </div>
-              ) : sessions.length === 0 ? (
-                <div className="bg-white border border-neutral-200 rounded-xl p-6 text-left text-sm text-neutral-500 shadow-none">
-                  No active session information available.
-                </div>
-              ) : (
-                <div className="bg-white border border-neutral-200 rounded-xl divide-y divide-neutral-200 shadow-none overflow-hidden max-w-2xl text-left">
-                  {sessions.map((sess) => {
-                    const isMobile = sess.userAgent?.toLowerCase().includes('mobile');
-                    return (
-                      <div key={sess.id} className="p-4 sm:p-4.5 flex items-center justify-between gap-4 hover:bg-neutral-50 transition-colors">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className="w-9 h-9 rounded-lg bg-neutral-100 text-black flex items-center justify-center shrink-0 border border-neutral-200">
-                            {isMobile ? <Smartphone className="w-4 h-4" /> : <Laptop className="w-4 h-4" />}
-                          </div>
-                          <div className="min-w-0 text-left">
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-bold text-neutral-900 truncate">
-                                {sess.userAgent || 'Web Browser'}
-                              </p>
-                              {sess.isCurrent && (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
-                                  Current Device
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-xs text-neutral-500 mt-0.5 truncate">
-                              IP: {sess.ipAddress || 'Hidden'} • Active {new Date(sess.lastUsedAt).toLocaleDateString('en-IN')}
-                            </p>
-                          </div>
-                        </div>
-
-                        {!sess.isCurrent && (
-                          <button
-                            type="button"
-                            onClick={() => handleRevokeSession(sess.id)}
-                            disabled={revokingSessionId === sess.id}
-                            className="h-8 px-3 rounded border border-neutral-200 hover:border-rose-300 hover:bg-rose-50 text-neutral-600 hover:text-rose-700 font-bold text-xs transition-colors cursor-pointer shrink-0 disabled:opacity-50"
-                          >
-                            {revokingSessionId === sess.id ? 'Revoking...' : 'Sign Out'}
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* TAB 5: PAYMENT ORDERS */}
+          {/* TAB 4: PAYMENT ORDERS */}
           {activeTab === 'orders' && (
             <div className="space-y-6 text-left">
               <div>
