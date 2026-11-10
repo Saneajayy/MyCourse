@@ -46,7 +46,7 @@ export function PaymentSuccessModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 overflow-y-auto select-none transition-all duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 overflow-y-auto select-none transition-all duration-200"
     >
       {/* Click backdrop to close */}
       <div className="fixed inset-0" aria-hidden="true" onClick={onClose} />
