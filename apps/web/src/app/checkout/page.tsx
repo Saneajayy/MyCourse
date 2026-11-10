@@ -18,7 +18,6 @@ import {
   Check,
   X,
   ArrowLeft,
-  Star,
 } from 'lucide-react';
 import { computeOrderTotals, TaxConfig } from '../../lib/tax';
 
@@ -643,217 +642,188 @@ function CheckoutContent() {
   return (
     <div className="w-full min-h-screen lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row">
       {/* ============================================================== */}
-      {/* LEFT COLUMN: Product Summary, Course Card, Perks, Order Details */}
-      {/* (Brand Pure Blue #0033FF, High-Contrast White Typography)       */}
+      {/* LEFT COLUMN: Clean Minimal White Card on Brand Pure Blue #0033FF */}
       {/* ============================================================== */}
-      <div className="w-full lg:w-1/2 lg:h-full bg-[#0033FF] text-white flex flex-col justify-between relative overflow-y-auto p-6 sm:p-8 lg:p-8 xl:p-12 border-b lg:border-b-0 lg:border-r border-white/10 select-none">
-        <div className="relative z-10 space-y-6 sm:space-y-7 max-w-xl mx-auto lg:mx-0 w-full">
-          {/* Top Escape Link */}
-          <div className="flex items-center justify-start pb-2 border-b border-white/15">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-white/80 hover:text-white text-xs sm:text-sm font-semibold transition-colors group cursor-pointer"
-            >
-              <ArrowLeft className="w-4 h-4 stroke-[2.5] transition-transform group-hover:-translate-x-1" />
-              <span>Back to Course</span>
-            </Link>
-          </div>
+      <div className="w-full lg:w-1/2 lg:h-full bg-[#0033FF] text-white flex flex-col justify-between relative overflow-y-auto p-4 sm:p-6 md:p-8 select-none">
+        {/* Top Escape Link */}
+        <div className="flex items-center justify-start pb-2">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-white/80 hover:text-white text-xs sm:text-sm font-semibold transition-colors group cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4 stroke-[2.5] transition-transform group-hover:-translate-x-1" />
+            <span>Back to Course</span>
+          </Link>
+        </div>
 
-          {/* Order Summary Headline */}
-          <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Order Summary
-            </h1>
-            <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
-              Review your course enrollment, syllabus validity, and tax-inclusive breakdown below.
-            </p>
-          </div>
+        {/* Centered Minimal Course & Order Card */}
+        <div className="flex-1 flex items-center justify-center py-2 sm:py-3 w-full my-auto">
+          <div className="relative w-full max-w-[430px] sm:max-w-[460px] bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 select-none overflow-hidden space-y-3.5 sm:space-y-4 text-neutral-900">
+            {/* Course Landscape Image */}
+            <div className="relative aspect-[16/10] w-full rounded-xl sm:rounded-2xl overflow-hidden bg-neutral-900 border border-neutral-100">
+              <Image
+                src="/course-hydraulic-basics.jpg"
+                alt={course?.title || 'Hydraulic System Basics'}
+                fill
+                sizes="(max-width: 640px) 100vw, 460px"
+                className="object-cover object-center"
+                priority
+              />
+            </div>
 
-          {/* Course Card Preview */}
-          <div className="w-full bg-white/10 border border-white/15 backdrop-blur-md rounded-2xl p-4 sm:p-5 transition-all">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              {/* Course Thumbnail */}
-              <div className="relative w-full sm:w-36 md:w-40 aspect-video sm:aspect-square rounded-xl overflow-hidden shrink-0 border border-white/20 bg-black/40">
-                <Image
-                  src="/course-hydraulic-basics.jpg"
-                  alt={course?.title || 'Hydraulic System Basics'}
-                  fill
-                  sizes="(max-width: 640px) 100vw, 160px"
-                  className="object-cover object-center"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded bg-black/75 text-[10px] font-bold tracking-wide uppercase text-white backdrop-blur-sm">
-                  1 Year Access
+            {/* Course Title matching reference image */}
+            <div className="pt-0.5">
+              <h2 className="font-extrabold text-lg sm:text-xl md:text-2xl text-[#0033FF] tracking-tight uppercase leading-snug">
+                HYDRAULIC SYSTEM BASICS.
+              </h2>
+            </div>
+
+            {/* Fine Divider Line */}
+            <div className="w-full border-t border-[#0033FF]/15" />
+
+            {/* Perks List with Royal Blue Check Circles */}
+            <div className="space-y-2 sm:space-y-2.5 pt-0.5">
+              {[
+                '60 video lessons in Hindi.',
+                'Certificate of completion.',
+                'Track your progress.',
+                'Stream in HD Quality.',
+              ].map((perk) => (
+                <div key={perk} className="flex items-center gap-2.5 text-xs sm:text-sm font-medium text-[#0033FF]">
+                  <span className="w-4 h-4 rounded-full bg-[#0033FF] flex items-center justify-center text-white shrink-0">
+                    <Check className="w-2.5 h-2.5 stroke-[3]" />
+                  </span>
+                  <span>{perk}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Divider between Perks and Order Breakdown */}
+            <div className="-mx-4 sm:-mx-6 border-t border-neutral-200/80" />
+
+            {/* Order Breakdown & Pricing Container */}
+            <div className="space-y-3 pt-0.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+                  Order Breakdown
+                </span>
+                <span className="text-[11px] font-mono text-neutral-400">
+                  INR (₹) Invoicing
                 </span>
               </div>
 
-              {/* Course Information */}
-              <div className="space-y-1.5 flex-1 min-w-0">
-                <span className="text-[11px] font-bold text-cyan-300 uppercase tracking-wider block">
-                  Self-Paced Masterclass
+              {/* Base Course Price */}
+              <div className="flex justify-between items-center text-xs sm:text-sm">
+                <span className="text-neutral-600">Course Base Enrollment</span>
+                <span className="font-mono font-bold text-neutral-900">
+                  ₹{(basePricePaise / 100).toLocaleString('en-IN')}
                 </span>
-                <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight leading-snug truncate">
-                  {course?.title || 'Hydraulic System Basics'}
-                </h2>
-                <p className="text-xs text-blue-100/80 line-clamp-2 leading-relaxed">
-                  Comprehensive industrial hydraulic engineering: valve schematics, pump selection, fluid power, and field troubleshooting.
-                </p>
-                <div className="pt-1 flex flex-wrap items-center gap-2 text-[11px] font-semibold text-white/90">
-                  <span className="inline-flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-md">
-                    <Check className="w-3 h-3 text-emerald-400 stroke-[3]" />
-                    Hindi + Eng Terms
+              </div>
+
+              {/* Applied Coupon Display */}
+              {appliedCoupon && (
+                <div className="flex justify-between items-center text-xs font-bold text-emerald-700 bg-emerald-50 p-2.5 rounded-lg border border-emerald-200">
+                  <div className="flex items-center gap-1.5">
+                    <Tag className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Coupon ({appliedCoupon.code})</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono">
+                      -₹{(discountPaise / 100).toLocaleString('en-IN')}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="text-rose-600 hover:text-rose-800 underline text-xs font-semibold ml-1 cursor-pointer"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Coupon Code Input */}
+              {!appliedCoupon && (
+                <form onSubmit={handleApplyCoupon} className="pt-0.5">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="ENTER COUPON CODE"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                      className="w-full h-9 rounded-lg border border-neutral-300 bg-white px-3 text-xs font-mono uppercase text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-1 focus:ring-[#0033FF]/20 focus:outline-none transition-all flex-1"
+                    />
+                    <button
+                      type="submit"
+                      disabled={couponLoading}
+                      className="h-9 px-3.5 bg-[#0033FF] hover:bg-[#0028D6] text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0"
+                    >
+                      {couponLoading ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                      ) : (
+                        'Apply'
+                      )}
+                    </button>
+                  </div>
+                  {couponError && (
+                    <p className="text-[11px] font-semibold text-rose-600 mt-1 flex items-center gap-1">
+                      <X className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <span>{couponError}</span>
+                    </p>
+                  )}
+                </form>
+              )}
+
+              {/* GST Tax Breakdown */}
+              {isTaxApplicable && taxPaise > 0 && (
+                <div className="border-t border-neutral-200/80 pt-2 space-y-1 text-xs text-neutral-600">
+                  <div className="flex justify-between">
+                    <span>Net Taxable Value</span>
+                    <span className="font-mono text-neutral-900 font-medium">
+                      ₹
+                      {(subtotalPaise / 100).toLocaleString('en-IN', {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>
+                      GST ({taxRatePercent}%{' '}
+                      {pricesTaxInclusive ? 'Inclusive' : 'Exclusive'})
+                    </span>
+                    <span className="font-mono text-neutral-900 font-medium">
+                      ₹
+                      {(taxPaise / 100).toLocaleString('en-IN', {
+                        minimumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Total Amount Due */}
+              <div className="border-t border-neutral-200/80 pt-3 flex justify-between items-end">
+                <div>
+                  <span className="text-[11px] uppercase tracking-wider text-neutral-500 block font-bold">
+                    Total Amount Due
                   </span>
-                  <span className="inline-flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-md">
-                    <Check className="w-3 h-3 text-emerald-400 stroke-[3]" />
-                    QR Verified Certificate
+                  <span className="text-[10px] text-neutral-400">
+                    {pricesTaxInclusive ? 'All GST & taxes included' : '+ Applicable taxes calculated'}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-[#0033FF] leading-none block">
+                    ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
                   </span>
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Order Details & Pricing Card */}
-          <div className="w-full bg-white/10 border border-white/15 backdrop-blur-md rounded-2xl p-5 sm:p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-white/15 pb-3">
-              <h3 className="text-base font-bold text-white tracking-tight">
-                Order Breakdown
-              </h3>
-              <span className="text-xs font-mono font-medium text-blue-200">
-                INR (₹) Invoicing
-              </span>
-            </div>
-
-            {/* Base Course Price */}
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-blue-100">Course Base Enrollment</span>
-              <span className="font-mono font-bold text-white">
-                ₹{(basePricePaise / 100).toLocaleString('en-IN')}
-              </span>
-            </div>
-
-            {/* Applied Coupon Display */}
-            {appliedCoupon && (
-              <div className="flex justify-between items-center text-xs font-bold text-emerald-300 bg-emerald-950/60 p-2.5 rounded-lg border border-emerald-500/30">
-                <div className="flex items-center gap-1.5">
-                  <Tag className="w-4 h-4 text-emerald-400" />
-                  <span>Coupon ({appliedCoupon.code})</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono">
-                    -₹{(discountPaise / 100).toLocaleString('en-IN')}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleRemoveCoupon}
-                    className="text-rose-300 hover:text-white underline text-xs font-semibold ml-1 cursor-pointer"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Coupon Code Input */}
-            {!appliedCoupon && (
-              <form onSubmit={handleApplyCoupon} className="pt-1">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="ENTER COUPON CODE"
-                    value={couponInput}
-                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                    className="w-full h-10 rounded-lg border border-white/20 bg-white/10 px-3 text-xs font-mono uppercase text-white placeholder:text-white/40 focus:border-cyan-300 focus:bg-white/15 focus:outline-none transition-all flex-1"
-                  />
-                  <button
-                    type="submit"
-                    disabled={couponLoading}
-                    className="h-10 px-4 bg-white hover:bg-neutral-100 text-[#00186B] font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0"
-                  >
-                    {couponLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-[#00186B]" />
-                    ) : (
-                      'Apply'
-                    )}
-                  </button>
-                </div>
-                {couponError && (
-                  <p className="text-[11px] font-semibold text-rose-300 mt-1.5 flex items-center gap-1">
-                    <X className="w-3.5 h-3.5 stroke-[2.5]" />
-                    <span>{couponError}</span>
-                  </p>
-                )}
-              </form>
-            )}
-
-            {/* GST Tax Breakdown */}
-            {isTaxApplicable && taxPaise > 0 && (
-              <div className="border-t border-white/15 pt-3 space-y-1.5 text-xs text-blue-100/80">
-                <div className="flex justify-between">
-                  <span>Net Taxable Value</span>
-                  <span className="font-mono text-white">
-                    ₹
-                    {(subtotalPaise / 100).toLocaleString('en-IN', {
-                      minimumFractionDigits: 2,
-                    })}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span>
-                    IGST / CGST+SGST ({taxRatePercent}%{' '}
-                    {pricesTaxInclusive ? 'Inclusive' : 'Exclusive'})
-                  </span>
-                  <span className="font-mono text-white">
-                    ₹
-                    {(taxPaise / 100).toLocaleString('en-IN', {
-                      minimumFractionDigits: 2,
-                    })}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Total Amount Due */}
-            <div className="border-t border-white/20 pt-4 flex justify-between items-end">
-              <div>
-                <span className="text-xs uppercase tracking-wider text-cyan-200 block font-bold">
-                  Total Amount Due
-                </span>
-                <span className="text-[11px] text-blue-200/70">
-                  {pricesTaxInclusive ? 'All GST & taxes included' : '+ Applicable taxes calculated'}
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none block">
-                  ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Social Proof & Rating Trust */}
-          <div className="flex items-center justify-between text-xs text-blue-100/75 pt-2 border-t border-white/15">
-            <div className="flex items-center gap-1.5">
-              <div className="flex text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
-                ))}
-              </div>
-              <span className="font-semibold text-white">4.9 / 5</span>
-              <span>(1,200+ engineers)</span>
-            </div>
-            <span className="hidden sm:inline-block font-mono text-[11px] text-cyan-300">
-              ISO-Compliant Curriculum
-            </span>
           </div>
         </div>
 
         {/* Footer Guarantee & Terms */}
-        <div className="relative z-10 pt-5 mt-5 sm:pt-6 sm:mt-6 border-t border-white/15 text-center lg:text-left text-xs text-blue-100/60 space-y-2.5">
+        <div className="pt-2 text-center text-xs text-blue-100/70 space-y-1 shrink-0">
           <p>
-            Official course curriculum by <strong className="text-white">{siteConfig.instructor.name}</strong>. Certified for plant engineers, diploma holders, and maintenance technicians.
-          </p>
-          <p className="text-blue-100/70">
             By completing this payment, you agree to the{' '}
             <Link href="/terms" className="underline text-white hover:text-cyan-200">
               Terms of Service
@@ -862,7 +832,10 @@ function CheckoutContent() {
             <Link href="/refunds" className="underline text-white hover:text-cyan-200">
               Refund Policy
             </Link>
-            . Need assistance? Contact{' '}
+            .
+          </p>
+          <p className="text-[11px] text-blue-100/60">
+            Need assistance? Contact{' '}
             <a href={`mailto:${siteConfig.supportEmail}`} className="underline text-white hover:text-cyan-200">
               {siteConfig.supportEmail}
             </a>
