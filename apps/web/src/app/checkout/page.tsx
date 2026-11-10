@@ -9,7 +9,6 @@ import { apiClient } from '../../lib/api-client';
 import { siteConfig } from '../../config/site';
 import { useToast } from '../../components/ui';
 import {
-  ShieldCheck,
   Tag,
   AlertTriangle,
   Lock,
@@ -69,8 +68,8 @@ declare global {
 
 function GPayLogo({ className = 'h-5 w-auto' }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 64 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Google Pay">
-      <g transform="translate(1, 2) scale(0.75)">
+    <svg className={className} viewBox="0 0 46 19" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Google Pay">
+      <g transform="translate(0, 1) scale(0.72)">
         <path
           fill="#4285F4"
           d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -89,10 +88,10 @@ function GPayLogo({ className = 'h-5 w-auto' }: { className?: string }) {
         />
       </g>
       <text
-        x="22"
-        y="16"
+        x="19.5"
+        y="14.5"
         fill="#5F6368"
-        fontSize="14.5"
+        fontSize="14"
         fontWeight="600"
         fontFamily="system-ui, -apple-system, 'Google Sans', Roboto, sans-serif"
         letterSpacing="-0.02em"
@@ -105,7 +104,7 @@ function GPayLogo({ className = 'h-5 w-auto' }: { className?: string }) {
 
 function VisaLogo({ className = 'h-5 w-auto' }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 50 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Visa">
+    <svg className={className} viewBox="3.5 1.2 43 15.5" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Visa">
       <path
         d="M19.4 16.5L21.8 1.5H25.6L23.2 16.5H19.4ZM35.8 1.8C35 1.5 33.7 1.2 32.1 1.2C28.4 1.2 25.8 3.2 25.8 6C25.8 8.1 27.6 9.3 28.9 10C30.2 10.7 30.7 11.1 30.7 11.8C30.7 12.9 29.5 13.4 28.3 13.4C26.8 13.4 25.9 13.1 24.6 12.4L24.1 12.1L23.4 15.3C24.4 15.8 26.2 16.2 28.1 16.2C32.1 16.2 34.7 14.2 34.7 11.4C34.7 9 32.7 7.7 31.1 6.9C29.9 6.3 29.4 5.9 29.4 5.2C29.4 4.5 30.1 3.9 31.5 3.9C32.7 3.9 33.7 4.2 34.6 4.6L35 4.8L35.8 1.8ZM43 1.5H40C39.1 1.5 38.3 1.8 38 2.6L32.4 16.5H36.4L37.2 14.1H42.1L42.6 16.5H46.3L43 1.5ZM38.3 11.1L40.3 5.3L41.5 11.1H38.3ZM16.2 1.5L12.5 11.8L12.1 9.9C11.4 7.5 10 5 8 3.7L11.5 16.5H15.5L20.2 1.5H16.2Z"
         fill="#1A1F71"
@@ -117,7 +116,7 @@ function VisaLogo({ className = 'h-5 w-auto' }: { className?: string }) {
 
 function MastercardLogo({ className = 'h-5 w-auto' }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Mastercard">
+    <svg className={className} viewBox="2 2 34 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Mastercard">
       <circle cx="12" cy="12" r="10" fill="#EB001B" />
       <circle cx="26" cy="12" r="10" fill="#F79E1B" />
       <path
@@ -130,10 +129,10 @@ function MastercardLogo({ className = 'h-5 w-auto' }: { className?: string }) {
 
 function PaytmLogo({ className = 'h-5 w-auto' }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 66 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Paytm">
+    <svg className={className} viewBox="0 1 54 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Paytm">
       <text
-        x="2"
-        y="16.5"
+        x="0"
+        y="15.5"
         fill="#002970"
         fontSize="17"
         fontWeight="900"
@@ -143,8 +142,8 @@ function PaytmLogo({ className = 'h-5 w-auto' }: { className?: string }) {
         Pay
       </text>
       <text
-        x="35"
-        y="16.5"
+        x="32"
+        y="15.5"
         fill="#00BAF2"
         fontSize="17"
         fontWeight="900"
@@ -1031,35 +1030,38 @@ function CheckoutContent() {
               />
             </div>
 
-            {/* Phone Number */}
-            <div className="space-y-1.5 text-left">
-              <label htmlFor="checkout-phone" className="text-sm font-bold text-neutral-900 block">
-                Phone Number <span className="text-rose-500">*</span>
-              </label>
-              <input
-                id="checkout-phone"
-                type="tel"
-                required
-                placeholder="+91 98765 43210"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono"
-              />
-            </div>
+            {/* Phone Number & Company GSTIN in one single row */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-3.5">
+              {/* Phone Number */}
+              <div className="space-y-1.5 text-left">
+                <label htmlFor="checkout-phone" className="text-sm font-bold text-neutral-900 block truncate" title="Phone Number">
+                  Phone Number <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  id="checkout-phone"
+                  type="tel"
+                  required
+                  placeholder="+91 98765 43210"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono"
+                />
+              </div>
 
-            {/* Company GSTIN */}
-            <div className="space-y-1.5 text-left">
-              <label htmlFor="checkout-gstin" className="text-sm font-bold text-neutral-900 block">
-                Company GSTIN (Optional)
-              </label>
-              <input
-                id="checkout-gstin"
-                type="text"
-                placeholder="22AAAAA0000A1Z5"
-                value={gstin}
-                onChange={(e) => setGstin(e.target.value.toUpperCase())}
-                className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono uppercase"
-              />
+              {/* Company GSTIN */}
+              <div className="space-y-1.5 text-left">
+                <label htmlFor="checkout-gstin" className="text-sm font-bold text-neutral-900 block truncate" title="Company GSTIN (Optional)">
+                  GSTIN (Optional)
+                </label>
+                <input
+                  id="checkout-gstin"
+                  type="text"
+                  placeholder="22AAAAA0000A1Z5"
+                  value={gstin}
+                  onChange={(e) => setGstin(e.target.value.toUpperCase())}
+                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-[#0033FF] focus:ring-2 focus:ring-[#0033FF]/15 focus:outline-none transition-all font-mono uppercase"
+                />
+              </div>
             </div>
           </div>
 
@@ -1071,7 +1073,7 @@ function CheckoutContent() {
           )}
 
           {/* Primary Checkout CTA */}
-          <div className="pt-2 space-y-3">
+          <div className="pt-2">
             {!isAuthenticated ? (
               <Link
                 href="/login?redirect=/checkout"
@@ -1105,11 +1107,6 @@ function CheckoutContent() {
               </button>
             )}
 
-            {/* Security and Trust Signals */}
-            <div className="flex items-center justify-center gap-2 text-xs text-neutral-500 text-center pt-1">
-              <ShieldCheck className="w-4 h-4 text-[#0033FF] shrink-0" />
-              <span>256-bit SSL Encrypted • Official GST Invoice • Instant Access</span>
-            </div>
           </div>
 
           {/* Payment Methods and Security Guarantee */}
@@ -1121,18 +1118,18 @@ function CheckoutContent() {
             </div>
 
             {/* Real Brand Logos in One Single Row: GPay, Visa, Mastercard, Paytm */}
-            <div className="flex items-center justify-center gap-3.5 sm:gap-4.5 py-0.5 flex-nowrap">
+            <div className="flex items-center justify-center gap-5 sm:gap-6 py-0.5 flex-nowrap">
               <div title="Google Pay (GPay)" className="shrink-0 flex items-center justify-center">
-                <GPayLogo className="h-[18px] sm:h-[22px] w-auto" />
+                <GPayLogo className="h-[18px] sm:h-[21px] w-auto" />
               </div>
               <div title="Visa" className="shrink-0 flex items-center justify-center">
-                <VisaLogo className="h-[15px] sm:h-[18px] w-auto" />
+                <VisaLogo className="h-[14px] sm:h-[16px] w-auto" />
               </div>
               <div title="Mastercard" className="shrink-0 flex items-center justify-center">
-                <MastercardLogo className="h-[19px] sm:h-[22px] w-auto" />
+                <MastercardLogo className="h-[18px] sm:h-[21px] w-auto" />
               </div>
               <div title="Paytm" className="shrink-0 flex items-center justify-center">
-                <PaytmLogo className="h-[18px] sm:h-[22px] w-auto" />
+                <PaytmLogo className="h-[17px] sm:h-[20px] w-auto" />
               </div>
             </div>
           </div>
