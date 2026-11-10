@@ -157,6 +157,30 @@ function PaytmLogo({ className = 'h-5 w-auto' }: { className?: string }) {
   );
 }
 
+function RazorpayLogo({ className = 'h-3.5 w-auto' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 88 19" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Razorpay">
+      <g transform="translate(0, 1) scale(0.72)">
+        <path
+          d="M22.436 0l-11.91 7.773-1.174 4.276 6.625-4.297L11.65 24h4.391l6.395-24zM14.26 10.098L3.389 17.166 1.564 24h9.008l3.688-13.902Z"
+          fill="#0033FF"
+        />
+      </g>
+      <text
+        x="19"
+        y="14.5"
+        fill="#0C2340"
+        fontSize="13.5"
+        fontWeight="800"
+        fontFamily="system-ui, -apple-system, sans-serif"
+        letterSpacing="-0.02em"
+      >
+        Razorpay
+      </text>
+    </svg>
+  );
+}
+
 function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1088,40 +1112,30 @@ function CheckoutContent() {
             </div>
           </div>
 
-          {/* Payment Methods and Guarantees with Authentic Logos */}
-          <div className="border-t border-neutral-200 pt-5 space-y-3.5 text-center">
-            <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-500 px-1">
+          {/* Payment Methods and Security Guarantee */}
+          <div className="border-t border-neutral-200/80 pt-4 space-y-2.5 text-center">
+            <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-neutral-500 px-0.5">
               <span>Accepted Payment Methods</span>
-              <span className="text-[#0033FF] font-semibold lowercase">powered by razorpay</span>
-            </div>
-
-            {/* Grid of Real Brand Logos: GPay, Visa, Mastercard, Paytm */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="Google Pay (GPay)">
-                <GPayLogo className="h-4.5 w-auto" />
-              </div>
-              <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="Visa Credit and Debit Cards">
-                <VisaLogo className="h-4 w-auto" />
-              </div>
-              <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="Mastercard Credit and Debit Cards">
-                <MastercardLogo className="h-5 w-auto" />
-              </div>
-              <div className="h-11 px-3 bg-white rounded-lg border border-neutral-200/90 hover:border-neutral-300 flex items-center justify-center gap-1.5 transition-colors shadow-none" title="Paytm UPI, Wallet & Cards">
-                <PaytmLogo className="h-4.5 w-auto" />
+              <div className="flex items-center gap-1.5 normal-case tracking-normal">
+                <span className="text-[11px] text-neutral-500 font-medium">Secured by</span>
+                <RazorpayLogo className="h-3.5 sm:h-4 w-auto" />
               </div>
             </div>
 
-            {/* Additional payment coverage pills */}
-            <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px] text-neutral-600 font-medium">
-              <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 border border-neutral-200">
-                All Major Debit &amp; Credit Cards
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 border border-neutral-200">
-                Net Banking (50+ Banks)
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-neutral-100 border border-neutral-200">
-                EMI Available
-              </span>
+            {/* Real Brand Logos in One Single Row: GPay, Visa, Mastercard, Paytm (No blocks, tightly together) */}
+            <div className="flex items-center justify-center gap-4 sm:gap-6 py-1 flex-nowrap">
+              <div title="Google Pay (GPay)" className="shrink-0 flex items-center justify-center">
+                <GPayLogo className="h-3.5 sm:h-4 w-auto" />
+              </div>
+              <div title="Visa" className="shrink-0 flex items-center justify-center">
+                <VisaLogo className="h-3 sm:h-3.5 w-auto" />
+              </div>
+              <div title="Mastercard" className="shrink-0 flex items-center justify-center">
+                <MastercardLogo className="h-3.5 sm:h-4 w-auto" />
+              </div>
+              <div title="Paytm" className="shrink-0 flex items-center justify-center">
+                <PaytmLogo className="h-3.5 sm:h-4 w-auto" />
+              </div>
             </div>
           </div>
         </div>
