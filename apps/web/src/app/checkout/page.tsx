@@ -24,6 +24,7 @@ interface CourseProduct {
   title: string;
   slug: string;
   pricePaise: number;
+  compareAtPricePaise?: number | null;
   validityDays: number;
   description?: string;
 }
@@ -263,6 +264,7 @@ function CheckoutContent() {
             title: data.data.title,
             slug: data.data.slug,
             pricePaise: data.data.pricePaise || 499900,
+            compareAtPricePaise: data.data.compareAtPricePaise || 999900,
             validityDays: data.data.validityDays || 365,
             description: data.data.description,
           });
@@ -276,6 +278,7 @@ function CheckoutContent() {
           title: 'Hydraulic System Basics',
           slug: 'hydraulic-engineering-mastery',
           pricePaise: 499900,
+          compareAtPricePaise: 999900,
           validityDays: 365,
           description: 'Comprehensive industrial hydraulic engineering: valve schematics, pump selection, fluid power, and field troubleshooting.',
         });
@@ -409,6 +412,7 @@ function CheckoutContent() {
 
   // Read price and tax breakdown
   const basePricePaise = quote?.basePricePaise ?? course?.pricePaise ?? 499900;
+  const compareAtPricePaise = course?.compareAtPricePaise ?? 999900;
   const discountPaise = quote?.discountPaise ?? 0;
   const finalPricePaise = quote?.totalPaise ?? basePricePaise;
 
@@ -653,78 +657,76 @@ function CheckoutContent() {
         />
         {/* Soft overlay gradient for subtle depth */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/90 via-[#000c3b]/35 to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-t from-[#000c3b]/95 via-[#000c3b]/45 to-transparent pointer-events-none"
           aria-hidden="true"
         />
-        {/* Strip: Final Price & Coupon Entry Bar */}
-        <div className="relative z-10 w-full mb-3 bg-[#000d3b]/85 backdrop-blur-md border border-white/20 rounded-xl p-3.5 sm:p-4 text-white shadow-2xl">
-          <div className="flex items-center justify-between gap-3">
-            {/* Final Price */}
-            <div className="flex flex-col justify-center shrink-0">
-              <span className="text-[10px] uppercase font-bold tracking-wider text-blue-200/80">
-                Final Price
-              </span>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white leading-none">
-                  ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
-                </span>
-                {appliedCoupon && (
-                  <span className="text-xs text-blue-200/60 line-through font-mono">
-                    ₹{(basePricePaise / 100).toLocaleString('en-IN')}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Coupon Code Entry Bar or Applied Badge */}
-            <div className="flex-1 max-w-[280px]">
+        {/* Price & Coupon Controls (Directly on Image, No Card) */}
+        <div className="relative z-10 w-full mb-6 select-none">
+          <div className="flex items-end justify-between gap-4">
+            {/* Coupon Code Entry: Apply button then input bar */}
+            <div className="shrink-0">
               {appliedCoupon ? (
-                <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-200 text-xs">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-sm shadow-md">
+                  <div className="flex items-center gap-2 truncate">
+                    <Tag className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span className="font-mono font-bold tracking-wide">{appliedCoupon.code}</span>
-                    <span className="text-emerald-300 text-[11px]">
+                    <span className="text-emerald-300 font-semibold text-xs">
                       (-₹{(discountPaise / 100).toLocaleString('en-IN')})
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={handleRemoveCoupon}
-                    className="text-white/80 hover:text-white underline text-[11px] font-semibold cursor-pointer shrink-0"
+                    className="text-white hover:text-rose-200 underline text-xs font-bold cursor-pointer shrink-0 ml-1.5"
                   >
                     Remove
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleApplyCoupon} className="space-y-1">
-                  <div className="flex gap-1.5">
-                    <input
-                      type="text"
-                      placeholder="COUPON CODE"
-                      value={couponInput}
-                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                      className="w-full h-9.5 rounded-lg border border-white/20 bg-white/10 px-3 text-xs font-mono uppercase text-white placeholder:text-blue-200/50 focus:border-white focus:bg-white/20 focus:outline-none transition-all"
-                    />
+                <form onSubmit={handleApplyCoupon} className="relative">
+                  <div className="flex items-center gap-2">
                     <button
                       type="submit"
                       disabled={couponLoading}
-                      className="h-9.5 px-3.5 bg-white hover:bg-blue-50 text-[#00186B] font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
+                      className="h-11 px-5 bg-white hover:bg-blue-50 active:bg-blue-100 text-[#00186B] font-extrabold text-sm rounded-lg transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-md"
                     >
                       {couponLoading ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-[#00186B]" />
+                        <Loader2 className="w-4 h-4 animate-spin text-[#00186B]" />
                       ) : (
                         'Apply'
                       )}
                     </button>
+                    <input
+                      type="text"
+                      placeholder="ENTER COUPON CODE"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                      className="h-11 w-44 sm:w-56 md:w-64 rounded-lg border border-white/30 bg-black/35 backdrop-blur-sm px-3.5 text-sm font-mono uppercase text-white placeholder:text-blue-200/50 focus:border-white focus:bg-black/50 focus:outline-none transition-all shadow-inner"
+                    />
                   </div>
                   {couponError && (
-                    <p className="text-[11px] font-semibold text-rose-300 flex items-center gap-1">
-                      <X className="w-3 h-3 stroke-[2.5]" />
+                    <p className="absolute -bottom-5 left-0 text-[11px] font-semibold text-rose-300 flex items-center gap-1 drop-shadow">
+                      <X className="w-3.5 h-3.5 stroke-[2.5]" />
                       <span>{couponError}</span>
                     </p>
                   )}
                 </form>
               )}
+            </div>
+
+            {/* Final Price & Actual Price on the Right */}
+            <div className="flex flex-col items-end shrink-0 text-right">
+              <span className="text-[11px] uppercase font-bold tracking-wider text-blue-200/80 drop-shadow">
+                Final Price
+              </span>
+              <div className="flex items-baseline gap-2.5">
+                <span className="text-xl sm:text-2xl font-bold font-mono text-blue-200/60 line-through drop-shadow">
+                  ₹{((appliedCoupon ? basePricePaise : compareAtPricePaise) / 100).toLocaleString('en-IN')}
+                </span>
+                <span className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
+                  ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -848,14 +850,12 @@ function CheckoutContent() {
                   Final Price
                 </span>
                 <div className="flex items-baseline gap-2">
+                  <span className="text-xs font-bold text-neutral-400 line-through font-mono">
+                    ₹{((appliedCoupon ? basePricePaise : compareAtPricePaise) / 100).toLocaleString('en-IN')}
+                  </span>
                   <span className="text-2xl font-black font-mono tracking-tight text-[#0033FF] leading-none">
                     ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
                   </span>
-                  {appliedCoupon && (
-                    <span className="text-xs text-neutral-400 line-through font-mono">
-                      ₹{(basePricePaise / 100).toLocaleString('en-IN')}
-                    </span>
-                  )}
                 </div>
               </div>
 
