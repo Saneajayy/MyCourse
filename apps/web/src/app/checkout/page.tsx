@@ -19,7 +19,6 @@ import {
   X,
   ArrowLeft,
   Star,
-  Sparkles,
 } from 'lucide-react';
 import { computeOrderTotals, TaxConfig } from '../../lib/tax';
 
@@ -645,19 +644,9 @@ function CheckoutContent() {
     <div className="w-full min-h-screen lg:h-screen lg:overflow-hidden flex flex-col lg:flex-row">
       {/* ============================================================== */}
       {/* LEFT COLUMN: Product Summary, Course Card, Perks, Order Details */}
-      {/* (Brand Deep Blue #00186B, High-Contrast White & Cyan Typography)  */}
+      {/* (Brand Pure Blue #0033FF, High-Contrast White Typography)       */}
       {/* ============================================================== */}
-      <div className="w-full lg:w-1/2 lg:h-full bg-[#00186B] text-white flex flex-col justify-between relative overflow-y-auto p-6 sm:p-8 lg:p-8 xl:p-12 border-b lg:border-b-0 lg:border-r border-white/10 select-none">
-        {/* Subtle decorative mesh gradient in the background */}
-        <div
-          className="absolute -top-32 -left-32 w-96 h-96 bg-[#0033FF]/30 rounded-full blur-3xl pointer-events-none"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute bottom-0 right-0 w-80 h-80 bg-[#001147]/80 rounded-full blur-2xl pointer-events-none"
-          aria-hidden="true"
-        />
-
+      <div className="w-full lg:w-1/2 lg:h-full bg-[#0033FF] text-white flex flex-col justify-between relative overflow-y-auto p-6 sm:p-8 lg:p-8 xl:p-12 border-b lg:border-b-0 lg:border-r border-white/10 select-none">
         <div className="relative z-10 space-y-6 sm:space-y-7 max-w-xl mx-auto lg:mx-0 w-full">
           {/* Top Escape Link */}
           <div className="flex items-center justify-start pb-2 border-b border-white/15">
@@ -670,16 +659,12 @@ function CheckoutContent() {
             </Link>
           </div>
 
-          {/* Section Eyebrow */}
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-cyan-300 text-xs font-bold tracking-wider uppercase mb-3">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
-              <span>Industrial Masterclass Enrollment</span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl xl:text-5xl font-black tracking-tight text-white leading-tight">
-              Order Summary.
+          {/* Order Summary Headline */}
+          <div className="space-y-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              Order Summary
             </h1>
-            <p className="text-sm text-blue-100/75 mt-2 leading-relaxed">
+            <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
               Review your course enrollment, syllabus validity, and tax-inclusive breakdown below.
             </p>
           </div>
