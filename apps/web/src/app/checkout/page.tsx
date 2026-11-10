@@ -877,16 +877,9 @@ function CheckoutContent() {
       <div className="w-full lg:w-1/2 lg:min-h-screen bg-white text-neutral-900 flex flex-col justify-between relative overflow-y-auto">
         {/* Top Header Bar: Pinned deeply into top-left and top-right corners with NO separation line */}
         <header className="w-full flex items-center justify-between px-6 pt-6 sm:px-8 sm:pt-8 md:px-10 md:pt-8 shrink-0 z-20">
-          {/* Top-Left Corner: Already Enrolled / Signed In */}
+          {/* Top-Left Corner: Already Enrolled / Sign In (hidden when signed in) */}
           <div>
-            {isAuthenticated ? (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-100 border border-neutral-200 text-xs text-neutral-700">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                <span className="truncate max-w-[160px] sm:max-w-[220px] font-medium" title={user?.email}>
-                  {user?.email}
-                </span>
-              </div>
-            ) : (
+            {!isAuthenticated && (
               <div className="text-xs sm:text-sm text-neutral-600">
                 Already enrolled?{' '}
                 <Link
