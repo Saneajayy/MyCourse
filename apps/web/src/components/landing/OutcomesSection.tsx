@@ -46,7 +46,7 @@ export function OutcomesSection() {
           {outcomes.map((item) => (
             <TiltCard
               key={item.title}
-              className="relative p-5 sm:p-8 md:p-9 lg:p-10 bg-white rounded-lg sm:rounded-xl select-none group cursor-pointer shadow-lg"
+              className="relative p-5 sm:p-8 md:p-9 lg:p-10 bg-white rounded-lg sm:rounded-xl select-none group cursor-pointer"
               maxTilt={6.5}
             >
               {/* Card Content (stays crisp, sharp and vector-rendered in #0033FF) */}

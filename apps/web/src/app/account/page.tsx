@@ -460,7 +460,7 @@ export default function AccountPage() {
         {activeTab === 'profile' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
             {/* Card 1: Profile Details - Smooth Plain White Card */}
-            <div className="relative w-full bg-white rounded-lg sm:rounded-xl shadow-lg p-6 sm:p-8 select-none">
+            <div className="relative w-full bg-white rounded-lg sm:rounded-xl p-6 sm:p-8 select-none">
               {/* Card Content */}
               <div className="relative z-10 w-full text-neutral-900 space-y-6">
                 <div>
@@ -567,7 +567,7 @@ export default function AccountPage() {
             </div>
 
             {/* Card 2: Change Password - Smooth Plain White Card */}
-            <div className="relative w-full bg-white rounded-lg sm:rounded-xl shadow-lg p-6 sm:p-8 select-none">
+            <div className="relative w-full bg-white rounded-lg sm:rounded-xl p-6 sm:p-8 select-none">
               {/* Card Content */}
               <div className="relative z-10 w-full text-neutral-900 space-y-6">
                 <div>
@@ -655,7 +655,7 @@ export default function AccountPage() {
 
         {/* TAB 2: Active Devices & Streaming Sessions */}
         {activeTab === 'sessions' && (
-          <div className="relative w-full bg-white rounded-lg sm:rounded-xl shadow-lg p-6 sm:p-8 select-none">
+          <div className="relative w-full bg-white rounded-lg sm:rounded-xl p-6 sm:p-8 select-none">
             {/* Card Content */}
             <div className="relative z-10 w-full text-neutral-900 space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -751,7 +751,7 @@ export default function AccountPage() {
 
         {/* TAB 3: Order History & Tax Invoices */}
         {activeTab === 'orders' && (
-          <div className="relative w-full bg-white rounded-lg sm:rounded-xl shadow-lg p-6 sm:p-8 select-none">
+          <div className="relative w-full bg-white rounded-lg sm:rounded-xl p-6 sm:p-8 select-none">
             {/* Card Content */}
             <div className="relative z-10 w-full text-neutral-900 space-y-6">
               <div>

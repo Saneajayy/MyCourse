@@ -49,7 +49,7 @@ export function CertificateSection() {
         {/* Mobile View: Dedicated Portrait Certificate Card (< md) */}
         <div className="block md:hidden w-full">
           <TiltCard
-            className="relative w-full max-w-[380px] sm:max-w-[420px] p-4 sm:p-5 bg-white rounded-lg sm:rounded-xl select-none cursor-pointer shadow-2xl"
+            className="relative w-full max-w-[380px] sm:max-w-[420px] p-4 sm:p-5 bg-white rounded-lg sm:rounded-xl select-none cursor-pointer"
             maxTilt={4}
           >
             {/* Inner White Card with Blue Border & Blue Content */}
@@ -142,7 +142,7 @@ export function CertificateSection() {
         {/* Desktop View: Full-size Landscape Certificate Card (>= md) */}
         <div className="hidden md:block w-full">
           <TiltCard
-            className="relative w-full max-w-4xl md:max-w-[760px] lg:max-w-[870px] p-5 sm:p-6 md:p-7 bg-white rounded-lg sm:rounded-xl select-none cursor-pointer shadow-2xl"
+            className="relative w-full max-w-4xl md:max-w-[760px] lg:max-w-[870px] p-5 sm:p-6 md:p-7 bg-white rounded-lg sm:rounded-xl select-none cursor-pointer"
             maxTilt={5}
           >
             {/* Background Design Watermark: Hero 3D Component */}

@@ -172,7 +172,7 @@ export default function OrderSuccessPage() {
         <div className="noise-texture" aria-hidden="true" />
         <OrderSuccessNavbar />
         <main className="relative z-10 flex-1 w-full max-w-[1440px] mx-auto py-12 sm:py-16 px-4 flex items-center justify-center">
-          <div className="max-w-md bg-white p-8 rounded-lg shadow-xl text-neutral-900 space-y-4 text-center">
+          <div className="max-w-md bg-white p-8 rounded-lg text-neutral-900 space-y-4 text-center">
             <h2 className="text-xl font-bold text-rose-600">Order Notice</h2>
             <p className="text-sm text-neutral-600">
               {errorMsg || 'Order details not found.'}

@@ -136,7 +136,7 @@ export function ReviewsSection() {
               key={`${item.id}-${idx}`}
               maxTilt={5.5}
               scale={1.02}
-              className="relative w-[320px] sm:w-[420px] md:w-[480px] lg:w-[540px] xl:w-[580px] min-h-[305px] sm:min-h-[350px] md:min-h-[385px] lg:min-h-[410px] p-6 sm:p-7 md:p-8 lg:p-9 bg-white rounded-lg sm:rounded-xl shadow-lg shrink-0 select-none flex flex-col justify-between cursor-pointer"
+              className="relative w-[320px] sm:w-[420px] md:w-[480px] lg:w-[540px] xl:w-[580px] min-h-[305px] sm:min-h-[350px] md:min-h-[385px] lg:min-h-[410px] p-6 sm:p-7 md:p-8 lg:p-9 bg-white rounded-lg sm:rounded-xl shrink-0 select-none flex flex-col justify-between cursor-pointer"
             >
               {/* Card Content in Royal Blue #0033FF */}
               <div className="relative z-10 flex flex-col justify-between h-full">

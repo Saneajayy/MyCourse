@@ -55,7 +55,7 @@ export function InstructorSection() {
           {/* Right Column: Pure Card Element matching Outcomes Section: Reduced by 15% */}
           <div className="lg:col-span-5 xl:col-span-5 flex justify-center lg:justify-end items-start w-full">
             <TiltCard
-              className="relative w-full max-w-[410px] sm:max-w-[475px] md:max-w-[530px] lg:max-w-[580px] xl:max-w-[630px] aspect-[390/418] min-h-[410px] sm:min-h-[475px] md:min-h-[530px] lg:min-h-[580px] xl:min-h-[630px] bg-white rounded-lg sm:rounded-xl select-none cursor-pointer shadow-2xl"
+              className="relative w-full max-w-[410px] sm:max-w-[475px] md:max-w-[530px] lg:max-w-[580px] xl:max-w-[630px] aspect-[390/418] min-h-[410px] sm:min-h-[475px] md:min-h-[530px] lg:min-h-[580px] xl:min-h-[630px] bg-white rounded-lg sm:rounded-xl select-none cursor-pointer"
               maxTilt={6.5}
             >
               <div className="w-full h-full" />

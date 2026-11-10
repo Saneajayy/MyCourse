@@ -61,7 +61,7 @@ export function PricingSection({
           {/* Right Column: Pricing Card matching instructor card position and right margin */}
           <div className="lg:col-span-5 xl:col-span-5 flex justify-center lg:justify-end items-start w-full z-10">
             <TiltCard
-              className="relative w-full max-w-[410px] sm:max-w-[475px] md:max-w-[530px] lg:max-w-[580px] xl:max-w-[630px] p-7 sm:p-8 md:p-9 lg:p-10 bg-white rounded-lg sm:rounded-xl select-none shadow-2xl cursor-pointer"
+              className="relative w-full max-w-[410px] sm:max-w-[475px] md:max-w-[530px] lg:max-w-[580px] xl:max-w-[630px] p-7 sm:p-8 md:p-9 lg:p-10 bg-white rounded-lg sm:rounded-xl select-none cursor-pointer"
               maxTilt={5.5}
             >
               {/* Card Content in Royal Blue #0033FF */}
@@ -102,7 +102,7 @@ export function PricingSection({
                 {/* Checkout CTA Button: Enlarged, bold, high-contrast */}
                 <Link
                   href="/checkout"
-                  className="mt-7 sm:mt-8 md:mt-9 w-full h-[54px] sm:h-[58px] md:h-[62px] lg:h-[66px] py-0 px-2 rounded-xl bg-[#0033FF] hover:bg-[#0022cc] text-white font-black text-[24px] sm:text-[27px] md:text-[30px] lg:text-[32px] uppercase tracking-wide flex items-center justify-center leading-none text-center transition-all duration-200 active:scale-[0.98] shadow-md"
+                  className="mt-7 sm:mt-8 md:mt-9 w-full h-[54px] sm:h-[58px] md:h-[62px] lg:h-[66px] py-0 px-2 rounded-xl bg-[#0033FF] hover:bg-[#0022cc] text-white font-black text-[24px] sm:text-[27px] md:text-[30px] lg:text-[32px] uppercase tracking-wide flex items-center justify-center leading-none text-center transition-all duration-200 active:scale-[0.98]"
                 >
                   CHECKOUT NOW
                 </Link>

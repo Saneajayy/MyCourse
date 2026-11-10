@@ -670,7 +670,7 @@ function CheckoutContent() {
           </div>
 
           {/* Course Card Preview */}
-          <div className="w-full bg-white/10 border border-white/15 backdrop-blur-md rounded-2xl p-4 sm:p-5 shadow-2xl transition-all">
+          <div className="w-full bg-white/10 border border-white/15 backdrop-blur-md rounded-2xl p-4 sm:p-5 transition-all">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
               {/* Course Thumbnail */}
               <div className="relative w-full sm:w-36 md:w-40 aspect-video sm:aspect-square rounded-xl overflow-hidden shrink-0 border border-white/20 bg-black/40">
@@ -714,7 +714,7 @@ function CheckoutContent() {
           </div>
 
           {/* Order Details & Pricing Card */}
-          <div className="w-full bg-white/10 border border-white/15 backdrop-blur-md rounded-2xl p-5 sm:p-6 space-y-4 shadow-xl">
+          <div className="w-full bg-white/10 border border-white/15 backdrop-blur-md rounded-2xl p-5 sm:p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-white/15 pb-3">
               <h3 className="text-base font-bold text-white tracking-tight">
                 Order Breakdown
@@ -912,7 +912,7 @@ function CheckoutContent() {
           <div className="w-full max-w-lg space-y-4">
           {/* Email Verification Warning Alert Gate */}
           {isAuthenticated && !user?.emailVerifiedAt && (
-            <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-xl p-5 shadow-sm text-amber-950">
+            <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-xl p-5 text-amber-950">
               <div className="space-y-3">
                 <div className="flex items-center gap-2 font-bold text-sm text-amber-900">
                   <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0" />
