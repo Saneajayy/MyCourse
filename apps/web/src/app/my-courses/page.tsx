@@ -140,9 +140,8 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
 
       {/* Percentage Label */}
       <span
-        className={`text-black font-medium text-[11px] sm:text-xs leading-none shrink-0 select-none ${
-          clamped === 0 ? 'pr-1.5' : clamped === 100 ? 'pl-1.5' : 'px-1.5'
-        }`}
+        className={`text-black font-medium text-[11px] sm:text-xs leading-none shrink-0 select-none ${clamped === 0 ? 'pr-1.5' : clamped === 100 ? 'pl-1.5' : 'px-1.5'
+          }`}
       >
         {clamped}%
       </span>
@@ -419,25 +418,22 @@ function StudentDashboardContent() {
             className="h-10 w-10 relative flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-colors focus:outline-none cursor-pointer"
           >
             <Menu
-              className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${
-                isMobileMenuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
-              }`}
+              className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
+                }`}
             />
             <X
-              className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${
-                isMobileMenuOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'
-              }`}
+              className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'
+                }`}
             />
           </button>
         </div>
 
         {/* Dropping Column when opened: Expands on top of screen and collapses smoothly without affecting content */}
         <div
-          className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
-            isMobileMenuOpen
+          className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isMobileMenuOpen
               ? 'grid-rows-[1fr] opacity-100 pointer-events-auto visible'
               : 'grid-rows-[0fr] opacity-0 pointer-events-none invisible'
-          }`}
+            }`}
         >
           <div className="overflow-hidden relative bg-black border-t border-white/50">
             {/* Background halftone image shifted to the right, full-bleed with no left cut-off */}
@@ -467,11 +463,10 @@ function StudentDashboardContent() {
                       handleTabChange(tab.id);
                       setIsMobileMenuOpen(false);
                     }}
-                    className={`w-full text-left px-6 py-4 text-[15px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
-                      isActive
+                    className={`w-full text-left px-6 py-4 text-[15px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${isActive
                         ? 'bg-white text-black font-extrabold'
                         : 'bg-transparent text-white hover:bg-white/10'
-                    }`}
+                      }`}
                   >
                     {tab.label}
                   </button>
@@ -506,9 +501,9 @@ function StudentDashboardContent() {
         </div>
       </header>
 
-      {/* Dimming Backdrop Overlay: Fixed over the screen behind the header */}
+      {/* Dimming Backdrop Overlay: Fixed over the screen behind the header (No blur, pure neutral opacity dimming) */}
       <div
-        className={`md:hidden fixed inset-0 bg-black/60 z-40 backdrop-blur-[2px] transition-opacity duration-300 ease-in-out ${
+        className={`md:hidden fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 ease-in-out ${
           isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setIsMobileMenuOpen(false)}
@@ -555,11 +550,10 @@ function StudentDashboardContent() {
                 key={tab.id}
                 type="button"
                 onClick={() => handleTabChange(tab.id)}
-                className={`w-full text-left px-6 sm:px-7 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
-                  isActive
+                className={`w-full text-left px-6 sm:px-7 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${isActive
                     ? 'bg-white text-black font-extrabold'
                     : 'bg-transparent text-white hover:bg-white/10'
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>
@@ -742,7 +736,7 @@ function StudentDashboardContent() {
                   My Certificates
                 </h1>
                 <p className="text-xs sm:text-sm text-neutral-500 mt-1">
-                  Official verifiable certificates of completion signed by instructor HiraLal.
+                  Official certificates of completion signed by instructor HiraLal.
                 </p>
               </div>
 
