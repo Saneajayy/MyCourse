@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { apiClient } from '../../../../lib/api-client';
-import { formatDisplayOrderId } from '../../../../lib/order';
-import { Loader2, AlertCircle, RefreshCw, BookOpen } from 'lucide-react';
+import { X, Loader2, BookOpen } from 'lucide-react';
+import { PaymentPendingCard } from '../../../../components/PaymentPendingCard';
 
 interface OrderResponse {
   id: string;
@@ -18,51 +19,24 @@ interface OrderResponse {
   };
 }
 
-function OrderPendingNavbar() {
-  return (
-    <header className="fixed top-0 inset-x-0 z-50 w-full figma-glass-nav font-reddit select-none">
-      <nav
-        aria-label="Order Status Navigation"
-        className="w-full h-20 md:h-[84px] flex items-stretch justify-between"
-      >
-        <div className="flex items-center pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 gap-6 sm:gap-8 lg:gap-12">
-          <Link
-            href="/"
-            className="flex flex-col justify-center -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity"
-            aria-label="HYDRO BASICS Home"
-          >
-            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-              HYDRO
-            </span>
-            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-              BASICS
-            </span>
-          </Link>
-        </div>
-
-        <div className="flex items-stretch">
-          <Link
-            href="/my-courses"
-            className="figma-glass-divider border-r border-white/20 h-full flex items-center justify-center px-6 sm:px-8 text-white font-bold text-sm sm:text-[15px] hover:bg-white/10 transition-colors gap-2"
-          >
-            <BookOpen className="w-4 h-4 text-white/80" />
-            <span>My Courses</span>
-          </Link>
-        </div>
-      </nav>
-    </header>
-  );
-}
-
 export default function OrderPendingPage() {
   const params = useParams();
   const router = useRouter();
   const orderId = params.id as string;
 
-  const [, setOrder] = useState<OrderResponse | null>(null);
+  const [order, setOrder] = useState<OrderResponse | null>(null);
   const [pollCount, setPollCount] = useState(0);
   const [isTimedOut, setIsTimedOut] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = '#FFFFFF';
+    document.body.style.backgroundColor = '#FFFFFF';
+    return () => {
+      document.documentElement.style.backgroundColor = '';
+      document.body.style.backgroundColor = '';
+    };
+  }, []);
 
   useEffect(() => {
     if (!orderId) return;
@@ -82,7 +56,7 @@ export default function OrderPendingPage() {
           return;
         }
 
-        if (res.status === 'FAILED') {
+        if (res.status === 'FAILED' || res.status === 'CANCELLED') {
           router.replace(`/order/failed/${orderId}`);
           return;
         }
@@ -113,129 +87,94 @@ export default function OrderPendingPage() {
   const handleManualRefresh = () => {
     setIsTimedOut(false);
     setPollCount(0);
+    setErrorMsg(null);
   };
 
   return (
-    <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
-      <div className="noise-texture" aria-hidden="true" />
-      <OrderPendingNavbar />
+    <div className="w-full h-screen h-[100dvh] overflow-hidden bg-white font-reddit selection:bg-black selection:text-white flex flex-col lg:flex-row">
+      {/* ============================================================== */}
+      {/* LEFT COLUMN (Desktop Only): Signature Halftone Graphic         */}
+      {/* ============================================================== */}
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-end lg:w-1/2 h-full bg-black overflow-hidden select-none p-6 sm:p-8">
+        <Image
+          src="/login-pixelated.png"
+          alt="HydroBasics Industrial Hydraulic Engineer"
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover object-center mix-blend-screen opacity-95 select-none"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#000000]/95 via-[#000000]/45 to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
 
-      <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
-        <defs>
-          <filter
-            id="figma-texture-order-pending"
-            x="-10%"
-            y="-15%"
-            width="120%"
-            height="130%"
-            filterUnits="objectBoundingBox"
-            primitiveUnits="userSpaceOnUse"
+        <div className="relative z-10 w-full mb-1 select-none">
+          <div className="flex items-end justify-between gap-4">
+            <div className="shrink-0">
+              <div className="h-11 flex items-center gap-2 px-4 rounded-md bg-amber-500/25 border border-amber-400/50 backdrop-blur-sm text-amber-200 text-sm font-mono font-bold tracking-wide shadow-md">
+                <Loader2 className="w-4 h-4 animate-spin text-amber-400 shrink-0" />
+                <span>PAYMENT VERIFYING</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ============================================================== */}
+      {/* RIGHT COLUMN: Clean White Background with Centered Pop-up Card */}
+      {/* ============================================================== */}
+      <div className="w-full lg:w-1/2 h-full bg-white text-neutral-900 flex flex-col relative overflow-hidden">
+        {/* Top Header Bar */}
+        <header className="absolute top-0 inset-x-0 w-full flex items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 z-20 pointer-events-none">
+          <div className="pointer-events-auto">
+            <Link
+              href="/my-courses"
+              className="text-xs sm:text-sm font-bold text-neutral-600 hover:text-black flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <BookOpen className="w-4 h-4 text-black" />
+              <span>My Courses &rarr;</span>
+            </Link>
+          </div>
+
+          <Link
+            href="/"
+            className="pointer-events-auto flex flex-col items-end -space-y-0.5 leading-[0.92] text-black hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+            aria-label="HYDRO BASICS Home - Back to Course"
           >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.25"
-              numOctaves="3"
-              result="noise"
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+              BASICS
+            </span>
+          </Link>
+        </header>
+
+        {/* Center Section: Pop-up Card */}
+        <div className="flex-1 w-full min-h-0 overflow-y-auto relative flex flex-col justify-center items-center py-6 sm:py-8 px-4">
+          <div className="my-auto w-full max-w-[460px] relative">
+            {/* Pop-up close X button in top right corner of card */}
+            <Link
+              href="/my-courses"
+              aria-label="Close"
+              className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white border border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100 flex items-center justify-center shadow-md transition-all cursor-pointer z-20"
+            >
+              <X className="w-4 h-4 sm:w-5 sm:h-5" />
+            </Link>
+
+            <PaymentPendingCard
+              orderId={orderId}
+              courseTitle={order?.product?.title}
+              pollCount={pollCount}
+              maxPoll={15}
+              isTimedOut={isTimedOut}
+              errorMsg={errorMsg}
+              onRefresh={handleManualRefresh}
             />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="noise"
-              scale="5.5"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-        </defs>
-      </svg>
-
-      <main className="relative z-10 flex-1 w-full max-w-[1440px] mx-auto py-10 sm:py-14 md:py-16 pb-16 sm:pb-24 pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 pr-6 sm:pr-8 md:pr-12 lg:pr-16">
-        <div className="mb-8 sm:mb-10 select-none">
-          <h1 className="font-extrabold text-white uppercase leading-[0.88] tracking-[-0.02em] text-5xl sm:text-6xl md:text-7xl lg:text-[76px] xl:text-[84px] select-none">
-            <span className="block">PAYMENT</span>
-            <span className="block">VERIFYING.</span>
-          </h1>
-        </div>
-
-        <div className="relative w-full max-w-xl sm:max-w-2xl p-7 sm:p-9 md:p-10 select-none drop-shadow-[0_20px_35px_rgba(0,0,60,0.35)] my-6">
-          <div className="absolute inset-0 pointer-events-none overflow-visible">
-            <svg className="w-full h-full overflow-visible" xmlns="http://www.w3.org/2000/svg">
-              <rect
-                x="0"
-                y="0"
-                width="100%"
-                height="100%"
-                rx="5.1"
-                ry="5.1"
-                fill="white"
-                filter="url(#figma-texture-order-pending)"
-              />
-            </svg>
-          </div>
-
-          <div className="relative z-10 w-full text-neutral-900 space-y-6 text-left">
-            {!isTimedOut && !errorMsg && (
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-black/10 text-black inline-flex items-center justify-center">
-                  <Loader2 className="w-6 h-6 animate-spin stroke-[2.5]" />
-                </div>
-                <h2 className="text-2xl font-bold text-neutral-900 tracking-tight">
-                  Confirming Payment with Gateway
-                </h2>
-                <p className="text-sm text-neutral-600 leading-relaxed">
-                  We are validating the payment signature with the payment provider. Please do not close or refresh this tab.
-                </p>
-                <div className="p-3 bg-neutral-50 rounded-md border border-neutral-200 text-xs font-mono text-neutral-600">
-                  Verifying Order: {formatDisplayOrderId(orderId)} (Attempt {pollCount + 1}/15)
-                </div>
-              </div>
-            )}
-
-            {isTimedOut && (
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 border border-amber-300 inline-flex items-center justify-center">
-                  <AlertCircle className="w-6 h-6 stroke-[2.5]" />
-                </div>
-                <h2 className="text-2xl font-bold text-neutral-900 tracking-tight">
-                  Payment Confirmation in Progress
-                </h2>
-                <p className="text-sm text-neutral-600 leading-relaxed">
-                  Your bank or UPI app has completed the transaction, but we have not received the webhook confirmation yet.
-                </p>
-                <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={handleManualRefresh}
-                    className="h-11 px-6 bg-black hover:bg-[#262626] text-white font-bold text-sm uppercase rounded-md shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <RefreshCw className="w-4 h-4" />
-                    <span>Check Status Again</span>
-                  </button>
-                  <Link
-                    href="/my-courses"
-                    className="h-11 px-6 rounded-md border border-neutral-300 hover:border-black bg-white hover:bg-neutral-50 text-neutral-900 font-bold text-sm uppercase flex items-center justify-center transition-colors"
-                  >
-                    Go to My Courses
-                  </Link>
-                </div>
-              </div>
-            )}
-
-            {errorMsg && (
-              <div className="space-y-4">
-                <div className="p-4 bg-rose-50 border border-rose-200 rounded-md text-rose-900 text-sm font-semibold">
-                  {errorMsg}
-                </div>
-                <Link
-                  href="/checkout"
-                  className="inline-flex items-center justify-center h-11 px-6 bg-black hover:bg-[#262626] text-white font-bold text-sm uppercase rounded-md transition-colors"
-                >
-                  Return to Checkout
-                </Link>
-              </div>
-            )}
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
