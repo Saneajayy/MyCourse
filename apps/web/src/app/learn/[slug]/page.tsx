@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import type Hls from 'hls.js';
 import { useAuth } from '../../../context/auth-context';
 import { apiClient, ApiError } from '../../../lib/api-client';
-import { siteConfig } from '../../../config/site';
 import { Button } from '../../../components/ui';
 import {
   Play,
@@ -67,7 +66,7 @@ interface PlaybackData {
 export default function CoursePlayerPage({ params }: { params: Promise<{ slug: string }> }) {
   const router = useRouter();
   const { slug } = use(params);
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   // Curriculum State
   const [sections, setSections] = useState<SectionProgressItem[]>([]);
@@ -99,17 +98,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
   const [currentQuality, setCurrentQuality] = useState<number>(-1); // -1 = Auto
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
 
-  // Dynamic Floating Watermark
-  const [watermarkPos, setWatermarkPos] = useState({ top: '20%', left: '25%' });
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const top = `${Math.floor(Math.random() * 70) + 10}%`;
-      const left = `${Math.floor(Math.random() * 60) + 10}%`;
-      setWatermarkPos({ top, left });
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
 
   // 1. Auth Guard
   useEffect(() => {
@@ -480,38 +469,6 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     }
   };
 
-  // Toggle Lesson Completion Status
-  const toggleLessonCompleted = () => {
-    if (!selectedLessonId) return;
-    const allLessonsList = sections.flatMap((s) => s.lessons);
-    const curr = allLessonsList.find((l) => l.lessonId === selectedLessonId);
-    const currentStatus = curr?.isCompleted || false;
-    const newStatus = !currentStatus;
-
-    setSections((prev) =>
-      prev.map((sec) => ({
-        ...sec,
-        lessons: sec.lessons.map((l) =>
-          l.lessonId === selectedLessonId ? { ...l, isCompleted: newStatus } : l
-        ),
-      }))
-    );
-
-    if (newStatus && playbackData) {
-      apiClient(`/lessons/${selectedLessonId}/heartbeat`, {
-        method: 'POST',
-        body: JSON.stringify({
-          sessionId: playbackData.sessionId,
-          positionSeconds: Math.floor(duration || playbackData.durationSeconds),
-          durationSeconds: Math.floor(duration || playbackData.durationSeconds),
-          watchedSeconds: Math.floor(duration || playbackData.durationSeconds),
-          isPlaying: false,
-          state: 'completed',
-        }),
-      }).catch(() => {});
-    }
-  };
-
   const formatTime = (secs: number) => {
     const mins = Math.floor(secs / 60);
     const rem = Math.floor(secs % 60);
@@ -602,10 +559,12 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             <span>← My Courses</span>
           </Link>
         </div>
-      </header>      {/* Main Split Layout: On mobile, flows vertically with video at the top -> then syllabus modules. On desktop, 2-panel with Syllabus on left and Video on right. */}
-      <div className="flex-1 flex flex-col md:flex-row-reverse overflow-y-auto overflow-x-hidden md:overflow-hidden min-h-0 bg-[#121417] w-full max-w-full">
-        {/* MAIN VIDEO & PLAYER AREA: First in DOM -> Always at the top on mobile. On desktop: Right panel via md:flex-row-reverse */}
-        <main className="w-full flex-1 flex flex-col md:h-full md:overflow-y-auto bg-[#121417] min-w-0 shrink-0 max-w-full">
+      </header>
+
+      {/* Main Split Layout: On mobile: video player is fixed at the top, syllabus scrolls below. On desktop: 2-panel with Syllabus on left and Video on right. */}
+      <div className="flex-1 flex flex-col md:flex-row-reverse overflow-hidden min-h-0 bg-[#121417] w-full max-w-full">
+        {/* MAIN VIDEO & PLAYER AREA: On mobile: shrink-0 (FIXED at top, does not scroll). On desktop: flex-1 md:h-full md:overflow-y-auto */}
+        <main className="w-full shrink-0 md:shrink md:flex-1 flex flex-col md:h-full md:overflow-y-auto bg-[#121417] min-w-0 max-w-full border-b md:border-b-0 border-white/20">
           {/* Top Breadcrumb/Header Bar on Desktop */}
           <div className="hidden md:flex px-6 lg:px-8 py-3.5 bg-[#16191d] border-b border-white/10 items-center justify-between gap-4 shrink-0">
             <div className="min-w-0 flex items-center gap-2.5">
@@ -628,16 +587,16 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             </div>
           </div>
 
-          <div className="w-full flex-1 flex flex-col items-center justify-start p-0 md:p-6 lg:p-8">
+          <div className="w-full flex flex-col items-center justify-start p-3 pb-0 sm:p-4 md:p-6 lg:p-8">
             <div className="w-full max-w-5xl mx-auto flex flex-col">
-              {/* Video Player Frame (Sticky on mobile) */}
-              <div className="w-full bg-black shrink-0 relative flex items-center justify-center sticky top-0 z-20 max-w-full overflow-hidden">
+              {/* Video Player Frame with rounded edges */}
+              <div className="w-full bg-black shrink-0 relative flex items-center justify-center max-w-full overflow-hidden rounded-xl sm:rounded-2xl">
                 <div
                   ref={containerRef}
-                  className={`relative bg-black w-full select-none overflow-hidden max-w-full border-b md:border border-white/10 shadow-2xl ${
+                  className={`relative bg-black w-full select-none overflow-hidden max-w-full rounded-xl sm:rounded-2xl border border-white/15 shadow-2xl ${
                     isFullscreen
-                      ? 'fixed inset-0 z-50 w-screen h-screen flex flex-col justify-center bg-black'
-                      : 'w-full aspect-video max-h-[50vh] sm:max-h-[60vh] md:max-h-[70vh] mx-auto'
+                      ? 'fixed inset-0 z-50 w-screen h-screen flex flex-col justify-center bg-black rounded-none border-none'
+                      : 'w-full aspect-video max-h-[46vh] sm:max-h-[56vh] md:max-h-[70vh] mx-auto'
                   }`}
                 >
                   {/* Loading Overlay */}
@@ -736,29 +695,20 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                     onClick={togglePlay}
                   />
 
-                  {/* Big Center Play Button Overlay (matches TakeUForward reference) */}
+                  {/* Big Center Play Button Overlay with rounded aesthetic */}
                   {!isPlaying && !streamLoading && !streamError && !isEvicted && (
                     <button
                       type="button"
                       onClick={togglePlay}
                       aria-label="Play video"
-                      className="absolute inset-0 m-auto w-16 h-16 sm:w-20 sm:h-20 bg-black/60 hover:bg-black/80 text-white rounded-none border border-white/40 backdrop-blur-sm flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95 z-10 shadow-2xl group"
+                      className="absolute inset-0 m-auto w-14 h-14 sm:w-18 sm:h-18 bg-black/60 hover:bg-black/80 text-white rounded-full border border-white/40 backdrop-blur-sm flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95 z-10 shadow-2xl group"
                     >
-                      <Play className="w-7 h-7 sm:w-9 sm:h-9 fill-white group-hover:scale-110 transition-transform ml-1" />
+                      <Play className="w-6 h-6 sm:w-8 sm:h-8 fill-white group-hover:scale-110 transition-transform ml-0.5" />
                     </button>
                   )}
 
-                  {/* Moving Anti-Piracy Watermark */}
-                  <div
-                    className="absolute pointer-events-none transition-all duration-1000 ease-in-out font-mono text-xs uppercase text-white/30 select-none max-w-[80%] truncate"
-                    style={{ top: watermarkPos.top, left: watermarkPos.left }}
-                    aria-hidden="true"
-                  >
-                    {user?.email || siteConfig.brandName}
-                  </div>
-
-                  {/* Custom Video Control Bar */}
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/85 to-transparent px-3 py-2 sm:px-4 sm:py-2.5 flex flex-col gap-1.5 sm:gap-2 text-white border-t border-white/10 max-w-full">
+                  {/* Custom Video Control Bar (Floating seamlessly over video without top dividing border line) */}
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/65 to-transparent px-3 py-2 sm:px-4 sm:py-2.5 flex flex-col gap-1.5 sm:gap-2 text-white max-w-full">
                     {/* Scrubbing timeline slider with timestamps at ends */}
                     <div className="flex items-center gap-2 sm:gap-3 w-full">
                       <span className="text-[11px] sm:text-xs font-mono text-white/90 shrink-0">
@@ -920,8 +870,8 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 </div>
               </div>
 
-              {/* Action Bar Directly Underneath Video (TakeUForward style: Previous, Completed toggle, Next) */}
-              <div className="w-full bg-[#181b20] border-b md:border-x md:border-b border-white/10 px-4 sm:px-6 py-3 sm:py-3.5 flex items-center justify-between gap-3 text-white">
+              {/* Action Bar Directly Underneath Video: Previous and Next Lesson */}
+              <div className="w-full bg-[#181b20] border-t md:border-x md:border-b border-white/10 px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3 text-white">
                 {/* Previous Lesson Button */}
                 <button
                   type="button"
@@ -935,28 +885,6 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 >
                   <span>←</span>
                   <span className="hidden sm:inline">Previous</span>
-                </button>
-
-                {/* Mark as Completed Checkbox Toggle */}
-                <button
-                  type="button"
-                  onClick={toggleLessonCompleted}
-                  className={`inline-flex items-center gap-2 px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider border rounded-none transition-all cursor-pointer ${
-                    isCurrentCompleted
-                      ? 'bg-white text-black border-white'
-                      : 'bg-[#1f2328] hover:bg-[#282d33] text-white/90 border-white/20'
-                  }`}
-                >
-                  <div
-                    className={`w-4 h-4 border flex items-center justify-center ${
-                      isCurrentCompleted
-                        ? 'bg-black border-black text-white'
-                        : 'border-white/50 bg-transparent'
-                    }`}
-                  >
-                    {isCurrentCompleted && <Check className="w-3 h-3 stroke-[3]" />}
-                  </div>
-                  <span>{isCurrentCompleted ? 'Completed' : 'Mark Complete'}</span>
                 </button>
 
                 {/* Next Lesson Button */}
@@ -976,21 +904,15 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 </button>
               </div>
 
-              {/* Lesson Overview Details (Grey Theme) */}
-              <div className="w-full bg-[#141619] border-b md:border-x md:border-b border-white/10 p-5 sm:p-6 md:p-8 space-y-2 text-white max-w-full">
+              {/* Compact Module & Lesson Title (No description) */}
+              <div className="w-full bg-[#141619] border-t md:border-x md:border-b border-white/10 px-4 py-2.5 sm:px-6 sm:py-3.5 text-white max-w-full">
                 <div className="min-w-0">
-                  <span className="text-[11px] font-mono uppercase tracking-widest text-white/50 block mb-1">
+                  <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-white/50 block mb-0.5">
                     {currentSection ? `Module ${currentSectionIdx + 1}: ${currentSection.title.replace(/^Module\s*\d+\s*:\s*/i, '')}` : 'Curriculum Lesson'}
                   </span>
-                  <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-white tracking-tight leading-snug">
+                  <h2 className="text-sm sm:text-lg md:text-xl font-bold text-white tracking-tight leading-snug">
                     {currentLessonTitle}
                   </h2>
-                </div>
-
-                <div className="space-y-2 text-white/75 text-xs sm:text-sm leading-relaxed max-w-3xl pt-2">
-                  <p>
-                    Fundamental principles of fluid power, hydraulic circuit behavior, and practical workplace concepts. Watch the stream above, use playback controls as needed, and proceed to the next lesson once completed.
-                  </p>
                 </div>
               </div>
             </div>
@@ -999,7 +921,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
         {/* SYLLABUS & MODULES: Second in DOM -> Below video on mobile. On desktop: Left panel via md:flex-row-reverse */}
         <aside
-          className="w-full md:w-72 lg:w-80 md:h-full border-t md:border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col shrink-0 overflow-hidden relative select-none shadow-none max-w-full"
+          className="w-full flex-1 overflow-y-auto md:w-72 lg:w-80 md:h-full md:flex-none border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col relative select-none shadow-none max-w-full"
         >
           {/* Embedded Background Graphic strictly contained inside aside with zero mobile bleed */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
