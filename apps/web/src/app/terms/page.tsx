@@ -73,158 +73,115 @@ export default function TermsPage() {
       {/* Floating Glass Navigation */}
       <TermsNavbar />
 
-      {/* SVG Deckled Edge Filter */}
-      <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
-        <defs>
-          <filter
-            id="figma-texture-terms"
-            x="-10%"
-            y="-15%"
-            width="120%"
-            height="130%"
-            filterUnits="objectBoundingBox"
-            primitiveUnits="userSpaceOnUse"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.25"
-              numOctaves="3"
-              result="noise"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="noise"
-              scale="5.5"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-        </defs>
-      </svg>
-
       {/* Main Content Area */}
       <main className="relative z-10 flex-1 w-full max-w-[1240px] mx-auto py-10 sm:py-14 md:py-16 pb-16 sm:pb-24 pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 pr-6 sm:pr-8 md:pr-12 lg:pr-16">
-        {/* Header Block: Exact landing page title scale & typography */}
-        <div className="mb-10 sm:mb-14 select-none">
-          <h1 className="font-extrabold text-white uppercase leading-[0.88] tracking-[-0.02em] text-5xl sm:text-6xl md:text-7xl lg:text-[76px] xl:text-[84px] select-none">
+        {/* Header Block */}
+        <div className="mb-8 sm:mb-12 select-none">
+          <h1 className="font-extrabold text-white uppercase leading-[0.88] tracking-[-0.02em] text-4xl sm:text-5xl md:text-6xl lg:text-[68px] select-none">
             <span className="block">TERMS &amp;</span>
             <span className="block">CONDITIONS.</span>
           </h1>
-          <p className="text-white/80 font-medium text-sm sm:text-base md:text-lg mt-3 max-w-xl">
+          <p className="text-white/70 font-medium text-xs sm:text-sm md:text-base mt-3 max-w-xl">
             Official student enrollment agreement, platform licensing rules, and industrial engineering safety protocols.
           </p>
         </div>
 
-        {/* Master Deckled Paper Card Container */}
-        <div className="relative w-full p-8 sm:p-10 md:p-12 lg:p-14 select-none drop-shadow-[0_20px_35px_rgba(0,0,60,0.35)]">
-          {/* Textured White Card Background via SVG Filter */}
-          <div className="absolute inset-0 pointer-events-none overflow-visible">
-            <svg className="w-full h-full overflow-visible" xmlns="http://www.w3.org/2000/svg">
-              <rect
-                x="0"
-                y="0"
-                width="100%"
-                height="100%"
-                rx="5.1"
-                ry="5.1"
-                fill="white"
-                filter="url(#figma-texture-terms)"
-              />
-            </svg>
-          </div>
-
-          {/* Card Content in crisp solid dark neutral & brand blue */}
-          <div className="relative z-10 w-full text-neutral-900 space-y-8 select-text">
-            {/* Meta Timestamp Header */}
-            <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white shrink-0 shadow-sm">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-black">
+        {/* Minimal Policy Card Container */}
+        <div className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl overflow-hidden shadow-none select-text">
+          {/* Header Bar with continuous edge-to-edge dividing line */}
+          <div className="px-6 sm:px-8 md:px-10 py-4.5 sm:py-5 border-b border-neutral-200 flex flex-wrap items-center justify-between gap-3 bg-neutral-50/50">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white shrink-0">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-neutral-900 block">
                   Binding Legal Agreement
                 </span>
-              </div>
-              <div className="text-xs font-mono text-neutral-500">
-                Last Updated: October 2026 • Jurisdiction: {siteConfig.contact.jurisdiction}
+                <span className="text-[11px] text-neutral-500 font-medium">
+                  Jurisdiction: {siteConfig.contact.jurisdiction}
+                </span>
               </div>
             </div>
+            <div className="text-xs font-mono font-medium text-neutral-600 bg-white border border-neutral-200 px-3 py-1.5 rounded-md">
+              Last Updated: October 2026
+            </div>
+          </div>
 
-            {/* Terms Content Sections */}
-            <div className="space-y-8 text-sm sm:text-base text-neutral-800 leading-relaxed">
-              <section className="space-y-2.5">
-                <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-black font-mono">01.</span> Acceptance of Terms
-                </h2>
-                <p>
-                  By registering for an account or enrolling in courses provided by{' '}
-                  <strong className="text-neutral-950">{siteConfig.brandName}</strong> (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;),
-                  you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not purchase or access the course curriculum.
-                </p>
-              </section>
+          {/* Card Body */}
+          <div className="p-6 sm:p-8 md:p-10 lg:p-12 space-y-8 text-neutral-800 text-sm sm:text-[15px] leading-relaxed">
+            <section className="space-y-2.5">
+              <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2">
+                <span className="text-black font-mono">01.</span> Acceptance of Terms
+              </h2>
+              <p>
+                By registering for an account or enrolling in courses provided by{' '}
+                <strong className="text-neutral-950">{siteConfig.brandName}</strong> (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;),
+                you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not purchase or access the course curriculum.
+              </p>
+            </section>
 
-              <section className="space-y-2.5">
-                <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-black font-mono">02.</span> Course Access &amp; Validity
-                </h2>
-                <p>
-                  Enrolling in the course grants you a single-user, non-exclusive, non-transferable license to stream instructional videos, review hydraulic schematics, and access supplemental reference materials for a period of <strong className="text-neutral-950">365 days (1 year)</strong> from the timestamp of payment confirmation, unless lifetime access was explicitly purchased.
-                </p>
-              </section>
+            <section className="space-y-2.5">
+              <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2">
+                <span className="text-black font-mono">02.</span> Course Access &amp; Validity
+              </h2>
+              <p>
+                Enrolling in the course grants you a single-user, non-exclusive, non-transferable license to stream instructional videos, review hydraulic schematics, and access supplemental reference materials for a period of <strong className="text-neutral-950">365 days (1 year)</strong> from the timestamp of payment confirmation, unless lifetime access was explicitly purchased.
+              </p>
+            </section>
 
-              <section className="space-y-2.5">
-                <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-black font-mono">03.</span> Anti-Piracy &amp; Dynamic Watermarking
-                </h2>
-                <p>
-                  All video lectures are dynamically embedded with cryptographic watermarks displaying the enrolled student&apos;s registered email address and session tokens. Screen-recording, ripping, downloading, sharing credentials, or publicly distributing course materials is strictly prohibited and constitutes a copyright violation punishable under the Indian Copyright Act, 1957.
-                </p>
-                <p>
-                  Single-device concurrent streaming is strictly enforced. Sharing student login accounts will trigger automatic session revocation or permanent account ban without refund.
-                </p>
-              </section>
+            <section className="space-y-2.5">
+              <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2">
+                <span className="text-black font-mono">03.</span> Anti-Piracy &amp; Dynamic Watermarking
+              </h2>
+              <p>
+                All video lectures are dynamically embedded with cryptographic watermarks displaying the enrolled student&apos;s registered email address and session tokens. Screen-recording, ripping, downloading, sharing credentials, or publicly distributing course materials is strictly prohibited and constitutes a copyright violation punishable under the Indian Copyright Act, 1957.
+              </p>
+              <p>
+                Single-device concurrent streaming is strictly enforced. Sharing student login accounts will trigger automatic session revocation or permanent account ban without refund.
+              </p>
+            </section>
 
-              <section className="space-y-2.5">
-                <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-black font-mono">04.</span> Pricing, Payments &amp; Taxes
-                </h2>
-                <p>
-                  All course fees are quoted in Indian Rupees (INR) and are inclusive of Goods and Services Tax (GST) where applicable. Payments are processed securely via RBI-authorized payment aggregators (Razorpay). Valid GST tax invoices are automatically generated upon payment confirmation and remain available for PDF download in your student account dashboard.
-                </p>
-              </section>
+            <section className="space-y-2.5">
+              <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2">
+                <span className="text-black font-mono">04.</span> Pricing, Payments &amp; Taxes
+              </h2>
+              <p>
+                All course fees are quoted in Indian Rupees (INR) and are inclusive of Goods and Services Tax (GST) where applicable. Payments are processed securely via RBI-authorized payment aggregators (Razorpay). Valid GST tax invoices are automatically generated upon payment confirmation and remain available for PDF download in your student account dashboard.
+              </p>
+            </section>
 
-              <section className="space-y-2.5">
-                <div className="p-5 bg-amber-50/80 border border-amber-300 rounded-md sm:rounded-lg text-amber-950 space-y-2">
-                  <div className="flex items-center gap-2 font-bold text-amber-900">
-                    <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0" />
-                    <h2 className="text-base sm:text-lg font-bold">05. Engineering Safety Disclaimer</h2>
-                  </div>
-                  <p className="text-xs sm:text-sm text-amber-900/90 leading-relaxed">
-                    Industrial hydraulic machinery operates under extreme fluid pressures exceeding 200–350 bar. The instructions, schematic circuits, and troubleshooting procedures taught in this course are educational demonstrations. Students and engineers must follow original manufacturer safety manuals, plant isolation (LOTO) protocols, and pressure relief checks before performing live maintenance. We assume no liability for equipment damage or personal injury resulting from improper practical application.
-                  </p>
+            <section className="space-y-2.5">
+              <div className="p-4 sm:p-5 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 space-y-2">
+                <div className="flex items-center gap-2 font-bold text-neutral-950 text-sm sm:text-base">
+                  <AlertTriangle className="w-4 h-4 text-neutral-900 shrink-0" />
+                  <h3>05. Engineering Safety Disclaimer</h3>
                 </div>
-              </section>
-
-              <section className="space-y-2.5">
-                <h2 className="text-lg sm:text-xl font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-black font-mono">06.</span> Contact &amp; Grievance Redressal
-                </h2>
-                <p>
-                  For any billing inquiries, account questions, or legal notices, contact our support desk directly at{' '}
-                  <a
-                    href={`mailto:${siteConfig.supportEmail}`}
-                    className="font-bold underline text-black hover:underline"
-                  >
-                    {siteConfig.supportEmail}
-                  </a>{' '}
-                  or visit our{' '}
-                  <Link href="/contact" className="font-bold underline text-black hover:underline">
-                    Contact Support
-                  </Link>{' '}
-                  page.
+                <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
+                  Industrial hydraulic machinery operates under extreme fluid pressures exceeding 200–350 bar. The instructions, schematic circuits, and troubleshooting procedures taught in this course are educational demonstrations. Students and engineers must follow original manufacturer safety manuals, plant isolation (LOTO) protocols, and pressure relief checks before performing live maintenance. We assume no liability for equipment damage or personal injury resulting from improper practical application.
                 </p>
-              </section>
-            </div>
+              </div>
+            </section>
+
+            <section className="space-y-2.5">
+              <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2">
+                <span className="text-black font-mono">06.</span> Contact &amp; Grievance Redressal
+              </h2>
+              <p>
+                For any billing inquiries, account questions, or legal notices, contact our support desk directly at{' '}
+                <a
+                  href={`mailto:${siteConfig.supportEmail}`}
+                  className="font-bold underline text-black hover:underline"
+                >
+                  {siteConfig.supportEmail}
+                </a>{' '}
+                or visit our{' '}
+                <Link href="/contact" className="font-bold underline text-black hover:underline">
+                  Contact Support
+                </Link>{' '}
+                page.
+              </p>
+            </section>
           </div>
         </div>
       </main>
