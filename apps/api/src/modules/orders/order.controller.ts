@@ -43,8 +43,15 @@ export class OrderController {
 
   public async getOrderById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const orderId = req.params.id as string;
+      const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+      if (!orderId || !UUID_REGEX.test(orderId)) {
+        throw new NotFoundError('Order not found');
+      }
+
       const order = await prisma.order.findUnique({
-        where: { id: req.params.id as string },
+        where: { id: orderId },
         include: {
           product: true,
           coupon: true,

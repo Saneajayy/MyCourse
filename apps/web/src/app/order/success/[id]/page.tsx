@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { apiClient, getAccessToken } from '../../../../lib/api-client';
 import { siteConfig } from '../../../../config/site';
-import { Loader2, BookOpen, CheckCircle2 } from 'lucide-react';
+import { Loader2, BookOpen, CheckCircle2, AlertCircle } from 'lucide-react';
 import { PaymentSuccessCard } from '../../../../components/PaymentSuccessCard';
 
 interface OrderSuccessData {
@@ -131,17 +131,30 @@ export default function OrderSuccessPage() {
   if (errorMsg || !order) {
     return (
       <div className="w-full h-screen h-[100dvh] flex flex-col items-center justify-center p-4 bg-white font-reddit">
-        <div className="max-w-md w-full bg-white border border-neutral-200/80 rounded-2xl p-8 text-neutral-900 space-y-4 text-center shadow-sm">
-          <h2 className="text-xl font-bold text-rose-600">Order Notice</h2>
-          <p className="text-sm text-neutral-600">
-            {errorMsg || 'Order details not found.'}
-          </p>
-          <Link
-            href="/my-courses"
-            className="inline-flex items-center justify-center h-11 px-6 bg-black text-white font-bold text-sm uppercase rounded-lg hover:bg-[#262626] transition-colors"
-          >
-            Go to My Courses
-          </Link>
+        <div className="max-w-md w-full bg-white border border-neutral-200/80 rounded-2xl p-7 sm:p-8 text-neutral-900 space-y-4 text-center shadow-none">
+          <div className="w-12 h-12 rounded-full bg-neutral-100 text-neutral-800 flex items-center justify-center mx-auto">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold text-neutral-950">Order Not Found</h2>
+            <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
+              We couldn&apos;t retrieve the order details for this reference. Please check your student portal or contact support.
+            </p>
+          </div>
+          <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
+            <Link
+              href="/my-courses"
+              className="flex-1 inline-flex items-center justify-center h-11 px-5 bg-black text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-neutral-800 transition-colors"
+            >
+              Go to My Courses
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-flex items-center justify-center h-11 px-5 border border-neutral-300 text-neutral-900 font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-neutral-50 transition-colors"
+            >
+              Contact Support
+            </Link>
+          </div>
         </div>
       </div>
     );
