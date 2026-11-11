@@ -175,23 +175,23 @@ export function CertificateSection() {
                     </span>
                   </div>
 
-                  {/* 2. Recipient Info */}
-                  <div className="mt-6 md:mt-7 lg:mt-8">
+                  {/* 2. Recipient Info & Course Description */}
+                  <div className="mt-7 md:mt-8 lg:mt-10">
                     <p className="text-black/75 font-light text-[13px] md:text-sm lg:text-[14px] lowercase tracking-normal text-left select-none">
                       presented to
                     </p>
 
-                    <h3 className="font-extrabold text-black text-[28px] md:text-[34px] lg:text-[38px] tracking-wide uppercase leading-tight select-none mt-1 sm:mt-1.5 mb-0">
+                    <h3 className="font-extrabold text-black text-[28px] md:text-[34px] lg:text-[38px] tracking-wide uppercase leading-tight select-none mt-2.5 md:mt-3 mb-0">
                       VARUN KUMAR
                     </h3>
-                  </div>
 
-                  {/* 3. Course Description */}
-                  <p className="mt-6 md:mt-7 lg:mt-8 text-black/80 font-light text-[12px] md:text-[13px] lg:text-[14px] leading-[1.55] text-left select-none max-w-[480px] lg:max-w-[530px]">
-                    For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong><br className="hidden md:inline" />
-                    by Mr. Hira Lal, covering the Fundamentals of Hydraulic<br className="hidden md:inline" />
-                    systems, components and circuit designs.
-                  </p>
+                    {/* 3. Course Description */}
+                    <p className="mt-2.5 md:mt-3 text-black/80 font-light text-[12px] md:text-[13px] lg:text-[14px] leading-[1.55] text-left select-none max-w-[480px] lg:max-w-[530px]">
+                      For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong><br className="hidden md:inline" />
+                      by Mr. Hira Lal, covering the Fundamentals of Hydraulic<br className="hidden md:inline" />
+                      systems, components and circuit designs.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Vertical Divider Line: Touches the top border line and bottom box border */}
