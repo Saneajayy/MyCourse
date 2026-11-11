@@ -1063,9 +1063,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
         {/* SYLLABUS & MODULES: Second in DOM -> Below video on mobile. On desktop: Left panel via md:flex-row-reverse */}
         <aside
-          className="w-full flex-1 overflow-y-auto md:w-72 lg:w-80 md:h-full md:flex-none border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col relative select-none shadow-none max-w-full"
+          className="w-full flex-1 overflow-hidden md:w-72 lg:w-80 md:h-full md:flex-none border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col relative select-none shadow-none max-w-full"
         >
-          {/* Background Image Embedded on Column Back (Shifted to left, subtle opacity) */}
+          {/* Background Image Embedded on Column Back (Fixed backdrop: always covers entire visible column, never falls short) */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
             <Image
               src="/login-pixelated.png"
@@ -1093,8 +1093,8 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             </h2>
           </div>
 
-          {/* Scrollable Modules List (Independent Scroll on desktop) */}
-          <div className="relative z-10 flex-1 md:overflow-y-auto flex flex-col">
+          {/* Scrollable Modules List (Smooth scroll over fixed background on both mobile and desktop) */}
+          <div className="relative z-10 flex-1 overflow-y-auto flex flex-col pb-8 sm:pb-10">
             {sections.map((section, sIdx) => {
               const isExpanded = expandedSections[section.sectionId] ?? true;
               const completedCount = section.lessons.filter((l) => l.isCompleted).length;
