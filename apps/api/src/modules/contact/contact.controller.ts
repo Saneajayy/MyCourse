@@ -145,23 +145,23 @@ Submission ID: ${submission.id}`;
 
       const contentHtml = `
         <p style="margin: 0 0 14px 0;">A new contact form submission was received from the course website.</p>
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 16px 0; border: 1px solid #0A192F; background-color: #F8FAFC;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0; border: 1px solid #000000; background-color: #FAFAFA; border-radius: 0;">
           <tr>
-            <td style="padding: 10px 14px; border-bottom: 1px solid #E2E8F0; font-size: 13px; font-weight: 700; color: #64748B;">From</td>
-            <td style="padding: 10px 14px; border-bottom: 1px solid #E2E8F0; font-size: 14px; font-weight: 800; color: #0A192F;">${input.name} &lt;${input.email}&gt;</td>
+            <td style="padding: 12px 16px; border-bottom: 1px solid #E5E5E5; font-size: 12px; font-weight: 700; color: #737373; text-transform: uppercase; letter-spacing: 0.5px;">From</td>
+            <td style="padding: 12px 16px; border-bottom: 1px solid #E5E5E5; font-size: 14px; font-weight: 800; color: #000000;">${input.name} &lt;${input.email}&gt;</td>
           </tr>
           <tr>
-            <td style="padding: 10px 14px; border-bottom: 1px solid #E2E8F0; font-size: 13px; font-weight: 700; color: #64748B;">Subject</td>
-            <td style="padding: 10px 14px; border-bottom: 1px solid #E2E8F0; font-size: 14px; font-weight: 800; color: #0A192F;">${input.subject}</td>
+            <td style="padding: 12px 16px; border-bottom: 1px solid #E5E5E5; font-size: 12px; font-weight: 700; color: #737373; text-transform: uppercase; letter-spacing: 0.5px;">Subject</td>
+            <td style="padding: 12px 16px; border-bottom: 1px solid #E5E5E5; font-size: 14px; font-weight: 800; color: #000000;">${input.subject}</td>
           </tr>
           <tr>
-            <td style="padding: 10px 14px; border-bottom: 1px solid #E2E8F0; font-size: 13px; font-weight: 700; color: #64748B;">IP Address</td>
-            <td style="padding: 10px 14px; border-bottom: 1px solid #E2E8F0; font-size: 13px; font-family: monospace; color: #0A192F;">${clientIp}</td>
+            <td style="padding: 12px 16px; border-bottom: 1px solid #E5E5E5; font-size: 12px; font-weight: 700; color: #737373; text-transform: uppercase; letter-spacing: 0.5px;">IP Address</td>
+            <td style="padding: 12px 16px; border-bottom: 1px solid #E5E5E5; font-size: 13px; font-family: monospace; color: #000000;">${clientIp}</td>
           </tr>
         </table>
-        <div style="margin: 16px 0; padding: 16px; background-color: #ffffff; border: 1px solid #0A192F;">
-          <h4 style="margin: 0 0 8px 0; font-size: 13px; text-transform: uppercase; color: #64748B;">Message</h4>
-          <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #0A192F; white-space: pre-wrap;">${input.message}</p>
+        <div style="margin: 20px 0; padding: 18px 20px; background-color: #FAFAFA; border: 1px solid #000000; border-radius: 0;">
+          <h4 style="margin: 0 0 8px 0; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #000000;">Message</h4>
+          <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #171717; white-space: pre-wrap;">${input.message}</p>
         </div>
       `;
 

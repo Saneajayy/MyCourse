@@ -84,9 +84,10 @@ describe('Phase 8 Production Email Infrastructure & System Notifications Integra
       });
 
       expect(html).toContain('Hydro Basics');
-      expect(html).toContain('#0A192F'); // Dark Blue
-      expect(html).toContain('#E05305'); // Orange fill
+      expect(html).toContain('#000000'); // Pitch Black
+      expect(html).toContain('#FFFFFF'); // Pure White
       expect(html).toContain('min-height: 44px'); // Touch target
+      expect(html).toContain('border-radius: 0'); // Sharp edges
       expect(html).not.toContain('[TODO_REPLACE');
       expect(html).not.toContain('undefined');
       expect(html).not.toContain('null');

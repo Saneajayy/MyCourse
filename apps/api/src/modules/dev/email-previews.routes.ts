@@ -113,26 +113,26 @@ emailPreviewsRouter.get('/', (req: Request, res: Response) => {
   <title>Email Template Previews - Dev Mode</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0A192F; color: #F8FAFC; display: flex; height: 100vh; overflow: hidden; }
-    .sidebar { width: 320px; background-color: #050E1D; border-right: 2px solid #1E293B; display: flex; flex-direction: column; }
-    .sidebar-header { padding: 20px; border-bottom: 2px solid #E05305; background-color: #0A192F; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #000000; color: #FFFFFF; display: flex; height: 100vh; overflow: hidden; }
+    .sidebar { width: 320px; background-color: #0A0A0A; border-right: 1px solid #262626; display: flex; flex-direction: column; }
+    .sidebar-header { padding: 20px; border-bottom: 1px solid #262626; background-color: #000000; }
     .sidebar-header h1 { font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: #FFFFFF; }
-    .sidebar-header p { font-size: 12px; color: #94A3B8; margin-top: 4px; }
+    .sidebar-header p { font-size: 12px; color: #737373; margin-top: 4px; }
     .template-list { list-style: none; overflow-y: auto; flex: 1; padding: 12px; }
-    .template-link { display: block; padding: 12px 14px; margin-bottom: 6px; border-radius: 4px; color: #CBD5E1; text-decoration: none; font-size: 13px; font-weight: 700; border: 1px solid transparent; transition: all 0.15s ease; }
-    .template-link:hover { background-color: #1E293B; color: #FFFFFF; }
-    .template-link.active { background-color: #E05305; color: #0A192F; font-weight: 900; border-color: #0A192F; }
-    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background-color: #0F172A; }
-    .topbar { padding: 14px 24px; background-color: #0A192F; border-bottom: 1px solid #1E293B; display: flex; justify-content: space-between; align-items: center; }
+    .template-link { display: block; padding: 12px 14px; margin-bottom: 6px; border-radius: 0; color: #A3A3A3; text-decoration: none; font-size: 13px; font-weight: 700; border: 1px solid transparent; transition: all 0.15s ease; }
+    .template-link:hover { background-color: #171717; color: #FFFFFF; }
+    .template-link.active { background-color: #FFFFFF; color: #000000; font-weight: 900; border-color: #FFFFFF; }
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background-color: #050505; }
+    .topbar { padding: 14px 24px; background-color: #000000; border-bottom: 1px solid #262626; display: flex; justify-content: space-between; align-items: center; }
     .topbar-info { display: flex; flex-direction: column; gap: 4px; }
     .topbar-subject { font-size: 14px; font-weight: 800; color: #FFFFFF; }
     .topbar-actions { display: flex; gap: 10px; align-items: center; }
-    .btn-tab { padding: 6px 14px; font-size: 12px; font-weight: 800; border: 1px solid #334155; background-color: #1E293B; color: #FFFFFF; text-decoration: none; border-radius: 4px; }
-    .btn-tab.active { background-color: #E05305; color: #0A192F; border-color: #0A192F; }
-    .btn-action { padding: 6px 14px; font-size: 12px; font-weight: 800; background-color: #38BDF8; color: #0A192F; text-decoration: none; border-radius: 4px; }
-    .preview-container { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 24px; overflow-y: auto; background-color: #0F172A; }
-    .email-frame { width: 640px; height: 100%; min-height: 700px; border: 1px solid #334155; background: #FFFFFF; border-radius: 4px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .text-pre { width: 640px; background-color: #050E1D; border: 1px solid #334155; padding: 20px; font-family: monospace; font-size: 13px; color: #38BDF8; line-height: 1.6; white-space: pre-wrap; word-break: break-all; border-radius: 4px; }
+    .btn-tab { padding: 6px 14px; font-size: 12px; font-weight: 800; border: 1px solid #333333; background-color: #171717; color: #FFFFFF; text-decoration: none; border-radius: 0; }
+    .btn-tab.active { background-color: #FFFFFF; color: #000000; border-color: #FFFFFF; }
+    .btn-action { padding: 6px 14px; font-size: 12px; font-weight: 800; background-color: #FFFFFF; color: #000000; text-decoration: none; border-radius: 0; border: 1px solid #FFFFFF; }
+    .preview-container { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 24px; overflow-y: auto; background-color: #0F0F0F; }
+    .email-frame { width: 640px; height: 100%; min-height: 700px; border: 1px solid #262626; background: #FFFFFF; border-radius: 0; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .text-pre { width: 640px; background-color: #000000; border: 1px solid #262626; padding: 20px; font-family: monospace; font-size: 13px; color: #E5E5E5; line-height: 1.6; white-space: pre-wrap; word-break: break-all; border-radius: 0; }
   </style>
 </head>
 <body>
