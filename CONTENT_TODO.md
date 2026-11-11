@@ -6,11 +6,11 @@ Before launching the course website to production, review and replace all items 
 
 ## 1. Instructor & Brand Identity
 
-- [ ] **Instructor Full Name**
+- [x] **Instructor Full Name**
   - **Environment Variable:** `NEXT_PUBLIC_INSTRUCTOR_NAME`
   - **Config File:** `apps/web/src/config/site.ts` (`siteConfig.instructor.name`)
-  - **Current Marker:** `[TODO_REPLACE: INSTRUCTOR NAME]`
-  - **Required Value:** Father's actual legal / professional name as it should appear on course certificates, landing page, and video player.
+  - **Configured Value:** `Mr. Hira Lal`
+  - **Status:** Saved in site configuration.
 
 - [ ] **Instructor Professional Credentials**
   - **Environment Variable:** `NEXT_PUBLIC_INSTRUCTOR_CREDENTIALS`
@@ -23,11 +23,11 @@ Before launching the course website to production, review and replace all items 
   - **Config File:** `apps/web/src/config/site.ts` (`siteConfig.instructor.bio`)
   - **Action:** Confirm or provide your father's 2-3 paragraph professional background, industry sectors, and field experience.
 
-- [ ] **Official YouTube Channel Link**
+- [x] **Official YouTube Channel Link**
   - **Environment Variable:** `NEXT_PUBLIC_YOUTUBE_URL`
   - **Config File:** `apps/web/src/config/site.ts` (`siteConfig.instructor.youtubeUrl`)
-  - **Current Marker:** `https://www.youtube.com/[TODO_REPLACE_CHANNEL]`
-  - **Required Value:** Direct URL to father's 70k subscriber YouTube channel.
+  - **Configured Value:** `https://www.youtube.com/@HYDRAULICSYSTEMbasics`
+  - **Status:** Saved in site configuration.
 
 - [ ] **Logo / Brand Wordmark**
   - **Config File:** `apps/web/src/config/site.ts` (`siteConfig.logo`)

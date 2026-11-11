@@ -1,7 +1,6 @@
 /**
  * Central Brand and Site Configuration
- * All brand inputs are stored here in one place so they can be easily customized or updated later.
- * Entries marked with [TODO_REPLACE] must be filled in with real owner details prior to live launch.
+ * All brand inputs and instructor details are stored here in one place so they can be easily customized or updated later.
  */
 export const siteConfig = {
   brandName: process.env.NEXT_PUBLIC_BRAND_NAME || 'Hydro Basics',
@@ -12,19 +11,16 @@ export const siteConfig = {
     'Master industrial hydraulic systems, proportional valves, schematic reading, and live troubleshooting directly from a veteran engineer with 20+ years of field experience.',
 
   instructor: {
-    // [TODO_REPLACE: Replace with father's actual name]
-    name: process.env.NEXT_PUBLIC_INSTRUCTOR_NAME || '[TODO_REPLACE: INSTRUCTOR NAME]',
+    name: process.env.NEXT_PUBLIC_INSTRUCTOR_NAME || 'Mr. Hira Lal',
     credentials:
       process.env.NEXT_PUBLIC_INSTRUCTOR_CREDENTIALS ||
       'Hydraulic Engineer (20+ Years Field Experience)',
     subscribers: '70,000+ Subscribers on YouTube',
-    // [TODO_REPLACE: Provide instructor bio and background details]
     bio:
       process.env.NEXT_PUBLIC_INSTRUCTOR_BIO ||
       'Hydraulic engineer with over 20 years of field experience in industrial plants, hydraulic systems, and circuit design. Teaches practical engineering and troubleshooting on YouTube (70k subscribers).',
-    // [TODO_REPLACE: Replace with real YouTube channel URL]
     youtubeUrl:
-      process.env.NEXT_PUBLIC_YOUTUBE_URL || 'https://www.youtube.com/[TODO_REPLACE_CHANNEL]',
+      process.env.NEXT_PUBLIC_YOUTUBE_URL || 'https://www.youtube.com/@HYDRAULICSYSTEMbasics',
   },
 
   // Official support email

@@ -8,16 +8,18 @@ const __dirname = path.dirname(__filename);
 const webRoot = path.resolve(__dirname, '../..');
 const siteConfigPath = path.resolve(webRoot, 'src/config/site.ts');
 
+const fixturePath = path.resolve(__dirname, 'fixtures/todo-fixture.ts');
+
 describe('Production Content Audit Pre-Build Check (C2)', () => {
-  it('detects unresolved [TODO_REPLACE] markers in configuration', () => {
-    const violations = scanForTodoMarkers([siteConfigPath]);
+  it('detects unresolved [TODO_REPLACE] markers in files', () => {
+    const violations = scanForTodoMarkers([fixturePath]);
 
     // Confirms the scanner properly identifies markers
     expect(violations.length).toBeGreaterThan(0);
-    const hasInstructorMarker = violations.some((v) =>
-      v.content.includes('[TODO_REPLACE: INSTRUCTOR NAME]'),
+    const hasMarker = violations.some((v) =>
+      v.content.includes('[TODO_REPLACE: TEST_FIXTURE_MARKER]'),
     );
-    expect(hasInstructorMarker).toBe(true);
+    expect(hasMarker).toBe(true);
   });
 
   it('proves clean files return zero violations', () => {
@@ -28,12 +30,17 @@ describe('Production Content Audit Pre-Build Check (C2)', () => {
   });
 
   it('identifies exact file and line number for each marker', () => {
-    const violations = scanForTodoMarkers([siteConfigPath]);
+    const violations = scanForTodoMarkers([fixturePath]);
     for (const v of violations) {
-      expect(v.file).toContain('site.ts');
+      expect(v.file).toContain('todo-fixture.ts');
       expect(typeof v.line).toBe('number');
       expect(v.line).toBeGreaterThan(0);
       expect(v.content).toContain('[TODO_REPLACE');
     }
+  });
+
+  it('confirms site.ts configuration has zero unresolved [TODO_REPLACE] markers', () => {
+    const violations = scanForTodoMarkers([siteConfigPath]);
+    expect(violations).toEqual([]);
   });
 });

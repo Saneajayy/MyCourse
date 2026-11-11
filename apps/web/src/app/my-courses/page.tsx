@@ -768,7 +768,7 @@ function StudentDashboardContent() {
                   My Certificates
                 </h1>
                 <p className="text-xs sm:text-sm text-neutral-500 mt-1">
-                  Official certificates of completion signed by instructor HiraLal.
+                  Official certificates of completion signed by instructor {siteConfig.instructor.name}.
                 </p>
               </div>
 
@@ -814,7 +814,7 @@ function StudentDashboardContent() {
 
                       <div className="p-3.5 rounded-lg bg-neutral-50 border border-neutral-200 text-xs text-neutral-600 space-y-1">
                         <p><strong className="text-neutral-900">Credential:</strong> Verified Certificate of Completion</p>
-                        <p><strong className="text-neutral-900">Instructor:</strong> HiraLal</p>
+                        <p><strong className="text-neutral-900">Instructor:</strong> {siteConfig.instructor.name}</p>
                       </div>
 
                       <Link
