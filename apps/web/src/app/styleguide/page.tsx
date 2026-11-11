@@ -14,11 +14,15 @@ import {
   ProgressBar,
   useToast,
 } from '../../components/ui';
+import { PaymentSuccessCard } from '../../components/PaymentSuccessCard';
+import { PaymentFailedCard } from '../../components/PaymentFailedCard';
+import { PaymentPendingCard } from '../../components/PaymentPendingCard';
 
 export default function StyleguidePage() {
   const { info, success, error, warning } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [previewModal, setPreviewModal] = useState<'success' | 'failed' | 'pending' | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [progressVal, setProgressVal] = useState(65);
 
@@ -351,6 +355,91 @@ export default function StyleguidePage() {
           </div>
         </div>
       </section>
+
+      {/* 12. Payment & Order Status Pop-up Modals */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-bold uppercase tracking-wider text-course-darkBlue border-b border-black pb-2">
+          12. Order Status Pop-up Modals
+        </h2>
+        <p className="text-sm text-neutral-600">
+          Interactive triggers to preview each modal state identically to live checkout:
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <Button
+            size="md"
+            variant="primary"
+            onClick={() => setPreviewModal('success')}
+          >
+            Preview Payment Success Card
+          </Button>
+          <Button
+            size="md"
+            variant="outline"
+            onClick={() => setPreviewModal('failed')}
+          >
+            Preview Payment Failed Card
+          </Button>
+          <Button
+            size="md"
+            variant="outline"
+            onClick={() => setPreviewModal('pending')}
+          >
+            Preview Payment Verifying Card
+          </Button>
+        </div>
+      </section>
+
+      {/* Pop-up Modal Container */}
+      {previewModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 overflow-y-auto select-none"
+        >
+          {/* Backdrop click to dismiss */}
+          <div className="fixed inset-0" onClick={() => setPreviewModal(null)} />
+
+          <div className="relative z-10 w-full max-w-[460px] my-auto">
+            {previewModal === 'success' && (
+              <PaymentSuccessCard
+                data={{
+                  orderId: 'ord_demo_success',
+                  orderNumber: 'HB-2026-8812',
+                  transactionId: 'pay_demo_success_tx',
+                  invoiceId: 'INV-2026-0042',
+                  courseTitle: 'Hydraulic System Basics',
+                  courseSlug: 'hydraulic-system-basics',
+                  validityDays: 365,
+                  amountPaise: 499900,
+                  studentName: 'Ramesh Kumar',
+                  studentEmail: 'student@example.com',
+                }}
+                onClose={() => setPreviewModal(null)}
+              />
+            )}
+
+            {previewModal === 'failed' && (
+              <PaymentFailedCard
+                orderId="ord_demo_failed"
+                courseTitle="Hydraulic System Basics"
+                amountPaise={499900}
+                onClose={() => setPreviewModal(null)}
+              />
+            )}
+
+            {previewModal === 'pending' && (
+              <PaymentPendingCard
+                orderId="ord_demo_pending"
+                courseTitle="Hydraulic System Basics"
+                pollCount={3}
+                maxPoll={15}
+                onRefresh={() => {}}
+                onClose={() => setPreviewModal(null)}
+              />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
