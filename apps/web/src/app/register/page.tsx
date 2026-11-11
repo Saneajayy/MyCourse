@@ -153,9 +153,9 @@ function RegisterForm() {
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                       >
                         {showPassword ? (
-                          <EyeOff className="w-4 h-4" aria-hidden="true" />
-                        ) : (
                           <Eye className="w-4 h-4" aria-hidden="true" />
+                        ) : (
+                          <EyeOff className="w-4 h-4" aria-hidden="true" />
                         )}
                       </button>
                     </div>
