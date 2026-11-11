@@ -699,9 +699,11 @@ function StudentDashboardContent() {
                               {c.product.description ||
                                 'Learn the fundamentals of hydraulic systems from scratch. This course introduces you to the working principles of hydraulics, essential components, and hydraulic circuit basics through easy-to-understand video lessons.'}
                             </p>
+                          </div>
 
+                          <div className="mt-4 sm:mt-5">
                             {/* Course Metadata: Total Videos & Total Hours of Content */}
-                            <div className="flex items-center gap-2.5 text-xs text-neutral-500 font-medium mt-3 select-none">
+                            <div className="flex items-center gap-2.5 text-xs text-neutral-500 font-medium mb-2 select-none">
                               <span className="inline-flex items-center gap-1.5">
                                 <Video className="w-3.5 h-3.5 text-neutral-400" />
                                 <span>{totalVideos} Videos</span>
@@ -712,9 +714,7 @@ function StudentDashboardContent() {
                                 <span>{durationText}</span>
                               </span>
                             </div>
-                          </div>
 
-                          <div className="mt-3.5 sm:mt-4">
                             {/* Barcode / Hatch Progress Bar with dynamic percentage */}
                             <CloseBarsProgressBar percent={percent} />
 
