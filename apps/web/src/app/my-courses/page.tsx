@@ -1095,24 +1095,15 @@ function StudentDashboardContent() {
                           {/* Status Badge + Amount */}
                           <div className="flex items-center gap-3">
                             <span
-                              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                              className={`px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase rounded shrink-0 select-none ${
                                 ord.status === 'PAID'
-                                  ? 'bg-[#0e5c2f]/10 text-[#0e5c2f]'
+                                  ? 'text-white bg-[#0e5c2f]'
                                   : ord.status === 'FAILED'
-                                    ? 'bg-rose-50 text-rose-700'
-                                    : 'bg-neutral-100 text-neutral-700'
+                                    ? 'text-white bg-rose-700'
+                                    : 'text-neutral-700 bg-neutral-200'
                               }`}
                             >
-                              <span
-                                className={`w-1.5 h-1.5 rounded-full ${
-                                  ord.status === 'PAID'
-                                    ? 'bg-[#0e5c2f]'
-                                    : ord.status === 'FAILED'
-                                      ? 'bg-rose-600'
-                                      : 'bg-neutral-500'
-                                }`}
-                              />
-                              <span>{ord.status === 'PAID' ? 'Paid' : ord.status}</span>
+                              {ord.status === 'PAID' ? 'PAID' : ord.status}
                             </span>
                             <span className="font-mono font-bold text-sm sm:text-base text-neutral-900">
                               ₹{amountFormatted}
@@ -1126,14 +1117,8 @@ function StudentDashboardContent() {
                             <h2 className="text-base sm:text-lg font-bold text-neutral-900 truncate">
                               {ord.product.title}
                             </h2>
-                            <p className="text-xs text-neutral-500 flex flex-wrap items-center gap-2">
-                              <span>Full Lifetime Access</span>
-                              <span className="text-neutral-300">•</span>
-                              <span>
-                                {ord.invoice?.invoiceNumber
-                                  ? `Tax Invoice #${ord.invoice.invoiceNumber}`
-                                  : 'Official GST Invoice Included'}
-                              </span>
+                            <p className="text-xs text-neutral-500 font-medium">
+                              12 Months Access
                             </p>
                           </div>
 
