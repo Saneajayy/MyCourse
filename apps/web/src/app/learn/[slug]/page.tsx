@@ -718,12 +718,12 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             </div>
           </div>
 
-          <div className="w-full flex flex-col items-center justify-start p-3 pb-0 sm:p-4 md:p-6 lg:p-8">
+          <div className="w-full flex flex-col items-center justify-start p-3 pb-3 sm:p-4 sm:pb-4 md:p-6 lg:p-8">
             <div className="w-full max-w-5xl mx-auto flex flex-col">
               {/* Video Player Frame with rounded edges */}
               <div
                 ref={containerRef}
-                className={`relative bg-black select-none max-w-full shadow-2xl transition-all ${
+                className={`relative bg-black select-none max-w-full transition-all ${
                   isFullscreen
                     ? 'fixed inset-0 z-[9999] w-full h-[100dvh] flex flex-col justify-center items-center bg-black rounded-none border-none overflow-hidden'
                     : 'w-full aspect-video max-h-[46vh] sm:max-h-[56vh] md:max-h-[70vh] mx-auto rounded-xl sm:rounded-2xl border border-white/15 overflow-hidden'
@@ -1011,32 +1011,34 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 </div>
 
               {/* Independently Floating Previous & Next Video Buttons (not in any box) */}
-              <div className="w-full flex items-center justify-between gap-4 pt-3 sm:pt-4">
+              <div className="w-full flex items-center justify-between gap-3 pt-3 sm:pt-4">
                 <button
                   type="button"
                   onClick={handlePrevLesson}
                   disabled={!hasPrevLesson}
-                  className={`inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold tracking-wide rounded-lg sm:rounded-xl border transition-all ${
+                  className={`inline-flex items-center justify-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3.5 sm:px-5 text-xs sm:text-sm font-semibold tracking-wide rounded-lg sm:rounded-xl border transition-all ${
                     hasPrevLesson
-                      ? 'border-white/20 bg-white/5 hover:bg-white/10 text-white cursor-pointer active:scale-95'
-                      : 'border-white/5 bg-transparent text-white/20 cursor-not-allowed'
+                      ? 'border-white/25 bg-white/10 hover:bg-white/15 text-white cursor-pointer active:scale-95'
+                      : 'border-white/10 bg-white/[0.03] text-white/30 cursor-not-allowed'
                   }`}
                 >
                   <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span>Previous Video</span>
+                  <span className="sm:hidden">Previous</span>
+                  <span className="hidden sm:inline">Previous Video</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleNextLesson}
                   disabled={!hasNextLesson}
-                  className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold tracking-wide rounded-lg sm:rounded-xl border transition-all ${
+                  className={`inline-flex items-center justify-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-4 sm:px-5 text-xs sm:text-sm font-bold tracking-wide rounded-lg sm:rounded-xl border transition-all ${
                     hasNextLesson
-                      ? 'bg-white hover:bg-neutral-200 text-black border-white cursor-pointer shadow-lg active:scale-95'
-                      : 'border-white/5 bg-transparent text-white/20 cursor-not-allowed'
+                      ? 'bg-white hover:bg-neutral-200 text-black border-white cursor-pointer active:scale-95'
+                      : 'border-white/10 bg-white/[0.03] text-white/30 cursor-not-allowed'
                   }`}
                 >
-                  <span>Next Video</span>
+                  <span className="sm:hidden">Next</span>
+                  <span className="hidden sm:inline">Next Video</span>
                   <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               </div>
