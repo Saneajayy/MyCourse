@@ -39,15 +39,12 @@ export const siteConfig = {
   },
 
   contact: {
-    // [TODO_REPLACE: Physical registered business address for GST compliance]
     address:
-      process.env.NEXT_PUBLIC_BUSINESS_ADDRESS || '[TODO_REPLACE: REGISTERED BUSINESS ADDRESS]',
+      process.env.NEXT_PUBLIC_BUSINESS_ADDRESS || 'Rudrapur, Uttarakhand, India',
     hours: 'Monday – Friday, 9:00 AM – 6:00 PM IST',
-    // [TODO_REPLACE: Official support telephone or WhatsApp business line]
-    phone: process.env.NEXT_PUBLIC_SUPPORT_PHONE || '[TODO_REPLACE: SUPPORT PHONE NUMBER]',
-    // [TODO_REPLACE: Legal jurisdiction city/state for Terms & Conditions]
+    phone: process.env.NEXT_PUBLIC_SUPPORT_PHONE || '+91 97582 62351',
     jurisdiction:
-      process.env.NEXT_PUBLIC_LEGAL_JURISDICTION || '[TODO_REPLACE: LEGAL JURISDICTION CITY]',
+      process.env.NEXT_PUBLIC_LEGAL_JURISDICTION || 'Rudrapur, Uttarakhand, India',
   },
 
   urls: {

@@ -44,23 +44,23 @@ Before launching the course website to production, review and replace all items 
   - **Configured Value:** `support@hydrobasics.com`
   - **Status:** Dedicated inbox monitored for student inquiries and payment confirmation.
 
-- [ ] **Registered Business Physical Address**
+- [x] **Registered Business Physical Address**
   - **Environment Variable:** `NEXT_PUBLIC_BUSINESS_ADDRESS` & `BUSINESS_ADDRESS` (Backend)
   - **Config File:** `apps/web/src/config/site.ts` (`siteConfig.contact.address`)
-  - **Current Marker:** `[TODO_REPLACE: REGISTERED BUSINESS ADDRESS]`
-  - **Required Value:** Official physical correspondence address printed on student GST tax invoices.
+  - **Configured Value:** `Rudrapur, Uttarakhand, India`
+  - **Status:** Saved in site configuration.
 
-- [ ] **Support Phone / WhatsApp Helpline**
+- [x] **Support Phone / WhatsApp Helpline**
   - **Environment Variable:** `NEXT_PUBLIC_SUPPORT_PHONE`
   - **Config File:** `apps/web/src/config/site.ts` (`siteConfig.contact.phone`)
-  - **Current Marker:** `[TODO_REPLACE: SUPPORT PHONE NUMBER]`
-  - **Action:** Provide telephone or WhatsApp helpline number for payment/login assistance.
+  - **Configured Value:** `+91 97582 62351`
+  - **Status:** Saved in site configuration.
 
-- [ ] **Legal Jurisdiction (City / State)**
+- [x] **Legal Jurisdiction (City / State)**
   - **Environment Variable:** `NEXT_PUBLIC_LEGAL_JURISDICTION`
   - **Config File:** `apps/web/src/config/site.ts` (`siteConfig.contact.jurisdiction`)
-  - **Current Marker:** `[TODO_REPLACE: LEGAL JURISDICTION CITY]`
-  - **Required Value:** Jurisdiction city/state for the Terms & Conditions governing law clause (e.g. "New Delhi, India").
+  - **Configured Value:** `Rudrapur, Uttarakhand, India`
+  - **Status:** Saved in site configuration for Terms & Conditions.
 
 ---
 
