@@ -547,7 +547,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       <div className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden min-h-0 bg-black">
         {/* SYLLABUS & MODULES: Left Column matching Dashboard Left Sidebar (Size, Font, Design, Embedded Image) */}
         <aside
-          className="order-2 md:order-1 w-full md:w-64 lg:w-72 md:h-full border-t md:border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col shrink-0 md:overflow-hidden relative select-none shadow-none"
+          className="order-2 md:order-1 w-full md:w-72 lg:w-80 md:h-full border-t md:border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col shrink-0 md:overflow-hidden relative select-none shadow-none"
         >
           {/* Embedded Background Graphic matching Dashboard Column */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
@@ -555,7 +555,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
               src="/login-pixelated.png"
               alt="Hydraulic System Graphic"
               fill
-              sizes="300px"
+              sizes="340px"
               priority
               style={{ objectPosition: '35% center' }}
               className="object-cover mix-blend-screen opacity-15 select-none"
@@ -563,7 +563,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
           </div>
 
           {/* Syllabus Header: Matches Dashboard's Top Sidebar Header with Bottom Dividing Line */}
-          <div className="relative z-10 w-full px-6 sm:px-7 py-5 sm:py-6 border-b border-white/50 text-left shrink-0">
+          <div className="relative z-10 w-full px-5 sm:px-6 py-5 sm:py-6 border-b border-white/50 text-left shrink-0">
             <span className="text-[11px] font-mono tracking-widest text-white/70 uppercase block mb-1">
               Course Curriculum
             </span>
@@ -586,20 +586,20 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                   <button
                     type="button"
                     onClick={() => toggleSection(section.sectionId)}
-                    className="w-full text-left px-6 sm:px-7 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none bg-transparent hover:bg-white/10 text-white flex items-center justify-between"
+                    className="w-full text-left px-5 sm:px-6 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none bg-transparent hover:bg-white/10 text-white flex items-start justify-between gap-3"
                     aria-expanded={isExpanded}
                   >
-                    <div className="min-w-0 pr-3">
+                    <div className="min-w-0 flex-1">
                       <span className="block font-bold text-[15px] sm:text-[16px] leading-tight">
                         Module {sIdx + 1}
                       </span>
                       {section.title && (
-                        <span className="block text-xs text-white/80 font-normal mt-1 truncate">
+                        <span className="block text-xs text-white/80 font-normal mt-1 leading-snug whitespace-normal break-words">
                           {section.title.replace(/^Module\s*\d+\s*:\s*/i, '')}
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2.5 shrink-0 text-white/80">
+                    <div className="flex items-center gap-2 shrink-0 text-white/80 pt-0.5">
                       {isModuleCompleted ? (
                         <div
                           className="w-5 h-5 rounded-none bg-white flex items-center justify-center shrink-0"
@@ -630,13 +630,13 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             key={lesson.lessonId}
                             type="button"
                             onClick={() => setSelectedLessonId(lesson.lessonId)}
-                            className={`w-full text-left px-6 sm:px-7 py-3.5 sm:py-4 border-b border-white/50 flex items-center gap-3 transition-colors cursor-pointer select-none ${
+                            className={`w-full text-left px-5 sm:px-6 py-3.5 sm:py-4 border-b border-white/50 flex items-start gap-3 transition-colors cursor-pointer select-none ${
                               isCurrent
                                 ? 'bg-white text-black font-extrabold'
                                 : 'bg-transparent text-white hover:bg-white/10'
                             }`}
                           >
-                            <div className="shrink-0 flex items-center justify-center w-5">
+                            <div className="shrink-0 flex items-center justify-center w-5 pt-0.5">
                               {lesson.isCompleted ? (
                                 <div
                                   className={`w-4 h-4 rounded-none flex items-center justify-center shrink-0 ${
@@ -661,7 +661,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
                             <div className="min-w-0 flex-1">
                               <div
-                                className={`text-xs sm:text-[13px] leading-snug truncate ${
+                                className={`text-xs sm:text-[13px] leading-snug whitespace-normal break-words ${
                                   isCurrent ? 'font-extrabold text-black' : 'font-medium text-white/90'
                                 }`}
                               >
@@ -670,7 +670,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             </div>
 
                             <div
-                              className={`text-[11px] font-mono shrink-0 ${
+                              className={`text-[11px] font-mono shrink-0 pt-0.5 ${
                                 isCurrent ? 'text-black/80 font-bold' : 'text-white/60'
                               }`}
                             >
