@@ -1136,28 +1136,30 @@ function StudentDashboardContent() {
                             </p>
                           </div>
 
-                          {/* Actions: Download Invoice & Access Course */}
-                          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                          {/* Actions: Download Invoice & Access Course equally spread on bottom */}
+                          <div className="grid grid-cols-2 gap-3 pt-1 w-full">
                             {ord.invoice ? (
                               <a
                                 href={`${siteConfig.urls.api}/api/v1/invoices/${ord.invoice.id}/download`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="h-9 px-3.5 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-300 hover:border-neutral-400 font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center gap-2 shadow-none cursor-pointer"
+                                className="h-10 px-3 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-300 hover:border-neutral-400 font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center justify-center gap-2 shadow-none cursor-pointer w-full text-center select-none"
                               >
-                                <Download className="w-3.5 h-3.5 text-neutral-700" />
-                                <span>Download Invoice</span>
+                                <Download className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
+                                <span className="truncate">Download Invoice</span>
                               </a>
                             ) : (
-                              <span className="text-xs text-neutral-400 font-medium">Invoice generating...</span>
+                              <div className="h-10 px-3 bg-neutral-50 text-neutral-400 border border-neutral-200 font-medium text-xs rounded-none inline-flex items-center justify-center text-center w-full select-none">
+                                <span className="truncate">Generating Invoice...</span>
+                              </div>
                             )}
 
                             <Link
                               href={`/learn/${ord.product.slug}`}
-                              className="h-9 px-3.5 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center gap-1.5 shadow-none"
+                              className="h-10 px-3 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center justify-center gap-1.5 shadow-none w-full text-center select-none"
                             >
-                              <span>Go to Course</span>
-                              <span>&rarr;</span>
+                              <span className="truncate">Go to Course</span>
+                              <span className="shrink-0">&rarr;</span>
                             </Link>
                           </div>
                         </div>
