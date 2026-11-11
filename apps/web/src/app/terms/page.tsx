@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { siteConfig } from '../../config/site';
 import { useAuth } from '../../context/auth-context';
-import { ShieldCheck, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 function TermsNavbar() {
   const { isAuthenticated } = useAuth();
@@ -132,7 +132,7 @@ export default function TermsPage() {
           </p>
           <div className="flex flex-wrap items-center justify-between gap-3 pt-6 mt-6 border-t border-neutral-100 text-xs font-mono text-neutral-500">
             <span>Jurisdiction: {siteConfig.contact.jurisdiction}</span>
-            <span>Last Updated: October 2026</span>
+            <span>Updated: October 2026</span>
           </div>
         </header>
 
@@ -145,7 +145,7 @@ export default function TermsPage() {
             <p className="text-neutral-600 leading-relaxed">
               By registering for an account or enrolling in courses provided by{' '}
               <strong className="text-neutral-950">{siteConfig.brandName}</strong> (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;),
-              you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not purchase or access the course curriculum.
+              you agree to be legally bound by these Terms and Conditions. If you do not agree to these terms, please do not purchase or access the course curriculum.
             </p>
           </section>
 
@@ -165,9 +165,16 @@ export default function TermsPage() {
             <p className="text-neutral-600 leading-relaxed">
               All video lectures are dynamically embedded with cryptographic watermarks displaying the enrolled student&apos;s registered email address and session tokens. Screen-recording, ripping, downloading, sharing credentials, or publicly distributing course materials is strictly prohibited and constitutes a copyright violation punishable under the Indian Copyright Act, 1957.
             </p>
-            <p className="text-neutral-600 leading-relaxed">
-              Single-device concurrent streaming is strictly enforced. Sharing student login accounts will trigger automatic session revocation or permanent account ban without refund.
-            </p>
+            <div className="p-5 sm:p-6 bg-neutral-50 border border-neutral-200 rounded-xl space-y-2.5 text-xs sm:text-sm text-neutral-700">
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-black shrink-0" />
+                <span>Single-device concurrent streaming is strictly enforced.</span>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-black shrink-0" />
+                <span>Sharing student login accounts triggers automatic session revocation without refund.</span>
+              </div>
+            </div>
           </section>
 
           <section className="space-y-3">
@@ -180,12 +187,15 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-3">
-            <div className="p-5 sm:p-6 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 space-y-2.5">
-              <div className="flex items-center gap-2 font-bold text-neutral-950 text-sm sm:text-base">
-                <AlertTriangle className="w-4 h-4 text-black shrink-0" />
-                <h3>05. Engineering Safety Disclaimer</h3>
+            <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2.5">
+              <span className="text-black font-mono font-bold">05.</span> Engineering Safety Protocol
+            </h2>
+            <div className="p-5 sm:p-6 bg-amber-50 border border-amber-200 rounded-xl text-amber-950 space-y-2.5">
+              <div className="flex items-center gap-2 font-bold text-amber-900">
+                <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
+                <span className="text-xs sm:text-sm uppercase tracking-wider font-bold">Safety Compliance Notice</span>
               </div>
-              <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
+              <p className="text-xs sm:text-sm text-amber-900/90 leading-relaxed">
                 Industrial hydraulic machinery operates under extreme fluid pressures exceeding 200–350 bar. The instructions, schematic circuits, and troubleshooting procedures taught in this course are educational demonstrations. Students and engineers must follow original manufacturer safety manuals, plant isolation (LOTO) protocols, and pressure relief checks before performing live maintenance. We assume no liability for equipment damage or personal injury resulting from improper practical application.
               </p>
             </div>

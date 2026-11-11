@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { siteConfig } from '../../config/site';
 import { useAuth } from '../../context/auth-context';
-import { Lock } from 'lucide-react';
+import { Lock, ShieldCheck, CreditCard, Server } from 'lucide-react';
 
 function PrivacyNavbar() {
   const { isAuthenticated } = useAuth();
@@ -122,7 +122,7 @@ export default function PrivacyPage() {
         <header className="mb-10 sm:mb-12 border-b border-neutral-200 pb-8 sm:pb-10">
           <div className="flex items-center gap-2 text-xs font-mono font-medium text-neutral-500 uppercase tracking-widest mb-3">
             <Lock className="w-4 h-4 text-black shrink-0" />
-            <span>Data Protection Architecture</span>
+            <span>Data Protection &amp; Security Architecture</span>
           </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-neutral-950 uppercase tracking-tight">
             Privacy Policy
@@ -131,8 +131,8 @@ export default function PrivacyPage() {
             Data protection architecture, cryptographic session handling, and student privacy rights under Indian IT regulations.
           </p>
           <div className="flex flex-wrap items-center justify-between gap-3 pt-6 mt-6 border-t border-neutral-100 text-xs font-mono text-neutral-500">
-            <span>DPDP Act Compliant • ISO/IEC 27001 Alignment</span>
-            <span>Effective: October 2026</span>
+            <span>Compliant with DPDP Act 2023 &amp; IT Rules</span>
+            <span>Updated: October 2026</span>
           </div>
         </header>
 
@@ -146,26 +146,31 @@ export default function PrivacyPage() {
               When you register for an account, enroll in courses, or stream instructional videos, we collect only the information necessary to provide authentication, tax invoicing, and course delivery:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-              <div className="p-4 sm:p-5 bg-neutral-50 border border-neutral-200 rounded-xl">
-                <h3 className="font-bold text-xs uppercase tracking-wider text-neutral-950 mb-1.5">
-                  Account Credentials
-                </h3>
+              <div className="p-4 sm:p-5 bg-neutral-50 border border-neutral-200 rounded-xl space-y-1.5 shadow-none">
+                <div className="flex items-center gap-2 text-neutral-950 font-bold text-xs uppercase tracking-wider">
+                  <ShieldCheck className="w-4 h-4 text-black shrink-0" />
+                  <span>Account Credentials</span>
+                </div>
                 <p className="text-xs text-neutral-600 leading-relaxed">
                   Full student name, registered email address, phone number, and password hashes encrypted via argon2id.
                 </p>
               </div>
-              <div className="p-4 sm:p-5 bg-neutral-50 border border-neutral-200 rounded-xl">
-                <h3 className="font-bold text-xs uppercase tracking-wider text-neutral-950 mb-1.5">
-                  Billing &amp; Tax Data
-                </h3>
+
+              <div className="p-4 sm:p-5 bg-neutral-50 border border-neutral-200 rounded-xl space-y-1.5 shadow-none">
+                <div className="flex items-center gap-2 text-neutral-950 font-bold text-xs uppercase tracking-wider">
+                  <CreditCard className="w-4 h-4 text-black shrink-0" />
+                  <span>Billing &amp; Tax Data</span>
+                </div>
                 <p className="text-xs text-neutral-600 leading-relaxed">
                   Name, transaction amount, and optional GSTIN provided for official tax invoice generation.
                 </p>
               </div>
-              <div className="p-4 sm:p-5 bg-neutral-50 border border-neutral-200 rounded-xl">
-                <h3 className="font-bold text-xs uppercase tracking-wider text-neutral-950 mb-1.5">
-                  Telemetry &amp; DRM
-                </h3>
+
+              <div className="p-4 sm:p-5 bg-neutral-50 border border-neutral-200 rounded-xl space-y-1.5 shadow-none">
+                <div className="flex items-center gap-2 text-neutral-950 font-bold text-xs uppercase tracking-wider">
+                  <Server className="w-4 h-4 text-black shrink-0" />
+                  <span>Telemetry &amp; DRM</span>
+                </div>
                 <p className="text-xs text-neutral-600 leading-relaxed">
                   IP address, device browser agent, and playback timestamps to enforce single-stream security and resume points.
                 </p>
@@ -178,7 +183,7 @@ export default function PrivacyPage() {
               <span className="text-black font-mono font-bold">02.</span> Payment Security &amp; Zero Card Storage
             </h2>
             <p className="text-neutral-600 leading-relaxed">
-              We strictly do NOT store, process, or transmit your credit/debit card numbers, CVVs, netbanking credentials, or UPI PINs on our servers. All financial transactions are processed directly by RBI-regulated, PCI-DSS Level 1 compliant payment aggregators (Razorpay Software Private Limited).
+              We strictly do <strong className="text-neutral-950">NOT</strong> store, process, or transmit your credit/debit card numbers, CVVs, netbanking credentials, or UPI PINs on our servers. All financial transactions are processed directly by RBI-regulated, PCI-DSS Level 1 compliant payment aggregators (Razorpay Software Private Limited).
             </p>
           </section>
 
@@ -187,7 +192,7 @@ export default function PrivacyPage() {
               <span className="text-black font-mono font-bold">03.</span> Cookie &amp; Storage Architecture
             </h2>
             <p className="text-neutral-600 leading-relaxed">
-              In strict accordance with enterprise security practices (ADR 001), student session access tokens are maintained in volatile browser memory only and are never exposed to browser <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded text-neutral-900">localStorage</code>. Refresh tokens are secured in encrypted <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded text-neutral-900">httpOnly</code> cookies protected by <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded text-neutral-900">SameSite=Lax</code> policies to completely neutralize Cross-Site Scripting (XSS) risks.
+              In strict accordance with enterprise security practices, student session access tokens are maintained in volatile browser memory only and are never exposed to browser <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded text-neutral-900">localStorage</code>. Refresh tokens are secured in encrypted <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded text-neutral-900">httpOnly</code> cookies protected by <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded text-neutral-900">SameSite=Lax</code> policies to completely neutralize Cross-Site Scripting (XSS) risks.
             </p>
           </section>
 
@@ -202,8 +207,12 @@ export default function PrivacyPage() {
                 className="font-bold underline text-black hover:opacity-80"
               >
                 {siteConfig.supportEmail}
-              </a>
-              .
+              </a>{' '}
+              or via our{' '}
+              <Link href="/contact" className="font-bold underline text-black hover:opacity-80">
+                Contact Support
+              </Link>{' '}
+              page.
             </p>
           </section>
         </div>
