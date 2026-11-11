@@ -176,7 +176,7 @@ export function CertificateSection() {
                   </div>
 
                   {/* 2. Recipient Info & Course Description */}
-                  <div className="mt-7 md:mt-8 lg:mt-10">
+                  <div className="mt-4 md:mt-5 lg:mt-6">
                     <p className="text-black/75 font-light text-[14px] md:text-[15px] lg:text-[16px] lowercase tracking-normal text-left select-none">
                       presented to
                     </p>
