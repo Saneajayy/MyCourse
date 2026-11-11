@@ -456,15 +456,59 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [togglePlay, toggleMute, toggleCustomFullscreen]);
 
+  // Navigate to Previous Lesson
+  const handlePrevLesson = () => {
+    const allLessonsList = sections.flatMap((s) => s.lessons);
+    const currIdx = allLessonsList.findIndex((l) => l.lessonId === selectedLessonId);
+    if (currIdx > 0) {
+      const prev = allLessonsList[currIdx - 1];
+      if (prev) {
+        setSelectedLessonId(prev.lessonId);
+      }
+    }
+  };
+
   // Navigate to Next Lesson
   const handleNextLesson = () => {
-    const allLessons = sections.flatMap((s) => s.lessons);
-    const currIdx = allLessons.findIndex((l) => l.lessonId === selectedLessonId);
-    if (currIdx >= 0 && currIdx < allLessons.length - 1) {
-      const next = allLessons[currIdx + 1];
+    const allLessonsList = sections.flatMap((s) => s.lessons);
+    const currIdx = allLessonsList.findIndex((l) => l.lessonId === selectedLessonId);
+    if (currIdx >= 0 && currIdx < allLessonsList.length - 1) {
+      const next = allLessonsList[currIdx + 1];
       if (next) {
         setSelectedLessonId(next.lessonId);
       }
+    }
+  };
+
+  // Toggle Lesson Completion Status
+  const toggleLessonCompleted = () => {
+    if (!selectedLessonId) return;
+    const allLessonsList = sections.flatMap((s) => s.lessons);
+    const curr = allLessonsList.find((l) => l.lessonId === selectedLessonId);
+    const currentStatus = curr?.isCompleted || false;
+    const newStatus = !currentStatus;
+
+    setSections((prev) =>
+      prev.map((sec) => ({
+        ...sec,
+        lessons: sec.lessons.map((l) =>
+          l.lessonId === selectedLessonId ? { ...l, isCompleted: newStatus } : l
+        ),
+      }))
+    );
+
+    if (newStatus && playbackData) {
+      apiClient(`/lessons/${selectedLessonId}/heartbeat`, {
+        method: 'POST',
+        body: JSON.stringify({
+          sessionId: playbackData.sessionId,
+          positionSeconds: Math.floor(duration || playbackData.durationSeconds),
+          durationSeconds: Math.floor(duration || playbackData.durationSeconds),
+          watchedSeconds: Math.floor(duration || playbackData.durationSeconds),
+          isPlaying: false,
+          state: 'completed',
+        }),
+      }).catch(() => {});
     }
   };
 
@@ -509,10 +553,25 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     );
   }
 
+  const allFlattenedLessons = sections.flatMap((s) => s.lessons);
+  const currentLessonIndex = allFlattenedLessons.findIndex((l) => l.lessonId === selectedLessonId);
+  const currentLesson = allFlattenedLessons[currentLessonIndex];
+  const hasPrevLesson = currentLessonIndex > 0;
+  const hasNextLesson = currentLessonIndex >= 0 && currentLessonIndex < allFlattenedLessons.length - 1;
+
+  const currentSection = sections.find((s) =>
+    s.lessons.some((l) => l.lessonId === selectedLessonId)
+  );
+  const currentSectionIdx = sections.findIndex((s) =>
+    s.lessons.some((l) => l.lessonId === selectedLessonId)
+  );
+
   const currentLessonTitle =
-    sections.flatMap((s) => s.lessons).find((l) => l.lessonId === selectedLessonId)?.title ||
+    currentLesson?.title ||
     playbackData?.title ||
     'Video Lesson';
+
+  const isCurrentCompleted = currentLesson?.isCompleted || false;
 
   return (
     <div className="fixed inset-0 z-20 flex flex-col bg-black overflow-hidden font-reddit select-none text-white w-full max-w-full">
@@ -724,306 +783,394 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
           </div>
         </aside>
 
-        {/* MAIN VIDEO & DETAILS AREA: On mobile: order-1 (sits at the top). On desktop: order-2 (right column) */}
-        <main className="order-1 md:order-2 flex-1 flex flex-col md:h-full md:overflow-y-auto bg-black min-w-0 shrink-0 w-full max-w-full overflow-x-hidden">
-          <div className="w-full flex-1 flex flex-col max-w-full">
-            {/* Black Video Player Frame */}
-            <div className="w-full bg-black shrink-0 relative flex items-center justify-center border-b border-white/50 sticky top-0 z-20 max-w-full overflow-hidden">
-              <div
-                ref={containerRef}
-                className={`relative bg-black w-full select-none overflow-hidden max-w-full ${
-                  isFullscreen
-                    ? 'fixed inset-0 z-50 w-screen h-screen flex flex-col justify-center bg-black'
-                    : 'w-full aspect-video max-h-[50vh] sm:max-h-[60vh] md:max-h-[68vh] mx-auto'
-                }`}
-              >
-                {/* Loading Overlay */}
-                {streamLoading && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white z-10 space-y-2">
-                    <Loader2 className="w-8 h-8 animate-spin text-white" />
-                    <span className="text-xs font-mono tracking-widest uppercase text-white/80">
-                      Securing Stream Ticket...
-                    </span>
-                  </div>
-                )}
+        {/* MAIN VIDEO & PLAYER AREA: Grey theme, 2-panel desktop layout, sticky on mobile */}
+        <main className="order-1 md:order-2 flex-1 flex flex-col md:h-full md:overflow-y-auto bg-[#121417] min-w-0 shrink-0 w-full max-w-full overflow-x-hidden">
+          {/* Top Breadcrumb/Header Bar on Desktop */}
+          <div className="hidden md:flex px-6 lg:px-8 py-3.5 bg-[#16191d] border-b border-white/10 items-center justify-between gap-4 shrink-0">
+            <div className="min-w-0 flex items-center gap-2.5">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-white/50 shrink-0">
+                {currentSection ? `Module ${currentSectionIdx + 1}` : 'Curriculum'}
+              </span>
+              <span className="text-white/30 text-xs">/</span>
+              <h1 className="text-sm lg:text-[15px] font-bold text-white truncate">
+                {currentLessonTitle}
+              </h1>
+            </div>
 
-                {/* Error Overlay */}
-                {streamError && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 text-white p-6 z-20 text-center space-y-3">
-                    <AlertTriangle className="w-10 h-10 text-rose-500" />
-                    <p className="text-sm font-bold text-rose-200">{streamError}</p>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="bg-white text-black rounded-none border border-black"
-                      onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
-                    >
-                      <RotateCcw className="w-4 h-4 mr-1.5" />
-                      Retry Playback
-                    </Button>
-                  </div>
-                )}
+            <div className="flex items-center gap-2 shrink-0">
+              {isCurrentCompleted && (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/10 text-white border border-white/20 text-[11px] font-mono font-medium">
+                  <Check className="w-3 h-3 stroke-[3]" />
+                  Completed
+                </span>
+              )}
+            </div>
+          </div>
 
-                {/* Session Eviction Overlay: Another Device Took Over */}
-                {isEvicted && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 text-white p-6 z-30 text-center space-y-4">
-                    <div className="w-12 h-12 bg-amber-500/20 text-amber-400 inline-flex items-center justify-center border border-amber-500 rounded-none">
-                      <AlertTriangle className="w-6 h-6 text-amber-400" />
-                    </div>
-                    <div className="max-w-md space-y-1">
-                      <h3 className="text-lg font-black text-amber-300">
-                        You started watching on another device
-                      </h3>
-                      <p className="text-xs text-gray-300 leading-relaxed">
-                        Your streaming session was paused because playback was initiated on another
-                        browser or device.
-                      </p>
-                    </div>
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      className="bg-black hover:bg-[#262626] text-white rounded-none"
-                      onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
-                    >
-                      Resume Watching Here
-                    </Button>
-                  </div>
-                )}
-
-                {/* HTML5 Video Element */}
-                <video
-                  ref={videoRef}
-                  playsInline
-                  className="w-full h-full object-contain max-w-full"
-                  onPlay={() => setIsPlaying(true)}
-                  onPause={() => setIsPlaying(false)}
-                  onTimeUpdate={() => {
-                    if (videoRef.current) {
-                      setCurrentTime(videoRef.current.currentTime);
-                      setDuration(videoRef.current.duration || 0);
-                    }
-                  }}
-                  onEnded={() => {
-                    setIsPlaying(false);
-                    if (selectedLessonId) {
-                      setSections((prev) =>
-                        prev.map((sec) => ({
-                          ...sec,
-                          lessons: sec.lessons.map((l) =>
-                            l.lessonId === selectedLessonId ? { ...l, isCompleted: true } : l
-                          ),
-                        }))
-                      );
-                      if (playbackData) {
-                        apiClient(`/lessons/${selectedLessonId}/heartbeat`, {
-                          method: 'POST',
-                          body: JSON.stringify({
-                            sessionId: playbackData.sessionId,
-                            positionSeconds: Math.floor(duration || playbackData.durationSeconds),
-                            durationSeconds: Math.floor(duration || playbackData.durationSeconds),
-                            watchedSeconds: Math.floor(duration || playbackData.durationSeconds),
-                            isPlaying: false,
-                            state: 'completed',
-                          }),
-                        }).catch(() => {});
-                      }
-                      fetchCurriculum();
-                    }
-                  }}
-                  onClick={togglePlay}
-                />
-
-                {/* Moving Anti-Piracy Watermark: Constrained inside video container */}
+          <div className="w-full flex-1 flex flex-col items-center justify-start p-0 md:p-6 lg:p-8">
+            <div className="w-full max-w-5xl mx-auto flex flex-col">
+              {/* Video Player Frame */}
+              <div className="w-full bg-black shrink-0 relative flex items-center justify-center sticky top-0 z-20 max-w-full overflow-hidden">
                 <div
-                  className="absolute pointer-events-none transition-all duration-1000 ease-in-out font-mono text-xs uppercase text-white/30 select-none max-w-[80%] truncate"
-                  style={{ top: watermarkPos.top, left: watermarkPos.left }}
-                  aria-hidden="true"
+                  ref={containerRef}
+                  className={`relative bg-black w-full select-none overflow-hidden max-w-full border-b md:border border-white/10 shadow-2xl ${
+                    isFullscreen
+                      ? 'fixed inset-0 z-50 w-screen h-screen flex flex-col justify-center bg-black'
+                      : 'w-full aspect-video max-h-[50vh] sm:max-h-[60vh] md:max-h-[70vh] mx-auto'
+                  }`}
                 >
-                  {user?.email || siteConfig.brandName}
-                </div>
+                  {/* Loading Overlay */}
+                  {streamLoading && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white z-20 space-y-2">
+                      <Loader2 className="w-8 h-8 animate-spin text-white" />
+                      <span className="text-xs font-mono tracking-widest uppercase text-white/80">
+                        Securing Stream Ticket...
+                      </span>
+                    </div>
+                  )}
 
-                {/* Custom Video Control Bar */}
-                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/85 to-transparent px-3 py-2 sm:px-4 sm:py-2.5 flex flex-col gap-1.5 sm:gap-2 text-white border-t border-white/10 max-w-full">
-                  {/* Scrubbing timeline slider with clean custom styling */}
-                  <input
-                    type="range"
-                    min={0}
-                    max={duration || 100}
-                    value={currentTime}
-                    onChange={handleSeek}
-                    aria-label="Video seek slider"
-                    className="w-full h-1 bg-white/25 accent-white cursor-pointer"
+                  {/* Error Overlay */}
+                  {streamError && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 text-white p-6 z-20 text-center space-y-3">
+                      <AlertTriangle className="w-10 h-10 text-rose-500" />
+                      <p className="text-sm font-bold text-rose-200">{streamError}</p>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="bg-white text-black rounded-none border border-black"
+                        onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
+                      >
+                        <RotateCcw className="w-4 h-4 mr-1.5" />
+                        Retry Playback
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Session Eviction Overlay */}
+                  {isEvicted && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 text-white p-6 z-30 text-center space-y-4">
+                      <div className="w-12 h-12 bg-amber-500/20 text-amber-400 inline-flex items-center justify-center border border-amber-500 rounded-none">
+                        <AlertTriangle className="w-6 h-6 text-amber-400" />
+                      </div>
+                      <div className="max-w-md space-y-1">
+                        <h3 className="text-lg font-black text-amber-300">
+                          You started watching on another device
+                        </h3>
+                        <p className="text-xs text-gray-300 leading-relaxed">
+                          Your streaming session was paused because playback was initiated on another
+                          browser or device.
+                        </p>
+                      </div>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        className="bg-black hover:bg-[#262626] text-white rounded-none"
+                        onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
+                      >
+                        Resume Watching Here
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* HTML5 Video Element */}
+                  <video
+                    ref={videoRef}
+                    playsInline
+                    className="w-full h-full object-contain max-w-full"
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                    onTimeUpdate={() => {
+                      if (videoRef.current) {
+                        setCurrentTime(videoRef.current.currentTime);
+                        setDuration(videoRef.current.duration || 0);
+                      }
+                    }}
+                    onEnded={() => {
+                      setIsPlaying(false);
+                      if (selectedLessonId) {
+                        setSections((prev) =>
+                          prev.map((sec) => ({
+                            ...sec,
+                            lessons: sec.lessons.map((l) =>
+                              l.lessonId === selectedLessonId ? { ...l, isCompleted: true } : l
+                            ),
+                          }))
+                        );
+                        if (playbackData) {
+                          apiClient(`/lessons/${selectedLessonId}/heartbeat`, {
+                            method: 'POST',
+                            body: JSON.stringify({
+                              sessionId: playbackData.sessionId,
+                              positionSeconds: Math.floor(duration || playbackData.durationSeconds),
+                              durationSeconds: Math.floor(duration || playbackData.durationSeconds),
+                              watchedSeconds: Math.floor(duration || playbackData.durationSeconds),
+                              isPlaying: false,
+                              state: 'completed',
+                            }),
+                          }).catch(() => {});
+                        }
+                        fetchCurriculum();
+                      }
+                    }}
+                    onClick={togglePlay}
                   />
 
-                  <div className="flex items-center justify-between gap-2 w-full">
-                    <div className="flex items-center gap-1.5 sm:gap-2.5">
-                      <button
-                        type="button"
-                        onClick={togglePlay}
-                        aria-label={isPlaying ? 'Pause video (Space)' : 'Play video (Space)'}
-                        className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
-                      >
-                        {isPlaying ? (
-                          <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
-                        ) : (
-                          <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
-                        )}
-                      </button>
+                  {/* Big Center Play Button Overlay (matches TakeUForward reference) */}
+                  {!isPlaying && !streamLoading && !streamError && !isEvicted && (
+                    <button
+                      type="button"
+                      onClick={togglePlay}
+                      aria-label="Play video"
+                      className="absolute inset-0 m-auto w-16 h-16 sm:w-20 sm:h-20 bg-black/60 hover:bg-black/80 text-white rounded-none border border-white/40 backdrop-blur-sm flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95 z-10 shadow-2xl group"
+                    >
+                      <Play className="w-7 h-7 sm:w-9 sm:h-9 fill-white group-hover:scale-110 transition-transform ml-1" />
+                    </button>
+                  )}
 
-                      <button
-                        type="button"
-                        onClick={toggleMute}
-                        aria-label={isMuted ? 'Unmute (M)' : 'Mute (M)'}
-                        className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
-                      >
-                        {isMuted ? <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" /> : <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />}
-                      </button>
+                  {/* Moving Anti-Piracy Watermark */}
+                  <div
+                    className="absolute pointer-events-none transition-all duration-1000 ease-in-out font-mono text-xs uppercase text-white/30 select-none max-w-[80%] truncate"
+                    style={{ top: watermarkPos.top, left: watermarkPos.left }}
+                    aria-hidden="true"
+                  >
+                    {user?.email || siteConfig.brandName}
+                  </div>
 
-                      {/* Volume Slider hidden on mobile */}
+                  {/* Custom Video Control Bar */}
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/85 to-transparent px-3 py-2 sm:px-4 sm:py-2.5 flex flex-col gap-1.5 sm:gap-2 text-white border-t border-white/10 max-w-full">
+                    {/* Scrubbing timeline slider with timestamps at ends */}
+                    <div className="flex items-center gap-2 sm:gap-3 w-full">
+                      <span className="text-[11px] sm:text-xs font-mono text-white/90 shrink-0">
+                        {formatTime(currentTime)}
+                      </span>
                       <input
                         type="range"
                         min={0}
-                        max={1}
-                        step={0.05}
-                        value={isMuted ? 0 : volume}
-                        onChange={handleVolumeChange}
-                        aria-label="Volume slider"
-                        className="w-16 md:w-20 h-1 bg-white/20 accent-white hidden sm:block"
+                        max={duration || 100}
+                        value={currentTime}
+                        onChange={handleSeek}
+                        aria-label="Video seek slider"
+                        className="flex-1 h-1 bg-white/25 accent-white cursor-pointer"
                       />
-
-                      <span className="text-[11px] sm:text-xs font-mono text-white/90 shrink-0">
-                        {formatTime(currentTime)} / {formatTime(duration)}
+                      <span className="text-[11px] sm:text-xs font-mono text-white/70 shrink-0">
+                        {formatTime(duration)}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1 sm:gap-1.5">
-                      {/* Settings Menu (Speed & Quality) */}
-                      <div className="relative">
+                    <div className="flex items-center justify-between gap-2 w-full">
+                      <div className="flex items-center gap-1 sm:gap-2">
                         <button
                           type="button"
-                          onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-                          aria-label="Player settings"
+                          onClick={togglePlay}
+                          aria-label={isPlaying ? 'Pause video (Space)' : 'Play video (Space)'}
                           className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
                         >
-                          <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
+                          {isPlaying ? (
+                            <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
+                          ) : (
+                            <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
+                          )}
                         </button>
 
-                        {showSettingsMenu && (
-                          <div className="absolute right-0 bottom-12 w-48 bg-white text-black border border-neutral-300 p-3 space-y-3 z-30 shadow-none rounded-none text-xs">
-                            {/* Playback speed */}
-                            <div>
-                              <span className="font-bold uppercase tracking-wider block mb-1 text-black">
-                                Speed
-                              </span>
-                              <div className="grid grid-cols-3 gap-1">
-                                {[0.75, 1, 1.25, 1.5, 1.75, 2].map((s) => (
-                                  <button
-                                    key={s}
-                                    type="button"
-                                    onClick={() => handleSpeedChange(s)}
-                                    className={`p-1 border border-neutral-300 font-mono font-bold rounded-none cursor-pointer ${
-                                      playbackRate === s
-                                        ? 'bg-black text-white border-black'
-                                        : 'bg-white hover:bg-neutral-100 text-black'
-                                    }`}
-                                  >
-                                    {s}x
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
+                        <button
+                          type="button"
+                          onClick={toggleMute}
+                          aria-label={isMuted ? 'Unmute (M)' : 'Mute (M)'}
+                          className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
+                        >
+                          {isMuted ? <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" /> : <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />}
+                        </button>
 
-                            {/* Quality selector */}
-                            {qualityLevels.length > 0 && (
-                              <div className="border-t border-neutral-200 pt-2">
+                        {/* Volume Slider hidden on mobile */}
+                        <input
+                          type="range"
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          value={isMuted ? 0 : volume}
+                          onChange={handleVolumeChange}
+                          aria-label="Volume slider"
+                          className="w-16 md:w-20 h-1 bg-white/20 accent-white hidden sm:block"
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-1 sm:gap-1.5">
+                        {/* Settings Menu (Speed & Quality) */}
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+                            aria-label="Player settings"
+                            className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
+                          >
+                            <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
+                          </button>
+
+                          {showSettingsMenu && (
+                            <div className="absolute right-0 bottom-12 w-48 bg-white text-black border border-neutral-300 p-3 space-y-3 z-30 shadow-none rounded-none text-xs">
+                              {/* Playback speed */}
+                              <div>
                                 <span className="font-bold uppercase tracking-wider block mb-1 text-black">
-                                  Quality
+                                  Speed
                                 </span>
-                                <div className="space-y-1">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleQualityChange(-1)}
-                                    className={`w-full text-left p-1 border border-neutral-300 font-bold rounded-none cursor-pointer ${
-                                      currentQuality === -1
-                                        ? 'bg-black text-white border-black'
-                                        : 'bg-white hover:bg-neutral-100 text-black'
-                                    }`}
-                                  >
-                                    Auto
-                                  </button>
-                                  {qualityLevels.map((lvl) => (
+                                <div className="grid grid-cols-3 gap-1">
+                                  {[0.75, 1, 1.25, 1.5, 1.75, 2].map((s) => (
                                     <button
-                                      key={lvl.id}
+                                      key={s}
                                       type="button"
-                                      onClick={() => handleQualityChange(lvl.id)}
-                                      className={`w-full text-left p-1 border border-neutral-300 font-bold rounded-none cursor-pointer ${
-                                        currentQuality === lvl.id
+                                      onClick={() => handleSpeedChange(s)}
+                                      className={`p-1 border border-neutral-300 font-mono font-bold rounded-none cursor-pointer ${
+                                        playbackRate === s
                                           ? 'bg-black text-white border-black'
                                           : 'bg-white hover:bg-neutral-100 text-black'
                                       }`}
                                     >
-                                      {lvl.label}
+                                      {s}x
                                     </button>
                                   ))}
                                 </div>
                               </div>
-                            )}
-                          </div>
-                        )}
+
+                              {/* Quality selector */}
+                              {qualityLevels.length > 0 && (
+                                <div className="border-t border-neutral-200 pt-2">
+                                  <span className="font-bold uppercase tracking-wider block mb-1 text-black">
+                                    Quality
+                                  </span>
+                                  <div className="space-y-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleQualityChange(-1)}
+                                      className={`w-full text-left p-1 border border-neutral-300 font-bold rounded-none cursor-pointer ${
+                                        currentQuality === -1
+                                          ? 'bg-black text-white border-black'
+                                          : 'bg-white hover:bg-neutral-100 text-black'
+                                      }`}
+                                    >
+                                      Auto
+                                    </button>
+                                    {qualityLevels.map((lvl) => (
+                                      <button
+                                        key={lvl.id}
+                                        type="button"
+                                        onClick={() => handleQualityChange(lvl.id)}
+                                        className={`w-full text-left p-1 border border-neutral-300 font-bold rounded-none cursor-pointer ${
+                                          currentQuality === lvl.id
+                                            ? 'bg-black text-white border-black'
+                                            : 'bg-white hover:bg-neutral-100 text-black'
+                                        }`}
+                                      >
+                                        {lvl.label}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Next Lesson Trigger */}
+                        <button
+                          type="button"
+                          onClick={handleNextLesson}
+                          aria-label="Next lesson"
+                          className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
+                        >
+                          <SkipForward className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+
+                        {/* Fullscreen Button */}
+                        <button
+                          type="button"
+                          onClick={toggleCustomFullscreen}
+                          aria-label={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
+                          className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
+                        >
+                          {isFullscreen ? (
+                            <Minimize className="w-4 h-4 sm:w-5 sm:h-5" />
+                          ) : (
+                            <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
+                          )}
+                        </button>
                       </div>
-
-                      {/* Next Lesson Trigger */}
-                      <button
-                        type="button"
-                        onClick={handleNextLesson}
-                        aria-label="Next lesson"
-                        className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
-                      >
-                        <SkipForward className="w-4 h-4 sm:w-5 sm:h-5" />
-                      </button>
-
-                      {/* Fullscreen Button */}
-                      <button
-                        type="button"
-                        onClick={toggleCustomFullscreen}
-                        aria-label={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
-                        className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
-                      >
-                        {isFullscreen ? (
-                          <Minimize className="w-4 h-4 sm:w-5 sm:h-5" />
-                        ) : (
-                          <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
-                        )}
-                      </button>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Lesson Title and Description */}
-            <div className="p-4 sm:p-6 md:p-8 lg:p-10 space-y-3 sm:space-y-4 bg-black text-white max-w-full border-b border-white/20 md:border-b-0">
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
-                <div className="min-w-0">
-                  <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-white tracking-tight leading-snug">
-                    {currentLessonTitle}
-                  </h1>
-                </div>
+              {/* Action Bar Directly Underneath Video (TakeUForward style: Previous, Completed toggle, Next) */}
+              <div className="w-full bg-[#181b20] border-b md:border-x md:border-b border-white/10 px-4 sm:px-6 py-3 sm:py-3.5 flex items-center justify-between gap-3 text-white">
+                {/* Previous Lesson Button */}
+                <button
+                  type="button"
+                  onClick={handlePrevLesson}
+                  disabled={!hasPrevLesson}
+                  className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider border rounded-none transition-all ${
+                    hasPrevLesson
+                      ? 'border-white/20 bg-[#1f2328] hover:bg-[#282d33] text-white cursor-pointer'
+                      : 'border-white/5 bg-transparent text-white/25 cursor-not-allowed'
+                  }`}
+                >
+                  <span>←</span>
+                  <span className="hidden sm:inline">Previous</span>
+                </button>
 
+                {/* Mark as Completed Checkbox Toggle */}
+                <button
+                  type="button"
+                  onClick={toggleLessonCompleted}
+                  className={`inline-flex items-center gap-2 px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider border rounded-none transition-all cursor-pointer ${
+                    isCurrentCompleted
+                      ? 'bg-white text-black border-white'
+                      : 'bg-[#1f2328] hover:bg-[#282d33] text-white/90 border-white/20'
+                  }`}
+                >
+                  <div
+                    className={`w-4 h-4 border flex items-center justify-center ${
+                      isCurrentCompleted
+                        ? 'bg-black border-black text-white'
+                        : 'border-white/50 bg-transparent'
+                    }`}
+                  >
+                    {isCurrentCompleted && <Check className="w-3 h-3 stroke-[3]" />}
+                  </div>
+                  <span>{isCurrentCompleted ? 'Completed' : 'Mark Complete'}</span>
+                </button>
+
+                {/* Next Lesson Button */}
                 <button
                   type="button"
                   onClick={handleNextLesson}
-                  className="inline-flex items-center justify-center h-9 sm:h-10 px-4 sm:px-5 bg-white hover:bg-neutral-100 text-black font-black text-xs uppercase tracking-wider rounded-none transition-all gap-2 cursor-pointer shrink-0 border border-white self-start"
+                  disabled={!hasNextLesson}
+                  className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider border rounded-none transition-all ${
+                    hasNextLesson
+                      ? 'bg-white hover:bg-neutral-200 text-black border-white cursor-pointer font-black'
+                      : 'border-white/5 bg-transparent text-white/25 cursor-not-allowed'
+                  }`}
                 >
-                  <span>Next Lesson</span>
-                  <span className="text-xs">▶</span>
+                  <span className="hidden sm:inline">Next Lesson</span>
+                  <span className="sm:hidden">Next</span>
+                  <span>→</span>
                 </button>
               </div>
 
-              <div className="space-y-2 text-white/80 text-xs sm:text-sm leading-relaxed max-w-3xl">
-                <p>
-                  Fundamental principles of fluid power, hydraulic circuit behavior, and practical workplace concepts. Watch the stream above, use playback controls as needed, and proceed to the next lesson once completed.
-                </p>
+              {/* Lesson Overview Details (Grey Theme) */}
+              <div className="w-full bg-[#141619] border-b md:border-x md:border-b border-white/10 p-5 sm:p-6 md:p-8 space-y-2 text-white max-w-full">
+                <div className="min-w-0">
+                  <span className="text-[11px] font-mono uppercase tracking-widest text-white/50 block mb-1">
+                    {currentSection ? `Module ${currentSectionIdx + 1}: ${currentSection.title.replace(/^Module\s*\d+\s*:\s*/i, '')}` : 'Curriculum Lesson'}
+                  </span>
+                  <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-white tracking-tight leading-snug">
+                    {currentLessonTitle}
+                  </h2>
+                </div>
+
+                <div className="space-y-2 text-white/75 text-xs sm:text-sm leading-relaxed max-w-3xl pt-2">
+                  <p>
+                    Fundamental principles of fluid power, hydraulic circuit behavior, and practical workplace concepts. Watch the stream above, use playback controls as needed, and proceed to the next lesson once completed.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
