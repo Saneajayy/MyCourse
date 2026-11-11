@@ -26,6 +26,7 @@ function ForgotPasswordContent() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const isVerifyingRef = useRef(false);
 
   // Focus first input box on switching to OTP step
   useEffect(() => {
@@ -63,6 +64,8 @@ function ForgotPasswordContent() {
       setStep('otp');
       setResendCooldown(60);
       setDigits(['', '', '', '', '', '']);
+      isVerifyingRef.current = false;
+      setIsVerifying(false);
       toastSuccess('Code Sent', 'A 6-digit reset code was sent to your email.');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Something went wrong';
@@ -75,6 +78,8 @@ function ForgotPasswordContent() {
 
   // Step 2: Handle individual digit inputs (identical to verify-email)
   const handleDigitChange = (index: number, value: string) => {
+    if (isVerifyingRef.current) return;
+
     const rawVal = value.replace(/\D/g, '');
     const newDigits = [...digits];
 
@@ -111,11 +116,18 @@ function ForgotPasswordContent() {
     } else if (e.key === 'ArrowRight' && index < 5) {
       e.preventDefault();
       inputRefs.current[index + 1]?.focus();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!isVerifyingRef.current && digits.every((d) => d !== '')) {
+        handleVerifyOtp();
+      }
     }
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
+    if (isVerifyingRef.current) return;
+
     const pastedData = e.clipboardData.getData('text').trim();
     const cleanNumbers = pastedData.replace(/\D/g, '').slice(0, 6);
 
@@ -137,12 +149,16 @@ function ForgotPasswordContent() {
 
   // Step 3: Verify OTP and navigate to /reset-password
   const handleVerifyOtp = async (codeToVerify?: string) => {
+    // Synchronously lock out duplicate calls (Enter key + auto-verify + button click)
+    if (isVerifyingRef.current) return;
+
     const otpCode = codeToVerify || digits.join('');
     if (otpCode.length !== 6) {
       setErrorMsg('Please enter all 6 digits of your reset code.');
       return;
     }
 
+    isVerifyingRef.current = true;
     setErrorMsg(null);
     setIsVerifying(true);
 
@@ -165,13 +181,15 @@ function ForgotPasswordContent() {
       }
 
       toastSuccess('Code Verified', 'Please enter your new password.');
+      // Keep isVerifyingRef.current = true during route transition so no subsequent submit can trigger
       router.push(`/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email.trim().toLowerCase())}`);
     } catch (err: unknown) {
+      // Only unlock on error so user can re-try
+      isVerifyingRef.current = false;
+      setIsVerifying(false);
       const msg = err instanceof Error ? err.message : 'Invalid or expired reset code';
       setErrorMsg(msg);
       toastError('Verification Failed', msg);
-    } finally {
-      setIsVerifying(false);
     }
   };
 
@@ -382,6 +400,8 @@ function ForgotPasswordContent() {
               onClick={() => {
                 setStep('email');
                 setErrorMsg(null);
+                isVerifyingRef.current = false;
+                setIsVerifying(false);
               }}
               className="font-bold text-black underline hover:text-[#262626] ml-1 cursor-pointer"
             >

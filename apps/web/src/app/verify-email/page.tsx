@@ -34,6 +34,7 @@ function VerifyEmailForm() {
   const [isResending, setIsResending] = useState<boolean>(false);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const isVerifyingRef = useRef(false);
 
   // Cooldown countdown timer
   useEffect(() => {
@@ -114,6 +115,8 @@ function VerifyEmailForm() {
   };
 
   const executeVerification = async (targetEmail: string, otpCode: string) => {
+    if (isVerifyingRef.current) return;
+
     if (!targetEmail.trim()) {
       setErrorMessage('Please provide your email address.');
       setIsEditingEmail(true);
@@ -124,6 +127,7 @@ function VerifyEmailForm() {
       return;
     }
 
+    isVerifyingRef.current = true;
     setStatus('verifying');
     setErrorMessage('');
 
@@ -166,6 +170,7 @@ function VerifyEmailForm() {
         router.push(targetDestination);
       }, 500);
     } catch (err: unknown) {
+      isVerifyingRef.current = false;
       setStatus('error');
       const msg = err instanceof Error ? err.message : 'Invalid or expired verification code.';
       setErrorMessage(msg);
