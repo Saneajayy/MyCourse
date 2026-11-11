@@ -64,10 +64,10 @@ export default function TermsPage() {
 
         {/* Content Container */}
         <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10 relative z-10 flex-1">
-          {/* Main Card with thin solid black border matching login & signup cards */}
-          <div className="relative w-full bg-white border border-black rounded-xl sm:rounded-2xl p-6 sm:p-8 md:p-10 select-text overflow-hidden shadow-none">
-            {/* Document Header */}
-            <header className="mb-8 border-b border-neutral-200 pb-6 sm:pb-8">
+          {/* Main Card with border matching separation line, all separation lines touching the box border */}
+          <div className="relative w-full bg-white border border-neutral-200 rounded-xl sm:rounded-2xl select-text overflow-hidden shadow-none">
+            {/* Document Header Section with full-width bottom border */}
+            <header className="p-6 sm:p-8 md:p-10 pb-6 sm:pb-8 border-b border-neutral-200">
               <div className="flex items-center gap-2 text-xs font-mono font-medium text-neutral-500 uppercase tracking-widest mb-2.5">
                 <ShieldCheck className="w-4 h-4 text-black shrink-0" />
                 <span>Binding Legal Agreement</span>
@@ -78,14 +78,14 @@ export default function TermsPage() {
               <p className="text-neutral-600 font-medium text-xs sm:text-sm mt-2 leading-relaxed">
                 Official student enrollment agreement, platform licensing rules, and industrial engineering safety protocols.
               </p>
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-4 mt-4 border-t border-neutral-100 text-[11px] sm:text-xs font-mono text-neutral-500">
+              <div className="-mx-6 sm:-mx-8 md:-mx-10 px-6 sm:px-8 md:px-10 pt-4 mt-4 border-t border-neutral-200 flex flex-wrap items-center justify-between gap-2 text-[11px] sm:text-xs font-mono text-neutral-500">
                 <span>Jurisdiction: {siteConfig.contact.jurisdiction}</span>
                 <span>Updated: October 2026</span>
               </div>
             </header>
 
             {/* Policy Body */}
-            <div className="space-y-8 text-neutral-800 text-xs sm:text-sm leading-relaxed">
+            <div className="p-6 sm:p-8 md:p-10 space-y-8 text-neutral-800 text-xs sm:text-sm leading-relaxed">
               <section className="space-y-2">
                 <h2 className="text-sm sm:text-base font-bold text-neutral-950 flex items-center gap-2">
                   <span className="text-black font-mono font-bold">01.</span> Acceptance of Terms

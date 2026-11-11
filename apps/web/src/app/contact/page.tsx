@@ -116,10 +116,10 @@ export default function ContactPage() {
 
         {/* Content Container */}
         <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10 relative z-10 flex-1">
-          {/* Main Card with thin solid black border matching login & signup cards */}
-          <div className="relative w-full bg-white border border-black rounded-xl sm:rounded-2xl p-6 sm:p-8 md:p-10 select-text overflow-hidden shadow-none">
-            {/* Document Header */}
-            <header className="mb-8 border-b border-neutral-200 pb-6 sm:pb-8">
+          {/* Main Card with border matching separation line, all separation lines touching the box border */}
+          <div className="relative w-full bg-white border border-neutral-200 rounded-xl sm:rounded-2xl select-text overflow-hidden shadow-none">
+            {/* Document Header Section with full-width bottom border */}
+            <header className="p-6 sm:p-8 md:p-10 pb-6 sm:pb-8 border-b border-neutral-200">
               <div className="flex items-center gap-2 text-xs font-mono font-medium text-neutral-500 uppercase tracking-widest mb-2.5">
                 <Mail className="w-4 h-4 text-black shrink-0" />
                 <span>Engineering Support Desk</span>
@@ -130,14 +130,14 @@ export default function ContactPage() {
               <p className="text-neutral-600 font-medium text-xs sm:text-sm mt-2 leading-relaxed">
                 Have questions about the industrial curriculum, enterprise access, or billing? Reach out to our engineering support desk.
               </p>
-              <div className="flex flex-wrap items-center justify-between gap-2 pt-4 mt-4 border-t border-neutral-100 text-[11px] sm:text-xs font-mono text-neutral-500">
+              <div className="-mx-6 sm:-mx-8 md:-mx-10 px-6 sm:px-8 md:px-10 pt-4 mt-4 border-t border-neutral-200 flex flex-wrap items-center justify-between gap-2 text-[11px] sm:text-xs font-mono text-neutral-500">
                 <span>Response Time: Within 24 Business Hours</span>
                 <span>Support Desk: Active</span>
               </div>
             </header>
 
             {/* Support Desk Details Cards */}
-            <div className="space-y-3 mb-8">
+            <div className="p-6 sm:p-8 md:p-10 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Email Card */}
                 <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-lg space-y-1">
@@ -166,7 +166,7 @@ export default function ContactPage() {
                     {siteConfig.contact.hours}
                   </div>
                   <p className="text-[11px] text-neutral-500">
-                    Mon–Sat (Closed Sundays)
+                    (Closed Sundays)
                   </p>
                 </div>
               </div>
@@ -190,8 +190,8 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Inquiry Form Section */}
-            <div className="border-t border-neutral-200 pt-6 sm:pt-8">
+            {/* Inquiry Form Section with full-width top border */}
+            <div className="border-t border-neutral-200 p-6 sm:p-8 md:p-10">
               <div className="flex items-center gap-2 mb-4">
                 <Send className="w-4 h-4 text-black shrink-0" />
                 <h2 className="text-sm sm:text-base font-bold text-neutral-950">
