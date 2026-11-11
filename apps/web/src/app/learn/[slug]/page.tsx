@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback, use } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type Hls from 'hls.js';
@@ -1064,6 +1065,19 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         <aside
           className="w-full flex-1 overflow-y-auto md:w-72 lg:w-80 md:h-full md:flex-none border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col relative select-none shadow-none max-w-full"
         >
+          {/* Background Image Embedded on Column Back (Matches Dashboard Left Column: 35% position, opacity-15) */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+            <Image
+              src="/login-pixelated.png"
+              alt="Hydraulic System Graphic"
+              fill
+              sizes="(max-width: 768px) 100vw, 320px"
+              priority
+              style={{ objectPosition: '35% center' }}
+              className="object-cover mix-blend-screen opacity-15 select-none"
+            />
+          </div>
+
           {/* Syllabus Header with Back to Courses Button */}
           <div className="relative z-10 w-full px-5 sm:px-6 py-4 sm:py-5 border-b border-white/50 text-left shrink-0">
             <Link
