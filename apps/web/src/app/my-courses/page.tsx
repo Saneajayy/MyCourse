@@ -571,7 +571,7 @@ function StudentDashboardContent() {
       {/* 2. RIGHT WHITE WORKSPACE (Left-aligned, Zero Shadows)          */}
       {/* ============================================================== */}
       <main className="flex-1 md:pl-64 lg:pl-72 w-full min-h-screen bg-white flex flex-col pt-16 sm:pt-20 md:pt-0">
-        <div className="w-full max-w-5xl xl:max-w-6xl p-6 sm:p-8 lg:p-10 space-y-6 text-left">
+        <div className="w-full max-w-4xl xl:max-w-5xl p-6 sm:p-8 lg:p-10 space-y-6 text-left">
 
           {/* TAB 1: MY COURSES */}
           {activeTab === 'courses' && (
@@ -843,10 +843,10 @@ function StudentDashboardContent() {
                 </p>
               </div>
 
-              {/* 2-Column Responsive Grid: Profile on Left, Password on Right */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start w-full">
+              {/* 2-Column Responsive Grid: Profile on Left, Password on Right (Compact horizontal width on desktop) */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 items-start w-full max-w-md lg:max-w-[720px]">
                 {/* Personal Details Card (Left) */}
-                <div className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl overflow-hidden shadow-none text-left w-full">
+                <div className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl overflow-hidden shadow-none text-left w-full lg:max-w-[345px]">
                   {/* Header with border joining outer outline */}
                   <div className="px-5 sm:px-7 py-4 sm:py-4.5 border-b border-neutral-200 flex items-center gap-2.5">
                     <UserIcon className="w-4 h-4 text-neutral-900" />
@@ -932,7 +932,7 @@ function StudentDashboardContent() {
                 </div>
 
                 {/* Change Password Card (Right) */}
-                <div className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl overflow-hidden shadow-none text-left w-full">
+                <div className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl overflow-hidden shadow-none text-left w-full lg:max-w-[345px]">
                   {/* Header with border joining outer outline */}
                   <div className="px-5 sm:px-7 py-4 sm:py-4.5 border-b border-neutral-200 flex items-center gap-2.5">
                     <Lock className="w-4 h-4 text-neutral-900" />
