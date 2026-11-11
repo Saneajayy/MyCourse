@@ -694,8 +694,14 @@ function StudentDashboardContent() {
                               </span>
                             </div>
 
+                            {/* Dynamic Course Description */}
+                            <p className="text-xs sm:text-[13px] text-neutral-700 leading-relaxed mt-2 sm:mt-2.5 text-justify">
+                              {c.product.description ||
+                                'Learn the fundamentals of hydraulic systems from scratch. This course introduces you to the working principles of hydraulics, essential components, and hydraulic circuit basics through easy-to-understand video lessons.'}
+                            </p>
+
                             {/* Course Metadata: Total Videos & Total Hours of Content */}
-                            <div className="flex items-center gap-2.5 text-xs text-neutral-500 font-medium mt-1.5 select-none">
+                            <div className="flex items-center gap-2.5 text-xs text-neutral-500 font-medium mt-3 select-none">
                               <span className="inline-flex items-center gap-1.5">
                                 <Video className="w-3.5 h-3.5 text-neutral-400" />
                                 <span>{totalVideos} Videos</span>
@@ -706,15 +712,9 @@ function StudentDashboardContent() {
                                 <span>{durationText}</span>
                               </span>
                             </div>
-
-                            {/* Dynamic Course Description */}
-                            <p className="text-xs sm:text-[13px] text-neutral-700 leading-relaxed mt-2.5 text-justify">
-                              {c.product.description ||
-                                'Learn the fundamentals of hydraulic systems from scratch. This course introduces you to the working principles of hydraulics, essential components, and hydraulic circuit basics through easy-to-understand video lessons.'}
-                            </p>
                           </div>
 
-                          <div className="mt-4 sm:mt-5">
+                          <div className="mt-3.5 sm:mt-4">
                             {/* Barcode / Hatch Progress Bar with dynamic percentage */}
                             <CloseBarsProgressBar percent={percent} />
 
