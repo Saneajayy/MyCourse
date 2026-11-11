@@ -164,7 +164,7 @@ export function CertificateSection() {
               {/* Main Certificate Content: 2-Column Split Layout */}
               <div className="flex items-stretch flex-1">
                 {/* Left Column (Title, Recipient, Description) */}
-                <div className="flex-1 flex flex-col justify-between pl-6 md:pl-8 lg:pl-9 pr-6 md:pr-7 lg:pr-8 py-6 md:py-7 lg:py-8">
+                <div className="flex-1 flex flex-col justify-start pl-6 md:pl-8 lg:pl-9 pr-6 md:pr-7 lg:pr-8 py-6 md:py-7 lg:py-8">
                   {/* 1. Certificate Title */}
                   <div className="flex flex-col items-start text-left select-none leading-none text-black">
                     <span className="font-light text-[42px] md:text-[50px] lg:text-[58px] xl:text-[62px] tracking-tight uppercase leading-[0.98]">
@@ -176,7 +176,7 @@ export function CertificateSection() {
                   </div>
 
                   {/* 2. Recipient Info */}
-                  <div className="my-auto py-4 md:py-5">
+                  <div className="mt-6 md:mt-7 lg:mt-8">
                     <p className="text-black/75 font-light text-[13px] md:text-sm lg:text-[14px] lowercase tracking-normal text-left select-none">
                       presented to
                     </p>
@@ -187,7 +187,7 @@ export function CertificateSection() {
                   </div>
 
                   {/* 3. Course Description */}
-                  <p className="text-black/80 font-light text-[12px] md:text-[13px] lg:text-[14px] leading-[1.55] text-left select-none max-w-[480px] lg:max-w-[530px]">
+                  <p className="mt-6 md:mt-7 lg:mt-8 text-black/80 font-light text-[12px] md:text-[13px] lg:text-[14px] leading-[1.55] text-left select-none max-w-[480px] lg:max-w-[530px]">
                     For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong><br className="hidden md:inline" />
                     by Mr. Hira Lal, covering the Fundamentals of Hydraulic<br className="hidden md:inline" />
                     systems, components and circuit designs.
