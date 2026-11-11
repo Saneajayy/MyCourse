@@ -222,7 +222,7 @@ function ForgotPasswordContent() {
   const isComplete = digits.every((d) => d.length === 1);
 
   return (
-    <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-8 select-none overflow-hidden">
+    <div className="relative w-full bg-white border border-neutral-200/80 rounded-none p-5 sm:p-8 select-none overflow-hidden">
       {step === 'email' ? (
         <>
           {/* Main Headline - Sizing & Placing identical to login, signup, and verify-email */}
@@ -237,7 +237,7 @@ function ForgotPasswordContent() {
 
           {/* Error Message Alert Banner */}
           {errorMsg && (
-            <div className="mb-4 p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
+            <div className="mb-4 p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
               <span>{errorMsg}</span>
             </div>
           )}
@@ -260,7 +260,7 @@ function ForgotPasswordContent() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
+                  className="w-full h-[44px] sm:h-[46px] rounded-none border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
                 />
                 {email.includes('@') && email.length > 4 && (
                   <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-600">
@@ -275,7 +275,7 @@ function ForgotPasswordContent() {
               <button
                 type="submit"
                 disabled={isLoading || !email.trim()}
-                className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-none transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
               >
                 {isLoading && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
                 <span>{isLoading ? 'Sending Code...' : 'Send Reset Code'}</span>
@@ -321,7 +321,7 @@ function ForgotPasswordContent() {
 
           {/* Error Message Alert Banner */}
           {errorMsg && (
-            <div className="mb-4 p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
+            <div className="mb-4 p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
               <span>{errorMsg}</span>
             </div>
           )}
@@ -351,7 +351,7 @@ function ForgotPasswordContent() {
                   onChange={(e) => handleDigitChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
                   disabled={isVerifying}
-                  className="w-[38px] h-[44px] sm:w-[42px] sm:h-[48px] text-center text-xl sm:text-2xl font-bold text-neutral-900 bg-white border border-neutral-300 focus:border-black focus:ring-1 focus:ring-black caret-black rounded-[4px] focus:outline-none transition-all disabled:opacity-50 select-none"
+                  className="w-[38px] h-[44px] sm:w-[42px] sm:h-[48px] text-center text-xl sm:text-2xl font-bold text-neutral-900 bg-white border border-neutral-300 focus:border-black focus:ring-1 focus:ring-black caret-black rounded-none focus:outline-none transition-all disabled:opacity-50 select-none"
                   aria-label={`Digit ${index + 1}`}
                 />
               ))}
@@ -362,7 +362,7 @@ function ForgotPasswordContent() {
               <button
                 type="submit"
                 disabled={!isComplete || isVerifying}
-                className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-none transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
               >
                 {isVerifying && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
                 <span>{isVerifying ? 'Verifying Code...' : 'Verify & Continue'}</span>

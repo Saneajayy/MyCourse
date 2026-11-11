@@ -112,7 +112,7 @@ export default function OrderPendingPage() {
         <div className="relative z-10 w-full mb-1 select-none">
           <div className="flex items-end justify-between gap-4">
             <div className="shrink-0">
-              <div className="h-11 flex items-center gap-2 px-4 rounded-md bg-amber-500/25 border border-amber-400/50 backdrop-blur-sm text-amber-200 text-sm font-mono font-bold tracking-wide shadow-md">
+              <div className="h-11 flex items-center gap-2 px-4 rounded-none bg-amber-500/25 border border-amber-400/50 backdrop-blur-sm text-amber-200 text-sm font-mono font-bold tracking-wide shadow-md">
                 <Loader2 className="w-4 h-4 animate-spin text-amber-400 shrink-0" />
                 <span>PAYMENT VERIFYING</span>
               </div>
@@ -158,7 +158,7 @@ export default function OrderPendingPage() {
             <Link
               href="/my-courses"
               aria-label="Close"
-              className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white border border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100 flex items-center justify-center shadow-md transition-all cursor-pointer z-20"
+              className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-9 h-9 sm:w-10 sm:h-10 rounded-none bg-white border border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100 flex items-center justify-center shadow-md transition-all cursor-pointer z-20"
             >
               <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>

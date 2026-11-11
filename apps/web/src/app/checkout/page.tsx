@@ -773,7 +773,7 @@ function CheckoutContent() {
             {/* Coupon Code Entry: Apply button then input bar */}
             <div className="shrink-0">
               {appliedCoupon ? (
-                <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-lg bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-sm shadow-md">
+                <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-none bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-sm shadow-md">
                   <div className="flex items-center gap-2 truncate">
                     <Tag className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span className="font-mono font-bold tracking-wide">{appliedCoupon.code}</span>
@@ -795,7 +795,7 @@ function CheckoutContent() {
                     <button
                       type="submit"
                       disabled={couponLoading}
-                      className="h-11 px-5 bg-white hover:bg-neutral-100 active:bg-neutral-200 text-black font-extrabold text-sm rounded-md transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-md"
+                      className="h-11 px-5 bg-white hover:bg-neutral-100 active:bg-neutral-200 text-black font-extrabold text-sm rounded-none transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-md"
                     >
                       {couponLoading ? (
                         <Loader2 className="w-4 h-4 animate-spin text-black" />
@@ -808,7 +808,7 @@ function CheckoutContent() {
                       placeholder="COUPON CODE"
                       value={couponInput}
                       onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                      className="h-11 w-44 sm:w-56 md:w-64 rounded-md border border-white/45 bg-transparent px-3.5 text-sm font-mono uppercase text-white placeholder:text-neutral-400/60 focus:border-white focus:outline-none transition-all"
+                      className="h-11 w-44 sm:w-56 md:w-64 rounded-none border border-white/45 bg-transparent px-3.5 text-sm font-mono uppercase text-white placeholder:text-neutral-400/60 focus:border-white focus:outline-none transition-all"
                     />
                   </div>
                   {couponError && (
@@ -922,7 +922,7 @@ function CheckoutContent() {
               {/* Coupon Code Entry: Apply button then input bar extending horizontally */}
               <div className="flex-1 min-w-0">
                 {appliedCoupon ? (
-                  <div className="h-11 flex items-center gap-1.5 px-3 rounded-md bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs">
+                  <div className="h-11 flex items-center gap-1.5 px-3 rounded-none bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs">
                     <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span className="font-mono font-bold tracking-wide truncate">{appliedCoupon.code}</span>
                     <span className="text-emerald-300 font-semibold text-[11px] shrink-0">
@@ -942,7 +942,7 @@ function CheckoutContent() {
                       <button
                         type="submit"
                         disabled={couponLoading}
-                        className="h-11 px-4 bg-white hover:bg-neutral-100 active:bg-neutral-200 text-black font-extrabold text-xs sm:text-sm rounded-md transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
+                        className="h-11 px-4 bg-white hover:bg-neutral-100 active:bg-neutral-200 text-black font-extrabold text-xs sm:text-sm rounded-none transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
                       >
                         {couponLoading ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-black" />
@@ -955,7 +955,7 @@ function CheckoutContent() {
                         placeholder="COUPON CODE"
                         value={couponInput}
                         onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                        className="h-11 flex-1 min-w-0 rounded-md border border-white/45 bg-transparent px-3 text-xs sm:text-sm font-mono uppercase text-white placeholder:text-neutral-400/60 focus:border-white focus:outline-none transition-all"
+                        className="h-11 flex-1 min-w-0 rounded-none border border-white/45 bg-transparent px-3 text-xs sm:text-sm font-mono uppercase text-white placeholder:text-neutral-400/60 focus:border-white focus:outline-none transition-all"
                       />
                     </div>
                     {couponError && (
@@ -987,7 +987,7 @@ function CheckoutContent() {
           <div className="w-full max-w-lg px-4 sm:px-6 py-6 sm:py-8 relative z-10 space-y-4 lg:my-auto">
           {/* Email Verification Warning Alert Gate */}
           {isAuthenticated && !user?.emailVerifiedAt && (
-            <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-xl p-5 text-amber-950">
+            <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-none p-5 text-amber-950">
               <div className="space-y-3">
                 <div className="flex items-center gap-2 font-bold text-sm text-amber-900">
                   <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0" />
@@ -1000,7 +1000,7 @@ function CheckoutContent() {
                 <div className="flex flex-wrap items-center gap-2.5 pt-1">
                   <Link
                     href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
-                    className="h-9 px-3.5 bg-black hover:bg-[#262626] text-white font-bold text-xs rounded-lg transition-all flex items-center justify-center cursor-pointer"
+                    className="h-9 px-3.5 bg-black hover:bg-[#262626] text-white font-bold text-xs rounded-none transition-all flex items-center justify-center cursor-pointer"
                   >
                     Enter 6-Digit OTP
                   </Link>
@@ -1008,7 +1008,7 @@ function CheckoutContent() {
                     type="button"
                     onClick={handleResendVerification}
                     disabled={resendingVerification}
-                    className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-lg transition-all flex items-center cursor-pointer disabled:opacity-60"
+                    className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-none transition-all flex items-center cursor-pointer disabled:opacity-60"
                   >
                     {resendingVerification ? (
                       <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
@@ -1021,7 +1021,7 @@ function CheckoutContent() {
                     type="button"
                     onClick={handleCheckVerification}
                     disabled={checkingVerification}
-                    className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-lg transition-all flex items-center cursor-pointer disabled:opacity-60"
+                    className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-none transition-all flex items-center cursor-pointer disabled:opacity-60"
                   >
                     {checkingVerification ? (
                       <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
@@ -1036,7 +1036,7 @@ function CheckoutContent() {
           )}
 
           {/* Billing Info Card Box - Identical styling to Login / Signup / Verify-Email cards */}
-          <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-7 select-none overflow-hidden space-y-5">
+          <div className="relative w-full bg-white border border-neutral-200/80 rounded-none p-5 sm:p-7 select-none overflow-hidden space-y-5">
             {/* Simple Billing Information Headline */}
             <div className="space-y-1">
               <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
@@ -1062,7 +1062,7 @@ function CheckoutContent() {
                     placeholder="Ramesh"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all"
+                    className="w-full h-11 rounded-none border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all"
                   />
                 </div>
                 <div className="space-y-1.5 text-left">
@@ -1076,7 +1076,7 @@ function CheckoutContent() {
                     placeholder="Kumar"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all"
+                    className="w-full h-11 rounded-none border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all"
                   />
                 </div>
               </div>
@@ -1094,7 +1094,7 @@ function CheckoutContent() {
                   placeholder="engineer@plant.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
+                  className="w-full h-11 rounded-none border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
                 />
               </div>
 
@@ -1110,7 +1110,7 @@ function CheckoutContent() {
                   placeholder="+91 98765 43210"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all font-mono"
+                  className="w-full h-11 rounded-none border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all font-mono"
                 />
               </div>
 
@@ -1125,14 +1125,14 @@ function CheckoutContent() {
                   placeholder="22AAAAA0000A1Z5"
                   value={gstin}
                   onChange={(e) => setGstin(e.target.value.toUpperCase())}
-                  className="w-full h-11 rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all font-mono uppercase"
+                  className="w-full h-11 rounded-none border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all font-mono uppercase"
                 />
               </div>
             </div>
 
             {/* Error Alert Banner: Translucent Red (matching Login/Register) */}
             {checkoutError && (
-              <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium flex items-center justify-center text-center animate-in fade-in">
+              <div className="p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium flex items-center justify-center text-center animate-in fade-in">
                 <span>{checkoutError}</span>
               </div>
             )}
@@ -1142,7 +1142,7 @@ function CheckoutContent() {
               {!isAuthenticated ? (
                 <Link
                   href="/login?redirect=/checkout"
-                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all flex items-center justify-center cursor-pointer text-center select-none"
+                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-base sm:text-[17px] rounded-none transition-all flex items-center justify-center cursor-pointer text-center select-none"
                 >
                   Sign In to Continue Checkout &rarr;
                 </Link>
@@ -1150,7 +1150,7 @@ function CheckoutContent() {
                 <button
                   type="button"
                   disabled
-                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-neutral-200 text-neutral-500 font-bold text-sm sm:text-base uppercase tracking-wider rounded-lg opacity-75 cursor-not-allowed flex items-center justify-center text-center select-none"
+                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-neutral-200 text-neutral-500 font-bold text-sm sm:text-base uppercase tracking-wider rounded-none opacity-75 cursor-not-allowed flex items-center justify-center text-center select-none"
                 >
                   Verify Email to Enable Payment
                 </button>
@@ -1159,7 +1159,7 @@ function CheckoutContent() {
                   type="button"
                   onClick={handleProceedToPayment}
                   disabled={quoteLoading || isSubmitting}
-                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-base sm:text-[17px] rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer select-none"
+                  className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-base sm:text-[17px] rounded-none transition-all disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer select-none"
                 >
                   {isSubmitting || quoteLoading ? (
                     <Loader2 className="w-5 h-5 animate-spin text-white" />

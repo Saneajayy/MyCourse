@@ -588,7 +588,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                     <div className="flex items-center gap-2.5 shrink-0 text-white/80">
                       {isModuleCompleted ? (
                         <div
-                          className="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0"
+                          className="w-5 h-5 rounded-none bg-white flex items-center justify-center shrink-0"
                           title="Module Completed"
                         >
                           <Check className="w-3.5 h-3.5 text-black stroke-[3]" />
@@ -625,7 +625,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             <div className="shrink-0 flex items-center justify-center w-5">
                               {lesson.isCompleted ? (
                                 <div
-                                  className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                                  className={`w-4 h-4 rounded-none flex items-center justify-center shrink-0 ${
                                     isCurrent ? 'bg-black' : 'bg-white'
                                   }`}
                                   title="Completed"

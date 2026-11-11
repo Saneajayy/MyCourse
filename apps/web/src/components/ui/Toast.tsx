@@ -121,10 +121,10 @@ function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
   return (
     <div
       role="status"
-      className={`pointer-events-auto flex items-start gap-3 p-3.5 sm:p-4 bg-white/95 backdrop-blur-md border border-neutral-200/90 border-l-[3.5px] ${config.borderAccent} rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08),0_4px_10px_-2px_rgba(0,0,0,0.04)] w-full transition-all animate-in fade-in slide-in-from-top-3 duration-200 select-none`}
+      className={`pointer-events-auto flex items-start gap-3 p-3.5 sm:p-4 bg-white/95 backdrop-blur-md border border-neutral-200/90 border-l-[3.5px] ${config.borderAccent} rounded-none shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08),0_4px_10px_-2px_rgba(0,0,0,0.04)] w-full transition-all animate-in fade-in slide-in-from-top-3 duration-200 select-none`}
     >
       <div
-        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg border flex items-center justify-center shrink-0 ${config.badgeBg}`}
+        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-none border flex items-center justify-center shrink-0 ${config.badgeBg}`}
       >
         {config.icon}
       </div>
@@ -142,7 +142,7 @@ function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
         type="button"
         onClick={onDismiss}
         aria-label="Dismiss notification"
-        className="p-1 rounded-md text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors -mr-1 -mt-1 cursor-pointer shrink-0"
+        className="p-1 rounded-none text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors -mr-1 -mt-1 cursor-pointer shrink-0"
       >
         <X className="w-3.5 h-3.5 stroke-[2.2]" />
       </button>

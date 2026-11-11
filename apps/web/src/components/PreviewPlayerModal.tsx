@@ -256,7 +256,7 @@ export function PreviewPlayerModal({
 
       {/* Modal Dialog Card */}
       <div
-        className="relative z-10 w-full max-w-4xl bg-gradient-to-b from-[#000000] via-[#171717] to-[#000000] border border-white/25 rounded-lg sm:rounded-xl p-5 sm:p-7 md:p-8 max-h-[92vh] overflow-y-auto font-reddit text-white shadow-[0_25px_80px_rgba(0,0,0,0.65)] select-none"
+        className="relative z-10 w-full max-w-4xl bg-gradient-to-b from-[#000000] via-[#171717] to-[#000000] border border-white/25 rounded-none p-5 sm:p-7 md:p-8 max-h-[92vh] overflow-y-auto font-reddit text-white shadow-[0_25px_80px_rgba(0,0,0,0.65)] select-none"
       >
         {/* Modal Header: Big standalone FREE PREVIEW heading & standalone rotating cross mark */}
         <div className="flex items-start justify-between gap-4 mb-4 sm:mb-5">
@@ -292,7 +292,7 @@ export function PreviewPlayerModal({
         {/* Video Player Container */}
         <div
           ref={containerRef}
-          className="relative w-full aspect-video bg-black/95 rounded-md sm:rounded-lg border border-white/20 overflow-hidden flex items-center justify-center select-none shadow-2xl group/player"
+          className="relative w-full aspect-video bg-black/95 rounded-none border border-white/20 overflow-hidden flex items-center justify-center select-none shadow-2xl group/player"
         >
           {isLoading && (
             <div className="flex flex-col items-center gap-2.5 text-white/80">
@@ -309,7 +309,7 @@ export function PreviewPlayerModal({
               <p className="text-sm font-semibold text-white/90 mb-4">{errorMsg}</p>
               <button
                 type="button"
-                className="px-4 py-1.5 rounded-md bg-white text-black font-bold text-xs uppercase tracking-wider hover:bg-white/90 active:scale-95 transition-all shadow-sm cursor-pointer"
+                className="px-4 py-1.5 rounded-none bg-white text-black font-bold text-xs uppercase tracking-wider hover:bg-white/90 active:scale-95 transition-all shadow-sm cursor-pointer"
                 onClick={onClose}
               >
                 Close Preview
@@ -347,14 +347,14 @@ export function PreviewPlayerModal({
               <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-3 sm:p-4 text-white">
                 {/* Scrubber Progress Bar */}
                 <div
-                  className="w-full h-1.5 hover:h-2 bg-white/25 rounded-sm cursor-pointer transition-all duration-150 mb-2.5 relative group/bar"
+                  className="w-full h-1.5 hover:h-2 bg-white/25 rounded-none cursor-pointer transition-all duration-150 mb-2.5 relative group/bar"
                   onClick={handleSeek}
                 >
                   <div
-                    className="h-full bg-white rounded-sm transition-all duration-75 relative"
+                    className="h-full bg-white rounded-none transition-all duration-75 relative"
                     style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                   >
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-sm shadow opacity-0 group-hover/bar:opacity-100 transition-opacity" />
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-none shadow opacity-0 group-hover/bar:opacity-100 transition-opacity" />
                   </div>
                 </div>
 
@@ -365,7 +365,7 @@ export function PreviewPlayerModal({
                       type="button"
                       onClick={togglePlay}
                       aria-label={isPlaying ? 'Pause video' : 'Play video'}
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-md sm:rounded-lg bg-white text-black flex items-center justify-center hover:bg-white/90 active:scale-95 transition-all shadow-md cursor-pointer"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-none bg-white text-black flex items-center justify-center hover:bg-white/90 active:scale-95 transition-all shadow-md cursor-pointer"
                     >
                       {isPlaying ? (
                         <Pause className="w-4 h-4 fill-current" />
@@ -378,7 +378,7 @@ export function PreviewPlayerModal({
                       type="button"
                       onClick={toggleMute}
                       aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-none bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer"
                     >
                       {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                     </button>
@@ -393,7 +393,7 @@ export function PreviewPlayerModal({
                       type="button"
                       onClick={changeSpeed}
                       aria-label={`Current speed ${playbackRate}x. Click to change.`}
-                      className="px-2 py-1 rounded-md bg-white/15 hover:bg-white/25 active:scale-95 text-white font-mono text-xs font-bold border border-white/20 transition-all cursor-pointer"
+                      className="px-2 py-1 rounded-none bg-white/15 hover:bg-white/25 active:scale-95 text-white font-mono text-xs font-bold border border-white/20 transition-all cursor-pointer"
                     >
                       {playbackRate}x
                     </button>
@@ -402,7 +402,7 @@ export function PreviewPlayerModal({
                       type="button"
                       onClick={toggleFullscreen}
                       aria-label="Toggle Fullscreen"
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-none bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer"
                     >
                       <Maximize className="w-4 h-4" />
                     </button>
@@ -421,7 +421,7 @@ export function PreviewPlayerModal({
               onClose();
               window.location.href = '/checkout';
             }}
-            className="w-full sm:w-auto min-w-[240px] px-8 py-3.5 sm:px-10 sm:py-4 rounded-md sm:rounded-lg bg-white text-black font-black text-lg sm:text-xl md:text-2xl uppercase tracking-wide shadow-md hover:bg-white/95 active:scale-95 transition-all cursor-pointer leading-none flex items-center justify-center gap-2.5"
+            className="w-full sm:w-auto min-w-[240px] px-8 py-3.5 sm:px-10 sm:py-4 rounded-none bg-white text-black font-black text-lg sm:text-xl md:text-2xl uppercase tracking-wide shadow-md hover:bg-white/95 active:scale-95 transition-all cursor-pointer leading-none flex items-center justify-center gap-2.5"
           >
             <span>ENROLL NOW</span>
             <span className="text-xl sm:text-2xl leading-none">→</span>

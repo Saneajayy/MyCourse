@@ -131,8 +131,8 @@ export default function OrderSuccessPage() {
   if (errorMsg || !order) {
     return (
       <div className="w-full h-screen h-[100dvh] flex flex-col items-center justify-center p-4 bg-white font-reddit">
-        <div className="max-w-md w-full bg-white border border-neutral-200/80 rounded-2xl p-7 sm:p-8 text-neutral-900 space-y-4 text-center shadow-none">
-          <div className="w-12 h-12 rounded-full bg-neutral-100 text-neutral-800 flex items-center justify-center mx-auto">
+        <div className="max-w-md w-full bg-white border border-neutral-200/80 rounded-none p-7 sm:p-8 text-neutral-900 space-y-4 text-center shadow-none">
+          <div className="w-12 h-12 rounded-none bg-neutral-100 text-neutral-800 flex items-center justify-center mx-auto">
             <AlertCircle className="w-6 h-6" />
           </div>
           <div className="space-y-1">
@@ -144,13 +144,13 @@ export default function OrderSuccessPage() {
           <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
             <Link
               href="/my-courses"
-              className="flex-1 inline-flex items-center justify-center h-11 px-5 bg-black text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-neutral-800 transition-colors"
+              className="flex-1 inline-flex items-center justify-center h-11 px-5 bg-black text-white font-bold text-xs uppercase tracking-wider rounded-none hover:bg-neutral-800 transition-colors"
             >
               Go to My Courses
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center h-11 px-5 border border-neutral-300 text-neutral-900 font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-neutral-50 transition-colors"
+              className="inline-flex items-center justify-center h-11 px-5 border border-neutral-300 text-neutral-900 font-bold text-xs uppercase tracking-wider rounded-none hover:bg-neutral-50 transition-colors"
             >
               Contact Support
             </Link>
@@ -198,7 +198,7 @@ export default function OrderSuccessPage() {
         <div className="relative z-10 w-full mb-1 select-none">
           <div className="flex items-end justify-between gap-4">
             <div className="shrink-0">
-              <div className="h-11 flex items-center gap-2 px-4 rounded-md bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-sm font-mono font-bold tracking-wide shadow-md">
+              <div className="h-11 flex items-center gap-2 px-4 rounded-none bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-sm font-mono font-bold tracking-wide shadow-md">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>PAYMENT CONFIRMED</span>
               </div>
@@ -286,7 +286,7 @@ export default function OrderSuccessPage() {
           <div className="relative z-10 w-full">
             <div className="flex items-end justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <div className="h-10 flex items-center gap-1.5 px-3 rounded-md bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs font-mono font-bold tracking-wide">
+                <div className="h-10 flex items-center gap-1.5 px-3 rounded-none bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs font-mono font-bold tracking-wide">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span className="truncate">PAYMENT CONFIRMED</span>
                 </div>

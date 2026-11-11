@@ -65,7 +65,7 @@ export default function RefundPage() {
         {/* Content Container */}
         <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10 relative z-10 flex-1">
           {/* Main Card with border matching separation line, all separation lines touching the box border */}
-          <div className="relative w-full bg-white border border-neutral-200 rounded-xl sm:rounded-2xl select-text overflow-hidden shadow-none">
+          <div className="relative w-full bg-white border border-neutral-200 rounded-none select-text overflow-hidden shadow-none">
             {/* Document Header Section with full-width bottom border */}
             <header className="p-6 sm:p-8 md:p-10 pb-6 sm:pb-8 border-b border-neutral-200">
               <div className="flex items-center gap-2 text-xs font-mono font-medium text-neutral-500 uppercase tracking-widest mb-2.5">
@@ -102,7 +102,7 @@ export default function RefundPage() {
                 <p className="text-neutral-600 leading-relaxed">
                   We want you to be completely confident in the practical, industrial value of this training. If you determine that the course does not meet your engineering expectations, you are eligible for a <strong className="text-neutral-950">100% full refund</strong> within <strong className="text-neutral-950">7 calendar days</strong> of purchase, provided:
                 </p>
-                <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-lg space-y-2 text-xs text-neutral-700">
+                <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-none space-y-2 text-xs text-neutral-700">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-black shrink-0" />
                     <span>Your request is received within 7 calendar days of the payment timestamp.</span>
@@ -130,7 +130,7 @@ export default function RefundPage() {
                   >
                     {siteConfig.supportEmail}
                   </a>{' '}
-                  with the subject line: <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded text-neutral-900">Refund Request - [Your Order ID]</code>.
+                  with the subject line: <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded-none text-neutral-900">Refund Request - [Your Order ID]</code>.
                 </p>
                 <p className="text-xs text-neutral-500">
                   Please include your registered phone number and a short note on how we can improve our curriculum.

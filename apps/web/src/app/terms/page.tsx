@@ -65,7 +65,7 @@ export default function TermsPage() {
         {/* Content Container */}
         <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10 relative z-10 flex-1">
           {/* Main Card with border matching separation line, all separation lines touching the box border */}
-          <div className="relative w-full bg-white border border-neutral-200 rounded-xl sm:rounded-2xl select-text overflow-hidden shadow-none">
+          <div className="relative w-full bg-white border border-neutral-200 rounded-none select-text overflow-hidden shadow-none">
             {/* Document Header Section with full-width bottom border */}
             <header className="p-6 sm:p-8 md:p-10 pb-6 sm:pb-8 border-b border-neutral-200">
               <div className="flex items-center gap-2 text-xs font-mono font-medium text-neutral-500 uppercase tracking-widest mb-2.5">
@@ -113,7 +113,7 @@ export default function TermsPage() {
                 <p className="text-neutral-600 leading-relaxed">
                   All video lectures are dynamically embedded with cryptographic watermarks displaying the enrolled student&apos;s registered email address and session tokens. Screen-recording, ripping, downloading, sharing credentials, or publicly distributing course materials is strictly prohibited and constitutes a copyright violation punishable under the Indian Copyright Act, 1957.
                 </p>
-                <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-lg space-y-2 text-xs text-neutral-700">
+                <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-none space-y-2 text-xs text-neutral-700">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-3.5 h-3.5 text-black shrink-0" />
                     <span>Single-device concurrent streaming is strictly enforced.</span>
@@ -138,7 +138,7 @@ export default function TermsPage() {
                 <h2 className="text-sm sm:text-base font-bold text-neutral-950 flex items-center gap-2">
                   <span className="text-black font-mono font-bold">05.</span> Engineering Safety Protocol
                 </h2>
-                <div className="p-4 sm:p-5 bg-amber-50 border border-amber-200 rounded-lg text-amber-950 space-y-2">
+                <div className="p-4 sm:p-5 bg-amber-50 border border-amber-200 rounded-none text-amber-950 space-y-2">
                   <div className="flex items-center gap-2 font-bold text-amber-900">
                     <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
                     <span className="text-xs uppercase tracking-wider font-bold">Safety Compliance Notice</span>

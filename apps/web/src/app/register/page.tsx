@@ -51,13 +51,13 @@ function RegisterForm() {
   };
 
   return (
-    <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-7 select-none overflow-hidden">
+    <div className="relative w-full bg-white border border-neutral-200/80 rounded-none p-5 sm:p-7 select-none overflow-hidden">
       {/* Card Content */}
       <div className="relative z-10 w-full">
             {/* 1. Continue with Google Button */}
                 <a
                   href={`${siteConfig.urls.api}/api/v1/auth/google`}
-                  className="w-full h-[46px] sm:h-[48px] rounded-lg border border-neutral-300 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-neutral-900 font-semibold text-sm sm:text-[15px] flex items-center justify-center gap-3 transition-colors"
+                  className="w-full h-[46px] sm:h-[48px] rounded-none border border-neutral-300 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-neutral-900 font-semibold text-sm sm:text-[15px] flex items-center justify-center gap-3 transition-colors"
                 >
                   <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                     <path
@@ -82,7 +82,7 @@ function RegisterForm() {
 
                 {/* Error Alert */}
                 {errorMsg && (
-                  <div className="mt-4 p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
+                  <div className="mt-4 p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
                     <span>{errorMsg}</span>
                   </div>
                 )}
@@ -102,7 +102,7 @@ function RegisterForm() {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
+                      className="w-full h-[44px] sm:h-[46px] rounded-none border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
                     />
                   </div>
 
@@ -120,7 +120,7 @@ function RegisterForm() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
+                        className="w-full h-[44px] sm:h-[46px] rounded-none border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
                       />
                       {email.includes('@') && email.length > 4 && (
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-600">
@@ -144,12 +144,12 @@ function RegisterForm() {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
+                        className="w-full h-[44px] sm:h-[46px] rounded-none border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword((prev) => !prev)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors p-1 rounded-md focus:outline-none"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors p-1 rounded-none focus:outline-none"
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                       >
                         {showPassword ? (
@@ -166,7 +166,7 @@ function RegisterForm() {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-none transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
                     >
                       {isLoading && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
                       <span>{isLoading ? 'Creating Account...' : 'Create Account'}</span>

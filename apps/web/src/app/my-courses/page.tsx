@@ -398,7 +398,7 @@ function StudentDashboardContent() {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             aria-expanded={isMobileMenuOpen}
-            className="h-10 w-10 relative flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-colors focus:outline-none cursor-pointer"
+            className="h-10 w-10 relative flex items-center justify-center text-white hover:bg-white/10 rounded-none transition-colors focus:outline-none cursor-pointer"
           >
             <Menu
               className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
@@ -594,7 +594,7 @@ function StudentDashboardContent() {
                     placeholder="Search courses"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-10 px-3.5 bg-white border border-neutral-300 rounded-lg text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:outline-none transition-all shadow-none"
+                    className="w-full h-10 px-3.5 bg-white border border-neutral-300 rounded-none text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:outline-none transition-all shadow-none"
                   />
                   {searchQuery && (
                     <button
@@ -611,7 +611,7 @@ function StudentDashboardContent() {
 
               {/* Error Notice */}
               {coursesError && (
-                <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-semibold flex items-center gap-2">
+                <div className="p-4 rounded-none bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-semibold flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                   <span>{coursesError}</span>
                 </div>
@@ -629,7 +629,7 @@ function StudentDashboardContent() {
                   <div>
                     <Link
                       href="/#pricing"
-                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none"
+                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors shadow-none"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
                       <span>Explore Masterclass</span>
@@ -697,7 +697,7 @@ function StudentDashboardContent() {
                                   {c.product.title}
                                 </Link>
                               </h2>
-                              <span className="px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase text-white bg-[#0e5c2f] rounded shrink-0 select-none">
+                              <span className="px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase text-white bg-[#0e5c2f] rounded-none shrink-0 select-none">
                                 {c.entitlement?.status || 'ACTIVE'}
                               </span>
                             </div>
@@ -739,13 +739,13 @@ function StudentDashboardContent() {
                               <Link
                                 href={`/learn/${c.product.slug}`}
                                 aria-label={percent > 0 ? 'Continue Learning' : 'Start Learning'}
-                                className="h-10 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-medium text-xs sm:text-sm rounded-lg flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
+                                className="h-10 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-medium text-xs sm:text-sm rounded-none flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
                               >
                                 <span>{percent > 0 ? (percent >= 90 ? 'Review Course' : 'Continue Learning') : 'Start Learning'} &rarr;</span>
                               </Link>
                               <Link
                                 href={`/learn/${c.product.slug}`}
-                                className="h-10 px-6 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-900 font-medium text-xs sm:text-sm rounded-lg flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
+                                className="h-10 px-6 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-900 font-medium text-xs sm:text-sm rounded-none flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
                               >
                                 <span>View Syllabus &rarr;</span>
                               </Link>
@@ -784,7 +784,7 @@ function StudentDashboardContent() {
                     <button
                       type="button"
                       onClick={() => handleTabChange('courses')}
-                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none cursor-pointer"
+                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors shadow-none cursor-pointer"
                     >
                       <BookOpen className="w-3.5 h-3.5" />
                       <span>Go to My Courses</span>
@@ -799,7 +799,7 @@ function StudentDashboardContent() {
                       className="bg-white border border-neutral-200 rounded-none p-6 shadow-none space-y-4 text-left"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200">
+                        <div className="w-10 h-10 rounded-none bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200">
                           <CheckCircle2 className="w-5 h-5" />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -812,14 +812,14 @@ function StudentDashboardContent() {
                         </div>
                       </div>
 
-                      <div className="p-3.5 rounded-lg bg-neutral-50 border border-neutral-200 text-xs text-neutral-600 space-y-1">
+                      <div className="p-3.5 rounded-none bg-neutral-50 border border-neutral-200 text-xs text-neutral-600 space-y-1">
                         <p><strong className="text-neutral-900">Credential:</strong> Verified Certificate of Completion</p>
                         <p><strong className="text-neutral-900">Instructor:</strong> {siteConfig.instructor.name}</p>
                       </div>
 
                       <Link
                         href={`/learn/${c.product.slug}`}
-                        className="w-full h-10 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center justify-center gap-2 shadow-none"
+                        className="w-full h-10 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none flex items-center justify-center gap-2 shadow-none"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Download Certificate</span>
@@ -866,7 +866,7 @@ function StudentDashboardContent() {
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           placeholder="Your name"
-                          className="w-full h-11 px-3.5 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
+                          className="w-full h-11 px-3.5 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
                         />
                       </div>
 
@@ -880,7 +880,7 @@ function StudentDashboardContent() {
                           type="email"
                           disabled
                           value={user?.email || ''}
-                          className="w-full h-11 px-3.5 bg-neutral-100 border border-neutral-200 rounded-lg text-sm text-neutral-600 cursor-not-allowed select-none shadow-none disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
+                          className="w-full h-11 px-3.5 bg-neutral-100 border border-neutral-200 rounded-none text-sm text-neutral-600 cursor-not-allowed select-none shadow-none disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
                         />
                         {!user?.emailVerifiedAt && (
                           <div className="flex items-center gap-3 pt-1">
@@ -913,7 +913,7 @@ function StudentDashboardContent() {
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="+91 98765 43210"
-                          className="w-full h-11 px-3.5 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none font-mono"
+                          className="w-full h-11 px-3.5 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none font-mono"
                         />
                       </div>
 
@@ -921,7 +921,7 @@ function StudentDashboardContent() {
                         <button
                           type="submit"
                           disabled={profileSaving}
-                          className="w-full h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-lg transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                          className="w-full h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-none transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                         >
                           {profileSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                           <span>{profileSaving ? 'Saving...' : 'Save Profile'}</span>
@@ -942,7 +942,7 @@ function StudentDashboardContent() {
                   <div className="p-5 sm:p-7">
                     <form onSubmit={handleChangePassword} className="space-y-4 sm:space-y-4.5">
                       {passwordError && (
-                        <div className="p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium">
+                        <div className="p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium">
                           {passwordError}
                         </div>
                       )}
@@ -960,7 +960,7 @@ function StudentDashboardContent() {
                             onChange={(e) => setCurrentPassword(e.target.value)}
                             required
                             placeholder="Your current password"
-                            className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
+                            className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
                           />
                           <button
                             type="button"
@@ -986,7 +986,7 @@ function StudentDashboardContent() {
                             onChange={(e) => setNewPassword(e.target.value)}
                             required
                             placeholder="At least 8 characters"
-                            className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
+                            className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
                           />
                           <button
                             type="button"
@@ -1012,7 +1012,7 @@ function StudentDashboardContent() {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                             placeholder="Repeat new password"
-                            className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
+                            className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
                           />
                           <button
                             type="button"
@@ -1029,7 +1029,7 @@ function StudentDashboardContent() {
                         <button
                           type="submit"
                           disabled={passwordSaving}
-                          className="w-full h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-lg transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                          className="w-full h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-none transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                         >
                           {passwordSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                           <span>{passwordSaving ? 'Updating...' : 'Update Password'}</span>
@@ -1070,7 +1070,7 @@ function StudentDashboardContent() {
                   <div>
                     <Link
                       href="/#pricing"
-                      className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-lg transition-colors shadow-none"
+                      className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-none transition-colors shadow-none"
                     >
                       <Sparkles className="w-4 h-4" />
                       <span>View Courses</span>
@@ -1109,7 +1109,7 @@ function StudentDashboardContent() {
                           {/* Status Badge + Amount */}
                           <div className="flex items-center gap-3">
                             <span
-                              className={`px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase rounded shrink-0 select-none ${
+                              className={`px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase rounded-none shrink-0 select-none ${
                                 ord.status === 'PAID'
                                   ? 'text-white bg-[#0e5c2f]'
                                   : ord.status === 'FAILED'
@@ -1143,7 +1143,7 @@ function StudentDashboardContent() {
                                 href={`${siteConfig.urls.api}/api/v1/invoices/${ord.invoice.id}/download`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="h-10 px-4 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-300 hover:border-neutral-400 font-semibold text-xs sm:text-[13px] rounded-lg transition-colors inline-flex items-center gap-2 shadow-none cursor-pointer"
+                                className="h-10 px-4 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-300 hover:border-neutral-400 font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center gap-2 shadow-none cursor-pointer"
                               >
                                 <Download className="w-3.5 h-3.5 text-neutral-700" />
                                 <span>Download Invoice</span>
@@ -1154,7 +1154,7 @@ function StudentDashboardContent() {
 
                             <Link
                               href={`/learn/${ord.product.slug}`}
-                              className="h-10 px-4 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-xs sm:text-[13px] rounded-lg transition-colors inline-flex items-center gap-1.5 shadow-none"
+                              className="h-10 px-4 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center gap-1.5 shadow-none"
                             >
                               <span>Go to Course</span>
                               <span>&rarr;</span>

@@ -65,7 +65,7 @@ export default function PrivacyPage() {
         {/* Content Container */}
         <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10 relative z-10 flex-1">
           {/* Main Card with border matching separation line, all separation lines touching the box border */}
-          <div className="relative w-full bg-white border border-neutral-200 rounded-xl sm:rounded-2xl select-text overflow-hidden shadow-none">
+          <div className="relative w-full bg-white border border-neutral-200 rounded-none select-text overflow-hidden shadow-none">
             {/* Document Header Section with full-width bottom border */}
             <header className="p-6 sm:p-8 md:p-10 pb-6 sm:pb-8 border-b border-neutral-200">
               <div className="flex items-center gap-2 text-xs font-mono font-medium text-neutral-500 uppercase tracking-widest mb-2.5">
@@ -94,7 +94,7 @@ export default function PrivacyPage() {
                   When you register for an account, enroll in courses, or stream instructional videos, we collect only the information necessary to provide authentication, tax invoicing, and course delivery:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                  <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-lg space-y-1.5 shadow-none">
+                  <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-none space-y-1.5 shadow-none">
                     <div className="flex items-center gap-1.5 text-neutral-950 font-bold text-xs uppercase tracking-wider">
                       <ShieldCheck className="w-3.5 h-3.5 text-black shrink-0" />
                       <span>Account</span>
@@ -104,7 +104,7 @@ export default function PrivacyPage() {
                     </p>
                   </div>
 
-                  <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-lg space-y-1.5 shadow-none">
+                  <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-none space-y-1.5 shadow-none">
                     <div className="flex items-center gap-1.5 text-neutral-950 font-bold text-xs uppercase tracking-wider">
                       <CreditCard className="w-3.5 h-3.5 text-black shrink-0" />
                       <span>Billing &amp; Tax</span>
@@ -114,7 +114,7 @@ export default function PrivacyPage() {
                     </p>
                   </div>
 
-                  <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-lg space-y-1.5 shadow-none">
+                  <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-none space-y-1.5 shadow-none">
                     <div className="flex items-center gap-1.5 text-neutral-950 font-bold text-xs uppercase tracking-wider">
                       <Server className="w-3.5 h-3.5 text-black shrink-0" />
                       <span>Telemetry</span>
@@ -140,7 +140,7 @@ export default function PrivacyPage() {
                   <span className="text-black font-mono font-bold">03.</span> Cookie &amp; Storage Architecture
                 </h2>
                 <p className="text-neutral-600 leading-relaxed">
-                  In strict accordance with enterprise security practices, student session access tokens are maintained in volatile browser memory only and are never exposed to browser <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded text-neutral-900">localStorage</code>. Refresh tokens are secured in encrypted <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded text-neutral-900">httpOnly</code> cookies protected by <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded text-neutral-900">SameSite=Lax</code> policies to completely neutralize Cross-Site Scripting (XSS) risks.
+                  In strict accordance with enterprise security practices, student session access tokens are maintained in volatile browser memory only and are never exposed to browser <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded-none text-neutral-900">localStorage</code>. Refresh tokens are secured in encrypted <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded-none text-neutral-900">httpOnly</code> cookies protected by <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded-none text-neutral-900">SameSite=Lax</code> policies to completely neutralize Cross-Site Scripting (XSS) risks.
                 </p>
               </section>
 

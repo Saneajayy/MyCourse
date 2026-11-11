@@ -62,7 +62,7 @@ export default function OrderFailedPage() {
         <div className="relative z-10 w-full mb-1 select-none">
           <div className="flex items-end justify-between gap-4">
             <div className="shrink-0">
-              <div className="h-11 flex items-center gap-2 px-4 rounded-md bg-rose-500/25 border border-rose-400/50 backdrop-blur-sm text-rose-200 text-sm font-mono font-bold tracking-wide shadow-md">
+              <div className="h-11 flex items-center gap-2 px-4 rounded-none bg-rose-500/25 border border-rose-400/50 backdrop-blur-sm text-rose-200 text-sm font-mono font-bold tracking-wide shadow-md">
                 <X className="w-4 h-4 text-rose-400 shrink-0" />
                 <span>PAYMENT DECLINED</span>
               </div>
@@ -107,7 +107,7 @@ export default function OrderFailedPage() {
             <Link
               href="/checkout"
               aria-label="Close"
-              className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white border border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100 flex items-center justify-center shadow-md transition-all cursor-pointer z-20"
+              className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-9 h-9 sm:w-10 sm:h-10 rounded-none bg-white border border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100 flex items-center justify-center shadow-md transition-all cursor-pointer z-20"
             >
               <X className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>

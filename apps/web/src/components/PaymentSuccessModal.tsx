@@ -58,13 +58,13 @@ export function PaymentSuccessModal({
           type="button"
           onClick={onClose}
           aria-label="Close dialog"
-          className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white border border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100 flex items-center justify-center shadow-md transition-all cursor-pointer z-20"
+          className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-9 h-9 sm:w-10 sm:h-10 rounded-none bg-white border border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100 flex items-center justify-center shadow-md transition-all cursor-pointer z-20"
         >
           <X className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
 
         {status === 'verifying' ? (
-          <div className="bg-white rounded-[24px] sm:rounded-[28px] p-8 sm:p-10 shadow-2xl border border-neutral-100 text-center space-y-4">
+          <div className="bg-white rounded-none p-8 sm:p-10 shadow-2xl border border-neutral-100 text-center space-y-4">
             <Loader2 className="w-12 h-12 animate-spin text-black mx-auto" />
             <h2 className="text-xl sm:text-2xl font-extrabold text-neutral-900 tracking-tight">
               Verifying Payment...

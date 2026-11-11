@@ -117,7 +117,7 @@ export default function ContactPage() {
         {/* Content Container */}
         <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10 relative z-10 flex-1">
           {/* Main Card with border matching separation line, all separation lines touching the box border */}
-          <div className="relative w-full bg-white border border-neutral-200 rounded-xl sm:rounded-2xl select-text overflow-hidden shadow-none">
+          <div className="relative w-full bg-white border border-neutral-200 rounded-none select-text overflow-hidden shadow-none">
             {/* Document Header Section with full-width bottom border */}
             <header className="p-6 sm:p-8 md:p-10 pb-6 sm:pb-8 border-b border-neutral-200">
               <div className="flex items-center gap-2 text-xs font-mono font-medium text-neutral-500 uppercase tracking-widest mb-2.5">
@@ -140,7 +140,7 @@ export default function ContactPage() {
             <div className="p-6 sm:p-8 md:p-10 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Email Card */}
-                <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-lg space-y-1">
+                <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-none space-y-1">
                   <div className="flex items-center gap-2 text-neutral-500 text-xs font-bold uppercase tracking-wider">
                     <Mail className="w-3.5 h-3.5 text-black shrink-0" />
                     <span>Direct Email</span>
@@ -157,7 +157,7 @@ export default function ContactPage() {
                 </div>
 
                 {/* Hours Card */}
-                <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-lg space-y-1">
+                <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-none space-y-1">
                   <div className="flex items-center gap-2 text-neutral-500 text-xs font-bold uppercase tracking-wider">
                     <Clock className="w-3.5 h-3.5 text-black shrink-0" />
                     <span>Desk Hours</span>
@@ -172,7 +172,7 @@ export default function ContactPage() {
               </div>
 
               {/* Office & Phone */}
-              <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-lg space-y-2 text-xs">
+              <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-none space-y-2 text-xs">
                 <div className="flex items-start gap-2 text-neutral-700">
                   <MapPin className="w-3.5 h-3.5 text-black shrink-0 mt-0.5" />
                   <div>
@@ -200,8 +200,8 @@ export default function ContactPage() {
               </div>
 
               {isSent ? (
-                <div className="py-8 text-center space-y-3 bg-neutral-50 border border-neutral-200 rounded-xl p-6">
-                  <div className="w-10 h-10 bg-black text-white rounded-full inline-flex items-center justify-center">
+                <div className="py-8 text-center space-y-3 bg-neutral-50 border border-neutral-200 rounded-none p-6">
+                  <div className="w-10 h-10 bg-black text-white rounded-none inline-flex items-center justify-center">
                     <CheckCircle2 className="w-5 h-5" />
                   </div>
                   <h3 className="text-base sm:text-lg font-bold text-neutral-950 tracking-tight">
@@ -220,7 +220,7 @@ export default function ContactPage() {
                         setSubject('');
                         setMessage('');
                       }}
-                      className="inline-flex items-center justify-center h-9 px-4 bg-black hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors cursor-pointer"
+                      className="inline-flex items-center justify-center h-9 px-4 bg-black hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors cursor-pointer"
                     >
                       Send Another Message
                     </button>
@@ -242,7 +242,7 @@ export default function ContactPage() {
                   </div>
 
                   {errorMessage && (
-                    <div className="p-3 border border-rose-300 bg-rose-50 text-rose-900 text-xs font-semibold rounded-lg flex items-center gap-2">
+                    <div className="p-3 border border-rose-300 bg-rose-50 text-rose-900 text-xs font-semibold rounded-none flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                       <span>{errorMessage}</span>
                     </div>
@@ -259,7 +259,7 @@ export default function ContactPage() {
                         placeholder="e.g. Ramesh Kumar"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full h-10 px-3 bg-neutral-50 border border-neutral-300 focus:border-black rounded-lg text-neutral-900 text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400"
+                        className="w-full h-10 px-3 bg-neutral-50 border border-neutral-300 focus:border-black rounded-none text-neutral-900 text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400"
                       />
                     </div>
 
@@ -273,7 +273,7 @@ export default function ContactPage() {
                         placeholder="engineer@plant.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full h-10 px-3 bg-neutral-50 border border-neutral-300 focus:border-black rounded-lg text-neutral-900 text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400"
+                        className="w-full h-10 px-3 bg-neutral-50 border border-neutral-300 focus:border-black rounded-none text-neutral-900 text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400"
                       />
                     </div>
                   </div>
@@ -288,7 +288,7 @@ export default function ContactPage() {
                       placeholder="e.g. Corporate enrollment for 10 engineers"
                       value={subject}
                       onChange={(e) => setSubject(e.target.value)}
-                      className="w-full h-10 px-3 bg-neutral-50 border border-neutral-300 focus:border-black rounded-lg text-neutral-900 text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400"
+                      className="w-full h-10 px-3 bg-neutral-50 border border-neutral-300 focus:border-black rounded-none text-neutral-900 text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400"
                     />
                   </div>
 
@@ -302,7 +302,7 @@ export default function ContactPage() {
                       placeholder="Please describe your question or requirements in detail..."
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      className="w-full p-3 bg-neutral-50 border border-neutral-300 focus:border-black rounded-lg text-neutral-900 text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400 resize-none"
+                      className="w-full p-3 bg-neutral-50 border border-neutral-300 focus:border-black rounded-none text-neutral-900 text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400 resize-none"
                     />
                   </div>
 
@@ -310,7 +310,7 @@ export default function ContactPage() {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full h-11 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                      className="w-full h-11 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                     >
                       {isLoading ? (
                         <>

@@ -226,7 +226,7 @@ export function PaymentSuccessCard({
     : '365 Days Access';
 
   return (
-    <div className="relative w-full max-w-[420px] sm:max-w-[440px] mx-auto bg-white rounded-2xl sm:rounded-[24px] p-6 sm:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-neutral-100 select-none font-reddit text-left space-y-4">
+    <div className="relative w-full max-w-[420px] sm:max-w-[440px] mx-auto bg-white rounded-none p-6 sm:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-neutral-100 select-none font-reddit text-left space-y-4">
       {/* 1. Header: Blue Circle with White Tick Above Title + Confetti Burst from Behind */}
       <div className="flex flex-col items-center text-center space-y-3 pb-1">
         {/* Circle with Confetti Burst */}
@@ -235,7 +235,7 @@ export function PaymentSuccessCard({
           <ConfettiBurst />
 
           {/* Blue Circle with White Tick */}
-          <div className="relative z-10 w-12 h-12 rounded-full bg-black text-white flex items-center justify-center shrink-0">
+          <div className="relative z-10 w-12 h-12 rounded-none bg-black text-white flex items-center justify-center shrink-0">
             <svg
               className="w-6 h-6"
               viewBox="0 0 24 24"
@@ -304,7 +304,7 @@ export function PaymentSuccessCard({
         {/* Primary CTA */}
         <Link
           href={`/learn/${data.courseSlug || 'hydraulic-engineering-mastery'}`}
-          className="w-full h-12 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-sm sm:text-[15px] rounded-xl shadow-sm hover:shadow transition-all flex items-center justify-center cursor-pointer tracking-wide"
+          className="w-full h-12 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-sm sm:text-[15px] rounded-none shadow-sm hover:shadow transition-all flex items-center justify-center cursor-pointer tracking-wide"
         >
           <span>Start learning</span>
         </Link>
@@ -315,7 +315,7 @@ export function PaymentSuccessCard({
             type="button"
             onClick={onDownloadInvoice}
             disabled={downloadingInvoice}
-            className="w-full h-12 border border-black bg-white hover:bg-neutral-100 text-black font-bold text-sm sm:text-[15px] rounded-xl transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center text-center"
+            className="w-full h-12 border border-black bg-white hover:bg-neutral-100 text-black font-bold text-sm sm:text-[15px] rounded-none transition-all cursor-pointer disabled:opacity-60 flex items-center justify-center text-center"
           >
             {downloadingInvoice ? 'Downloading Receipt...' : 'Download Receipt'}
           </button>

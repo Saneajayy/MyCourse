@@ -215,7 +215,7 @@ function VerifyEmailForm() {
   const isComplete = digits.every((d) => d.length === 1);
 
   return (
-    <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-8 select-none overflow-hidden">
+    <div className="relative w-full bg-white border border-neutral-200/80 rounded-none p-5 sm:p-8 select-none overflow-hidden">
       <div className="w-full">
         {/* Header & Title - Sizing & Placing identical to login, signup, and forgot pwd */}
         <div className="text-center mb-6">
@@ -231,13 +231,13 @@ function VerifyEmailForm() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@example.com"
-                  className="bg-neutral-50 border border-neutral-300 rounded px-2.5 py-1 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-black text-center font-normal"
+                  className="bg-neutral-50 border border-neutral-300 rounded-none px-2.5 py-1 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-black text-center font-normal"
                   autoFocus
                 />
                 <button
                   type="button"
                   onClick={() => setIsEditingEmail(false)}
-                  className="text-xs font-bold text-white bg-black hover:bg-[#262626] px-2.5 py-1 rounded transition-colors cursor-pointer"
+                  className="text-xs font-bold text-white bg-black hover:bg-[#262626] px-2.5 py-1 rounded-none transition-colors cursor-pointer"
                 >
                   Save
                 </button>
@@ -258,14 +258,14 @@ function VerifyEmailForm() {
 
         {/* Info/Success message */}
         {infoMessage && (
-          <div className="mb-4 p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 text-xs sm:text-[13px] font-medium text-center">
+          <div className="mb-4 p-3.5 rounded-none bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 text-xs sm:text-[13px] font-medium text-center">
             <span>{infoMessage}</span>
           </div>
         )}
 
         {/* Error message */}
         {errorMessage && (
-          <div className="mb-4 p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
+          <div className="mb-4 p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
             <span>{errorMessage}</span>
           </div>
         )}
@@ -289,7 +289,7 @@ function VerifyEmailForm() {
                 onChange={(e) => handleDigitChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 disabled={status === 'verifying' || status === 'success'}
-                className="w-[38px] h-[44px] sm:w-[42px] sm:h-[48px] text-center text-xl sm:text-2xl font-bold text-neutral-900 bg-white border border-neutral-300 focus:border-black focus:ring-1 focus:ring-black caret-black rounded-[4px] focus:outline-none transition-all disabled:opacity-50 select-none"
+                className="w-[38px] h-[44px] sm:w-[42px] sm:h-[48px] text-center text-xl sm:text-2xl font-bold text-neutral-900 bg-white border border-neutral-300 focus:border-black focus:ring-1 focus:ring-black caret-black rounded-none focus:outline-none transition-all disabled:opacity-50 select-none"
                 aria-label={`Digit ${index + 1}`}
               />
             ))}
@@ -300,7 +300,7 @@ function VerifyEmailForm() {
             <button
               type="submit"
               disabled={!isComplete || status === 'verifying' || status === 'success'}
-              className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-none transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {status === 'verifying' ? (
                 <>

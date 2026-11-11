@@ -71,13 +71,13 @@ function LoginForm() {
   const [showRemindHint, setShowRemindHint] = useState(false);
 
   return (
-    <div className="relative w-full bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-5 sm:p-8 select-none overflow-hidden">
+    <div className="relative w-full bg-white border border-neutral-200/80 rounded-none p-5 sm:p-8 select-none overflow-hidden">
       {/* Card Content */}
       <div className="relative z-10 w-full">
         {/* 1. Continue with Google Button */}
         <a
           href={`${siteConfig.urls.api}/api/v1/auth/google`}
-          className="w-full h-[46px] sm:h-[48px] rounded-lg border border-neutral-300 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-neutral-900 font-semibold text-sm sm:text-[15px] flex items-center justify-center gap-3 transition-colors"
+          className="w-full h-[46px] sm:h-[48px] rounded-none border border-neutral-300 hover:border-neutral-400 bg-white hover:bg-neutral-50 text-neutral-900 font-semibold text-sm sm:text-[15px] flex items-center justify-center gap-3 transition-colors"
         >
           <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -102,7 +102,7 @@ function LoginForm() {
 
         {/* Success Notification Alert */}
         {searchParams.get('message') === 'password-changed' && !errorMsg && (
-          <div className="mt-4 p-3.5 rounded-lg border border-emerald-300 bg-emerald-50/95 text-emerald-950 text-xs">
+          <div className="mt-4 p-3.5 rounded-none border border-emerald-300 bg-emerald-50/95 text-emerald-950 text-xs">
             <div className="flex items-center gap-2 font-medium">
               <Check className="w-4 h-4 text-emerald-600 shrink-0 stroke-[2.5]" />
               <span>Password updated successfully. Please sign in with your new password.</span>
@@ -112,7 +112,7 @@ function LoginForm() {
 
         {/* Session Expired Alert */}
         {searchParams.get('message') === 'session-expired' && !errorMsg && (
-          <div className="mt-4 p-3.5 rounded-lg border border-amber-300 bg-amber-50/95 text-amber-950 text-xs">
+          <div className="mt-4 p-3.5 rounded-none border border-amber-300 bg-amber-50/95 text-amber-950 text-xs">
             <div className="flex items-center gap-2 font-medium">
               <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
               <span>Your session has expired. Please sign in again to continue.</span>
@@ -122,7 +122,7 @@ function LoginForm() {
 
         {/* Error Alert */}
         {errorMsg && (
-          <div className="mt-4 p-3.5 rounded-lg bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
+          <div className="mt-4 p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
             <span>{errorMsg}</span>
           </div>
         )}
@@ -144,7 +144,7 @@ function LoginForm() {
               </button>
             </div>
             {showRemindHint && (
-              <p className="text-xs text-neutral-600 bg-neutral-100 p-2 rounded-md">
+              <p className="text-xs text-neutral-600 bg-neutral-100 p-2 rounded-none">
                 Your username is the registered email you used during enrollment.
               </p>
             )}
@@ -157,7 +157,7 @@ function LoginForm() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
+                className="w-full h-[44px] sm:h-[46px] rounded-none border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
               />
               {email.includes('@') && email.length > 4 && (
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-600">
@@ -189,12 +189,12 @@ function LoginForm() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-[44px] sm:h-[46px] rounded-lg border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
+                className="w-full h-[44px] sm:h-[46px] rounded-none border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors p-1 rounded-md focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors p-1 rounded-none focus:outline-none"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
@@ -211,7 +211,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-lg transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-none transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
             >
               {isLoading && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
               <span>{isLoading ? 'Signing in...' : 'Sign in'}</span>
