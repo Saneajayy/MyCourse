@@ -345,9 +345,9 @@ function StudentDashboardContent() {
     );
   }, [courses, searchQuery]);
 
-  // Completed courses
+  // Completed courses eligible for certificate (unlocks at >= 90%)
   const completedCourses = useMemo(() => {
-    return courses.filter((c) => (c.progress?.percentComplete ?? 0) >= 100);
+    return courses.filter((c) => (c.progress?.percentComplete ?? 0) >= 90);
   }, [courses]);
 
   if (authLoading || (coursesLoading && courses.length === 0)) {
@@ -728,9 +728,9 @@ function StudentDashboardContent() {
 
                             {/* Dynamic Certificate Unlock Notice */}
                             <p className="font-bold text-neutral-900 text-xs sm:text-[13px] select-none mt-2">
-                              {percent >= 100
-                                ? 'Course completed. Certificate unlocked!'
-                                : 'Complete course to unlock certificate.'}
+                              {percent >= 90
+                                ? 'Certificate unlocked!'
+                                : 'Complete 90% to unlock certificate.'}
                             </p>
 
                             {/* Action Buttons */}
@@ -740,7 +740,7 @@ function StudentDashboardContent() {
                                 aria-label={percent > 0 ? 'Continue Learning' : 'Start Learning'}
                                 className="h-10 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-medium text-xs sm:text-sm rounded-lg flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
                               >
-                                <span>{percent > 0 ? (percent >= 100 ? 'Review Course' : 'Continue Learning') : 'Start Learning'} &rarr;</span>
+                                <span>{percent > 0 ? (percent >= 90 ? 'Review Course' : 'Continue Learning') : 'Start Learning'} &rarr;</span>
                               </Link>
                               <Link
                                 href={`/learn/${c.product.slug}`}
@@ -776,7 +776,7 @@ function StudentDashboardContent() {
                   <div className="space-y-1">
                     <h2 className="text-lg font-bold text-neutral-900 uppercase">NO CERTIFICATES EARNED YET.</h2>
                     <p className="text-xs text-neutral-500 leading-relaxed">
-                      Complete all lesson modules and practical evaluations in your enrolled courses to automatically unlock your verified certificate.
+                      Complete at least 90% of course content in your enrolled courses to automatically unlock your verified certificate.
                     </p>
                   </div>
                   <div>
@@ -803,7 +803,7 @@ function StudentDashboardContent() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 block">
-                            Course Completed
+                            Certificate Unlocked
                           </span>
                           <h2 className="text-base font-bold text-neutral-900 truncate">
                             {c.product.title}
