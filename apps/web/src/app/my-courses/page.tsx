@@ -92,7 +92,7 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
 
   return (
     <div
-      className="w-full flex items-center h-5 select-none my-2.5 overflow-hidden"
+      className="w-full flex items-center h-5 select-none mt-1 mb-2.5 overflow-hidden"
       aria-label={`Course progress: ${clamped}%`}
       role="progressbar"
       aria-valuenow={clamped}
@@ -701,20 +701,21 @@ function StudentDashboardContent() {
                             </p>
                           </div>
 
-                          <div className="mt-4 sm:mt-5">
-                            {/* Course Metadata: Total Videos & Total Hours of Content */}
-                            <div className="flex items-center gap-2.5 text-xs text-neutral-500 font-medium mb-2 select-none">
-                              <span className="inline-flex items-center gap-1.5">
-                                <Video className="w-3.5 h-3.5 text-neutral-400" />
-                                <span>{totalVideos} Videos</span>
-                              </span>
-                              <span className="text-neutral-300">•</span>
-                              <span className="inline-flex items-center gap-1.5">
-                                <Clock className="w-3.5 h-3.5 text-neutral-400" />
-                                <span>{durationText}</span>
-                              </span>
-                            </div>
+                          {/* 2. Course Metadata: Total Videos & Total Hours of Content (Centered evenly between Description and Progress Bar) */}
+                          <div className="flex items-center gap-2.5 text-xs text-neutral-500 font-medium select-none py-1">
+                            <span className="inline-flex items-center gap-1.5">
+                              <Video className="w-3.5 h-3.5 text-neutral-400" />
+                              <span>{totalVideos} Videos</span>
+                            </span>
+                            <span className="text-neutral-300">•</span>
+                            <span className="inline-flex items-center gap-1.5">
+                              <Clock className="w-3.5 h-3.5 text-neutral-400" />
+                              <span>{durationText}</span>
+                            </span>
+                          </div>
 
+                          {/* 3. Progress Bar, Certificate Unlock Notice & Action Buttons */}
+                          <div>
                             {/* Barcode / Hatch Progress Bar with dynamic percentage */}
                             <CloseBarsProgressBar percent={percent} />
 
