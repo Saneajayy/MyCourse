@@ -21,6 +21,8 @@ export const siteConfig = {
       'Hydraulic engineer with over 20 years of field experience in industrial plants, hydraulic systems, and circuit design. Teaches practical engineering and troubleshooting on YouTube (70k subscribers).',
     youtubeUrl:
       process.env.NEXT_PUBLIC_YOUTUBE_URL || 'https://www.youtube.com/@HYDRAULICSYSTEMbasics',
+    linkedinUrl:
+      process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linkedin.com',
   },
 
   // Official support email
