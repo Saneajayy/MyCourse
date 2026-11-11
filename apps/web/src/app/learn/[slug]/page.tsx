@@ -551,17 +551,19 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         <aside
           className="order-2 md:order-1 w-full md:w-72 lg:w-80 md:h-full border-t md:border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col shrink-0 md:overflow-hidden relative select-none shadow-none"
         >
-          {/* Embedded Background Graphic matching Dashboard Column (Subtle low opacity, shifted to right) */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-            <Image
-              src="/login-pixelated.png"
-              alt="Hydraulic System Graphic"
-              fill
-              sizes="340px"
-              priority
-              style={{ objectPosition: '60% center' }}
-              className="object-cover mix-blend-screen opacity-[0.06] select-none"
-            />
+          {/* Embedded Background Graphic matching Dashboard Column (Shifted to the right side of the column) */}
+          <div className="absolute inset-y-0 -left-16 right-0 pointer-events-none overflow-hidden select-none">
+            <div className="absolute inset-0 translate-x-16 sm:translate-x-24">
+              <Image
+                src="/login-pixelated.png"
+                alt="Hydraulic System Graphic"
+                fill
+                sizes="340px"
+                priority
+                style={{ objectPosition: '0% center' }}
+                className="object-cover mix-blend-screen opacity-[0.07] select-none"
+              />
+            </div>
           </div>
 
           {/* Syllabus Header: Matches Dashboard's Top Sidebar Header with Bottom Dividing Line */}
