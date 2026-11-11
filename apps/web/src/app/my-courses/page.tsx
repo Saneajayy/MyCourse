@@ -619,7 +619,7 @@ function StudentDashboardContent() {
 
               {/* Empty State: No Courses Enrolled */}
               {courses.length === 0 && !coursesError && (
-                <div className="bg-white border border-neutral-200 rounded-xl p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
+                <div className="bg-white border border-neutral-200 rounded-none p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
                   <div className="space-y-1">
                     <h2 className="text-lg font-bold text-neutral-900 uppercase">NO ACTIVE COURSES.</h2>
                     <p className="text-xs text-neutral-500 leading-relaxed">
@@ -640,7 +640,7 @@ function StudentDashboardContent() {
 
               {/* Empty Search Filter State */}
               {courses.length > 0 && filteredCourses.length === 0 && (
-                <div className="bg-white border border-neutral-200 rounded-xl p-6 text-left space-y-2 shadow-none max-w-md">
+                <div className="bg-white border border-neutral-200 rounded-none p-6 text-left space-y-2 shadow-none max-w-md">
                   <p className="text-sm font-bold text-neutral-800">
                     No courses match &ldquo;{searchQuery}&rdquo;
                   </p>
@@ -666,10 +666,10 @@ function StudentDashboardContent() {
                     return (
                       <div
                         key={c.product.id}
-                        className="w-full max-w-4xl bg-white border border-neutral-300 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 shadow-none select-none"
+                        className="w-full max-w-4xl bg-white border border-neutral-300 rounded-none p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 shadow-none select-none"
                       >
                         {/* Course Thumbnail Image: Desaturated Halftone Dot Effect */}
-                        <div className="relative w-full md:w-[320px] lg:w-[360px] shrink-0 aspect-[16/10] rounded-xl overflow-hidden bg-black border border-neutral-200">
+                        <div className="relative w-full md:w-[320px] lg:w-[360px] shrink-0 aspect-[16/10] rounded-none overflow-hidden bg-black border border-neutral-200">
                           <img
                             src={
                               c.product.thumbnailUrl && !c.product.thumbnailUrl.includes('unsplash')
@@ -773,7 +773,7 @@ function StudentDashboardContent() {
               </div>
 
               {completedCourses.length === 0 ? (
-                <div className="bg-white border border-neutral-200 rounded-xl p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
+                <div className="bg-white border border-neutral-200 rounded-none p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
                   <div className="space-y-1">
                     <h2 className="text-lg font-bold text-neutral-900 uppercase">NO CERTIFICATES EARNED YET.</h2>
                     <p className="text-xs text-neutral-500 leading-relaxed">
@@ -796,7 +796,7 @@ function StudentDashboardContent() {
                   {completedCourses.map((c) => (
                     <div
                       key={c.product.id}
-                      className="bg-white border border-neutral-200 rounded-xl p-6 shadow-none space-y-4 text-left"
+                      className="bg-white border border-neutral-200 rounded-none p-6 shadow-none space-y-4 text-left"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200">
@@ -846,7 +846,7 @@ function StudentDashboardContent() {
               {/* 2-Column Responsive Grid: Profile on Left, Password on Right (Compact horizontal width on desktop) */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 items-start w-full max-w-md lg:max-w-[720px]">
                 {/* Personal Details Card (Left) */}
-                <div className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl overflow-hidden shadow-none text-left w-full lg:max-w-[345px]">
+                <div className="bg-white border border-neutral-200/80 rounded-none overflow-hidden shadow-none text-left w-full lg:max-w-[345px]">
                   {/* Header with border joining outer outline */}
                   <div className="px-5 sm:px-7 py-4 sm:py-4.5 border-b border-neutral-200 flex items-center gap-2.5">
                     <UserIcon className="w-4 h-4 text-neutral-900" />
@@ -932,7 +932,7 @@ function StudentDashboardContent() {
                 </div>
 
                 {/* Change Password Card (Right) */}
-                <div className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl overflow-hidden shadow-none text-left w-full lg:max-w-[345px]">
+                <div className="bg-white border border-neutral-200/80 rounded-none overflow-hidden shadow-none text-left w-full lg:max-w-[345px]">
                   {/* Header with border joining outer outline */}
                   <div className="px-5 sm:px-7 py-4 sm:py-4.5 border-b border-neutral-200 flex items-center gap-2.5">
                     <Lock className="w-4 h-4 text-neutral-900" />
@@ -1055,12 +1055,12 @@ function StudentDashboardContent() {
               </div>
 
               {ordersLoading ? (
-                <div className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-10 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-none max-w-xl">
+                <div className="bg-white border border-neutral-200/80 rounded-none p-10 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-none max-w-xl">
                   <Loader2 className="w-5 h-5 animate-spin text-black" />
                   <span>Loading payment orders...</span>
                 </div>
               ) : orders.length === 0 ? (
-                <div className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-7 sm:p-9 text-left space-y-4 max-w-md shadow-none">
+                <div className="bg-white border border-neutral-200/80 rounded-none p-7 sm:p-9 text-left space-y-4 max-w-md shadow-none">
                   <div className="space-y-1.5">
                     <h2 className="text-lg font-bold text-neutral-900">No payment history yet</h2>
                     <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
@@ -1087,7 +1087,7 @@ function StudentDashboardContent() {
                     return (
                       <div
                         key={ord.id}
-                        className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl overflow-hidden select-none shadow-none text-left"
+                        className="bg-white border border-neutral-200/80 rounded-none overflow-hidden select-none shadow-none text-left"
                       >
                         {/* 1. Header Bar: Order reference, date, status, and total amount */}
                         <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-neutral-200 flex flex-wrap items-center justify-between gap-3 bg-neutral-50/50">

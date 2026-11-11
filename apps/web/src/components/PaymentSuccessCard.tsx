@@ -266,7 +266,7 @@ export function PaymentSuccessCard({
 
       {/* 2. Combined Course & Price Block with Blue Boundary (Order Summary text removed) */}
       <div className="pt-0.5">
-        <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl border border-black">
+        <div className="flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-none border border-black">
           {/* Left: Course Name & Validity */}
           <div className="min-w-0 flex-1 space-y-0.5">
             <span className="font-bold text-neutral-900 text-sm sm:text-base block truncate">
