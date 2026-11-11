@@ -1041,89 +1041,130 @@ function StudentDashboardContent() {
               </div>
 
               {ordersLoading ? (
-                <div className="bg-white border border-neutral-200 rounded-xl p-10 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-none">
+                <div className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-10 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-none max-w-xl">
                   <Loader2 className="w-5 h-5 animate-spin text-black" />
                   <span>Loading payment orders...</span>
                 </div>
               ) : orders.length === 0 ? (
-                <div className="bg-white border border-neutral-200 rounded-xl p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
-                  <div className="space-y-1">
-                    <h2 className="text-lg font-bold text-neutral-900 uppercase">NO PREVIOUS ORDERS.</h2>
-                    <p className="text-xs text-neutral-500 leading-relaxed">
-                      You haven&apos;t made any course purchases yet.
+                <div className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl p-7 sm:p-9 text-left space-y-4 max-w-md shadow-none">
+                  <div className="space-y-1.5">
+                    <h2 className="text-lg font-bold text-neutral-900">No payment history yet</h2>
+                    <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
+                      Once you enroll in a course, your official GST tax invoices and payment receipts will appear here.
                     </p>
                   </div>
                   <div>
                     <Link
                       href="/#pricing"
-                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors shadow-none"
+                      className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-lg transition-colors shadow-none"
                     >
-                      <Sparkles className="w-3.5 h-3.5" />
+                      <Sparkles className="w-4 h-4" />
                       <span>View Courses</span>
                     </Link>
                   </div>
                 </div>
               ) : (
-                <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-none max-w-4xl text-left">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs sm:text-sm border-collapse">
-                      <thead className="bg-neutral-50 text-neutral-600 uppercase font-bold text-[11px] border-b border-neutral-200">
-                        <tr>
-                          <th className="py-3.5 px-4">Order ID</th>
-                          <th className="py-3.5 px-4">Date</th>
-                          <th className="py-3.5 px-4">Course</th>
-                          <th className="py-3.5 px-4">Amount</th>
-                          <th className="py-3.5 px-4">Status</th>
-                          <th className="py-3.5 px-4 text-right">Invoice</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-neutral-200">
-                        {orders.map((ord) => (
-                          <tr key={ord.id} className="hover:bg-neutral-50 transition-colors">
-                            <td className="py-3.5 px-4 font-mono font-bold text-neutral-900">
+                <div className="space-y-4 max-w-3xl text-left">
+                  {orders.map((ord) => {
+                    const amountFormatted = (
+                      ((ord.totalPaise ?? ord.amountPaise ?? ord.invoice?.totalPaise ?? ord.payments?.[0]?.amountPaise ?? 0)) / 100
+                    ).toLocaleString('en-IN');
+
+                    return (
+                      <div
+                        key={ord.id}
+                        className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl overflow-hidden select-none shadow-none text-left"
+                      >
+                        {/* 1. Header Bar: Order reference, date, status, and total amount */}
+                        <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-neutral-200 flex flex-wrap items-center justify-between gap-3 bg-neutral-50/50">
+                          {/* Order ID & Date */}
+                          <div className="flex items-center gap-2 sm:gap-2.5 text-xs sm:text-[13px]">
+                            <span className="font-mono font-bold text-neutral-900 tracking-tight">
                               {formatDisplayOrderId(ord.orderNumber || ord.id)}
-                            </td>
-                            <td className="py-3.5 px-4 font-mono text-neutral-600">
-                              {new Date(ord.createdAt).toLocaleDateString('en-IN')}
-                            </td>
-                            <td className="py-3.5 px-4 font-bold text-neutral-900">
-                              {ord.product.title}
-                            </td>
-                            <td className="py-3.5 px-4 font-mono font-bold text-neutral-900">
-                              ₹{(((ord.totalPaise ?? ord.amountPaise ?? ord.invoice?.totalPaise ?? ord.payments?.[0]?.amountPaise ?? 0)) / 100).toLocaleString('en-IN')}
-                            </td>
-                            <td className="py-3.5 px-4">
-                              <span
-                                className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded ${ord.status === 'PAID'
-                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            </span>
+                            <span className="text-neutral-300">•</span>
+                            <span className="text-neutral-500 font-medium">
+                              {new Date(ord.createdAt).toLocaleDateString('en-IN', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                              })}
+                            </span>
+                          </div>
+
+                          {/* Status Badge + Amount */}
+                          <div className="flex items-center gap-3">
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                                ord.status === 'PAID'
+                                  ? 'bg-[#0e5c2f]/10 text-[#0e5c2f]'
                                   : ord.status === 'FAILED'
-                                    ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                                    : 'bg-neutral-100 text-neutral-700 border border-neutral-200'
-                                  }`}
-                              >
-                                {ord.status}
+                                    ? 'bg-rose-50 text-rose-700'
+                                    : 'bg-neutral-100 text-neutral-700'
+                              }`}
+                            >
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full ${
+                                  ord.status === 'PAID'
+                                    ? 'bg-[#0e5c2f]'
+                                    : ord.status === 'FAILED'
+                                      ? 'bg-rose-600'
+                                      : 'bg-neutral-500'
+                                }`}
+                              />
+                              <span>{ord.status === 'PAID' ? 'Paid' : ord.status}</span>
+                            </span>
+                            <span className="font-mono font-bold text-sm sm:text-base text-neutral-900">
+                              ₹{amountFormatted}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* 2. Card Body: Course information and direct action buttons */}
+                        <div className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                          <div className="space-y-1 min-w-0">
+                            <h2 className="text-base sm:text-lg font-bold text-neutral-900 truncate">
+                              {ord.product.title}
+                            </h2>
+                            <p className="text-xs text-neutral-500 flex flex-wrap items-center gap-2">
+                              <span>Full Lifetime Access</span>
+                              <span className="text-neutral-300">•</span>
+                              <span>
+                                {ord.invoice?.invoiceNumber
+                                  ? `Tax Invoice #${ord.invoice.invoiceNumber}`
+                                  : 'Official GST Invoice Included'}
                               </span>
-                            </td>
-                            <td className="py-3.5 px-4 text-right">
-                              {ord.invoice ? (
-                                <a
-                                  href={`${siteConfig.urls.api}/api/v1/invoices/${ord.invoice.id}/download`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-xs font-bold py-1.5 px-3 bg-black hover:bg-[#262626] text-white rounded-md transition-colors inline-flex items-center gap-1.5 shadow-none"
-                                >
-                                  <Download className="w-3.5 h-3.5" />
-                                  <span>PDF</span>
-                                </a>
-                              ) : (
-                                <span className="text-neutral-400 font-mono text-xs">—</span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                            </p>
+                          </div>
+
+                          {/* Actions: Download Invoice & Access Course */}
+                          <div className="flex flex-wrap items-center gap-2.5 shrink-0 pt-1 sm:pt-0">
+                            {ord.invoice ? (
+                              <a
+                                href={`${siteConfig.urls.api}/api/v1/invoices/${ord.invoice.id}/download`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="h-10 px-4 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-300 hover:border-neutral-400 font-semibold text-xs sm:text-[13px] rounded-lg transition-colors inline-flex items-center gap-2 shadow-none cursor-pointer"
+                              >
+                                <Download className="w-3.5 h-3.5 text-neutral-700" />
+                                <span>Download Invoice</span>
+                              </a>
+                            ) : (
+                              <span className="text-xs text-neutral-400 font-medium">Invoice generating...</span>
+                            )}
+
+                            <Link
+                              href={`/learn/${ord.product.slug}`}
+                              className="h-10 px-4 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-xs sm:text-[13px] rounded-lg transition-colors inline-flex items-center gap-1.5 shadow-none"
+                            >
+                              <span>Go to Course</span>
+                              <span>&rarr;</span>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
