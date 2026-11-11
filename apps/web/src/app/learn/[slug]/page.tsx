@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback, use } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type Hls from 'hls.js';
@@ -514,7 +515,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
   return (
     <div className="fixed inset-0 z-20 flex flex-col bg-black overflow-hidden font-reddit select-none text-white">
       {/* Top Header Bar: Glassy navbar matching home page (figma-glass-nav) */}
-      <header className="h-16 md:h-20 w-full figma-glass-nav px-6 sm:px-8 flex items-stretch justify-between shrink-0 z-30 select-none">
+      <header className="h-16 md:h-20 w-full figma-glass-nav px-6 sm:px-8 flex items-stretch justify-between shrink-0 z-30 select-none border-b border-white/50">
         {/* Left: HYDRO BASICS Logo */}
         <div className="flex items-center gap-6 sm:gap-8">
           <Link
@@ -522,10 +523,10 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             className="flex flex-col justify-center -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity shrink-0"
             aria-label="HYDRO BASICS Home"
           >
-            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
               HYDRO
             </span>
-            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
               BASICS
             </span>
           </Link>
@@ -535,7 +536,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         <div className="flex items-stretch">
           <Link
             href="/my-courses"
-            className="figma-glass-divider border-r border-white/20 h-full flex items-center justify-center px-4 sm:px-6 text-white/90 hover:text-white hover:bg-white/10 transition-colors font-semibold text-xs sm:text-sm uppercase tracking-wider"
+            className="figma-glass-divider border-l border-r border-white/50 h-full flex items-center justify-center px-4 sm:px-6 text-white/90 hover:text-white hover:bg-white/10 transition-colors font-semibold text-xs sm:text-sm uppercase tracking-wider"
           >
             <span>← My Courses</span>
           </Link>
@@ -544,22 +545,35 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
       {/* Main Split Layout: On mobile, flows vertically with video sticky on top -> details -> modules */}
       <div className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden min-h-0 bg-black">
-        {/* SYLLABUS & MODULES: On mobile: order-2 (placed below video & details). On desktop: order-1 (left column) */}
+        {/* SYLLABUS & MODULES: Left Column matching Dashboard Left Sidebar (Size, Font, Design, Embedded Image) */}
         <aside
-          className="order-2 md:order-1 w-full md:w-80 lg:w-[340px] xl:w-[380px] md:h-full border-t md:border-t-0 md:border-r border-white/20 bg-black flex flex-col shrink-0 md:overflow-hidden"
+          className="order-2 md:order-1 w-full md:w-64 lg:w-72 md:h-full border-t md:border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col shrink-0 md:overflow-hidden relative select-none shadow-none"
         >
-          {/* Actual Course Name Header Cell (Aligned to left side, NO 'COURSE NAME' text, NO plus icon) */}
-          <div className="border-b border-white/20 py-4 px-5 bg-black text-left shrink-0">
-            <span className="text-[10px] font-mono tracking-widest text-white/70 uppercase block mb-1">
+          {/* Embedded Background Graphic matching Dashboard Column */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+            <Image
+              src="/login-pixelated.png"
+              alt="Hydraulic System Graphic"
+              fill
+              sizes="300px"
+              priority
+              style={{ objectPosition: '35% center' }}
+              className="object-cover mix-blend-screen opacity-15 select-none"
+            />
+          </div>
+
+          {/* Syllabus Header: Matches Dashboard's Top Sidebar Header with Bottom Dividing Line */}
+          <div className="relative z-10 w-full px-6 sm:px-7 py-5 sm:py-6 border-b border-white/50 text-left shrink-0">
+            <span className="text-[11px] font-mono tracking-widest text-white/70 uppercase block mb-1">
               Course Curriculum
             </span>
-            <h2 className="font-bold text-sm sm:text-base text-white">
+            <h2 className="font-extrabold text-[16px] sm:text-[18px] text-white leading-tight">
               Hydraulic System Basics
             </h2>
           </div>
 
           {/* Scrollable Modules List (Independent Scroll on desktop) */}
-          <div className="flex-1 md:overflow-y-auto bg-black">
+          <div className="relative z-10 flex-1 md:overflow-y-auto flex flex-col">
             {sections.map((section, sIdx) => {
               const isExpanded = expandedSections[section.sectionId] ?? true;
               const completedCount = section.lessons.filter((l) => l.isCompleted).length;
@@ -567,20 +581,20 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 section.lessons.length > 0 && completedCount === section.lessons.length;
 
               return (
-                <div key={section.sectionId} className="bg-black">
-                  {/* MODULE HEADER: border-b border-white/20 (thin line, normal capitalization, font-bold) */}
+                <div key={section.sectionId} className="w-full">
+                  {/* MODULE HEADER: Matches dashboard tab size, typography, border-b border-white/50 */}
                   <button
                     type="button"
                     onClick={() => toggleSection(section.sectionId)}
-                    className="w-full py-3.5 px-5 border-b border-white/20 text-white flex items-center justify-between hover:bg-white/10 transition-colors cursor-pointer select-none bg-black text-left"
+                    className="w-full text-left px-6 sm:px-7 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none bg-transparent hover:bg-white/10 text-white flex items-center justify-between"
                     aria-expanded={isExpanded}
                   >
                     <div className="min-w-0 pr-3">
-                      <span className="block font-bold text-xs sm:text-sm">
+                      <span className="block font-bold text-[15px] sm:text-[16px] leading-tight">
                         Module {sIdx + 1}
                       </span>
                       {section.title && (
-                        <span className="block text-xs text-white/80 font-normal mt-0.5 truncate">
+                        <span className="block text-xs text-white/80 font-normal mt-1 truncate">
                           {section.title.replace(/^Module\s*\d+\s*:\s*/i, '')}
                         </span>
                       )}
@@ -594,7 +608,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                           <Check className="w-3.5 h-3.5 text-black stroke-[3]" />
                         </div>
                       ) : (
-                        <span className="text-[10px] font-mono">
+                        <span className="text-[11px] font-mono font-medium">
                           {completedCount}/{section.lessons.length}
                         </span>
                       )}
@@ -606,9 +620,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                     </div>
                   </button>
 
-                  {/* LESSONS: Each separated by a thin white horizontal divider line, video titles 1 step less bold than module */}
+                  {/* LESSONS: Each separated by border-b border-white/50, contrasting active lesson */}
                   {isExpanded && (
-                    <div className="bg-black">
+                    <div className="w-full">
                       {section.lessons.map((lesson, lIdx) => {
                         const isCurrent = lesson.lessonId === selectedLessonId;
                         return (
@@ -616,10 +630,10 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             key={lesson.lessonId}
                             type="button"
                             onClick={() => setSelectedLessonId(lesson.lessonId)}
-                            className={`w-full py-3 px-5 border-b border-white/15 text-left flex items-center gap-3 transition-colors cursor-pointer ${
+                            className={`w-full text-left px-6 sm:px-7 py-3.5 sm:py-4 border-b border-white/50 flex items-center gap-3 transition-colors cursor-pointer select-none ${
                               isCurrent
-                                ? 'bg-white text-black'
-                                : 'text-white hover:bg-white/10'
+                                ? 'bg-white text-black font-extrabold'
+                                : 'bg-transparent text-white hover:bg-white/10'
                             }`}
                           >
                             <div className="shrink-0 flex items-center justify-center w-5">
@@ -639,7 +653,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                               ) : isCurrent ? (
                                 <span className="text-xs font-black text-black">▶</span>
                               ) : (
-                                <span className="text-[10px] font-mono text-white/60">
+                                <span className="text-[11px] font-mono text-white/60">
                                   {String(lIdx + 1).padStart(2, '0')}
                                 </span>
                               )}
@@ -648,7 +662,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             <div className="min-w-0 flex-1">
                               <div
                                 className={`text-xs sm:text-[13px] leading-snug truncate ${
-                                  isCurrent ? 'font-semibold text-black' : 'font-medium text-white/90'
+                                  isCurrent ? 'font-extrabold text-black' : 'font-medium text-white/90'
                                 }`}
                               >
                                 {lesson.title}
@@ -656,7 +670,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             </div>
 
                             <div
-                              className={`text-[10px] font-mono shrink-0 ${
+                              className={`text-[11px] font-mono shrink-0 ${
                                 isCurrent ? 'text-black/80 font-bold' : 'text-white/60'
                               }`}
                             >
@@ -670,6 +684,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 </div>
               );
             })}
+
+            {/* Empty Space Column Continuing Down, allowing graphic to shine through */}
+            <div className="flex-1 w-full" />
           </div>
         </aside>
 
@@ -677,7 +694,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         <main className="order-1 md:order-2 flex-1 flex flex-col md:h-full md:overflow-y-auto bg-black min-w-0 shrink-0">
           <div className="w-full flex-1 flex flex-col">
             {/* Black Video Player Frame (Sticky on mobile) */}
-            <div className="w-full bg-black shrink-0 relative flex items-center justify-center border-b border-white/20 sticky top-0 z-20">
+            <div className="w-full bg-black shrink-0 relative flex items-center justify-center border-b border-white/50 sticky top-0 z-20">
               <div
                 ref={containerRef}
                 className={`relative bg-black w-full select-none ${
