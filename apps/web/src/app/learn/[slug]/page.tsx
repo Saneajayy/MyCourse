@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback, use } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type Hls from 'hls.js';
@@ -27,6 +26,8 @@ import {
   Folder,
   FolderOpen,
   X,
+  ArrowLeft,
+  ArrowRight,
 } from 'lucide-react';
 
 interface LessonProgressItem {
@@ -691,41 +692,12 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
   return (
     <div className="fixed inset-0 z-20 flex flex-col bg-black overflow-hidden font-reddit select-none text-white w-full max-w-full">
-      {/* Top Header Bar: Glassy navbar matching home page (figma-glass-nav) */}
-      <header className="h-14 sm:h-16 md:h-20 w-full figma-glass-nav px-4 sm:px-6 md:px-8 flex items-stretch justify-between shrink-0 z-30 select-none border-b border-white/50 max-w-full">
-        {/* Left: HYDRO BASICS Logo */}
-        <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
-          <Link
-            href="/"
-            className="flex flex-col justify-center -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity shrink-0"
-            aria-label="HYDRO BASICS Home"
-          >
-            <span className="font-extrabold text-[18px] sm:text-[20px] md:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
-              HYDRO
-            </span>
-            <span className="font-extrabold text-[18px] sm:text-[20px] md:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
-              BASICS
-            </span>
-          </Link>
-        </div>
-
-        {/* Right: Glassy Actions with Full-Height Vertical Dividers */}
-        <div className="flex items-stretch">
-          <Link
-            href="/my-courses"
-            className="figma-glass-divider border-l border-r border-white/50 h-full flex items-center justify-center px-3 sm:px-4 md:px-6 text-white/90 hover:text-white hover:bg-white/10 transition-colors font-semibold text-xs sm:text-sm uppercase tracking-wider"
-          >
-            <span>← My Courses</span>
-          </Link>
-        </div>
-      </header>
-
       {/* Main Split Layout: On mobile: video player is fixed at the top, syllabus scrolls below. On desktop: 2-panel with Syllabus on left and Video on right. */}
       <div className="flex-1 flex flex-col md:flex-row-reverse overflow-hidden min-h-0 bg-[#121417] w-full max-w-full">
         {/* MAIN VIDEO & PLAYER AREA: On mobile: shrink-0 (FIXED at top, does not scroll). On desktop: flex-1 md:h-full md:overflow-y-auto */}
         <main className="w-full shrink-0 md:shrink md:flex-1 flex flex-col md:h-full md:overflow-y-auto bg-[#121417] min-w-0 max-w-full border-b md:border-b-0 border-white/20">
-          {/* Top Breadcrumb/Header Bar on Desktop */}
-          <div className="hidden md:flex px-6 lg:px-8 py-3.5 bg-[#16191d] border-b border-white/10 items-center justify-between gap-4 shrink-0">
+          {/* Top Breadcrumb/Header Strip above video player */}
+          <div className="flex px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 bg-[#16191d] border-b border-white/10 items-center justify-between gap-4 shrink-0">
             <div className="min-w-0 flex items-center gap-2.5">
               <span className="text-[11px] font-mono uppercase tracking-wider text-white/50 shrink-0">
                 {currentSection ? `Module ${currentSectionIdx + 1}` : 'Curriculum'}
@@ -738,7 +710,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
             <div className="flex items-center gap-2 shrink-0">
               {isCurrentCompleted && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/10 text-white border border-white/20 text-[11px] font-mono font-medium">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/10 text-white border border-white/20 text-[11px] font-mono font-medium rounded-md">
                   <Check className="w-3 h-3 stroke-[3]" />
                   Completed
                 </span>
@@ -1038,50 +1010,35 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                   </div>
                 </div>
 
-              {/* Action Bar Directly Underneath Video: Previous and Next Lesson */}
-              <div className="w-full bg-[#181b20] border-t md:border-x md:border-b border-white/10 px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3 text-white">
-                {/* Previous Lesson Button */}
+              {/* Independently Floating Previous & Next Video Buttons (not in any box) */}
+              <div className="w-full flex items-center justify-between gap-4 pt-3 sm:pt-4">
                 <button
                   type="button"
                   onClick={handlePrevLesson}
                   disabled={!hasPrevLesson}
-                  className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider border rounded-none transition-all ${
+                  className={`inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold tracking-wide rounded-lg sm:rounded-xl border transition-all ${
                     hasPrevLesson
-                      ? 'border-white/20 bg-[#1f2328] hover:bg-[#282d33] text-white cursor-pointer'
-                      : 'border-white/5 bg-transparent text-white/25 cursor-not-allowed'
+                      ? 'border-white/20 bg-white/5 hover:bg-white/10 text-white cursor-pointer active:scale-95'
+                      : 'border-white/5 bg-transparent text-white/20 cursor-not-allowed'
                   }`}
                 >
-                  <span>←</span>
-                  <span className="hidden sm:inline">Previous</span>
+                  <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span>Previous Video</span>
                 </button>
 
-                {/* Next Lesson Button */}
                 <button
                   type="button"
                   onClick={handleNextLesson}
                   disabled={!hasNextLesson}
-                  className={`inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider border rounded-none transition-all ${
+                  className={`inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-bold tracking-wide rounded-lg sm:rounded-xl border transition-all ${
                     hasNextLesson
-                      ? 'bg-white hover:bg-neutral-200 text-black border-white cursor-pointer font-black'
-                      : 'border-white/5 bg-transparent text-white/25 cursor-not-allowed'
+                      ? 'bg-white hover:bg-neutral-200 text-black border-white cursor-pointer shadow-lg active:scale-95'
+                      : 'border-white/5 bg-transparent text-white/20 cursor-not-allowed'
                   }`}
                 >
-                  <span className="hidden sm:inline">Next Lesson</span>
-                  <span className="sm:hidden">Next</span>
-                  <span>→</span>
+                  <span>Next Video</span>
+                  <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
-              </div>
-
-              {/* Compact Module & Lesson Title (No description) */}
-              <div className="w-full bg-[#141619] border-t md:border-x md:border-b border-white/10 px-4 py-2.5 sm:px-6 sm:py-3.5 text-white max-w-full">
-                <div className="min-w-0">
-                  <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-white/50 block mb-0.5">
-                    {currentSection ? `Module ${currentSectionIdx + 1}: ${currentSection.title.replace(/^Module\s*\d+\s*:\s*/i, '')}` : 'Curriculum Lesson'}
-                  </span>
-                  <h2 className="text-sm sm:text-lg md:text-xl font-bold text-white tracking-tight leading-snug">
-                    {currentLessonTitle}
-                  </h2>
-                </div>
               </div>
             </div>
           </div>
@@ -1091,24 +1048,16 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         <aside
           className="w-full flex-1 overflow-y-auto md:w-72 lg:w-80 md:h-full md:flex-none border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col relative select-none shadow-none max-w-full"
         >
-          {/* Embedded Background Graphic strictly contained inside aside with zero mobile bleed */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-            <Image
-              src="/login-pixelated.png"
-              alt=""
-              fill
-              sizes="(max-width: 768px) 100vw, 340px"
-              priority
-              style={{ objectPosition: '85% center' }}
-              className="object-cover mix-blend-screen opacity-[0.06] select-none"
-            />
-          </div>
-
-          {/* Syllabus Header: Matches Dashboard's Top Sidebar Header with Bottom Dividing Line */}
-          <div className="relative z-10 w-full px-5 sm:px-6 py-5 sm:py-6 border-b border-white/50 text-left shrink-0">
-            <span className="text-[11px] font-mono tracking-widest text-white/70 uppercase block mb-1">
-              Course Curriculum
-            </span>
+          {/* Syllabus Header with Back to Courses Button */}
+          <div className="relative z-10 w-full px-5 sm:px-6 py-4 sm:py-5 border-b border-white/50 text-left shrink-0">
+            <Link
+              href="/my-courses"
+              className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-widest text-white/70 hover:text-white uppercase mb-2 group transition-colors cursor-pointer"
+              aria-label="Back to My Courses"
+            >
+              <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
+              <span>Back to Courses</span>
+            </Link>
             <h2 className="font-extrabold text-[16px] sm:text-[18px] text-white leading-tight">
               Hydraulic System Basics
             </h2>
