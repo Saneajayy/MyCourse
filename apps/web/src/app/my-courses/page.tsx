@@ -919,7 +919,7 @@ function StudentDashboardContent() {
                       <button
                         type="submit"
                         disabled={profileSaving}
-                        className="h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-lg transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                        className="w-full h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-lg transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                       >
                         {profileSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                         <span>{profileSaving ? 'Saving...' : 'Save Profile'}</span>
@@ -1027,7 +1027,7 @@ function StudentDashboardContent() {
                       <button
                         type="submit"
                         disabled={passwordSaving}
-                        className="h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-lg transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                        className="w-full h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-lg transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                       >
                         {passwordSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                         <span>{passwordSaving ? 'Updating...' : 'Update Password'}</span>
