@@ -1055,12 +1055,12 @@ function StudentDashboardContent() {
               </div>
 
               {ordersLoading ? (
-                <div className="bg-white border border-neutral-200/80 rounded-none p-10 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-none max-w-xl">
+                <div className="bg-white border border-neutral-200/80 rounded-none p-10 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-none w-full max-w-lg lg:max-w-[480px]">
                   <Loader2 className="w-5 h-5 animate-spin text-black" />
                   <span>Loading payment orders...</span>
                 </div>
               ) : orders.length === 0 ? (
-                <div className="bg-white border border-neutral-200/80 rounded-none p-7 sm:p-9 text-left space-y-4 max-w-md shadow-none">
+                <div className="bg-white border border-neutral-200/80 rounded-none p-7 sm:p-9 text-left space-y-4 w-full max-w-lg lg:max-w-[480px] shadow-none">
                   <div className="space-y-1.5">
                     <h2 className="text-lg font-bold text-neutral-900">No payment history yet</h2>
                     <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
@@ -1078,7 +1078,7 @@ function StudentDashboardContent() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4 max-w-3xl text-left">
+                <div className="space-y-4 w-full max-w-lg lg:max-w-[480px] text-left">
                   {orders.map((ord) => {
                     const amountFormatted = (
                       ((ord.totalPaise ?? ord.amountPaise ?? ord.invoice?.totalPaise ?? ord.payments?.[0]?.amountPaise ?? 0)) / 100
@@ -1090,14 +1090,14 @@ function StudentDashboardContent() {
                         className="bg-white border border-neutral-200/80 rounded-none overflow-hidden select-none shadow-none text-left"
                       >
                         {/* 1. Header Bar: Order reference, date, status, and total amount */}
-                        <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-neutral-200 flex flex-wrap items-center justify-between gap-3 bg-neutral-50/50">
+                        <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-neutral-200 flex items-center justify-between gap-3 bg-neutral-50/50">
                           {/* Order ID & Date */}
-                          <div className="flex items-center gap-2 sm:gap-2.5 text-xs sm:text-[13px]">
+                          <div className="flex items-center gap-2 sm:gap-2.5 text-xs sm:text-[13px] min-w-0">
                             <span className="font-mono font-bold text-neutral-900 tracking-tight">
                               {formatDisplayOrderId(ord.orderNumber || ord.id)}
                             </span>
                             <span className="text-neutral-300">•</span>
-                            <span className="text-neutral-500 font-medium">
+                            <span className="text-neutral-500 font-medium whitespace-nowrap">
                               {new Date(ord.createdAt).toLocaleDateString('en-IN', {
                                 day: 'numeric',
                                 month: 'short',
@@ -1107,7 +1107,7 @@ function StudentDashboardContent() {
                           </div>
 
                           {/* Status Badge + Amount */}
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
                             <span
                               className={`px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase rounded-none shrink-0 select-none ${
                                 ord.status === 'PAID'
@@ -1119,16 +1119,16 @@ function StudentDashboardContent() {
                             >
                               {ord.status === 'PAID' ? 'PAID' : ord.status}
                             </span>
-                            <span className="font-mono font-bold text-sm sm:text-base text-neutral-900">
+                            <span className="font-mono font-bold text-sm sm:text-base text-neutral-900 whitespace-nowrap">
                               ₹{amountFormatted}
                             </span>
                           </div>
                         </div>
 
                         {/* 2. Card Body: Course information and direct action buttons */}
-                        <div className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="p-5 sm:p-6 space-y-4">
                           <div className="space-y-1 min-w-0">
-                            <h2 className="text-base sm:text-lg font-bold text-neutral-900 truncate">
+                            <h2 className="text-base sm:text-[17px] font-bold text-neutral-900 leading-snug">
                               {ord.product.title}
                             </h2>
                             <p className="text-xs text-neutral-500 font-medium">
@@ -1137,13 +1137,13 @@ function StudentDashboardContent() {
                           </div>
 
                           {/* Actions: Download Invoice & Access Course */}
-                          <div className="flex flex-wrap items-center gap-2.5 shrink-0 pt-1 sm:pt-0">
+                          <div className="flex flex-wrap items-center gap-2.5 pt-1">
                             {ord.invoice ? (
                               <a
                                 href={`${siteConfig.urls.api}/api/v1/invoices/${ord.invoice.id}/download`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="h-10 px-4 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-300 hover:border-neutral-400 font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center gap-2 shadow-none cursor-pointer"
+                                className="h-9 px-3.5 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-300 hover:border-neutral-400 font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center gap-2 shadow-none cursor-pointer"
                               >
                                 <Download className="w-3.5 h-3.5 text-neutral-700" />
                                 <span>Download Invoice</span>
@@ -1154,7 +1154,7 @@ function StudentDashboardContent() {
 
                             <Link
                               href={`/learn/${ord.product.slug}`}
-                              className="h-10 px-4 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center gap-1.5 shadow-none"
+                              className="h-9 px-3.5 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center gap-1.5 shadow-none"
                             >
                               <span>Go to Course</span>
                               <span>&rarr;</span>
