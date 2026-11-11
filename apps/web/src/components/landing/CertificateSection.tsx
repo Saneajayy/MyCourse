@@ -143,17 +143,17 @@ export function CertificateSection() {
         {/* Desktop View: Full-size Landscape Certificate Card (>= md) */}
         <div className="hidden md:block w-full">
           <TiltCard
-            className="relative w-full max-w-4xl md:max-w-[760px] lg:max-w-[870px] p-5 sm:p-6 md:p-7 bg-white rounded-lg sm:rounded-xl select-none cursor-pointer"
+            className="relative w-full max-w-4xl md:max-w-[760px] lg:max-w-[880px] xl:max-w-[920px] p-4 sm:p-5 md:p-6 bg-white rounded-xl sm:rounded-2xl select-none cursor-pointer"
             maxTilt={4}
           >
-            {/* Inner White Card with Solid Black Border & Content matching mobile */}
-            <div className="relative z-10 bg-white border border-black rounded-md sm:rounded-lg overflow-hidden text-black flex flex-col justify-between">
+            {/* Inner White Card with Solid Black Border */}
+            <div className="relative z-10 bg-white border border-black rounded-lg md:rounded-xl overflow-hidden text-black flex flex-col justify-between min-h-[460px] md:min-h-[490px] lg:min-h-[520px]">
               {/* Top Bar: COURSE CERTIFICATE and CERT-98372 */}
-              <div className="flex items-center justify-between px-6 sm:px-8 lg:px-9 pt-5 sm:pt-6 pb-3.5 sm:pb-4">
-                <span className="text-black font-normal text-xs sm:text-[13px] tracking-[0.06em] uppercase">
+              <div className="flex items-center justify-between px-6 md:px-8 lg:px-9 pt-4 md:pt-5 pb-3 md:pb-3.5">
+                <span className="text-black font-normal text-xs md:text-[13px] tracking-[0.06em] uppercase">
                   COURSE CERTIFICATE
                 </span>
-                <span className="text-black font-normal text-xs sm:text-[13px] tracking-[0.06em] uppercase">
+                <span className="text-black font-normal text-xs md:text-[13px] tracking-[0.06em] uppercase">
                   CERT-98372
                 </span>
               </div>
@@ -161,37 +161,45 @@ export function CertificateSection() {
               {/* Top Divider Line */}
               <div className="w-full border-b border-black" />
 
-              {/* Main Certificate Content */}
-              <div className="px-6 sm:px-8 lg:px-9 pt-7 sm:pt-8 pb-7 sm:pb-8 flex flex-col items-start text-left flex-1 justify-between">
-                {/* 1. Certificate Title */}
-                <div className="flex flex-col items-start text-left select-none leading-none text-black">
-                  <span className="font-light text-[38px] md:text-[44px] lg:text-[48px] tracking-tight uppercase leading-[1.04]">
-                    CERTIFICATE OF
-                  </span>
-                  <span className="font-light text-[38px] md:text-[44px] lg:text-[48px] tracking-tight uppercase leading-[1.04]">
-                    COMPLETION.
-                  </span>
+              {/* Main Certificate Content: 2-Column Split Layout */}
+              <div className="flex items-stretch px-6 md:px-8 lg:px-9 py-6 md:py-7 lg:py-8 flex-1 gap-6 md:gap-7 lg:gap-8">
+                {/* Left Column (Title, Recipient, Description) */}
+                <div className="flex-1 flex flex-col justify-between pr-2 lg:pr-4">
+                  {/* 1. Certificate Title */}
+                  <div className="flex flex-col items-start text-left select-none leading-none text-black">
+                    <span className="font-light text-[34px] md:text-[40px] lg:text-[46px] tracking-tight uppercase leading-[1.04]">
+                      CERTIFICATE OF
+                    </span>
+                    <span className="font-light text-[34px] md:text-[40px] lg:text-[46px] tracking-tight uppercase leading-[1.04]">
+                      COMPLETION.
+                    </span>
+                  </div>
+
+                  {/* 2. Recipient Info */}
+                  <div className="my-auto py-4 md:py-5">
+                    <p className="text-black/75 font-light text-[13px] md:text-sm lg:text-[14px] lowercase tracking-normal text-left select-none">
+                      presented to
+                    </p>
+
+                    <h3 className="font-extrabold text-black text-[28px] md:text-[34px] lg:text-[38px] tracking-wide uppercase leading-tight select-none mt-1 sm:mt-1.5 mb-0">
+                      VARUN KUMAR
+                    </h3>
+                  </div>
+
+                  {/* 3. Course Description */}
+                  <p className="text-black/80 font-light text-[12px] md:text-[13px] lg:text-[14px] leading-[1.55] text-left select-none max-w-[480px] lg:max-w-[530px]">
+                    For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong><br className="hidden md:inline" />
+                    by Mr. Hira Lal, covering the Fundamentals of Hydraulic<br className="hidden md:inline" />
+                    systems, components and circuit designs.
+                  </p>
                 </div>
 
-                {/* 2. Recipient Info & Course Description */}
-                <div className="mt-5 md:mt-6 lg:mt-7">
-                  <p className="text-black/75 font-light text-[13px] md:text-sm lg:text-[14px] lowercase tracking-normal text-left select-none">
-                    presented to
-                  </p>
+                {/* Vertical Divider Line */}
+                <div className="w-px bg-black my-1 lg:my-2 shrink-0 self-stretch" />
 
-                  <h3 className="font-extrabold text-black text-[28px] md:text-[34px] lg:text-[38px] tracking-wide uppercase leading-tight select-none mt-1 sm:mt-1.5 mb-2.5 sm:mb-3">
-                    VARUN KUMAR
-                  </h3>
-
-                  <p className="text-black/80 font-light text-[13px] md:text-sm lg:text-[14px] leading-[1.5] text-left select-none max-w-[560px] lg:max-w-[620px]">
-                    For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong> by Mr. Hira lal, covering the<br />
-                    Fundamentals of Hydraulic systems, components and circuit designs.
-                  </p>
-                </div>
-
-                {/* 3. Bottom Row: QR Code (Left) and Signature + Brand (Right) */}
-                <div className="w-full flex items-end justify-between mt-8 md:mt-10 lg:mt-12 pt-1">
-                  {/* Verification QR Code: Saturation 0 to render in black */}
+                {/* Right Column (QR Code, Signature, Divider, Logo) */}
+                <div className="w-[150px] md:w-[170px] lg:w-[195px] shrink-0 flex flex-col items-center justify-between text-center pl-2">
+                  {/* Verification QR Code */}
                   <div className="relative w-[118px] h-[118px] md:w-[130px] md:h-[130px] lg:w-[140px] lg:h-[140px] flex-shrink-0">
                     <Image
                       src="/cert-qr-blue-exact.png"
@@ -203,31 +211,34 @@ export function CertificateSection() {
                     />
                   </div>
 
-                  {/* Instructor Signature: Saturation 0 to render in black */}
-                  <div className="flex flex-col items-start select-none">
-                    <div className="relative w-[92px] md:w-[105px] lg:w-[115px] h-[32px] md:h-[37px] lg:h-[40px]">
+                  {/* Middle: Signature + Course Instructor */}
+                  <div className="flex flex-col items-center select-none my-auto pt-3">
+                    <div className="relative w-[88px] md:w-[98px] lg:w-[108px] h-[30px] md:h-[34px] lg:h-[38px]">
                       <Image
                         src="/cert-signature-hiralal.png"
                         alt="HiraLal Signature"
                         fill
-                        sizes="115px"
-                        className="object-contain object-left saturate-0 grayscale contrast-200"
+                        sizes="108px"
+                        className="object-contain object-center saturate-0 grayscale contrast-200"
                         priority
                       />
                     </div>
-                    <span className="font-normal text-black text-xs md:text-[13px] tracking-normal mt-0.5">
+                    <span className="font-normal text-black text-[11px] md:text-xs tracking-normal mt-0.5">
                       Course Instructor
                     </span>
+                  </div>
 
-                    {/* Exact Stacked Brand Logo below Course Instructor */}
-                    <div className="flex flex-col items-start -space-y-0.5 leading-[0.92] text-black select-none mt-2.5 md:mt-3">
-                      <span className="font-extrabold text-[28px] md:text-[32px] lg:text-[36px] tracking-[0.01em] uppercase leading-[0.92]">
-                        HYDRO
-                      </span>
-                      <span className="font-extrabold text-[28px] md:text-[32px] lg:text-[36px] tracking-[0.01em] uppercase leading-[0.92]">
-                        BASICS
-                      </span>
-                    </div>
+                  {/* Horizontal Divider Line above Brand Logo */}
+                  <div className="w-full max-w-[130px] md:max-w-[145px] lg:max-w-[160px] border-b border-black my-2.5 lg:my-3" />
+
+                  {/* Bottom: Stacked Brand Logo */}
+                  <div className="flex flex-col items-center -space-y-0.5 leading-[0.92] text-black select-none">
+                    <span className="font-extrabold text-[26px] md:text-[30px] lg:text-[34px] tracking-[0.01em] uppercase leading-[0.92]">
+                      HYDRO
+                    </span>
+                    <span className="font-extrabold text-[26px] md:text-[30px] lg:text-[34px] tracking-[0.01em] uppercase leading-[0.92]">
+                      BASICS
+                    </span>
                   </div>
                 </div>
               </div>
