@@ -92,7 +92,7 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
 
   return (
     <div
-      className="w-full flex items-center h-5 select-none mt-1 mb-2.5 overflow-hidden"
+      className="w-full flex items-center h-5 select-none mb-3 overflow-hidden"
       aria-label={`Course progress: ${clamped}%`}
       role="progressbar"
       aria-valuenow={clamped}
@@ -702,7 +702,7 @@ function StudentDashboardContent() {
                           </div>
 
                           {/* 2. Course Metadata: Total Videos & Total Hours of Content (Centered evenly between Description and Progress Bar) */}
-                          <div className="flex items-center gap-2.5 text-xs text-neutral-500 font-medium select-none py-1">
+                          <div className="flex items-center gap-2.5 text-xs text-neutral-500 font-medium select-none py-3 sm:py-3.5">
                             <span className="inline-flex items-center gap-1.5">
                               <Video className="w-3.5 h-3.5 text-neutral-400" />
                               <span>{totalVideos} Videos</span>
