@@ -557,6 +557,23 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     };
   }, []);
 
+  // Prevent background document scroll and eliminate mobile WebKit touch hit-test offset bug
+  useEffect(() => {
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalBodyHeight = document.body.style.height;
+
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.body.style.height = '100%';
+
+    return () => {
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      document.body.style.overflow = originalBodyOverflow;
+      document.body.style.height = originalBodyHeight;
+    };
+  }, []);
+
   // Keyboard Shortcuts Listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -692,7 +709,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
   const isCurrentCompleted = currentLesson?.isCompleted || false;
 
   return (
-    <div className="fixed inset-0 z-20 flex flex-col bg-black overflow-hidden font-reddit select-none text-white w-full max-w-full">
+    <div className="relative w-full h-[100dvh] max-h-[100dvh] flex flex-col bg-black overflow-hidden font-reddit select-none text-white overscroll-none max-w-full">
       {/* Main Split Layout: On mobile: video player is fixed at the top, syllabus scrolls below. On desktop: 2-panel with Syllabus on left and Video on right. */}
       <div className="flex-1 flex flex-col md:flex-row-reverse overflow-hidden min-h-0 bg-[#121417] w-full max-w-full">
         {/* MAIN VIDEO & PLAYER AREA: On mobile: shrink-0 (FIXED at top, does not scroll). On desktop: flex-1 md:h-full md:overflow-y-auto */}
