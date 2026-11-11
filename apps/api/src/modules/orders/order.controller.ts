@@ -93,9 +93,14 @@ export class OrderController {
         orderBy: { createdAt: 'desc' },
       });
 
+      const transformedOrders = orders.map((o) => ({
+        ...o,
+        amountPaise: o.totalPaise,
+      }));
+
       res.status(200).json({
         success: true,
-        data: orders,
+        data: transformedOrders,
       });
     } catch (err) {
       next(err);

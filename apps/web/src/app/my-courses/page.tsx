@@ -72,7 +72,9 @@ interface OrderHistoryItem {
   id: string;
   orderNumber?: string;
   status: string;
-  amountPaise: number;
+  totalPaise?: number;
+  amountPaise?: number;
+  subtotalPaise?: number;
   currency: string;
   createdAt: string;
   product: {
@@ -82,7 +84,13 @@ interface OrderHistoryItem {
   invoice?: {
     id: string;
     invoiceNumber: string;
+    totalPaise?: number;
   } | null;
+  payments?: Array<{
+    id: string;
+    amountPaise: number;
+    status: string;
+  }>;
 }
 
 
@@ -1070,7 +1078,7 @@ function StudentDashboardContent() {
                               {ord.product.title}
                             </td>
                             <td className="py-3.5 px-4 font-mono font-bold text-neutral-900">
-                              ₹{(ord.amountPaise / 100).toLocaleString('en-IN')}
+                              ₹{(((ord.totalPaise ?? ord.amountPaise ?? ord.invoice?.totalPaise ?? ord.payments?.[0]?.amountPaise ?? 0)) / 100).toLocaleString('en-IN')}
                             </td>
                             <td className="py-3.5 px-4">
                               <span
