@@ -212,18 +212,18 @@ export function CertificateSection() {
                   </div>
 
                   {/* Middle: Signature + Course Instructor */}
-                  <div className="flex flex-col items-center select-none my-auto pt-3">
-                    <div className="relative w-[88px] md:w-[98px] lg:w-[108px] h-[30px] md:h-[34px] lg:h-[38px]">
+                  <div className="flex flex-col items-center select-none mt-auto pt-5 md:pt-7 lg:pt-8 mb-1">
+                    <div className="relative w-[92px] md:w-[104px] lg:w-[115px] h-[32px] md:h-[36px] lg:h-[40px]">
                       <Image
                         src="/cert-signature-hiralal.png"
                         alt="HiraLal Signature"
                         fill
-                        sizes="108px"
+                        sizes="115px"
                         className="object-contain object-center saturate-0 grayscale contrast-200"
                         priority
                       />
                     </div>
-                    <span className="font-normal text-black text-[11px] md:text-xs tracking-normal mt-0.5">
+                    <span className="font-normal text-black text-[12px] md:text-[13px] lg:text-[14px] tracking-normal mt-1">
                       Course Instructor
                     </span>
                   </div>
