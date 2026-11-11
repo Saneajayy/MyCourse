@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { siteConfig } from '../../config/site';
 import { useToast } from '../../components/ui';
-import { useAuth } from '../../context/auth-context';
 import {
   Mail,
   MapPin,
@@ -17,111 +17,17 @@ import {
 } from 'lucide-react';
 import { apiClient } from '../../lib/api-client';
 
-function ContactNavbar() {
-  const { isAuthenticated } = useAuth();
-
-  return (
-    <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-neutral-200 select-none">
-      <nav
-        aria-label="Contact Navigation"
-        className="w-full max-w-5xl mx-auto h-16 sm:h-20 px-6 sm:px-8 md:px-12 flex items-center justify-between"
-      >
-        {/* Left Side: Brand Logo + Back to Course Link */}
-        <div className="flex items-center gap-5 sm:gap-7">
-          <Link
-            href="/"
-            className="flex flex-col justify-center -space-y-0.5 leading-[0.92] text-black hover:opacity-80 transition-opacity"
-            aria-label="HYDRO BASICS Home"
-          >
-            <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-              HYDRO
-            </span>
-            <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-              BASICS
-            </span>
-          </Link>
-
-          <div className="h-5 w-px bg-neutral-200" aria-hidden="true" />
-
-          <Link
-            href="/"
-            className="text-neutral-600 hover:text-black font-semibold text-xs sm:text-sm tracking-normal transition-colors py-2 flex items-center gap-1.5"
-          >
-            <span aria-hidden="true">&larr;</span> Back to Course
-          </Link>
-        </div>
-
-        {/* Right Side: Account / Login */}
-        <div className="flex items-center">
-          {isAuthenticated ? (
-            <Link
-              href="/my-courses"
-              className="text-xs sm:text-sm font-bold text-neutral-900 hover:text-black px-3.5 py-1.5 rounded-lg hover:bg-neutral-100 transition-colors"
-            >
-              My Courses
-            </Link>
-          ) : (
-            <Link
-              href="/login?redirect=/contact"
-              className="text-xs sm:text-sm font-bold text-neutral-900 hover:text-black px-3.5 py-1.5 rounded-lg hover:bg-neutral-100 transition-colors"
-            >
-              Log In
-            </Link>
-          )}
-        </div>
-      </nav>
-    </header>
-  );
-}
-
-function ContactFooter() {
-  const currentYear = new Date().getFullYear();
-
-  return (
-    <footer className="w-full border-t border-neutral-200 bg-white select-none py-10 sm:py-12 mt-16 sm:mt-24">
-      <div className="w-full max-w-5xl mx-auto px-6 sm:px-8 md:px-12 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
-          <Link
-            href="/"
-            className="flex flex-col -space-y-0.5 leading-[0.92] text-black hover:opacity-80 transition-opacity"
-            aria-label="HYDRO BASICS Home"
-          >
-            <span className="font-extrabold text-[16px] tracking-[0.02em] uppercase leading-[0.92]">
-              HYDRO
-            </span>
-            <span className="font-extrabold text-[16px] tracking-[0.02em] uppercase leading-[0.92]">
-              BASICS
-            </span>
-          </Link>
-          <span className="hidden sm:inline text-neutral-300">|</span>
-          <p className="text-xs text-neutral-500">
-            © {currentYear} Hydro Basics. Industrial Hydraulic Engineering Masterclass.
-          </p>
-        </div>
-
-        <nav
-          aria-label="Footer Legal Links"
-          className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-semibold text-neutral-600"
-        >
-          <Link href="/terms" className="hover:text-black transition-colors">
-            Terms
-          </Link>
-          <Link href="/privacy" className="hover:text-black transition-colors">
-            Privacy
-          </Link>
-          <Link href="/refunds" className="hover:text-black transition-colors">
-            Refunds
-          </Link>
-          <Link href="/contact" className="text-black font-bold">
-            Contact
-          </Link>
-        </nav>
-      </div>
-    </footer>
-  );
-}
-
 export default function ContactPage() {
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = '#FFFFFF';
+    document.body.style.backgroundColor = '#FFFFFF';
+    return () => {
+      document.documentElement.style.backgroundColor = '';
+      document.body.style.backgroundColor = '';
+    };
+  }, []);
+
+  const currentYear = new Date().getFullYear();
   const { success: toastSuccess, error: toastError } = useToast();
 
   const [name, setName] = useState('');
@@ -165,136 +71,146 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900 font-reddit selection:bg-black selection:text-white flex flex-col justify-between">
-      {/* Sticky White Navigation */}
-      <ContactNavbar />
+    <div className="fixed inset-0 w-full h-full bg-white font-reddit selection:bg-black selection:text-white flex flex-col lg:flex-row overflow-hidden">
+      {/* Left Column (Desktop Only): Signature Dot Halftone Graphic on Black */}
+      <div className="hidden lg:relative lg:flex lg:w-1/2 h-full bg-black overflow-hidden select-none">
+        <Image
+          src="/split-pixelated.png"
+          alt="HydroBasics Industrial Hydraulic Engineer"
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover object-center mix-blend-screen opacity-95 select-none"
+        />
+        {/* Soft overlay gradient for subtle depth */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#000000]/80 via-transparent to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
+      </div>
 
-      {/* Main Document Content */}
-      <main className="w-full max-w-5xl mx-auto px-6 sm:px-8 md:px-12 py-10 sm:py-14 md:py-16 flex-1 select-text">
-        {/* Document Header */}
-        <header className="mb-10 sm:mb-12 border-b border-neutral-200 pb-8 sm:pb-10">
-          <div className="flex items-center gap-2 text-xs font-mono font-medium text-neutral-500 uppercase tracking-widest mb-3">
-            <Mail className="w-4 h-4 text-black shrink-0" />
-            <span>Engineering Support Desk</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-neutral-950 uppercase tracking-tight">
-            Contact Support
-          </h1>
-          <p className="text-neutral-600 font-medium text-sm sm:text-base mt-3 max-w-2xl leading-relaxed">
-            Have questions about the industrial curriculum, enterprise access, or billing? Reach out to our engineering support desk.
-          </p>
+      {/* Right Column: Clean White Background with Scrollable Content */}
+      <div className="w-full lg:w-1/2 h-full bg-white flex flex-col overflow-y-auto relative">
+        {/* Top Header Bar inside right side area */}
+        <header className="w-full flex items-center justify-between px-5 pt-5 sm:px-8 sm:pt-8 shrink-0 z-20">
+          <Link
+            href="/"
+            className="text-neutral-600 hover:text-black font-semibold text-xs sm:text-sm tracking-normal transition-colors flex items-center gap-1.5 py-1"
+          >
+            <span aria-hidden="true">&larr;</span> Back to Course
+          </Link>
+
+          <Link
+            href="/"
+            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-black hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+            aria-label="HYDRO BASICS Home"
+          >
+            <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+              BASICS
+            </span>
+          </Link>
         </header>
 
-        {/* 2-Column Content Grid: Contact Details (Left) + Inquiry Form (Right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-12 items-start">
-          {/* Left Column: Contact Channels */}
-          <div className="lg:col-span-5 space-y-4">
-            {/* Card: Direct Email */}
-            <div className="p-5 sm:p-6 bg-neutral-50 border border-neutral-200/90 rounded-xl space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white shrink-0">
-                  <Mail className="w-4 h-4" />
-                </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
-                  Direct Support Email
-                </span>
+        {/* Content Container */}
+        <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10 relative z-10 flex-1">
+          {/* Main Card with thin solid black border matching login & signup cards */}
+          <div className="relative w-full bg-white border border-black rounded-xl sm:rounded-2xl p-6 sm:p-8 md:p-10 select-text overflow-hidden shadow-none">
+            {/* Document Header */}
+            <header className="mb-8 border-b border-neutral-200 pb-6 sm:pb-8">
+              <div className="flex items-center gap-2 text-xs font-mono font-medium text-neutral-500 uppercase tracking-widest mb-2.5">
+                <Mail className="w-4 h-4 text-black shrink-0" />
+                <span>Engineering Support Desk</span>
               </div>
-              <div className="pt-1">
-                <a
-                  href={`mailto:${siteConfig.supportEmail}`}
-                  className="text-base font-bold text-neutral-950 hover:underline block"
-                >
-                  {siteConfig.supportEmail}
-                </a>
-                <p className="text-xs text-neutral-500 mt-1">
-                  Typical response time: Within 24 business hours
-                </p>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-neutral-950 uppercase tracking-tight">
+                Contact Support
+              </h1>
+              <p className="text-neutral-600 font-medium text-xs sm:text-sm mt-2 leading-relaxed">
+                Have questions about the industrial curriculum, enterprise access, or billing? Reach out to our engineering support desk.
+              </p>
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-4 mt-4 border-t border-neutral-100 text-[11px] sm:text-xs font-mono text-neutral-500">
+                <span>Response Time: Within 24 Business Hours</span>
+                <span>Support Desk: Active</span>
               </div>
-            </div>
+            </header>
 
-            {/* Card: Support Desk Hours */}
-            <div className="p-5 sm:p-6 bg-neutral-50 border border-neutral-200/90 rounded-xl space-y-2">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white shrink-0">
-                  <Clock className="w-4 h-4" />
-                </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
-                  Support Desk Hours
-                </span>
-              </div>
-              <div className="pt-1">
-                <div className="text-sm font-bold text-neutral-950">
-                  {siteConfig.contact.hours}
-                </div>
-                <p className="text-xs text-neutral-500 mt-1">
-                  Closed on Sundays and national public holidays
-                </p>
-              </div>
-            </div>
-
-            {/* Card: Registered Office & Phone */}
-            <div className="p-5 sm:p-6 bg-neutral-50 border border-neutral-200/90 rounded-xl space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white shrink-0">
-                    <MapPin className="w-4 h-4" />
+            {/* Support Desk Details Cards */}
+            <div className="space-y-3 mb-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Email Card */}
+                <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-lg space-y-1">
+                  <div className="flex items-center gap-2 text-neutral-500 text-xs font-bold uppercase tracking-wider">
+                    <Mail className="w-3.5 h-3.5 text-black shrink-0" />
+                    <span>Direct Email</span>
                   </div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
-                    Registered Office
-                  </span>
+                  <a
+                    href={`mailto:${siteConfig.supportEmail}`}
+                    className="text-xs sm:text-sm font-bold text-neutral-950 hover:underline block truncate"
+                  >
+                    {siteConfig.supportEmail}
+                  </a>
+                  <p className="text-[11px] text-neutral-500">
+                    Typically replied within 24 hrs
+                  </p>
                 </div>
-                <p className="text-xs text-neutral-700 leading-relaxed pl-11">
-                  {siteConfig.contact.address}
-                </p>
-              </div>
 
-              <div className="h-px bg-neutral-200/70" aria-hidden="true" />
-
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white shrink-0">
-                    <Phone className="w-4 h-4" />
+                {/* Hours Card */}
+                <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-lg space-y-1">
+                  <div className="flex items-center gap-2 text-neutral-500 text-xs font-bold uppercase tracking-wider">
+                    <Clock className="w-3.5 h-3.5 text-black shrink-0" />
+                    <span>Desk Hours</span>
                   </div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
-                    Phone Inquiries
-                  </span>
-                </div>
-                <p className="text-sm font-bold font-mono text-neutral-950 pl-11">
-                  {siteConfig.contact.phone}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Inquiry Message Form */}
-          <div className="lg:col-span-7">
-            <div className="bg-white border border-neutral-200/90 rounded-xl p-6 sm:p-8 space-y-6">
-              <div className="flex items-center gap-3 border-b border-neutral-200 pb-5">
-                <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white shrink-0">
-                  <Send className="w-4 h-4" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-neutral-950 tracking-tight">
-                    Send an Inquiry
-                  </h2>
-                  <p className="text-xs text-neutral-500">
-                    Fill out the details below and our engineers will reply via email.
+                  <div className="text-xs sm:text-sm font-bold text-neutral-950">
+                    {siteConfig.contact.hours}
+                  </div>
+                  <p className="text-[11px] text-neutral-500">
+                    Mon–Sat (Closed Sundays)
                   </p>
                 </div>
               </div>
 
-              {isSent ? (
-                <div className="py-10 text-center space-y-3">
-                  <div className="w-12 h-12 bg-neutral-100 text-black rounded-full inline-flex items-center justify-center">
-                    <CheckCircle2 className="w-6 h-6" />
+              {/* Office & Phone */}
+              <div className="p-3.5 sm:p-4 bg-neutral-50 border border-neutral-200 rounded-lg space-y-2 text-xs">
+                <div className="flex items-start gap-2 text-neutral-700">
+                  <MapPin className="w-3.5 h-3.5 text-black shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-neutral-950">Registered Office: </span>
+                    <span className="text-neutral-600">{siteConfig.contact.address}</span>
                   </div>
-                  <h3 className="text-xl font-bold text-neutral-950 tracking-tight">
+                </div>
+                <div className="flex items-center gap-2 text-neutral-700 pt-1 border-t border-neutral-200/80">
+                  <Phone className="w-3.5 h-3.5 text-black shrink-0" />
+                  <div>
+                    <span className="font-bold text-neutral-950">Phone: </span>
+                    <span className="font-mono text-neutral-800">{siteConfig.contact.phone}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Inquiry Form Section */}
+            <div className="border-t border-neutral-200 pt-6 sm:pt-8">
+              <div className="flex items-center gap-2 mb-4">
+                <Send className="w-4 h-4 text-black shrink-0" />
+                <h2 className="text-sm sm:text-base font-bold text-neutral-950">
+                  Send an Inquiry
+                </h2>
+              </div>
+
+              {isSent ? (
+                <div className="py-8 text-center space-y-3 bg-neutral-50 border border-neutral-200 rounded-xl p-6">
+                  <div className="w-10 h-10 bg-black text-white rounded-full inline-flex items-center justify-center">
+                    <CheckCircle2 className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-neutral-950 tracking-tight">
                     Inquiry Submitted Successfully
                   </h3>
                   <p className="text-xs sm:text-sm text-neutral-600 max-w-sm mx-auto leading-relaxed">
                     Thank you for reaching out. A confirmation ticket has been logged and our engineering team will get back to you within 24 business hours.
                   </p>
-                  <div className="pt-3">
+                  <div className="pt-2">
                     <button
                       type="button"
                       onClick={() => {
@@ -304,7 +220,7 @@ export default function ContactPage() {
                         setSubject('');
                         setMessage('');
                       }}
-                      className="inline-flex items-center justify-center h-10 px-5 bg-black hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors cursor-pointer"
+                      className="inline-flex items-center justify-center h-9 px-4 bg-black hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition-colors cursor-pointer"
                     >
                       Send Another Message
                     </button>
@@ -326,15 +242,15 @@ export default function ContactPage() {
                   </div>
 
                   {errorMessage && (
-                    <div className="p-3.5 border border-rose-300 bg-rose-50 text-rose-900 text-xs font-semibold rounded-lg flex items-center gap-2">
+                    <div className="p-3 border border-rose-300 bg-rose-50 text-rose-900 text-xs font-semibold rounded-lg flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                       <span>{errorMessage}</span>
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
-                      <label className="text-xs font-semibold text-neutral-700 block mb-1.5">
+                      <label className="text-xs font-semibold text-neutral-700 block mb-1">
                         Full Name <span className="text-rose-600">*</span>
                       </label>
                       <input
@@ -343,12 +259,12 @@ export default function ContactPage() {
                         placeholder="e.g. Ramesh Kumar"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full h-11 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-black rounded-lg text-neutral-900 text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400"
+                        className="w-full h-10 px-3 bg-neutral-50 border border-neutral-300 focus:border-black rounded-lg text-neutral-900 text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs font-semibold text-neutral-700 block mb-1.5">
+                      <label className="text-xs font-semibold text-neutral-700 block mb-1">
                         Email Address <span className="text-rose-600">*</span>
                       </label>
                       <input
@@ -357,13 +273,13 @@ export default function ContactPage() {
                         placeholder="engineer@plant.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full h-11 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-black rounded-lg text-neutral-900 text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400"
+                        className="w-full h-10 px-3 bg-neutral-50 border border-neutral-300 focus:border-black rounded-lg text-neutral-900 text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-neutral-700 block mb-1.5">
+                    <label className="text-xs font-semibold text-neutral-700 block mb-1">
                       Subject / Topic <span className="text-rose-600">*</span>
                     </label>
                     <input
@@ -372,25 +288,25 @@ export default function ContactPage() {
                       placeholder="e.g. Corporate enrollment for 10 engineers"
                       value={subject}
                       onChange={(e) => setSubject(e.target.value)}
-                      className="w-full h-11 px-3.5 bg-neutral-50 border border-neutral-300 focus:border-black rounded-lg text-neutral-900 text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400"
+                      className="w-full h-10 px-3 bg-neutral-50 border border-neutral-300 focus:border-black rounded-lg text-neutral-900 text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-neutral-700 block mb-1.5">
+                    <label className="text-xs font-semibold text-neutral-700 block mb-1">
                       Inquiry Details <span className="text-rose-600">*</span>
                     </label>
                     <textarea
                       required
-                      rows={5}
+                      rows={4}
                       placeholder="Please describe your question or requirements in detail..."
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      className="w-full p-3.5 bg-neutral-50 border border-neutral-300 focus:border-black rounded-lg text-neutral-900 text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400 resize-none"
+                      className="w-full p-3 bg-neutral-50 border border-neutral-300 focus:border-black rounded-lg text-neutral-900 text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-neutral-400 resize-none"
                     />
                   </div>
 
-                  <div className="pt-2">
+                  <div className="pt-1">
                     <button
                       type="submit"
                       disabled={isLoading}
@@ -413,11 +329,32 @@ export default function ContactPage() {
               )}
             </div>
           </div>
-        </div>
-      </main>
 
-      {/* Clean White Minimal Footer */}
-      <ContactFooter />
+          {/* Quick Legal Nav below card */}
+          <footer className="mt-6 sm:mt-8 pb-4 text-center">
+            <nav
+              aria-label="Footer Legal Links"
+              className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-neutral-500 mb-2"
+            >
+              <Link href="/terms" className="hover:text-black transition-colors">
+                Terms
+              </Link>
+              <Link href="/privacy" className="hover:text-black transition-colors">
+                Privacy
+              </Link>
+              <Link href="/refunds" className="hover:text-black transition-colors">
+                Refunds
+              </Link>
+              <Link href="/contact" className="text-black font-bold">
+                Contact
+              </Link>
+            </nav>
+            <p className="text-[11px] text-neutral-400">
+              © {currentYear} Hydro Basics. All rights reserved.
+            </p>
+          </footer>
+        </div>
+      </div>
     </div>
   );
 }
