@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { X } from 'lucide-react';
 
 export interface PaymentSuccessData {
   orderId: string;
@@ -206,6 +207,7 @@ export function PaymentSuccessCard({
   data,
   onDownloadInvoice,
   downloadingInvoice = false,
+  onClose,
 }: PaymentSuccessCardProps) {
   const amountRupees = (data.amountPaise || 0) / 100;
   const formattedAmount =
@@ -227,6 +229,18 @@ export function PaymentSuccessCard({
 
   return (
     <div className="relative w-full max-w-[420px] sm:max-w-[440px] mx-auto bg-white rounded-none p-6 sm:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-neutral-100 select-none font-reddit text-left space-y-4">
+      {/* Simple Cross Icon inside top right corner */}
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close dialog"
+          className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 text-neutral-400 hover:text-black transition-colors cursor-pointer p-1 z-20 focus:outline-none"
+        >
+          <X className="w-5 h-5 stroke-[2]" />
+        </button>
+      )}
+
       {/* 1. Header: Blue Circle with White Tick Above Title + Confetti Burst from Behind */}
       <div className="flex flex-col items-center text-center space-y-3 pb-1">
         {/* Circle with Confetti Burst */}

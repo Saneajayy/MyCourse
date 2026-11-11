@@ -43,9 +43,9 @@ export function PaymentFailedCard({
           type="button"
           onClick={onClose}
           aria-label="Close dialog"
-          className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-9 h-9 sm:w-10 sm:h-10 rounded-none bg-white border border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100 flex items-center justify-center shadow-md transition-all cursor-pointer z-20"
+          className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 text-neutral-400 hover:text-black transition-colors cursor-pointer p-1 z-20 focus:outline-none"
         >
-          <X className="w-4 h-4 sm:w-5 sm:h-5" />
+          <X className="w-5 h-5 stroke-[2]" />
         </button>
       )}
 
