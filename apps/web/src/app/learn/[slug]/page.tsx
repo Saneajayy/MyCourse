@@ -551,7 +551,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         <aside
           className="order-2 md:order-1 w-full md:w-72 lg:w-80 md:h-full border-t md:border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col shrink-0 md:overflow-hidden relative select-none shadow-none"
         >
-          {/* Embedded Background Graphic matching Dashboard Column (Subtle low opacity) */}
+          {/* Embedded Background Graphic matching Dashboard Column (Subtle low opacity, shifted to right) */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
             <Image
               src="/login-pixelated.png"
@@ -559,7 +559,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
               fill
               sizes="340px"
               priority
-              style={{ objectPosition: '35% center' }}
+              style={{ objectPosition: '60% center' }}
               className="object-cover mix-blend-screen opacity-[0.06] select-none"
             />
           </div>
@@ -583,21 +583,28 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 section.lessons.length > 0 && completedCount === section.lessons.length;
 
               return (
-                <div key={section.sectionId} className="w-full">
-                  {/* MODULE HEADER: Folder icon on left, tick when completed, border-b border-white/50 */}
+                <div key={section.sectionId} className="w-full border-b border-white/50">
+                  {/* MODULE HEADER: No bottom line so module & lessons merge in one tab-like field */}
                   <button
                     type="button"
                     onClick={() => toggleSection(section.sectionId)}
-                    className="w-full text-left px-5 sm:px-6 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none bg-transparent hover:bg-white/10 text-white flex items-start justify-between gap-3"
+                    className="w-full text-left px-5 sm:px-6 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold transition-colors cursor-pointer select-none bg-transparent hover:bg-white/10 text-white flex items-start justify-between gap-3"
                     aria-expanded={isExpanded}
                   >
                     <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                      {/* Folder icon on left side of Module */}
-                      {isExpanded ? (
-                        <FolderOpen className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                      ) : (
-                        <Folder className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                      )}
+                      {/* Folder icon rooting the connecting line */}
+                      <div className="relative shrink-0 w-4 self-stretch flex flex-col items-center">
+                        <div className="pt-0.5 z-10">
+                          {isExpanded ? (
+                            <FolderOpen className="w-4 h-4 text-white" />
+                          ) : (
+                            <Folder className="w-4 h-4 text-white" />
+                          )}
+                        </div>
+                        {isExpanded && (
+                          <div className="w-px flex-1 bg-white/40 mt-1" />
+                        )}
+                      </div>
                       <div className="min-w-0 flex-1">
                         <span className="block font-bold text-[15px] sm:text-[16px] leading-tight">
                           Module {sIdx + 1}
@@ -631,11 +638,10 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                     </div>
                   </button>
 
-                  {/* CONNECTED LESSONS TIMELINE: Continuous vertical line connecting lessons from top to bottom, NO internal tabs */}
+                  {/* CONNECTED LESSONS: Rooting from module, bending towards lesson title, no numbers */}
                   {isExpanded && (
-                    <div className="w-full py-2 border-b border-white/50">
+                    <div className="w-full pb-3 pt-0">
                       {section.lessons.map((lesson, lIdx) => {
-                        const isFirst = lIdx === 0;
                         const isLast = lIdx === section.lessons.length - 1;
                         const isCurrent = lesson.lessonId === selectedLessonId;
 
@@ -644,72 +650,64 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             key={lesson.lessonId}
                             type="button"
                             onClick={() => setSelectedLessonId(lesson.lessonId)}
-                            className={`w-full text-left px-5 sm:px-6 py-2.5 sm:py-3 flex items-start gap-3 transition-colors cursor-pointer select-none group ${
+                            className={`w-full text-left px-5 sm:px-6 py-2 sm:py-2.5 flex items-start gap-2.5 transition-colors cursor-pointer select-none group ${
                               isCurrent ? 'bg-white/[0.08]' : 'bg-transparent hover:bg-white/[0.04]'
                             }`}
                           >
-                            {/* Connected Node & Vertical Line Track */}
-                            <div className="relative flex flex-col items-center self-stretch shrink-0 w-5">
-                              {/* Top vertical connecting segment */}
+                            {/* Branch line rooting from module and bending towards lesson title */}
+                            <div className="relative shrink-0 w-4 self-stretch">
+                              {/* Curved L-bend line from top to right towards lesson title */}
                               <div
-                                className={`w-px flex-1 ${
-                                  isFirst ? 'bg-transparent' : 'bg-white/30'
-                                }`}
-                                style={{ minHeight: '6px' }}
+                                className={`absolute left-[7px] top-0 w-3 h-3.5 border-l border-b ${
+                                  isCurrent ? 'border-white' : 'border-white/40'
+                                } rounded-bl-[4px]`}
                               />
 
-                              {/* Lesson Milestone Node: Tick if completed, or 2-digit number (no play icon) */}
-                              <div
-                                className={`relative z-10 w-5 h-5 rounded-none flex items-center justify-center shrink-0 border transition-colors my-0.5 ${
-                                  isCurrent
-                                    ? 'bg-white text-black border-white font-extrabold'
-                                    : lesson.isCompleted
-                                    ? 'bg-white text-black border-white'
-                                    : 'bg-black text-white/70 border-white/40 group-hover:border-white group-hover:text-white'
-                                }`}
-                              >
-                                {lesson.isCompleted ? (
-                                  <Check className="w-3 h-3 stroke-[3] text-black" />
-                                ) : (
-                                  <span className="text-[10px] font-mono leading-none font-bold">
-                                    {String(lIdx + 1).padStart(2, '0')}
-                                  </span>
-                                )}
-                              </div>
-
-                              {/* Bottom vertical connecting segment */}
-                              <div
-                                className={`w-px flex-1 ${
-                                  isLast ? 'bg-transparent' : 'bg-white/30'
-                                }`}
-                                style={{ minHeight: '6px' }}
-                              />
+                              {/* Continuing vertical stem for subsequent lessons */}
+                              {!isLast && (
+                                <div
+                                  className={`absolute left-[7px] top-3.5 bottom-0 w-px ${
+                                    isCurrent ? 'bg-white' : 'bg-white/40'
+                                  }`}
+                                />
+                              )}
                             </div>
 
-                            {/* Lesson Title and Video Duration Below */}
-                            <div className="min-w-0 flex-1 pt-0.5">
-                              <div
-                                className={`text-xs sm:text-[13px] leading-snug whitespace-normal break-words ${
-                                  isCurrent
-                                    ? 'font-extrabold text-white'
-                                    : 'font-medium text-white/85 group-hover:text-white'
-                                }`}
-                              >
-                                {lesson.title}
-                              </div>
+                            {/* Lesson Content: Tick in front when completed, title, and video time below */}
+                            <div className="min-w-0 flex-1 pt-0.5 flex items-start gap-2">
+                              {lesson.isCompleted && (
+                                <div
+                                  className="w-4 h-4 rounded-none bg-white flex items-center justify-center shrink-0 mt-0.5"
+                                  title="Completed"
+                                >
+                                  <Check className="w-2.5 h-2.5 stroke-[3] text-black" />
+                                </div>
+                              )}
 
-                              {/* Video time placed directly below the title */}
-                              <div
-                                className={`text-[10px] sm:text-[11px] font-mono mt-1 ${
-                                  isCurrent
-                                    ? 'text-white/80 font-semibold'
-                                    : 'text-white/50 group-hover:text-white/70'
-                                }`}
-                              >
-                                {Math.floor(lesson.durationSeconds / 60)}m
-                                {lesson.durationSeconds % 60 > 0
-                                  ? ` ${lesson.durationSeconds % 60}s`
-                                  : ''}
+                              <div className="min-w-0 flex-1">
+                                <div
+                                  className={`text-xs sm:text-[13px] leading-snug whitespace-normal break-words ${
+                                    isCurrent
+                                      ? 'font-extrabold text-white'
+                                      : 'font-medium text-white/85 group-hover:text-white'
+                                  }`}
+                                >
+                                  {lesson.title}
+                                </div>
+
+                                {/* Video time placed directly below the title */}
+                                <div
+                                  className={`text-[10px] sm:text-[11px] font-mono mt-1 ${
+                                    isCurrent
+                                      ? 'text-white/80 font-semibold'
+                                      : 'text-white/50 group-hover:text-white/70'
+                                  }`}
+                                >
+                                  {Math.floor(lesson.durationSeconds / 60)}m
+                                  {lesson.durationSeconds % 60 > 0
+                                    ? ` ${lesson.durationSeconds % 60}s`
+                                    : ''}
+                                </div>
                               </div>
                             </div>
                           </button>
