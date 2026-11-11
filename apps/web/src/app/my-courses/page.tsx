@@ -959,7 +959,7 @@ function StudentDashboardContent() {
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
                             required
-                            placeholder="••••••••"
+                            placeholder="Your current password"
                             className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-lg text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
                           />
                           <button
