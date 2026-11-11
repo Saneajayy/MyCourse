@@ -90,7 +90,8 @@ export function CertificateSection() {
 
                 {/* 5. Course Completion Description */}
                 <p className="text-black/80 font-light text-[12px] sm:text-[13px] leading-[1.45] text-left select-none max-w-[340px]">
-                  For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong> by Mr. Hira lal, covering the Fundamentals of Hydraulic systems, components and circuit designs.
+                  For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong> by Mr. Hira lal, covering the<br />
+                  Fundamentals of Hydraulic systems, components and circuit designs.
                 </p>
 
                 {/* 6. Bottom Row: QR Code (Left) and Signature (Right) */}
@@ -183,7 +184,8 @@ export function CertificateSection() {
                   </h3>
 
                   <p className="text-black/80 font-light text-[13px] md:text-sm lg:text-[14px] leading-[1.5] text-left select-none max-w-[560px] lg:max-w-[620px]">
-                    For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong> by Mr. Hira lal, covering the Fundamentals of Hydraulic systems, components and circuit designs.
+                    For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong> by Mr. Hira lal, covering the<br />
+                    Fundamentals of Hydraulic systems, components and circuit designs.
                   </p>
                 </div>
 
