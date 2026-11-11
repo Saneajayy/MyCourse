@@ -143,24 +143,93 @@ export function CertificateSection() {
         <div className="hidden md:block w-full">
           <TiltCard
             className="relative w-full max-w-4xl md:max-w-[760px] lg:max-w-[870px] p-5 sm:p-6 md:p-7 bg-white rounded-lg sm:rounded-xl select-none cursor-pointer"
-            maxTilt={5}
+            maxTilt={4}
           >
-            {/* Background Design Watermark: Hero 3D Component */}
-            <div className="absolute inset-0 overflow-hidden rounded-lg sm:rounded-xl pointer-events-none z-0 flex items-center justify-center">
-              <div className="relative w-[175%] sm:w-[169%] md:w-[163%] max-w-[1270px] aspect-[1536/1024] -translate-x-[34%] -translate-y-[17%]">
-                <Image
-                  src="/hero-watermark-blue.png"
-                  alt="Hydraulic Motor Watermark"
-                  fill
-                  sizes="(max-width: 768px) 120vw, 1050px"
-                  className="object-contain opacity-[0.00] select-none pointer-events-none"
-                  priority={false}
-                />
+            {/* Inner White Card with Solid Black Border & Content matching mobile */}
+            <div className="relative z-10 bg-white border border-black rounded-md sm:rounded-lg overflow-hidden text-black flex flex-col justify-between">
+              {/* Top Bar: COURSE CERTIFICATE and CERT-98372 */}
+              <div className="flex items-center justify-between px-6 sm:px-8 lg:px-9 pt-5 sm:pt-6 pb-3.5 sm:pb-4">
+                <span className="text-black font-normal text-xs sm:text-[13px] tracking-[0.06em] uppercase">
+                  COURSE CERTIFICATE
+                </span>
+                <span className="text-black font-normal text-xs sm:text-[13px] tracking-[0.06em] uppercase">
+                  CERT-98372
+                </span>
+              </div>
+
+              {/* Top Divider Line */}
+              <div className="w-full border-b border-black" />
+
+              {/* Main Certificate Content */}
+              <div className="px-6 sm:px-8 lg:px-9 pt-7 sm:pt-8 pb-7 sm:pb-8 flex flex-col items-start text-left flex-1 justify-between">
+                {/* 1. Certificate Title */}
+                <div className="flex flex-col items-start text-left select-none leading-none text-black">
+                  <span className="font-light text-[38px] md:text-[44px] lg:text-[48px] tracking-tight uppercase leading-[1.04]">
+                    CERTIFICATE OF
+                  </span>
+                  <span className="font-light text-[38px] md:text-[44px] lg:text-[48px] tracking-tight uppercase leading-[1.04]">
+                    COMPLETION.
+                  </span>
+                </div>
+
+                {/* 2. Recipient Info & Course Description */}
+                <div className="mt-5 md:mt-6 lg:mt-7">
+                  <p className="text-black/75 font-light text-[13px] md:text-sm lg:text-[14px] lowercase tracking-normal text-left select-none">
+                    presented to
+                  </p>
+
+                  <h3 className="font-extrabold text-black text-[28px] md:text-[34px] lg:text-[38px] tracking-wide uppercase leading-tight select-none mt-1 sm:mt-1.5 mb-2.5 sm:mb-3">
+                    VARUN KUMAR
+                  </h3>
+
+                  <p className="text-black/80 font-light text-[13px] md:text-sm lg:text-[14px] leading-[1.5] text-left select-none max-w-[560px] lg:max-w-[620px]">
+                    For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong> by Mr. Hira lal, covering the Fundamentals of Hydraulic systems, components and circuit designs.
+                  </p>
+                </div>
+
+                {/* 3. Bottom Row: QR Code (Left) and Signature + Brand (Right) */}
+                <div className="w-full flex items-end justify-between mt-8 md:mt-10 lg:mt-12 pt-1">
+                  {/* Verification QR Code: Saturation 0 to render in black */}
+                  <div className="relative w-[118px] h-[118px] md:w-[130px] md:h-[130px] lg:w-[140px] lg:h-[140px] flex-shrink-0">
+                    <Image
+                      src="/cert-qr-blue-exact.png"
+                      alt="Certificate Verification QR Code"
+                      fill
+                      sizes="140px"
+                      className="object-contain saturate-0 grayscale contrast-200"
+                      priority
+                    />
+                  </div>
+
+                  {/* Instructor Signature: Saturation 0 to render in black */}
+                  <div className="flex flex-col items-start select-none">
+                    <div className="relative w-[92px] md:w-[105px] lg:w-[115px] h-[32px] md:h-[37px] lg:h-[40px]">
+                      <Image
+                        src="/cert-signature-hiralal.png"
+                        alt="HiraLal Signature"
+                        fill
+                        sizes="115px"
+                        className="object-contain object-left saturate-0 grayscale contrast-200"
+                        priority
+                      />
+                    </div>
+                    <span className="font-normal text-black text-xs md:text-[13px] tracking-normal mt-0.5">
+                      Course Instructor
+                    </span>
+
+                    {/* Exact Stacked Brand Logo below Course Instructor */}
+                    <div className="flex flex-col items-start -space-y-0.5 leading-[0.92] text-black select-none mt-2.5 md:mt-3">
+                      <span className="font-extrabold text-[28px] md:text-[32px] lg:text-[36px] tracking-[0.01em] uppercase leading-[0.92]">
+                        HYDRO
+                      </span>
+                      <span className="font-extrabold text-[28px] md:text-[32px] lg:text-[36px] tracking-[0.01em] uppercase leading-[0.92]">
+                        BASICS
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-
-            {/* Inner Blue Frame & Certificate Content Area */}
-            <div className="relative z-10 border border-black/35 rounded-md sm:rounded-lg p-6 sm:p-7 md:p-8 lg:p-9 min-h-[460px] md:min-h-[476px]" />
           </TiltCard>
         </div>
       </div>
