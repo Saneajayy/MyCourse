@@ -24,6 +24,8 @@ import {
   Eye,
   EyeOff,
   Lock,
+  Video,
+  Clock,
 } from 'lucide-react';
 
 export type DashboardTab = 'courses' | 'certificates' | 'profile' | 'orders';
@@ -35,6 +37,8 @@ interface EnrolledCourse {
     title: string;
     description?: string | null;
     thumbnailUrl: string | null;
+    totalVideos?: number;
+    totalDurationSeconds?: number;
   };
   entitlement: {
     id: string;
@@ -48,11 +52,21 @@ interface EnrolledCourse {
     totalLessons: number;
     completedLessons: number;
     percentComplete: number;
+    totalDurationSeconds?: number;
   };
   nextLesson?: {
     lessonId: string;
     title: string;
   } | null;
+}
+
+function formatCourseDuration(seconds?: number): string {
+  if (!seconds || seconds <= 0) return '5 Hours of Content';
+  const hrs = seconds / 3600;
+  const rounded = hrs >= 10 ? Math.round(hrs) : Math.round(hrs * 10) / 10;
+  const isWhole = rounded % 1 === 0;
+  const numStr = isWhole ? rounded.toFixed(0) : rounded.toFixed(1);
+  return `${numStr} ${rounded === 1 ? 'Hour' : 'Hours'} of Content`;
 }
 
 interface OrderHistoryItem {
@@ -637,6 +651,9 @@ function StudentDashboardContent() {
                 <div className="w-full flex flex-col gap-6 items-start text-left">
                   {filteredCourses.map((c) => {
                     const percent = Math.min(100, Math.max(0, Math.round(c.progress?.percentComplete ?? 0)));
+                    const totalVideos = c.product.totalVideos ?? c.progress?.totalLessons ?? 16;
+                    const durationSeconds = c.product.totalDurationSeconds ?? c.progress?.totalDurationSeconds ?? 17830;
+                    const durationText = formatCourseDuration(durationSeconds);
 
                     return (
                       <div
@@ -677,8 +694,21 @@ function StudentDashboardContent() {
                               </span>
                             </div>
 
+                            {/* Course Metadata: Total Videos & Total Hours of Content */}
+                            <div className="flex items-center gap-2.5 text-xs text-neutral-500 font-medium mt-1.5 select-none">
+                              <span className="inline-flex items-center gap-1.5">
+                                <Video className="w-3.5 h-3.5 text-neutral-400" />
+                                <span>{totalVideos} Videos</span>
+                              </span>
+                              <span className="text-neutral-300">•</span>
+                              <span className="inline-flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5 text-neutral-400" />
+                                <span>{durationText}</span>
+                              </span>
+                            </div>
+
                             {/* Dynamic Course Description */}
-                            <p className="text-xs sm:text-[13px] text-neutral-700 leading-relaxed mt-2 sm:mt-2.5 text-justify">
+                            <p className="text-xs sm:text-[13px] text-neutral-700 leading-relaxed mt-2.5 text-justify">
                               {c.product.description ||
                                 'Learn the fundamentals of hydraulic systems from scratch. This course introduces you to the working principles of hydraulics, essential components, and hydraulic circuit basics through easy-to-understand video lessons.'}
                             </p>

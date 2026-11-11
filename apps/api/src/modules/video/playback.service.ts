@@ -298,6 +298,7 @@ export class PlaybackService {
       const product = ent.product;
       const allLessons = product.sections.flatMap((s) => s.lessons);
       const totalLessons = allLessons.length;
+      const totalDurationSeconds = allLessons.reduce((acc, l) => acc + (l.durationSeconds || 0), 0);
 
       // Fetch user's progress across all lessons in this course
       const progressRecords = await prisma.lessonProgress.findMany({
@@ -340,6 +341,8 @@ export class PlaybackService {
           title: product.title,
           description: product.description,
           thumbnailUrl: product.thumbnailUrl,
+          totalVideos: totalLessons,
+          totalDurationSeconds,
         },
         entitlement: {
           id: ent.id,
@@ -353,6 +356,7 @@ export class PlaybackService {
           totalLessons,
           completedLessons,
           percentComplete,
+          totalDurationSeconds,
         },
         nextLesson,
       });
