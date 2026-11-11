@@ -729,8 +729,8 @@ function StudentDashboardContent() {
                             {/* Dynamic Certificate Unlock Notice */}
                             <p className="font-bold text-neutral-900 text-xs sm:text-[13px] select-none mt-2">
                               {percent >= 90
-                                ? 'Certificate unlocked!'
-                                : 'Complete 90% to unlock certificate.'}
+                                ? 'Course completed. Certificate unlocked!'
+                                : 'Complete course to unlock certificate.'}
                             </p>
 
                             {/* Action Buttons */}
@@ -776,7 +776,7 @@ function StudentDashboardContent() {
                   <div className="space-y-1">
                     <h2 className="text-lg font-bold text-neutral-900 uppercase">NO CERTIFICATES EARNED YET.</h2>
                     <p className="text-xs text-neutral-500 leading-relaxed">
-                      Complete at least 90% of course content in your enrolled courses to automatically unlock your verified certificate.
+                      Complete all lesson modules and practical evaluations in your enrolled courses to automatically unlock your verified certificate.
                     </p>
                   </div>
                   <div>
@@ -803,7 +803,7 @@ function StudentDashboardContent() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 block">
-                            Certificate Unlocked
+                            Course Completed
                           </span>
                           <h2 className="text-base font-bold text-neutral-900 truncate">
                             {c.product.title}
