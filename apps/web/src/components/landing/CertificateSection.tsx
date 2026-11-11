@@ -84,7 +84,7 @@ export function CertificateSection() {
                   presented to
                 </p>
 
-                <h3 className="font-extrabold text-black text-[24px] sm:text-[27px] tracking-wide uppercase leading-tight select-none mt-1 sm:mt-1.5 mb-2.5 sm:mb-3">
+                <h3 className="font-semibold text-black text-[24px] sm:text-[27px] tracking-wide uppercase leading-tight select-none mt-1 sm:mt-1.5 mb-2.5 sm:mb-3">
                   VARUN KUMAR
                 </h3>
 
@@ -181,7 +181,7 @@ export function CertificateSection() {
                       presented to
                     </p>
 
-                    <h3 className="font-extrabold text-black text-[25px] md:text-[29px] lg:text-[33px] xl:text-[35px] tracking-wide uppercase leading-tight select-none mt-1 md:mt-1.5 mb-0">
+                    <h3 className="font-semibold text-black text-[25px] md:text-[29px] lg:text-[33px] xl:text-[35px] tracking-wide uppercase leading-tight select-none mt-1 md:mt-1.5 mb-0">
                       VARUN KUMAR
                     </h3>
 
