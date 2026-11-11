@@ -5,189 +5,216 @@ import Link from 'next/link';
 import { siteConfig } from '../../config/site';
 import { useAuth } from '../../context/auth-context';
 import { ShieldCheck, AlertTriangle } from 'lucide-react';
-import { LandingFooter } from '../../components/landing/LandingFooter';
 
 function TermsNavbar() {
   const { isAuthenticated } = useAuth();
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 w-full figma-glass-nav font-reddit select-none">
+    <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-neutral-200 select-none">
       <nav
         aria-label="Terms Navigation"
-        className="w-full h-20 md:h-[84px] flex items-stretch justify-between"
+        className="w-full max-w-5xl mx-auto h-16 sm:h-20 px-6 sm:px-8 md:px-12 flex items-center justify-between"
       >
         {/* Left Side: Brand Logo + Back to Course Link */}
-        <div className="flex items-center pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 gap-6 sm:gap-8 lg:gap-10">
+        <div className="flex items-center gap-5 sm:gap-7">
           <Link
             href="/"
-            className="flex flex-col justify-center -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity"
+            className="flex flex-col justify-center -space-y-0.5 leading-[0.92] text-black hover:opacity-80 transition-opacity"
             aria-label="HYDRO BASICS Home"
           >
-            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
               HYDRO
             </span>
-            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
               BASICS
             </span>
           </Link>
 
+          <div className="h-5 w-px bg-neutral-200" aria-hidden="true" />
+
           <Link
             href="/"
-            className="text-white/80 hover:text-white font-semibold text-sm sm:text-base tracking-normal transition-colors py-2 flex items-center gap-2"
+            className="text-neutral-600 hover:text-black font-semibold text-xs sm:text-sm tracking-normal transition-colors py-2 flex items-center gap-1.5"
           >
             <span aria-hidden="true">&larr;</span> Back to Course
           </Link>
         </div>
 
-        {/* Right Side: Account / Login Cell */}
-        <div className="flex items-stretch">
-          <div className="figma-glass-divider border-r border-white/20 h-full flex items-stretch">
-            {isAuthenticated ? (
-              <Link
-                href="/my-courses"
-                className="h-full flex items-center justify-center px-6 sm:px-8 lg:px-10 text-white font-semibold text-[15px] sm:text-[16px] xl:text-[17px] tracking-normal hover:bg-white/10 active:bg-white/15 transition-all whitespace-nowrap"
-              >
-                My Courses
-              </Link>
-            ) : (
-              <Link
-                href="/login?redirect=/terms"
-                className="h-full flex items-center justify-center px-6 sm:px-8 lg:px-10 text-white font-semibold text-[15px] sm:text-[16px] xl:text-[17px] tracking-normal hover:bg-white/10 active:bg-white/15 transition-all whitespace-nowrap"
-              >
-                Log In
-              </Link>
-            )}
-          </div>
+        {/* Right Side: Account / Login */}
+        <div className="flex items-center">
+          {isAuthenticated ? (
+            <Link
+              href="/my-courses"
+              className="text-xs sm:text-sm font-bold text-neutral-900 hover:text-black px-3.5 py-1.5 rounded-lg hover:bg-neutral-100 transition-colors"
+            >
+              My Courses
+            </Link>
+          ) : (
+            <Link
+              href="/login?redirect=/terms"
+              className="text-xs sm:text-sm font-bold text-neutral-900 hover:text-black px-3.5 py-1.5 rounded-lg hover:bg-neutral-100 transition-colors"
+            >
+              Log In
+            </Link>
+          )}
         </div>
       </nav>
     </header>
   );
 }
 
-export default function TermsPage() {
+function TermsFooter() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-x-hidden pt-20 md:pt-[84px] flex flex-col justify-between">
-      {/* Background Noise Texture */}
-      <div className="noise-texture" aria-hidden="true" />
-
-      {/* Floating Glass Navigation */}
-      <TermsNavbar />
-
-      {/* Main Content Area */}
-      <main className="relative z-10 flex-1 w-full max-w-[1240px] mx-auto py-10 sm:py-14 md:py-16 pb-16 sm:pb-24 pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 pr-6 sm:pr-8 md:pr-12 lg:pr-16">
-        {/* Header Block */}
-        <div className="mb-8 sm:mb-12 select-none">
-          <h1 className="font-extrabold text-white uppercase leading-[0.88] tracking-[-0.02em] text-4xl sm:text-5xl md:text-6xl lg:text-[68px] select-none">
-            <span className="block">TERMS &amp;</span>
-            <span className="block">CONDITIONS.</span>
-          </h1>
-          <p className="text-white/70 font-medium text-xs sm:text-sm md:text-base mt-3 max-w-xl">
-            Official student enrollment agreement, platform licensing rules, and industrial engineering safety protocols.
+    <footer className="w-full border-t border-neutral-200 bg-white select-none py-10 sm:py-12 mt-16 sm:mt-24">
+      <div className="w-full max-w-5xl mx-auto px-6 sm:px-8 md:px-12 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
+          <Link
+            href="/"
+            className="flex flex-col -space-y-0.5 leading-[0.92] text-black hover:opacity-80 transition-opacity"
+            aria-label="HYDRO BASICS Home"
+          >
+            <span className="font-extrabold text-[16px] tracking-[0.02em] uppercase leading-[0.92]">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[16px] tracking-[0.02em] uppercase leading-[0.92]">
+              BASICS
+            </span>
+          </Link>
+          <span className="hidden sm:inline text-neutral-300">|</span>
+          <p className="text-xs text-neutral-500">
+            © {currentYear} Hydro Basics. Industrial Hydraulic Engineering Masterclass.
           </p>
         </div>
 
-        {/* Minimal Policy Card Container */}
-        <div className="bg-white border border-neutral-200/80 rounded-xl sm:rounded-2xl overflow-hidden shadow-none select-text">
-          {/* Header Bar with continuous edge-to-edge dividing line */}
-          <div className="px-6 sm:px-8 md:px-10 py-4.5 sm:py-5 border-b border-neutral-200 flex flex-wrap items-center justify-between gap-3 bg-neutral-50/50">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white shrink-0">
-                <ShieldCheck className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-neutral-900 block">
-                  Binding Legal Agreement
-                </span>
-                <span className="text-[11px] text-neutral-500 font-medium">
-                  Jurisdiction: {siteConfig.contact.jurisdiction}
-                </span>
-              </div>
-            </div>
-            <div className="text-xs font-mono font-medium text-neutral-600 bg-white border border-neutral-200 px-3 py-1.5 rounded-md">
-              Last Updated: October 2026
-            </div>
+        <nav
+          aria-label="Footer Legal Links"
+          className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-semibold text-neutral-600"
+        >
+          <Link href="/terms" className="text-black font-bold">
+            Terms
+          </Link>
+          <Link href="/privacy" className="hover:text-black transition-colors">
+            Privacy
+          </Link>
+          <Link href="/refunds" className="hover:text-black transition-colors">
+            Refunds
+          </Link>
+          <Link href="/contact" className="hover:text-black transition-colors">
+            Contact
+          </Link>
+        </nav>
+      </div>
+    </footer>
+  );
+}
+
+export default function TermsPage() {
+  return (
+    <div className="min-h-screen bg-white text-neutral-900 font-reddit selection:bg-black selection:text-white flex flex-col justify-between">
+      {/* Sticky White Navigation */}
+      <TermsNavbar />
+
+      {/* Main Document Content */}
+      <main className="w-full max-w-4xl mx-auto px-6 sm:px-8 md:px-12 py-10 sm:py-14 md:py-16 flex-1 select-text">
+        {/* Document Header */}
+        <header className="mb-10 sm:mb-12 border-b border-neutral-200 pb-8 sm:pb-10">
+          <div className="flex items-center gap-2 text-xs font-mono font-medium text-neutral-500 uppercase tracking-widest mb-3">
+            <ShieldCheck className="w-4 h-4 text-black shrink-0" />
+            <span>Binding Legal Agreement</span>
           </div>
-
-          {/* Card Body */}
-          <div className="p-6 sm:p-8 md:p-10 lg:p-12 space-y-8 text-neutral-800 text-sm sm:text-[15px] leading-relaxed">
-            <section className="space-y-2.5">
-              <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2">
-                <span className="text-black font-mono">01.</span> Acceptance of Terms
-              </h2>
-              <p>
-                By registering for an account or enrolling in courses provided by{' '}
-                <strong className="text-neutral-950">{siteConfig.brandName}</strong> (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;),
-                you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not purchase or access the course curriculum.
-              </p>
-            </section>
-
-            <section className="space-y-2.5">
-              <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2">
-                <span className="text-black font-mono">02.</span> Course Access &amp; Validity
-              </h2>
-              <p>
-                Enrolling in the course grants you a single-user, non-exclusive, non-transferable license to stream instructional videos, review hydraulic schematics, and access supplemental reference materials for a period of <strong className="text-neutral-950">365 days (1 year)</strong> from the timestamp of payment confirmation, unless lifetime access was explicitly purchased.
-              </p>
-            </section>
-
-            <section className="space-y-2.5">
-              <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2">
-                <span className="text-black font-mono">03.</span> Anti-Piracy &amp; Dynamic Watermarking
-              </h2>
-              <p>
-                All video lectures are dynamically embedded with cryptographic watermarks displaying the enrolled student&apos;s registered email address and session tokens. Screen-recording, ripping, downloading, sharing credentials, or publicly distributing course materials is strictly prohibited and constitutes a copyright violation punishable under the Indian Copyright Act, 1957.
-              </p>
-              <p>
-                Single-device concurrent streaming is strictly enforced. Sharing student login accounts will trigger automatic session revocation or permanent account ban without refund.
-              </p>
-            </section>
-
-            <section className="space-y-2.5">
-              <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2">
-                <span className="text-black font-mono">04.</span> Pricing, Payments &amp; Taxes
-              </h2>
-              <p>
-                All course fees are quoted in Indian Rupees (INR) and are inclusive of Goods and Services Tax (GST) where applicable. Payments are processed securely via RBI-authorized payment aggregators (Razorpay). Valid GST tax invoices are automatically generated upon payment confirmation and remain available for PDF download in your student account dashboard.
-              </p>
-            </section>
-
-            <section className="space-y-2.5">
-              <div className="p-4 sm:p-5 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 space-y-2">
-                <div className="flex items-center gap-2 font-bold text-neutral-950 text-sm sm:text-base">
-                  <AlertTriangle className="w-4 h-4 text-neutral-900 shrink-0" />
-                  <h3>05. Engineering Safety Disclaimer</h3>
-                </div>
-                <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
-                  Industrial hydraulic machinery operates under extreme fluid pressures exceeding 200–350 bar. The instructions, schematic circuits, and troubleshooting procedures taught in this course are educational demonstrations. Students and engineers must follow original manufacturer safety manuals, plant isolation (LOTO) protocols, and pressure relief checks before performing live maintenance. We assume no liability for equipment damage or personal injury resulting from improper practical application.
-                </p>
-              </div>
-            </section>
-
-            <section className="space-y-2.5">
-              <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2">
-                <span className="text-black font-mono">06.</span> Contact &amp; Grievance Redressal
-              </h2>
-              <p>
-                For any billing inquiries, account questions, or legal notices, contact our support desk directly at{' '}
-                <a
-                  href={`mailto:${siteConfig.supportEmail}`}
-                  className="font-bold underline text-black hover:underline"
-                >
-                  {siteConfig.supportEmail}
-                </a>{' '}
-                or visit our{' '}
-                <Link href="/contact" className="font-bold underline text-black hover:underline">
-                  Contact Support
-                </Link>{' '}
-                page.
-              </p>
-            </section>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-neutral-950 uppercase tracking-tight">
+            Terms &amp; Conditions
+          </h1>
+          <p className="text-neutral-600 font-medium text-sm sm:text-base mt-3 max-w-2xl leading-relaxed">
+            Official student enrollment agreement, platform licensing rules, and industrial engineering safety protocols.
+          </p>
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-6 mt-6 border-t border-neutral-100 text-xs font-mono text-neutral-500">
+            <span>Jurisdiction: {siteConfig.contact.jurisdiction}</span>
+            <span>Last Updated: October 2026</span>
           </div>
+        </header>
+
+        {/* Policy Body */}
+        <div className="space-y-10 sm:space-y-12 text-neutral-800 text-sm sm:text-[15px] leading-relaxed">
+          <section className="space-y-3">
+            <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2.5">
+              <span className="text-black font-mono font-bold">01.</span> Acceptance of Terms
+            </h2>
+            <p className="text-neutral-600 leading-relaxed">
+              By registering for an account or enrolling in courses provided by{' '}
+              <strong className="text-neutral-950">{siteConfig.brandName}</strong> (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;),
+              you agree to be bound by these Terms and Conditions. If you do not agree to these terms, please do not purchase or access the course curriculum.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2.5">
+              <span className="text-black font-mono font-bold">02.</span> Course Access &amp; Validity
+            </h2>
+            <p className="text-neutral-600 leading-relaxed">
+              Enrolling in the course grants you a single-user, non-exclusive, non-transferable license to stream instructional videos, review hydraulic schematics, and access supplemental reference materials for a period of <strong className="text-neutral-950">365 days (1 year)</strong> from the timestamp of payment confirmation, unless lifetime access was explicitly purchased.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2.5">
+              <span className="text-black font-mono font-bold">03.</span> Anti-Piracy &amp; Dynamic Watermarking
+            </h2>
+            <p className="text-neutral-600 leading-relaxed">
+              All video lectures are dynamically embedded with cryptographic watermarks displaying the enrolled student&apos;s registered email address and session tokens. Screen-recording, ripping, downloading, sharing credentials, or publicly distributing course materials is strictly prohibited and constitutes a copyright violation punishable under the Indian Copyright Act, 1957.
+            </p>
+            <p className="text-neutral-600 leading-relaxed">
+              Single-device concurrent streaming is strictly enforced. Sharing student login accounts will trigger automatic session revocation or permanent account ban without refund.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2.5">
+              <span className="text-black font-mono font-bold">04.</span> Pricing, Payments &amp; Taxes
+            </h2>
+            <p className="text-neutral-600 leading-relaxed">
+              All course fees are quoted in Indian Rupees (INR) and are inclusive of Goods and Services Tax (GST) where applicable. Payments are processed securely via RBI-authorized payment aggregators (Razorpay). Valid GST tax invoices are automatically generated upon payment confirmation and remain available for PDF download in your student account dashboard.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <div className="p-5 sm:p-6 bg-neutral-50 border border-neutral-200 rounded-xl text-neutral-900 space-y-2.5">
+              <div className="flex items-center gap-2 font-bold text-neutral-950 text-sm sm:text-base">
+                <AlertTriangle className="w-4 h-4 text-black shrink-0" />
+                <h3>05. Engineering Safety Disclaimer</h3>
+              </div>
+              <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
+                Industrial hydraulic machinery operates under extreme fluid pressures exceeding 200–350 bar. The instructions, schematic circuits, and troubleshooting procedures taught in this course are educational demonstrations. Students and engineers must follow original manufacturer safety manuals, plant isolation (LOTO) protocols, and pressure relief checks before performing live maintenance. We assume no liability for equipment damage or personal injury resulting from improper practical application.
+              </p>
+            </div>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-base sm:text-lg font-bold text-neutral-950 flex items-center gap-2.5">
+              <span className="text-black font-mono font-bold">06.</span> Contact &amp; Grievance Redressal
+            </h2>
+            <p className="text-neutral-600 leading-relaxed">
+              For any billing inquiries, account questions, or legal notices, contact our support desk directly at{' '}
+              <a
+                href={`mailto:${siteConfig.supportEmail}`}
+                className="font-bold underline text-black hover:opacity-80"
+              >
+                {siteConfig.supportEmail}
+              </a>{' '}
+              or visit our{' '}
+              <Link href="/contact" className="font-bold underline text-black hover:opacity-80">
+                Contact Support
+              </Link>{' '}
+              page.
+            </p>
+          </section>
         </div>
       </main>
 
-      {/* Signature Landing Footer */}
-      <LandingFooter showQuickLinks={true} />
+      {/* Clean White Minimal Footer */}
+      <TermsFooter />
     </div>
   );
 }
