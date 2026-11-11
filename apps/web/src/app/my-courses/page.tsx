@@ -12,7 +12,6 @@ import { useToast } from '../../components/ui';
 import {
   BookOpen,
   User as UserIcon,
-  Search,
   Menu,
   X,
   Check,
@@ -34,6 +33,7 @@ interface EnrolledCourse {
     id: string;
     slug: string;
     title: string;
+    description?: string | null;
     thumbnailUrl: string | null;
   };
   entitlement: {
@@ -72,60 +72,20 @@ interface OrderHistoryItem {
   } | null;
 }
 
-function formatExpiryDate(expiresAt: string | null | undefined, isLifetime?: boolean): string {
-  if (isLifetime || !expiresAt) return 'LIFETIME ACCESS';
-  const d = new Date(expiresAt);
-  if (isNaN(d.getTime())) return 'LIFETIME ACCESS';
-  const day = d.getDate();
-  const suffix = (n: number) => {
-    if (n >= 11 && n <= 13) return 'th';
-    switch (n % 10) {
-      case 1:
-        return 'st';
-      case 2:
-        return 'nd';
-      case 3:
-        return 'rd';
-      default:
-        return 'th';
-    }
-  };
-  const monthNames = [
-    'JANUARY',
-    'FEBRUARY',
-    'MARCH',
-    'APRIL',
-    'MAY',
-    'JUNE',
-    'JULY',
-    'AUGUST',
-    'SEPTEMBER',
-    'OCTOBER',
-    'NOVEMBER',
-    'DECEMBER',
-  ];
-  return `EXPIRES ON ${day}${suffix(day)} ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
-}
-
-function formatCourseTitle(title?: string): string {
-  if (!title) return 'UNTITLED COURSE.';
-  const t = title.trim().toUpperCase();
-  return t.endsWith('.') ? t : `${t}.`;
-}
 
 function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
   const clamped = Math.max(0, Math.min(100, Math.round(percent)));
 
   return (
     <div
-      className="w-full flex items-center h-[18px] sm:h-5 select-none my-3 sm:my-3.5 overflow-hidden"
+      className="w-full flex items-center h-5 select-none my-2.5 overflow-hidden"
       aria-label={`Course progress: ${clamped}%`}
       role="progressbar"
       aria-valuenow={clamped}
       aria-valuemin={0}
       aria-valuemax={100}
     >
-      {/* Completed portion with dense electric blue vertical bars */}
+      {/* Completed portion with dense black vertical bars */}
       {clamped > 0 && (
         <div
           className="h-full shrink-0"
@@ -133,26 +93,27 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
             width: clamped >= 100 ? '100%' : `calc(${clamped}% - 14px)`,
             minWidth: clamped > 0 && clamped < 100 ? '8px' : undefined,
             backgroundImage:
-              'repeating-linear-gradient(to right, #000000 0px, #000000 1.5px, transparent 1.5px, transparent 4px)',
+              'repeating-linear-gradient(to right, #000000 0px, #000000 1.5px, transparent 1.5px, transparent 3.5px)',
           }}
         />
       )}
 
       {/* Percentage Label */}
       <span
-        className={`text-black font-medium text-[11px] sm:text-xs leading-none shrink-0 select-none ${clamped === 0 ? 'pr-1.5' : clamped === 100 ? 'pl-1.5' : 'px-1.5'
-          }`}
+        className={`text-black font-semibold text-xs sm:text-[13px] leading-none shrink-0 select-none ${
+          clamped === 0 ? 'pr-2' : clamped === 100 ? 'pl-2' : 'px-2'
+        }`}
       >
         {clamped}%
       </span>
 
-      {/* Uncompleted portion with faint lavender-gray vertical bars */}
+      {/* Uncompleted portion with faint light-gray vertical bars */}
       {clamped < 100 && (
         <div
           className="flex-1 h-full"
           style={{
             backgroundImage:
-              'repeating-linear-gradient(to right, #E5E5E5 0px, #E5E5E5 1.5px, transparent 1.5px, transparent 4px)',
+              'repeating-linear-gradient(to right, #D4D4D4 0px, #D4D4D4 1.5px, transparent 1.5px, transparent 3.5px)',
           }}
         />
       )}
@@ -431,8 +392,8 @@ function StudentDashboardContent() {
         {/* Dropping Column when opened: Expands on top of screen and collapses smoothly without affecting content */}
         <div
           className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isMobileMenuOpen
-              ? 'grid-rows-[1fr] opacity-100 pointer-events-auto visible'
-              : 'grid-rows-[0fr] opacity-0 pointer-events-none invisible'
+            ? 'grid-rows-[1fr] opacity-100 pointer-events-auto visible'
+            : 'grid-rows-[0fr] opacity-0 pointer-events-none invisible'
             }`}
         >
           <div className="overflow-hidden relative bg-black border-t border-white/50">
@@ -464,8 +425,8 @@ function StudentDashboardContent() {
                       setIsMobileMenuOpen(false);
                     }}
                     className={`w-full text-left px-6 py-4 text-[15px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${isActive
-                        ? 'bg-white text-black font-extrabold'
-                        : 'bg-transparent text-white hover:bg-white/10'
+                      ? 'bg-white text-black font-extrabold'
+                      : 'bg-transparent text-white hover:bg-white/10'
                       }`}
                   >
                     {tab.label}
@@ -503,9 +464,8 @@ function StudentDashboardContent() {
 
       {/* Dimming Backdrop Overlay: Fixed over the screen behind the header (No blur, pure neutral opacity dimming) */}
       <div
-        className={`md:hidden fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
+        className={`md:hidden fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 ease-in-out ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
         onClick={() => setIsMobileMenuOpen(false)}
         aria-hidden="true"
       />
@@ -551,8 +511,8 @@ function StudentDashboardContent() {
                 type="button"
                 onClick={() => handleTabChange(tab.id)}
                 className={`w-full text-left px-6 sm:px-7 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${isActive
-                    ? 'bg-white text-black font-extrabold'
-                    : 'bg-transparent text-white hover:bg-white/10'
+                  ? 'bg-white text-black font-extrabold'
+                  : 'bg-transparent text-white hover:bg-white/10'
                   }`}
               >
                 {tab.label}
@@ -607,13 +567,12 @@ function StudentDashboardContent() {
               {/* Minimal Search Bar directly below Title */}
               {courses.length > 0 && (
                 <div className="relative w-full max-w-md">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" />
                   <input
                     type="text"
-                    placeholder="Search courses..."
+                    placeholder="Search courses"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-10 pl-9 pr-8 bg-white border border-neutral-300 rounded-lg text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:outline-none transition-all shadow-none"
+                    className="w-full h-10 px-3.5 bg-white border border-neutral-300 rounded-lg text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:outline-none transition-all shadow-none"
                   />
                   {searchQuery && (
                     <button
@@ -673,52 +632,86 @@ function StudentDashboardContent() {
                 </div>
               )}
 
-              {/* Courses Grid: Minimal White Cards with Minimal Text and Previous Progress Bar */}
+              {/* Courses List: Wide Horizontal Course Cards matching design */}
               {filteredCourses.length > 0 && (
-                <div className="flex flex-wrap gap-6 items-start text-left">
+                <div className="w-full flex flex-col gap-6 items-start text-left">
                   {filteredCourses.map((c) => {
                     const percent = Math.min(100, Math.max(0, Math.round(c.progress?.percentComplete ?? 0)));
 
                     return (
                       <div
                         key={c.product.id}
-                        className="relative w-full max-w-[420px] sm:max-w-[450px] bg-white border border-neutral-200 rounded-xl p-5 sm:p-6 shadow-none select-none flex flex-col justify-between"
+                        className="w-full max-w-4xl bg-white border border-neutral-300 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 shadow-none select-none"
                       >
-                        <div className="w-full flex flex-col">
-                          {/* Expiration Date Header - Minimal text like before, NO pills */}
-                          <div className="mb-2 sm:mb-2.5">
-                            <span className="text-black text-[11px] sm:text-[12px] font-medium tracking-wider uppercase select-none block">
-                              {formatExpiryDate(c.entitlement?.expiresAt, c.entitlement?.isLifetime)}
-                            </span>
+                        {/* Course Thumbnail Image: Desaturated Halftone Dot Effect */}
+                        <div className="relative w-full md:w-[320px] lg:w-[360px] shrink-0 aspect-[16/10] rounded-xl overflow-hidden bg-black border border-neutral-200">
+                          <img
+                            src={
+                              c.product.thumbnailUrl && !c.product.thumbnailUrl.includes('unsplash')
+                                ? c.product.thumbnailUrl
+                                : '/course-halftone.jpg'
+                            }
+                            alt={c.product.title}
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = '/course.jpg';
+                            }}
+                            className="w-full h-full object-cover select-none"
+                          />
+                        </div>
+
+                        {/* Course Content Details */}
+                        <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
+                          <div>
+                            {/* Course Title + Active Status Badge */}
+                            <div className="flex items-start justify-between gap-3">
+                              <h2 className="text-xl sm:text-[22px] font-bold text-neutral-900 tracking-tight leading-snug">
+                                <Link
+                                  href={`/learn/${c.product.slug}`}
+                                  className="underline underline-offset-4 decoration-neutral-900 hover:text-neutral-700 transition-colors"
+                                >
+                                  {c.product.title}
+                                </Link>
+                              </h2>
+                              <span className="px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase text-white bg-[#0e5c2f] rounded shrink-0 select-none">
+                                {c.entitlement?.status || 'ACTIVE'}
+                              </span>
+                            </div>
+
+                            {/* Dynamic Course Description */}
+                            <p className="text-xs sm:text-[13px] text-neutral-700 leading-relaxed mt-2 sm:mt-2.5">
+                              {c.product.description ||
+                                'Learn the fundamentals of hydraulic systems from scratch. This course introduces you to the working principles of hydraulics, essential components, and hydraulic circuit basics through easy-to-understand video lessons.'}
+                            </p>
                           </div>
 
-                          {/* Course Thumbnail Image: Desaturated Halftone Dot Effect */}
-                          <div className="relative w-full aspect-[16/10] rounded-lg overflow-hidden mb-3 sm:mb-3.5 select-none bg-black border border-neutral-200">
-                            <img
-                              src="/course-halftone.jpg"
-                              alt={c.product.title}
-                              onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).src = '/course.jpg';
-                              }}
-                              className="w-full h-full object-cover select-none"
-                            />
+                          <div className="mt-4 sm:mt-5">
+                            {/* Barcode / Hatch Progress Bar with dynamic percentage */}
+                            <CloseBarsProgressBar percent={percent} />
+
+                            {/* Dynamic Certificate Unlock Notice */}
+                            <p className="font-bold text-neutral-900 text-xs sm:text-[13px] select-none mt-2">
+                              {percent >= 100
+                                ? 'Course completed. Certificate unlocked!'
+                                : 'Complete course to unlock certificate.'}
+                            </p>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-wrap items-center gap-3 mt-3.5 sm:mt-4">
+                              <Link
+                                href={`/learn/${c.product.slug}`}
+                                aria-label={percent > 0 ? 'Continue Learning' : 'Start Learning'}
+                                className="h-10 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-medium text-xs sm:text-sm rounded-lg flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
+                              >
+                                <span>{percent > 0 ? (percent >= 100 ? 'Review Course' : 'Continue Learning') : 'Start Learning'} &rarr;</span>
+                              </Link>
+                              <Link
+                                href={`/learn/${c.product.slug}`}
+                                className="h-10 px-6 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-900 font-medium text-xs sm:text-sm rounded-lg flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
+                              >
+                                <span>View Syllabus &rarr;</span>
+                              </Link>
+                            </div>
                           </div>
-
-                          {/* Course Title: HYDRAULIC SYSTEM BASICS. */}
-                          <h2 className="font-extrabold text-black uppercase text-[20px] sm:text-[22px] md:text-[23px] tracking-tight leading-tight select-none">
-                            {formatCourseTitle(c.product.title)}
-                          </h2>
-
-                          {/* Progress Bar with Close Vertical Bars and Percentage Label (Previous Design) */}
-                          <CloseBarsProgressBar percent={percent} />
-
-                          {/* Full-Width Solid Blue Continue Learning Action Button - No Arrow, Shadow-none */}
-                          <Link
-                            href={`/learn/${c.product.slug}`}
-                            className="w-full h-11 sm:h-12 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase rounded-lg flex items-center justify-center transition-colors select-none shadow-none"
-                          >
-                            <span>CONTINUE LEARNING</span>
-                          </Link>
                         </div>
                       </div>
                     );

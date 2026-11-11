@@ -338,6 +338,7 @@ export class PlaybackService {
           id: product.id,
           slug: product.slug,
           title: product.title,
+          description: product.description,
           thumbnailUrl: product.thumbnailUrl,
         },
         entitlement: {
