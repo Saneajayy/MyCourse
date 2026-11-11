@@ -181,7 +181,7 @@ export function CertificateSection() {
                       presented to
                     </p>
 
-                    <h3 className="font-extrabold text-black text-[30px] md:text-[36px] lg:text-[42px] xl:text-[45px] tracking-wide uppercase leading-tight select-none mt-2.5 md:mt-3 mb-0">
+                    <h3 className="font-extrabold text-black text-[25px] md:text-[29px] lg:text-[33px] xl:text-[35px] tracking-wide uppercase leading-tight select-none mt-2.5 md:mt-3 mb-0">
                       VARUN KUMAR
                     </h3>
 
