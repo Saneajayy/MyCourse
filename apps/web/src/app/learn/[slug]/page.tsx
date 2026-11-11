@@ -919,22 +919,27 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                           </button>
 
                           {showSettingsMenu && (
-                            <div className="absolute right-0 bottom-12 w-48 bg-white text-black border border-neutral-300 p-3 space-y-3 z-30 shadow-none rounded-none text-xs">
+                            <div className="absolute right-0 bottom-12 sm:bottom-14 w-52 bg-black/80 backdrop-blur-2xl border border-white/20 p-3.5 space-y-3 z-30 shadow-2xl rounded-xl sm:rounded-2xl text-xs text-white select-none">
                               {/* Playback speed */}
                               <div>
-                                <span className="font-bold uppercase tracking-wider block mb-1 text-black">
-                                  Speed
-                                </span>
-                                <div className="grid grid-cols-3 gap-1">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-white/60">
+                                    Playback Speed
+                                  </span>
+                                  <span className="text-[10px] font-mono font-bold text-white/80">
+                                    {playbackRate}x
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-1.5">
                                   {[0.75, 1, 1.25, 1.5, 1.75, 2].map((s) => (
                                     <button
                                       key={s}
                                       type="button"
                                       onClick={() => handleSpeedChange(s)}
-                                      className={`p-1 border border-neutral-300 font-mono font-bold rounded-none cursor-pointer ${
+                                      className={`py-1.5 text-xs font-mono font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center ${
                                         playbackRate === s
-                                          ? 'bg-black text-white border-black'
-                                          : 'bg-white hover:bg-neutral-100 text-black'
+                                          ? 'bg-white text-black border border-white shadow-sm'
+                                          : 'bg-white/10 hover:bg-white/20 text-white border border-white/10 hover:border-white/25 active:scale-95'
                                       }`}
                                     >
                                       {s}x
@@ -945,34 +950,43 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
                               {/* Quality selector */}
                               {qualityLevels.length > 0 && (
-                                <div className="border-t border-neutral-200 pt-2">
-                                  <span className="font-bold uppercase tracking-wider block mb-1 text-black">
-                                    Quality
-                                  </span>
+                                <div className="border-t border-white/15 pt-2.5">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-white/60">
+                                      Quality
+                                    </span>
+                                    <span className="text-[10px] font-mono text-white/80">
+                                      {currentQuality === -1
+                                        ? 'Auto'
+                                        : qualityLevels.find((q) => q.id === currentQuality)?.label || 'Auto'}
+                                    </span>
+                                  </div>
                                   <div className="space-y-1">
                                     <button
                                       type="button"
                                       onClick={() => handleQualityChange(-1)}
-                                      className={`w-full text-left p-1 border border-neutral-300 font-bold rounded-none cursor-pointer ${
+                                      className={`w-full px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-between ${
                                         currentQuality === -1
-                                          ? 'bg-black text-white border-black'
-                                          : 'bg-white hover:bg-neutral-100 text-black'
+                                          ? 'bg-white text-black border border-white shadow-sm'
+                                          : 'bg-white/5 hover:bg-white/15 text-white/90 hover:text-white border border-white/10 hover:border-white/20 active:scale-95'
                                       }`}
                                     >
-                                      Auto
+                                      <span>Auto</span>
+                                      {currentQuality === -1 && <Check className="w-3 h-3 stroke-[3]" />}
                                     </button>
                                     {qualityLevels.map((lvl) => (
                                       <button
                                         key={lvl.id}
                                         type="button"
                                         onClick={() => handleQualityChange(lvl.id)}
-                                        className={`w-full text-left p-1 border border-neutral-300 font-bold rounded-none cursor-pointer ${
+                                        className={`w-full px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-between ${
                                           currentQuality === lvl.id
-                                            ? 'bg-black text-white border-black'
-                                            : 'bg-white hover:bg-neutral-100 text-black'
+                                            ? 'bg-white text-black border border-white shadow-sm'
+                                            : 'bg-white/5 hover:bg-white/15 text-white/90 hover:text-white border border-white/10 hover:border-white/20 active:scale-95'
                                         }`}
                                       >
-                                        {lvl.label}
+                                        <span>{lvl.label}</span>
+                                        {currentQuality === lvl.id && <Check className="w-3 h-3 stroke-[3]" />}
                                       </button>
                                     ))}
                                   </div>
