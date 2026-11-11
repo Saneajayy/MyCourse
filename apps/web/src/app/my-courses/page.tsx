@@ -14,7 +14,6 @@ import {
   User as UserIcon,
   Menu,
   X,
-  Check,
   CheckCircle2,
   AlertCircle,
   ShieldCheck,
@@ -857,24 +856,11 @@ function StudentDashboardContent() {
                     />
                   </div>
 
-                  {/* Email & Verification */}
+                  {/* Email Address */}
                   <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-bold text-neutral-700 uppercase tracking-wide">
-                        Email Address
-                      </label>
-                      {user?.emailVerifiedAt ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                          <Check className="w-3 h-3 stroke-[3]" />
-                          <span>Verified</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                          <AlertCircle className="w-3 h-3 stroke-[2.5]" />
-                          <span>Unverified</span>
-                        </span>
-                      )}
-                    </div>
+                    <label className="text-xs font-bold text-neutral-700 uppercase tracking-wide block">
+                      Email Address
+                    </label>
                     <input
                       type="email"
                       disabled
