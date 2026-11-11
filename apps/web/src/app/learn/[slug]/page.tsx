@@ -26,6 +26,7 @@ import {
   Lock,
   Folder,
   FolderOpen,
+  X,
 } from 'lucide-react';
 
 interface LessonProgressItem {
@@ -391,9 +392,167 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     setShowSettingsMenu(false);
   };
 
-  // Custom "Page-Level Fullscreen" Mode
-  const toggleCustomFullscreen = useCallback(() => {
+  // Fullscreen Handler: Native fullscreen on mobile (landscape video) & desktop (container), with in-page fallback
+  const toggleCustomFullscreen = useCallback(async () => {
+    const video = videoRef.current;
+    const container = containerRef.current;
+
+    // 1. Check if browser is in native fullscreen mode
+    const doc = typeof document !== 'undefined' ? (document as any) : null;
+    const isDocFullscreen = Boolean(
+      doc && (
+        doc.fullscreenElement ||
+        doc.webkitFullscreenElement ||
+        doc.mozFullScreenElement ||
+        doc.msFullscreenElement
+      )
+    );
+
+    // If currently in native fullscreen, exit it
+    if (isDocFullscreen && doc) {
+      try {
+        if (doc.exitFullscreen) {
+          await doc.exitFullscreen();
+        } else if (doc.webkitExitFullscreen) {
+          await doc.webkitExitFullscreen();
+        } else if (doc.mozCancelFullScreen) {
+          await doc.mozCancelFullScreen();
+        } else if (doc.msExitFullscreen) {
+          await doc.msExitFullscreen();
+        }
+      } catch (err) {
+        console.warn('Error exiting native fullscreen:', err);
+      }
+      setIsFullscreen(false);
+      return;
+    }
+
+    // If currently in in-page fallback fullscreen, exit it
+    if (isFullscreen) {
+      setIsFullscreen(false);
+      return;
+    }
+
+    // 2. Detect mobile device
+    const isTouchOrMobile =
+      typeof window !== 'undefined' &&
+      ('ontouchstart' in window ||
+        navigator.maxTouchPoints > 0 ||
+        window.innerWidth < 768);
+
+    const isIOS =
+      typeof navigator !== 'undefined' &&
+      (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+
+    // 3. On iOS: Use WebKit native video player (triggers landscape hardware playback)
+    if (isIOS && video && typeof (video as any).webkitEnterFullscreen === 'function') {
+      try {
+        (video as any).webkitEnterFullscreen();
+        return;
+      } catch (err) {
+        console.warn('iOS webkitEnterFullscreen failed, falling back:', err);
+      }
+    }
+
+    // 4. On Android / Mobile: Prefer video element fullscreen to trigger auto-rotation to landscape
+    if (isTouchOrMobile && video) {
+      try {
+        if (video.requestFullscreen) {
+          await video.requestFullscreen();
+          setIsFullscreen(true);
+        } else if ((video as any).webkitRequestFullscreen) {
+          await (video as any).webkitRequestFullscreen();
+          setIsFullscreen(true);
+        } else if (typeof (video as any).webkitEnterFullscreen === 'function') {
+          (video as any).webkitEnterFullscreen();
+          return;
+        }
+
+        // Try locking orientation to landscape
+        if (typeof screen !== 'undefined' && screen.orientation && 'lock' in screen.orientation) {
+          try {
+            await (screen.orientation as any).lock('landscape');
+          } catch {
+            // Screen orientation lock is optional
+          }
+        }
+        return;
+      } catch (err) {
+        console.warn('Mobile video requestFullscreen failed, attempting container:', err);
+      }
+    }
+
+    // 5. Desktop: Use Fullscreen API on containerRef to keep custom controls visible
+    const target = container ?? video;
+    if (target) {
+      try {
+        if (target.requestFullscreen) {
+          await target.requestFullscreen();
+          setIsFullscreen(true);
+          return;
+        } else if ((target as any).webkitRequestFullscreen) {
+          await (target as any).webkitRequestFullscreen();
+          setIsFullscreen(true);
+          return;
+        } else if ((target as any).mozRequestFullScreen) {
+          await (target as any).mozRequestFullScreen();
+          setIsFullscreen(true);
+          return;
+        } else if ((target as any).msRequestFullscreen) {
+          await (target as any).msRequestFullscreen();
+          setIsFullscreen(true);
+          return;
+        }
+      } catch (err) {
+        console.warn('Container requestFullscreen failed, falling back to in-page mode:', err);
+      }
+    }
+
+    // 6. Fallback: In-page fullscreen with close button
     setIsFullscreen((prev) => !prev);
+  }, [isFullscreen]);
+
+  // Synchronize fullscreen state with browser / native player events
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const doc = typeof document !== 'undefined' ? (document as any) : null;
+      const isDocFullscreen = Boolean(
+        doc && (
+          doc.fullscreenElement ||
+          doc.webkitFullscreenElement ||
+          doc.mozFullScreenElement ||
+          doc.msFullscreenElement
+        )
+      );
+      setIsFullscreen(isDocFullscreen);
+    };
+
+    const video = videoRef.current;
+    const handleWebkitBegin = () => setIsFullscreen(true);
+    const handleWebkitEnd = () => setIsFullscreen(false);
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    if (video) {
+      video.addEventListener('webkitbeginfullscreen', handleWebkitBegin);
+      video.addEventListener('webkitendfullscreen', handleWebkitEnd);
+    }
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+
+      if (video) {
+        video.removeEventListener('webkitbeginfullscreen', handleWebkitBegin);
+        video.removeEventListener('webkitendfullscreen', handleWebkitEnd);
+      }
+    };
   }, []);
 
   // Keyboard Shortcuts Listener
@@ -590,15 +749,25 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
           <div className="w-full flex flex-col items-center justify-start p-3 pb-0 sm:p-4 md:p-6 lg:p-8">
             <div className="w-full max-w-5xl mx-auto flex flex-col">
               {/* Video Player Frame with rounded edges */}
-              <div className="w-full bg-black shrink-0 relative flex items-center justify-center max-w-full overflow-hidden rounded-xl sm:rounded-2xl">
-                <div
-                  ref={containerRef}
-                  className={`relative bg-black w-full select-none overflow-hidden max-w-full rounded-xl sm:rounded-2xl border border-white/15 shadow-2xl ${
-                    isFullscreen
-                      ? 'fixed inset-0 z-50 w-screen h-screen flex flex-col justify-center bg-black rounded-none border-none'
-                      : 'w-full aspect-video max-h-[46vh] sm:max-h-[56vh] md:max-h-[70vh] mx-auto'
-                  }`}
-                >
+              <div
+                ref={containerRef}
+                className={`relative bg-black select-none max-w-full shadow-2xl transition-all ${
+                  isFullscreen
+                    ? 'fixed inset-0 z-[9999] w-full h-[100dvh] flex flex-col justify-center items-center bg-black rounded-none border-none overflow-hidden'
+                    : 'w-full aspect-video max-h-[46vh] sm:max-h-[56vh] md:max-h-[70vh] mx-auto rounded-xl sm:rounded-2xl border border-white/15 overflow-hidden'
+                }`}
+              >
+                {/* Floating Exit Fullscreen Button (always accessible when fullscreen is active) */}
+                {isFullscreen && (
+                  <button
+                    type="button"
+                    onClick={toggleCustomFullscreen}
+                    aria-label="Exit fullscreen"
+                    className="absolute top-4 right-4 z-50 p-2.5 bg-black/80 hover:bg-black text-white rounded-full border border-white/30 backdrop-blur-md shadow-2xl flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95 group"
+                  >
+                    <X className="w-5 h-5 text-white group-hover:rotate-90 transition-transform" />
+                  </button>
+                )}
                   {/* Loading Overlay */}
                   {streamLoading && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white z-20 space-y-2">
@@ -708,7 +877,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                   )}
 
                   {/* Custom Video Control Bar (Floating seamlessly over video without top dividing border line) */}
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/65 to-transparent px-3 py-2 sm:px-4 sm:py-2.5 flex flex-col gap-1.5 sm:gap-2 text-white max-w-full">
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/65 to-transparent px-3 py-2 sm:px-4 sm:py-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-col gap-1.5 sm:gap-2 text-white max-w-full">
                     {/* Scrubbing timeline slider with timestamps at ends */}
                     <div className="flex items-center gap-2 sm:gap-3 w-full">
                       <span className="text-[11px] sm:text-xs font-mono text-white/90 shrink-0">
@@ -868,7 +1037,6 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                     </div>
                   </div>
                 </div>
-              </div>
 
               {/* Action Bar Directly Underneath Video: Previous and Next Lesson */}
               <div className="w-full bg-[#181b20] border-t md:border-x md:border-b border-white/10 px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3 text-white">
