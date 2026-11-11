@@ -31,39 +31,6 @@ export function InstructorSection() {
               <p className="text-white/85 font-medium text-sm sm:text-base md:text-[17px] lg:text-[19px] xl:text-[20px] mt-1.5 sm:mt-2 leading-snug">
                 Associate Manager at TVS.
               </p>
-
-              {/* Social Channels: Floating independently without wrapper boxes */}
-              <div className="flex items-center gap-5 mt-4 sm:mt-5 select-none">
-                {/* YouTube: White rounded rectangle with black play icon */}
-                <a
-                  href={siteConfig.instructor.youtubeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:opacity-80 transition-opacity cursor-pointer inline-flex items-center"
-                  aria-label="Mr. Hira Lal on YouTube"
-                  title="YouTube Channel"
-                >
-                  <svg className="w-8 h-[22px] sm:w-[34px] sm:h-[24px]" viewBox="0 3.5 24 17" fill="none" aria-hidden="true">
-                    <path
-                      d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"
-                      fill="#FFFFFF"
-                    />
-                    <polygon points="9.545,8.432 15.818,12 9.545,15.568" fill="#000000" />
-                  </svg>
-                </a>
-
-                {/* LinkedIn: Written in white */}
-                <a
-                  href={siteConfig.instructor.linkedinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white hover:opacity-80 transition-opacity font-bold text-base sm:text-lg tracking-tight inline-flex items-center cursor-pointer"
-                  aria-label="Mr. Hira Lal on LinkedIn"
-                  title="LinkedIn Profile"
-                >
-                  LinkedIn
-                </a>
-              </div>
             </div>
 
             {/* Comprehensive Instructor Bio: Reduced content size, ending line aligns with the card bottom */}
@@ -89,9 +56,44 @@ export function InstructorSection() {
           {/* Right Column: Pure Card Element matching Outcomes Section: Reduced by 15% */}
           <div className="lg:col-span-5 xl:col-span-5 flex justify-center lg:justify-end items-start w-full">
             <TiltCard
-              className="relative w-full max-w-[410px] sm:max-w-[475px] md:max-w-[530px] lg:max-w-[580px] xl:max-w-[630px] aspect-[390/418] min-h-[410px] sm:min-h-[475px] md:min-h-[530px] lg:min-h-[580px] xl:min-h-[630px] bg-white rounded-lg sm:rounded-xl select-none cursor-pointer"
+              className="relative w-full max-w-[410px] sm:max-w-[475px] md:max-w-[530px] lg:max-w-[580px] xl:max-w-[630px] aspect-[390/418] min-h-[410px] sm:min-h-[475px] md:min-h-[530px] lg:min-h-[580px] xl:min-h-[630px] bg-white rounded-lg sm:rounded-xl select-none cursor-pointer overflow-hidden"
               maxTilt={6.5}
             >
+              {/* Top-Right Corner Logos: YouTube & LinkedIn from public folder */}
+              <div className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 flex items-center gap-3 sm:gap-4">
+                <a
+                  href={siteConfig.instructor.youtubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="hover:opacity-75 transition-opacity cursor-pointer inline-flex items-center"
+                  aria-label="Mr. Hira Lal on YouTube"
+                  title="YouTube Channel"
+                >
+                  <img
+                    src="/youtub.png"
+                    alt="YouTube"
+                    className="h-5 sm:h-[22px] lg:h-6 w-auto object-contain"
+                  />
+                </a>
+
+                <a
+                  href={siteConfig.instructor.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="hover:opacity-75 transition-opacity cursor-pointer inline-flex items-center"
+                  aria-label="Mr. Hira Lal on LinkedIn"
+                  title="LinkedIn Profile"
+                >
+                  <img
+                    src="/linkedin.png"
+                    alt="LinkedIn"
+                    className="h-5 sm:h-[22px] lg:h-6 w-auto object-contain"
+                  />
+                </a>
+              </div>
+
               <div className="w-full h-full" />
             </TiltCard>
           </div>
