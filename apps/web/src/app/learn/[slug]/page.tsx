@@ -718,15 +718,15 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             </div>
           </div>
 
-          <div className="w-full flex flex-col items-center justify-start p-3 pb-3 sm:p-4 sm:pb-4 md:p-6 lg:p-8">
-            <div className="w-full max-w-5xl mx-auto flex flex-col">
+          <div className="w-full flex flex-col items-center justify-start p-3 pb-3 sm:p-4 sm:pb-4 md:p-5 lg:px-8 lg:py-5">
+            <div className="w-full max-w-5xl md:max-w-6xl xl:max-w-7xl 2xl:max-w-[1500px] mx-auto flex flex-col">
               {/* Video Player Frame with rounded edges */}
               <div
                 ref={containerRef}
                 className={`relative bg-black select-none max-w-full transition-all ${
                   isFullscreen
                     ? 'fixed inset-0 z-[9999] w-full h-[100dvh] flex flex-col justify-center items-center bg-black rounded-none border-none overflow-hidden'
-                    : 'w-full aspect-video max-h-[46vh] sm:max-h-[56vh] md:max-h-[70vh] mx-auto rounded-xl sm:rounded-2xl border border-white/15 overflow-hidden'
+                    : 'w-full aspect-video max-h-[46vh] sm:max-h-[56vh] md:max-h-[76vh] lg:max-h-[80vh] xl:max-h-[82vh] mx-auto rounded-xl sm:rounded-2xl border border-white/15 overflow-hidden'
                 }`}
               >
                 {/* Floating Exit Fullscreen Button (always accessible when fullscreen is active) */}
