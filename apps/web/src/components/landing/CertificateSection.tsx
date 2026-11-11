@@ -162,9 +162,9 @@ export function CertificateSection() {
               <div className="w-full border-b border-black" />
 
               {/* Main Certificate Content: 2-Column Split Layout */}
-              <div className="flex items-stretch px-6 md:px-8 lg:px-9 py-6 md:py-7 lg:py-8 flex-1 gap-6 md:gap-7 lg:gap-8">
+              <div className="flex items-stretch flex-1">
                 {/* Left Column (Title, Recipient, Description) */}
-                <div className="flex-1 flex flex-col justify-between pr-2 lg:pr-4">
+                <div className="flex-1 flex flex-col justify-between pl-6 md:pl-8 lg:pl-9 pr-6 md:pr-7 lg:pr-8 py-6 md:py-7 lg:py-8">
                   {/* 1. Certificate Title */}
                   <div className="flex flex-col items-start text-left select-none leading-none text-black">
                     <span className="font-light text-[42px] md:text-[50px] lg:text-[58px] xl:text-[62px] tracking-tight uppercase leading-[0.98]">
@@ -194,11 +194,11 @@ export function CertificateSection() {
                   </p>
                 </div>
 
-                {/* Vertical Divider Line */}
-                <div className="w-px bg-black my-1 lg:my-2 shrink-0 self-stretch" />
+                {/* Vertical Divider Line: Touches the top border line and bottom box border */}
+                <div className="w-px bg-black shrink-0 self-stretch" />
 
-                {/* Right Column (QR Code, Signature, Divider, Logo) */}
-                <div className="w-[150px] md:w-[170px] lg:w-[195px] shrink-0 flex flex-col items-center justify-between text-center pl-2">
+                {/* Right Column (QR Code, Signature, Logo) */}
+                <div className="w-[170px] md:w-[195px] lg:w-[220px] shrink-0 flex flex-col items-center justify-between text-center px-4 md:px-5 lg:px-6 py-6 md:py-7 lg:py-8">
                   {/* Verification QR Code */}
                   <div className="relative w-[118px] h-[118px] md:w-[130px] md:h-[130px] lg:w-[140px] lg:h-[140px] flex-shrink-0">
                     <Image
@@ -212,7 +212,7 @@ export function CertificateSection() {
                   </div>
 
                   {/* Middle: Signature + Course Instructor */}
-                  <div className="flex flex-col items-center select-none mt-auto pt-5 md:pt-7 lg:pt-8 mb-1">
+                  <div className="flex flex-col items-center select-none mt-auto pt-5 md:pt-7 lg:pt-8 mb-2">
                     <div className="relative w-[92px] md:w-[104px] lg:w-[115px] h-[32px] md:h-[36px] lg:h-[40px]">
                       <Image
                         src="/cert-signature-hiralal.png"
@@ -227,9 +227,6 @@ export function CertificateSection() {
                       Course Instructor
                     </span>
                   </div>
-
-                  {/* Horizontal Divider Line above Brand Logo */}
-                  <div className="w-full max-w-[130px] md:max-w-[145px] lg:max-w-[160px] border-b border-black my-2.5 lg:my-3" />
 
                   {/* Bottom: Stacked Brand Logo */}
                   <div className="flex flex-col items-center -space-y-0.5 leading-[0.92] text-black select-none">
