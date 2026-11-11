@@ -1065,7 +1065,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         <aside
           className="w-full flex-1 overflow-y-auto md:w-72 lg:w-80 md:h-full md:flex-none border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col relative select-none shadow-none max-w-full"
         >
-          {/* Background Image Embedded on Column Back (Matches Dashboard Left Column: 35% position, subtle opacity) */}
+          {/* Background Image Embedded on Column Back (Shifted to right, subtle opacity) */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
             <Image
               src="/login-pixelated.png"
@@ -1073,7 +1073,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
               fill
               sizes="(max-width: 768px) 100vw, 320px"
               priority
-              style={{ objectPosition: '35% center' }}
+              style={{ objectPosition: '85% center' }}
               className="object-cover mix-blend-screen opacity-[0.07] select-none"
             />
           </div>
