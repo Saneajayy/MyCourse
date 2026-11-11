@@ -167,10 +167,10 @@ export function CertificateSection() {
                 <div className="flex-1 flex flex-col justify-between pr-2 lg:pr-4">
                   {/* 1. Certificate Title */}
                   <div className="flex flex-col items-start text-left select-none leading-none text-black">
-                    <span className="font-light text-[34px] md:text-[40px] lg:text-[46px] tracking-tight uppercase leading-[1.04]">
+                    <span className="font-light text-[42px] md:text-[50px] lg:text-[58px] xl:text-[62px] tracking-tight uppercase leading-[0.98]">
                       CERTIFICATE OF
                     </span>
-                    <span className="font-light text-[34px] md:text-[40px] lg:text-[46px] tracking-tight uppercase leading-[1.04]">
+                    <span className="font-light text-[42px] md:text-[50px] lg:text-[58px] xl:text-[62px] tracking-tight uppercase leading-[0.98]">
                       COMPLETION.
                     </span>
                   </div>
