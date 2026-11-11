@@ -59,8 +59,8 @@ export function InstructorSection() {
               className="relative w-full max-w-[410px] sm:max-w-[475px] md:max-w-[530px] lg:max-w-[580px] xl:max-w-[630px] aspect-[390/418] min-h-[410px] sm:min-h-[475px] md:min-h-[530px] lg:min-h-[580px] xl:min-h-[630px] bg-white rounded-lg sm:rounded-xl select-none cursor-pointer overflow-hidden"
               maxTilt={6.5}
             >
-              {/* Top-Right Corner Logos: YouTube & LinkedIn from public folder */}
-              <div className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 flex items-center gap-3 sm:gap-4">
+              {/* Top-Right Corner Logo: YouTube Channel */}
+              <div className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20">
                 <a
                   href={siteConfig.instructor.youtubeUrl}
                   target="_blank"
@@ -73,22 +73,6 @@ export function InstructorSection() {
                   <img
                     src="/youtub.png"
                     alt="YouTube"
-                    className="h-5 sm:h-[22px] lg:h-6 w-auto object-contain"
-                  />
-                </a>
-
-                <a
-                  href={siteConfig.instructor.linkedinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="hover:opacity-75 transition-opacity cursor-pointer inline-flex items-center"
-                  aria-label="Mr. Hira Lal on LinkedIn"
-                  title="LinkedIn Profile"
-                >
-                  <img
-                    src="/linkedin.png"
-                    alt="LinkedIn"
                     className="h-5 sm:h-[22px] lg:h-6 w-auto object-contain"
                   />
                 </a>
