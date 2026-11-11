@@ -515,20 +515,20 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     'Video Lesson';
 
   return (
-    <div className="fixed inset-0 z-20 flex flex-col bg-black overflow-hidden font-reddit select-none text-white">
+    <div className="fixed inset-0 z-20 flex flex-col bg-black overflow-hidden font-reddit select-none text-white w-full max-w-full">
       {/* Top Header Bar: Glassy navbar matching home page (figma-glass-nav) */}
-      <header className="h-16 md:h-20 w-full figma-glass-nav px-6 sm:px-8 flex items-stretch justify-between shrink-0 z-30 select-none border-b border-white/50">
+      <header className="h-14 sm:h-16 md:h-20 w-full figma-glass-nav px-4 sm:px-6 md:px-8 flex items-stretch justify-between shrink-0 z-30 select-none border-b border-white/50 max-w-full">
         {/* Left: HYDRO BASICS Logo */}
-        <div className="flex items-center gap-6 sm:gap-8">
+        <div className="flex items-center gap-4 sm:gap-6 md:gap-8">
           <Link
             href="/"
             className="flex flex-col justify-center -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity shrink-0"
             aria-label="HYDRO BASICS Home"
           >
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[18px] sm:text-[20px] md:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
               HYDRO
             </span>
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[18px] sm:text-[20px] md:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
               BASICS
             </span>
           </Link>
@@ -538,7 +538,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         <div className="flex items-stretch">
           <Link
             href="/my-courses"
-            className="figma-glass-divider border-l border-r border-white/50 h-full flex items-center justify-center px-4 sm:px-6 text-white/90 hover:text-white hover:bg-white/10 transition-colors font-semibold text-xs sm:text-sm uppercase tracking-wider"
+            className="figma-glass-divider border-l border-r border-white/50 h-full flex items-center justify-center px-3 sm:px-4 md:px-6 text-white/90 hover:text-white hover:bg-white/10 transition-colors font-semibold text-xs sm:text-sm uppercase tracking-wider"
           >
             <span>← My Courses</span>
           </Link>
@@ -546,24 +546,22 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       </header>
 
       {/* Main Split Layout: On mobile, flows vertically with video sticky on top -> details -> modules */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden min-h-0 bg-black">
+      <div className="flex-1 flex flex-col md:flex-row overflow-y-auto overflow-x-hidden md:overflow-hidden min-h-0 bg-black w-full max-w-full">
         {/* SYLLABUS & MODULES: Left Column matching Dashboard Left Sidebar (Size, Font, Design, Embedded Image) */}
         <aside
-          className="order-2 md:order-1 w-full md:w-72 lg:w-80 md:h-full border-t md:border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col shrink-0 md:overflow-hidden relative select-none shadow-none"
+          className="order-2 md:order-1 w-full md:w-72 lg:w-80 md:h-full border-t md:border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col shrink-0 overflow-hidden relative select-none shadow-none max-w-full"
         >
-          {/* Embedded Background Graphic matching Dashboard Column (Shifted to the right side of the column) */}
-          <div className="absolute inset-y-0 -left-16 right-0 pointer-events-none overflow-hidden select-none">
-            <div className="absolute inset-0 translate-x-16 sm:translate-x-24">
-              <Image
-                src="/login-pixelated.png"
-                alt="Hydraulic System Graphic"
-                fill
-                sizes="340px"
-                priority
-                style={{ objectPosition: '0% center' }}
-                className="object-cover mix-blend-screen opacity-[0.07] select-none"
-              />
-            </div>
+          {/* Embedded Background Graphic strictly contained inside aside with zero mobile bleed */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+            <Image
+              src="/login-pixelated.png"
+              alt=""
+              fill
+              sizes="(max-width: 768px) 100vw, 340px"
+              priority
+              style={{ objectPosition: '85% center' }}
+              className="object-cover mix-blend-screen opacity-[0.06] select-none"
+            />
           </div>
 
           {/* Syllabus Header: Matches Dashboard's Top Sidebar Header with Bottom Dividing Line */}
@@ -593,7 +591,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                     className="w-full text-left px-5 sm:px-6 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold transition-colors cursor-pointer select-none bg-transparent hover:bg-white/10 text-white flex items-start justify-between gap-3"
                     aria-expanded={isExpanded}
                   >
-                    <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
                       {/* Folder icon rooting the connecting line */}
                       <div className="relative shrink-0 w-4 self-stretch flex flex-col items-center">
                         <div className="pt-0.5 z-10">
@@ -604,7 +602,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                           )}
                         </div>
                         {isExpanded && (
-                          <div className="w-px flex-1 bg-white/40 mt-1" />
+                          <div className="w-px flex-1 bg-white/40 mt-1.5" />
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -612,13 +610,13 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                           Module {sIdx + 1}
                         </span>
                         {section.title && (
-                          <span className="block text-xs text-white/80 font-normal mt-1 leading-snug whitespace-normal break-words">
+                          <span className="block text-xs sm:text-[13px] text-white/75 font-normal mt-1.5 leading-snug whitespace-normal break-words">
                             {section.title.replace(/^Module\s*\d+\s*:\s*/i, '')}
                           </span>
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0 text-white/80 pt-0.5">
+                    <div className="flex items-center gap-2.5 shrink-0 text-white/80 pt-0.5">
                       {/* Tick on module after all the videos of that module get completed */}
                       {isModuleCompleted ? (
                         <div
@@ -628,7 +626,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                           <Check className="w-3.5 h-3.5 text-black stroke-[3]" />
                         </div>
                       ) : (
-                        <span className="text-[11px] font-mono font-medium">
+                        <span className="text-xs font-mono font-medium text-white/70">
                           {completedCount}/{section.lessons.length}
                         </span>
                       )}
@@ -640,9 +638,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                     </div>
                   </button>
 
-                  {/* CONNECTED LESSONS: Rooting from module, bending towards lesson title, no numbers */}
+                  {/* CONNECTED LESSONS: Generous vertical padding, clear branch bend, readable text */}
                   {isExpanded && (
-                    <div className="w-full pb-3 pt-0">
+                    <div className="w-full pb-4 pt-1">
                       {section.lessons.map((lesson, lIdx) => {
                         const isLast = lIdx === section.lessons.length - 1;
                         const isCurrent = lesson.lessonId === selectedLessonId;
@@ -652,23 +650,23 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             key={lesson.lessonId}
                             type="button"
                             onClick={() => setSelectedLessonId(lesson.lessonId)}
-                            className={`w-full text-left px-5 sm:px-6 py-2 sm:py-2.5 flex items-start gap-2.5 transition-colors cursor-pointer select-none group ${
+                            className={`w-full text-left px-5 sm:px-6 py-3 sm:py-3.5 flex items-start gap-3 transition-colors cursor-pointer select-none group ${
                               isCurrent ? 'bg-white/[0.08]' : 'bg-transparent hover:bg-white/[0.04]'
                             }`}
                           >
                             {/* Branch line rooting from module and bending towards lesson title */}
-                            <div className="relative shrink-0 w-4 self-stretch">
+                            <div className="relative shrink-0 w-5 sm:w-6 self-stretch">
                               {/* Curved L-bend line from top to right towards lesson title */}
                               <div
-                                className={`absolute left-[7px] top-0 w-3 h-3.5 border-l border-b ${
+                                className={`absolute left-[7px] top-0 w-3.5 sm:w-4 h-4 border-l border-b ${
                                   isCurrent ? 'border-white' : 'border-white/40'
-                                } rounded-bl-[4px]`}
+                                } rounded-bl-[5px]`}
                               />
 
                               {/* Continuing vertical stem for subsequent lessons */}
                               {!isLast && (
                                 <div
-                                  className={`absolute left-[7px] top-3.5 bottom-0 w-px ${
+                                  className={`absolute left-[7px] top-4 bottom-0 w-px ${
                                     isCurrent ? 'bg-white' : 'bg-white/40'
                                   }`}
                                 />
@@ -676,7 +674,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             </div>
 
                             {/* Lesson Content: Tick in front when completed, title, and video time below */}
-                            <div className="min-w-0 flex-1 pt-0.5 flex items-start gap-2">
+                            <div className="min-w-0 flex-1 pt-0.5 flex items-start gap-2.5">
                               {lesson.isCompleted && (
                                 <div
                                   className="w-4 h-4 rounded-none bg-white flex items-center justify-center shrink-0 mt-0.5"
@@ -688,18 +686,18 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
                               <div className="min-w-0 flex-1">
                                 <div
-                                  className={`text-xs sm:text-[13px] leading-snug whitespace-normal break-words ${
+                                  className={`text-[13px] sm:text-[14px] leading-snug whitespace-normal break-words ${
                                     isCurrent
                                       ? 'font-extrabold text-white'
-                                      : 'font-medium text-white/85 group-hover:text-white'
+                                      : 'font-medium text-white/90 group-hover:text-white'
                                   }`}
                                 >
                                   {lesson.title}
                                 </div>
 
-                                {/* Video time placed directly below the title */}
+                                {/* Video time placed directly below the title with clean spacing */}
                                 <div
-                                  className={`text-[10px] sm:text-[11px] font-mono mt-1 ${
+                                  className={`text-xs font-mono mt-1 ${
                                     isCurrent
                                       ? 'text-white/80 font-semibold'
                                       : 'text-white/50 group-hover:text-white/70'
@@ -727,23 +725,23 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         </aside>
 
         {/* MAIN VIDEO & DETAILS AREA: On mobile: order-1 (sits at the top). On desktop: order-2 (right column) */}
-        <main className="order-1 md:order-2 flex-1 flex flex-col md:h-full md:overflow-y-auto bg-black min-w-0 shrink-0">
-          <div className="w-full flex-1 flex flex-col">
-            {/* Black Video Player Frame (Sticky on mobile) */}
-            <div className="w-full bg-black shrink-0 relative flex items-center justify-center border-b border-white/50 sticky top-0 z-20">
+        <main className="order-1 md:order-2 flex-1 flex flex-col md:h-full md:overflow-y-auto bg-black min-w-0 shrink-0 w-full max-w-full overflow-x-hidden">
+          <div className="w-full flex-1 flex flex-col max-w-full">
+            {/* Black Video Player Frame */}
+            <div className="w-full bg-black shrink-0 relative flex items-center justify-center border-b border-white/50 sticky top-0 z-20 max-w-full overflow-hidden">
               <div
                 ref={containerRef}
-                className={`relative bg-black w-full select-none ${
+                className={`relative bg-black w-full select-none overflow-hidden max-w-full ${
                   isFullscreen
                     ? 'fixed inset-0 z-50 w-screen h-screen flex flex-col justify-center bg-black'
-                    : 'aspect-video max-h-[68vh] mx-auto'
+                    : 'w-full aspect-video max-h-[50vh] sm:max-h-[60vh] md:max-h-[68vh] mx-auto'
                 }`}
               >
                 {/* Loading Overlay */}
                 {streamLoading && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white z-10 space-y-2">
-                    <Loader2 className="w-8 h-8 animate-spin text-black" />
-                    <span className="text-xs font-mono tracking-widest uppercase">
+                    <Loader2 className="w-8 h-8 animate-spin text-white" />
+                    <span className="text-xs font-mono tracking-widest uppercase text-white/80">
                       Securing Stream Ticket...
                     </span>
                   </div>
@@ -796,7 +794,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 <video
                   ref={videoRef}
                   playsInline
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain max-w-full"
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
                   onTimeUpdate={() => {
@@ -835,9 +833,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                   onClick={togglePlay}
                 />
 
-                {/* Moving Anti-Piracy Watermark: Greyed-out text, no box */}
+                {/* Moving Anti-Piracy Watermark: Constrained inside video container */}
                 <div
-                  className="absolute pointer-events-none transition-all duration-1000 ease-in-out font-mono text-xs uppercase text-white/30 select-none"
+                  className="absolute pointer-events-none transition-all duration-1000 ease-in-out font-mono text-xs uppercase text-white/30 select-none max-w-[80%] truncate"
                   style={{ top: watermarkPos.top, left: watermarkPos.left }}
                   aria-hidden="true"
                 >
@@ -845,8 +843,8 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 </div>
 
                 {/* Custom Video Control Bar */}
-                <div className="absolute bottom-0 inset-x-0 bg-black/90 p-2 md:p-3 flex flex-col gap-2 text-white border-t border-white/10">
-                  {/* Scrubbing timeline slider with Royal Blue accent */}
+                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/85 to-transparent px-3 py-2 sm:px-4 sm:py-2.5 flex flex-col gap-1.5 sm:gap-2 text-white border-t border-white/10 max-w-full">
+                  {/* Scrubbing timeline slider with clean custom styling */}
                   <input
                     type="range"
                     min={0}
@@ -854,21 +852,21 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                     value={currentTime}
                     onChange={handleSeek}
                     aria-label="Video seek slider"
-                    className="w-full h-1.5 bg-white/20 accent-black cursor-pointer"
+                    className="w-full h-1 bg-white/25 accent-white cursor-pointer"
                   />
 
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 md:gap-3">
+                  <div className="flex items-center justify-between gap-2 w-full">
+                    <div className="flex items-center gap-1.5 sm:gap-2.5">
                       <button
                         type="button"
                         onClick={togglePlay}
                         aria-label={isPlaying ? 'Pause video (Space)' : 'Play video (Space)'}
-                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-black transition-colors cursor-pointer"
+                        className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
                       >
                         {isPlaying ? (
-                          <Pause className="w-5 h-5" />
+                          <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
                         ) : (
-                          <Play className="w-5 h-5 fill-current" />
+                          <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
                         )}
                       </button>
 
@@ -876,12 +874,12 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                         type="button"
                         onClick={toggleMute}
                         aria-label={isMuted ? 'Unmute (M)' : 'Mute (M)'}
-                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-black transition-colors cursor-pointer"
+                        className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
                       >
-                        {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                        {isMuted ? <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" /> : <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />}
                       </button>
 
-                      {/* Volume Slider with Royal Blue accent */}
+                      {/* Volume Slider hidden on mobile */}
                       <input
                         type="range"
                         min={0}
@@ -890,24 +888,24 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                         value={isMuted ? 0 : volume}
                         onChange={handleVolumeChange}
                         aria-label="Volume slider"
-                        className="w-16 md:w-20 h-1 bg-white/20 accent-black hidden sm:block"
+                        className="w-16 md:w-20 h-1 bg-white/20 accent-white hidden sm:block"
                       />
 
-                      <span className="text-xs font-mono text-white/90">
+                      <span className="text-[11px] sm:text-xs font-mono text-white/90 shrink-0">
                         {formatTime(currentTime)} / {formatTime(duration)}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 sm:gap-1.5">
                       {/* Settings Menu (Speed & Quality) */}
                       <div className="relative">
                         <button
                           type="button"
                           onClick={() => setShowSettingsMenu(!showSettingsMenu)}
                           aria-label="Player settings"
-                          className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-black transition-colors cursor-pointer"
+                          className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
                         >
-                          <Settings className="w-5 h-5" />
+                          <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
 
                         {showSettingsMenu && (
@@ -979,9 +977,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                         type="button"
                         onClick={handleNextLesson}
                         aria-label="Next lesson"
-                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-black transition-colors cursor-pointer"
+                        className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
                       >
-                        <SkipForward className="w-5 h-5" />
+                        <SkipForward className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
 
                       {/* Fullscreen Button */}
@@ -989,12 +987,12 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                         type="button"
                         onClick={toggleCustomFullscreen}
                         aria-label={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
-                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center text-white hover:text-black transition-colors cursor-pointer"
+                        className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
                       >
                         {isFullscreen ? (
-                          <Minimize className="w-5 h-5" />
+                          <Minimize className="w-4 h-4 sm:w-5 sm:h-5" />
                         ) : (
-                          <Maximize className="w-5 h-5" />
+                          <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
                         )}
                       </button>
                     </div>
@@ -1003,11 +1001,11 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
               </div>
             </div>
 
-            {/* Lesson Title and Description on Royal Blue Background */}
-            <div className="p-6 md:p-8 lg:p-10 space-y-4 bg-black text-white">
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                <div>
-                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white tracking-tight">
+            {/* Lesson Title and Description */}
+            <div className="p-4 sm:p-6 md:p-8 lg:p-10 space-y-3 sm:space-y-4 bg-black text-white max-w-full border-b border-white/20 md:border-b-0">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+                <div className="min-w-0">
+                  <h1 className="text-lg sm:text-2xl md:text-3xl font-bold text-white tracking-tight leading-snug">
                     {currentLessonTitle}
                   </h1>
                 </div>
@@ -1015,14 +1013,14 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 <button
                   type="button"
                   onClick={handleNextLesson}
-                  className="inline-flex items-center justify-center h-10 px-5 bg-white hover:bg-neutral-100 text-black font-black text-xs uppercase tracking-wider rounded-none transition-all gap-2 cursor-pointer shrink-0 border border-white"
+                  className="inline-flex items-center justify-center h-9 sm:h-10 px-4 sm:px-5 bg-white hover:bg-neutral-100 text-black font-black text-xs uppercase tracking-wider rounded-none transition-all gap-2 cursor-pointer shrink-0 border border-white self-start"
                 >
                   <span>Next Lesson</span>
                   <span className="text-xs">▶</span>
                 </button>
               </div>
 
-              <div className="space-y-2 text-white/90 text-xs sm:text-sm leading-relaxed max-w-3xl">
+              <div className="space-y-2 text-white/80 text-xs sm:text-sm leading-relaxed max-w-3xl">
                 <p>
                   Fundamental principles of fluid power, hydraulic circuit behavior, and practical workplace concepts. Watch the stream above, use playback controls as needed, and proceed to the next lesson once completed.
                 </p>
