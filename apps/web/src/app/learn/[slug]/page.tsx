@@ -602,189 +602,10 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             <span>← My Courses</span>
           </Link>
         </div>
-      </header>
-
-      {/* Main Split Layout: On mobile, flows vertically with video sticky on top -> details -> modules */}
-      <div className="flex-1 flex flex-col md:flex-row overflow-y-auto overflow-x-hidden md:overflow-hidden min-h-0 bg-black w-full max-w-full">
-        {/* SYLLABUS & MODULES: Left Column matching Dashboard Left Sidebar (Size, Font, Design, Embedded Image) */}
-        <aside
-          className="order-2 md:order-1 w-full md:w-72 lg:w-80 md:h-full border-t md:border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col shrink-0 overflow-hidden relative select-none shadow-none max-w-full"
-        >
-          {/* Embedded Background Graphic strictly contained inside aside with zero mobile bleed */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-            <Image
-              src="/login-pixelated.png"
-              alt=""
-              fill
-              sizes="(max-width: 768px) 100vw, 340px"
-              priority
-              style={{ objectPosition: '85% center' }}
-              className="object-cover mix-blend-screen opacity-[0.06] select-none"
-            />
-          </div>
-
-          {/* Syllabus Header: Matches Dashboard's Top Sidebar Header with Bottom Dividing Line */}
-          <div className="relative z-10 w-full px-5 sm:px-6 py-5 sm:py-6 border-b border-white/50 text-left shrink-0">
-            <span className="text-[11px] font-mono tracking-widest text-white/70 uppercase block mb-1">
-              Course Curriculum
-            </span>
-            <h2 className="font-extrabold text-[16px] sm:text-[18px] text-white leading-tight">
-              Hydraulic System Basics
-            </h2>
-          </div>
-
-          {/* Scrollable Modules List (Independent Scroll on desktop) */}
-          <div className="relative z-10 flex-1 md:overflow-y-auto flex flex-col">
-            {sections.map((section, sIdx) => {
-              const isExpanded = expandedSections[section.sectionId] ?? true;
-              const completedCount = section.lessons.filter((l) => l.isCompleted).length;
-              const isModuleCompleted =
-                section.lessons.length > 0 && completedCount === section.lessons.length;
-
-              return (
-                <div key={section.sectionId} className="w-full border-b border-white/50">
-                  {/* MODULE HEADER: No bottom line so module & lessons merge in one tab-like field */}
-                  <button
-                    type="button"
-                    onClick={() => toggleSection(section.sectionId)}
-                    className="w-full text-left px-5 sm:px-6 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold transition-colors cursor-pointer select-none bg-transparent hover:bg-white/10 text-white flex items-start justify-between gap-3"
-                    aria-expanded={isExpanded}
-                  >
-                    <div className="flex items-start gap-3 min-w-0 flex-1">
-                      {/* Folder icon rooting the connecting line */}
-                      <div className="relative shrink-0 w-4 self-stretch flex flex-col items-center">
-                        <div className="pt-0.5 z-10">
-                          {isExpanded ? (
-                            <FolderOpen className="w-4 h-4 text-white" />
-                          ) : (
-                            <Folder className="w-4 h-4 text-white" />
-                          )}
-                        </div>
-                        {isExpanded && (
-                          <div className="w-px flex-1 bg-white/40 mt-1.5" />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <span className="block font-bold text-[15px] sm:text-[16px] leading-tight">
-                          Module {sIdx + 1}
-                        </span>
-                        {section.title && (
-                          <span className="block text-xs sm:text-[13px] text-white/75 font-normal mt-1.5 leading-snug whitespace-normal break-words">
-                            {section.title.replace(/^Module\s*\d+\s*:\s*/i, '')}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2.5 shrink-0 text-white/80 pt-0.5">
-                      {/* Tick on module after all the videos of that module get completed */}
-                      {isModuleCompleted ? (
-                        <div
-                          className="w-5 h-5 rounded-none bg-white flex items-center justify-center shrink-0"
-                          title="Module Completed"
-                        >
-                          <Check className="w-3.5 h-3.5 text-black stroke-[3]" />
-                        </div>
-                      ) : (
-                        <span className="text-xs font-mono font-medium text-white/70">
-                          {completedCount}/{section.lessons.length}
-                        </span>
-                      )}
-                      {isExpanded ? (
-                        <ChevronDown className="w-4 h-4 text-white" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4 text-white" />
-                      )}
-                    </div>
-                  </button>
-
-                  {/* CONNECTED LESSONS: Generous vertical padding, clear branch bend, readable text */}
-                  {isExpanded && (
-                    <div className="w-full pb-4 pt-1">
-                      {section.lessons.map((lesson, lIdx) => {
-                        const isLast = lIdx === section.lessons.length - 1;
-                        const isCurrent = lesson.lessonId === selectedLessonId;
-
-                        return (
-                          <button
-                            key={lesson.lessonId}
-                            type="button"
-                            onClick={() => setSelectedLessonId(lesson.lessonId)}
-                            className={`w-full text-left px-5 sm:px-6 py-3 sm:py-3.5 flex items-start gap-3 transition-colors cursor-pointer select-none group ${
-                              isCurrent ? 'bg-white/[0.08]' : 'bg-transparent hover:bg-white/[0.04]'
-                            }`}
-                          >
-                            {/* Branch line rooting from module and bending towards lesson title */}
-                            <div className="relative shrink-0 w-5 sm:w-6 self-stretch">
-                              {/* Curved L-bend line from top to right towards lesson title */}
-                              <div
-                                className={`absolute left-[7px] top-0 w-3.5 sm:w-4 h-4 border-l border-b ${
-                                  isCurrent ? 'border-white' : 'border-white/40'
-                                } rounded-bl-[5px]`}
-                              />
-
-                              {/* Continuing vertical stem for subsequent lessons */}
-                              {!isLast && (
-                                <div
-                                  className={`absolute left-[7px] top-4 bottom-0 w-px ${
-                                    isCurrent ? 'bg-white' : 'bg-white/40'
-                                  }`}
-                                />
-                              )}
-                            </div>
-
-                            {/* Lesson Content: Tick in front when completed, title, and video time below */}
-                            <div className="min-w-0 flex-1 pt-0.5 flex items-start gap-2.5">
-                              {lesson.isCompleted && (
-                                <div
-                                  className="w-4 h-4 rounded-none bg-white flex items-center justify-center shrink-0 mt-0.5"
-                                  title="Completed"
-                                >
-                                  <Check className="w-2.5 h-2.5 stroke-[3] text-black" />
-                                </div>
-                              )}
-
-                              <div className="min-w-0 flex-1">
-                                <div
-                                  className={`text-[13px] sm:text-[14px] leading-snug whitespace-normal break-words ${
-                                    isCurrent
-                                      ? 'font-extrabold text-white'
-                                      : 'font-medium text-white/90 group-hover:text-white'
-                                  }`}
-                                >
-                                  {lesson.title}
-                                </div>
-
-                                {/* Video time placed directly below the title with clean spacing */}
-                                <div
-                                  className={`text-xs font-mono mt-1 ${
-                                    isCurrent
-                                      ? 'text-white/80 font-semibold'
-                                      : 'text-white/50 group-hover:text-white/70'
-                                  }`}
-                                >
-                                  {Math.floor(lesson.durationSeconds / 60)}m
-                                  {lesson.durationSeconds % 60 > 0
-                                    ? ` ${lesson.durationSeconds % 60}s`
-                                    : ''}
-                                </div>
-                              </div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            {/* Empty Space Column Continuing Down, allowing graphic to shine through */}
-            <div className="flex-1 w-full" />
-          </div>
-        </aside>
-
-        {/* MAIN VIDEO & PLAYER AREA: Grey theme, 2-panel desktop layout, sticky on mobile */}
-        <main className="order-1 md:order-2 flex-1 flex flex-col md:h-full md:overflow-y-auto bg-[#121417] min-w-0 shrink-0 w-full max-w-full overflow-x-hidden">
+      </header>      {/* Main Split Layout: On mobile, flows vertically with video at the top -> then syllabus modules. On desktop, 2-panel with Syllabus on left and Video on right. */}
+      <div className="flex-1 flex flex-col md:flex-row-reverse overflow-y-auto overflow-x-hidden md:overflow-hidden min-h-0 bg-[#121417] w-full max-w-full">
+        {/* MAIN VIDEO & PLAYER AREA: First in DOM -> Always at the top on mobile. On desktop: Right panel via md:flex-row-reverse */}
+        <main className="w-full flex-1 flex flex-col md:h-full md:overflow-y-auto bg-[#121417] min-w-0 shrink-0 max-w-full">
           {/* Top Breadcrumb/Header Bar on Desktop */}
           <div className="hidden md:flex px-6 lg:px-8 py-3.5 bg-[#16191d] border-b border-white/10 items-center justify-between gap-4 shrink-0">
             <div className="min-w-0 flex items-center gap-2.5">
@@ -809,7 +630,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
           <div className="w-full flex-1 flex flex-col items-center justify-start p-0 md:p-6 lg:p-8">
             <div className="w-full max-w-5xl mx-auto flex flex-col">
-              {/* Video Player Frame */}
+              {/* Video Player Frame (Sticky on mobile) */}
               <div className="w-full bg-black shrink-0 relative flex items-center justify-center sticky top-0 z-20 max-w-full overflow-hidden">
                 <div
                   ref={containerRef}
@@ -1175,6 +996,183 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             </div>
           </div>
         </main>
+
+        {/* SYLLABUS & MODULES: Second in DOM -> Below video on mobile. On desktop: Left panel via md:flex-row-reverse */}
+        <aside
+          className="w-full md:w-72 lg:w-80 md:h-full border-t md:border-t-0 md:border-r border-white/50 bg-black text-white flex flex-col shrink-0 overflow-hidden relative select-none shadow-none max-w-full"
+        >
+          {/* Embedded Background Graphic strictly contained inside aside with zero mobile bleed */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
+            <Image
+              src="/login-pixelated.png"
+              alt=""
+              fill
+              sizes="(max-width: 768px) 100vw, 340px"
+              priority
+              style={{ objectPosition: '85% center' }}
+              className="object-cover mix-blend-screen opacity-[0.06] select-none"
+            />
+          </div>
+
+          {/* Syllabus Header: Matches Dashboard's Top Sidebar Header with Bottom Dividing Line */}
+          <div className="relative z-10 w-full px-5 sm:px-6 py-5 sm:py-6 border-b border-white/50 text-left shrink-0">
+            <span className="text-[11px] font-mono tracking-widest text-white/70 uppercase block mb-1">
+              Course Curriculum
+            </span>
+            <h2 className="font-extrabold text-[16px] sm:text-[18px] text-white leading-tight">
+              Hydraulic System Basics
+            </h2>
+          </div>
+
+          {/* Scrollable Modules List (Independent Scroll on desktop) */}
+          <div className="relative z-10 flex-1 md:overflow-y-auto flex flex-col">
+            {sections.map((section, sIdx) => {
+              const isExpanded = expandedSections[section.sectionId] ?? true;
+              const completedCount = section.lessons.filter((l) => l.isCompleted).length;
+              const isModuleCompleted =
+                section.lessons.length > 0 && completedCount === section.lessons.length;
+
+              return (
+                <div key={section.sectionId} className="w-full border-b border-white/50">
+                  {/* MODULE HEADER: Generous py-5 padding so upper line never touches text/folder icon */}
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(section.sectionId)}
+                    className="w-full text-left px-5 sm:px-6 py-5 sm:py-6 text-[15px] sm:text-[16px] font-bold transition-colors cursor-pointer select-none bg-transparent hover:bg-white/10 text-white flex items-start justify-between gap-3"
+                    aria-expanded={isExpanded}
+                  >
+                    <div className="flex items-start gap-3 min-w-0 flex-1">
+                      {/* Folder icon rooting the connecting line */}
+                      <div className="relative shrink-0 w-4 self-stretch flex flex-col items-center">
+                        <div className="pt-0.5 z-10">
+                          {isExpanded ? (
+                            <FolderOpen className="w-4 h-4 text-white" />
+                          ) : (
+                            <Folder className="w-4 h-4 text-white" />
+                          )}
+                        </div>
+                        {isExpanded && (
+                          <div className="w-px flex-1 bg-white/40 mt-1.5" />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <span className="block font-bold text-[15px] sm:text-[16px] leading-tight">
+                          Module {sIdx + 1}
+                        </span>
+                        {section.title && (
+                          <span className="block text-xs sm:text-[13px] text-white/75 font-normal mt-1.5 leading-snug whitespace-normal break-words">
+                            {section.title.replace(/^Module\s*\d+\s*:\s*/i, '')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2.5 shrink-0 text-white/80 pt-0.5">
+                      {/* Tick on module after all the videos of that module get completed */}
+                      {isModuleCompleted ? (
+                        <div
+                          className="w-5 h-5 rounded-none bg-white flex items-center justify-center shrink-0"
+                          title="Module Completed"
+                        >
+                          <Check className="w-3.5 h-3.5 text-black stroke-[3]" />
+                        </div>
+                      ) : (
+                        <span className="text-xs font-mono font-medium text-white/70">
+                          {completedCount}/{section.lessons.length}
+                        </span>
+                      )}
+                      {isExpanded ? (
+                        <ChevronDown className="w-4 h-4" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4" />
+                      )}
+                    </div>
+                  </button>
+
+                  {/* CONNECTED LESSONS: Generous vertical padding, clear branch bend, readable text */}
+                  {isExpanded && (
+                    <div className="w-full pb-5 pt-1.5">
+                      {section.lessons.map((lesson, lIdx) => {
+                        const isLast = lIdx === section.lessons.length - 1;
+                        const isCurrent = lesson.lessonId === selectedLessonId;
+
+                        return (
+                          <button
+                            key={lesson.lessonId}
+                            type="button"
+                            onClick={() => setSelectedLessonId(lesson.lessonId)}
+                            className={`w-full text-left px-5 sm:px-6 py-3 sm:py-3.5 flex items-start gap-3 transition-colors cursor-pointer select-none group ${
+                              isCurrent ? 'bg-white/[0.08]' : 'bg-transparent hover:bg-white/[0.04]'
+                            }`}
+                          >
+                            {/* Branch line rooting from module and bending towards lesson title */}
+                            <div className="relative shrink-0 w-5 sm:w-6 self-stretch">
+                              {/* Curved L-bend line from top to right towards lesson title */}
+                              <div
+                                className={`absolute left-[7px] top-0 w-3.5 sm:w-4 h-4 border-l border-b ${
+                                  isCurrent ? 'border-white' : 'border-white/40'
+                                } rounded-bl-[5px]`}
+                              />
+
+                              {/* Continuing vertical stem for subsequent lessons */}
+                              {!isLast && (
+                                <div
+                                  className={`absolute left-[7px] top-4 bottom-0 w-px ${
+                                    isCurrent ? 'bg-white' : 'bg-white/40'
+                                  }`}
+                                />
+                              )}
+                            </div>
+
+                            {/* Lesson Content: Tick in front when completed, title, and video time below */}
+                            <div className="min-w-0 flex-1 pt-0.5 flex items-start gap-2.5">
+                              {lesson.isCompleted && (
+                                <div
+                                  className="w-4 h-4 rounded-none bg-white flex items-center justify-center shrink-0 mt-0.5"
+                                  title="Completed"
+                                >
+                                  <Check className="w-2.5 h-2.5 stroke-[3] text-black" />
+                                </div>
+                              )}
+
+                              <div className="min-w-0 flex-1">
+                                <div
+                                  className={`text-[13px] sm:text-[14px] leading-snug whitespace-normal break-words ${
+                                    isCurrent
+                                      ? 'font-extrabold text-white'
+                                      : 'font-medium text-white/90 group-hover:text-white'
+                                  }`}
+                                >
+                                  {lesson.title}
+                                </div>
+
+                                {/* Video time placed directly below the title with clean spacing */}
+                                <div
+                                  className={`text-xs font-mono mt-1 ${
+                                    isCurrent
+                                      ? 'text-white/80 font-semibold'
+                                      : 'text-white/50 group-hover:text-white/70'
+                                  }`}
+                                >
+                                  {Math.floor(lesson.durationSeconds / 60)}m
+                                  {lesson.durationSeconds % 60 > 0
+                                    ? ` ${lesson.durationSeconds % 60}s`
+                                    : ''}
+                                </div>
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Empty Space Column Continuing Down, allowing graphic to shine through */}
+            <div className="flex-1 w-full" />
+          </div>
+        </aside>
       </div>
     </div>
   );
