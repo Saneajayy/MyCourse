@@ -28,10 +28,10 @@ export function assertNoTodoMarkers(content: string): void {
 
 /**
  * Shared Table-Based Responsive Email Layout
- * - Maximum email client compatibility (Outlook, Gmail, iOS Mail, Yahoo)
+ * - Maximum email client compatibility (Outlook, Gmail, Apple Mail, Yahoo)
  * - Industrial Monochrome Design: Pure White (#FFFFFF), Pitch Black (#000000), Dark Neutral (#171717)
  * - Sharp corners throughout (zero rounded borders / border-radius: 0)
- * - Bold uppercase wordmark header ("HYDRO BASICS")
+ * - Stacked wordmark header ("HYDRO BASICS")
  * - Highly readable with images blocked and in dark mode
  * - CTA buttons >= 44px tall with sharp edges and high-contrast styling
  * - Dynamic brand name, support email, and links from config / APP_URL
@@ -43,11 +43,11 @@ export function buildEmailHtml(options: EmailLayoutOptions): string {
 
   const ctaButtonHtml = options.cta
     ? `
-      <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 32px 0 24px 0;">
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 28px 0 20px 0;">
         <tr>
           <td align="left">
             <a href="${options.cta.url}" target="_blank" style="display: inline-block; min-height: 44px; line-height: 44px; padding: 0 32px; background-color: #000000; color: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 900; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #000000; border-radius: 0;">
-              ${options.cta.text}
+              ${options.cta.text} &rarr;
             </a>
           </td>
         </tr>
@@ -68,7 +68,7 @@ export function buildEmailHtml(options: EmailLayoutOptions): string {
   <meta name="supported-color-schemes" content="light dark" />
   <title>${options.title}</title>
   <style type="text/css">
-    body { margin: 0; padding: 0; min-width: 100%; width: 100% !important; background-color: #FAFAFA; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    body { margin: 0; padding: 0; min-width: 100%; width: 100% !important; background-color: #F4F4F5; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
     table { border-spacing: 0; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
     td { padding: 0; }
     img { border: 0; -ms-interpolation-mode: bicubic; }
@@ -79,26 +79,28 @@ export function buildEmailHtml(options: EmailLayoutOptions): string {
     }
   </style>
 </head>
-<body style="margin: 0; padding: 32px 0; background-color: #FAFAFA; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #171717;">
+<body style="margin: 0; padding: 32px 0; background-color: #F4F4F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #171717;">
   ${preheaderHtml}
   <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
-      <td align="center">
+      <td align="center" style="padding: 0 12px;">
         <!-- Main Email Container with Sharp Edges -->
-        <table role="presentation" class="email-container" border="0" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; width: 100%; background-color: #ffffff; border: 1px solid #000000; border-radius: 0; text-align: left;">
+        <table role="presentation" class="email-container" border="0" cellpadding="0" cellspacing="0" width="580" style="max-width: 580px; width: 100%; background-color: #FFFFFF; border: 1px solid #000000; border-radius: 0; text-align: left;">
           
-          <!-- Brand Header (Pitch Black with Bold Uppercase Wordmark) -->
+          <!-- Brand Header (Pitch Black with Two-Line Stacked Wordmark) -->
           <tr>
-            <td style="background-color: #000000; padding: 24px 28px; border-bottom: 1px solid #000000; border-radius: 0;">
+            <td style="background-color: #000000; padding: 20px 28px; border-bottom: 1px solid #000000; border-radius: 0;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
-                  <td>
-                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase; color: #FFFFFF; line-height: 1;">
-                      ${brandName}
+                  <td align="left" valign="middle">
+                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 900; letter-spacing: 0.6px; text-transform: uppercase; color: #FFFFFF; line-height: 0.95;">
+                      HYDRO<br />BASICS
                     </div>
-                    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #A3A3A3; margin-top: 4px; line-height: 1;">
-                      Industrial Technical Training
-                    </div>
+                  </td>
+                  <td align="right" valign="middle">
+                    <span style="display: inline-block; padding: 4px 10px; background-color: #171717; border: 1px solid #333333; font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #D4D4D4;">
+                      OFFICIAL NOTICE
+                    </span>
                   </td>
                 </tr>
               </table>
@@ -107,32 +109,37 @@ export function buildEmailHtml(options: EmailLayoutOptions): string {
 
           <!-- Main Content Area -->
           <tr>
-            <td class="mobile-p-20" style="padding: 36px 32px; background-color: #ffffff; border-radius: 0;">
-              <h1 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 900; line-height: 1.3; color: #000000; letter-spacing: -0.3px; text-transform: uppercase;">
+            <td class="mobile-p-20" style="padding: 34px 28px; background-color: #FFFFFF; border-radius: 0;">
+              <h1 style="margin: 0 0 18px 0; font-size: 20px; font-weight: 900; line-height: 1.3; color: #000000; letter-spacing: -0.3px; text-transform: uppercase;">
                 ${options.title}
               </h1>
 
-              <div style="font-size: 15px; line-height: 1.6; color: #171717;">
+              <div style="font-size: 14px; line-height: 1.6; color: #171717;">
                 ${options.contentHtml}
               </div>
 
               ${ctaButtonHtml}
 
-              ${options.footerHtml ? `<div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #E5E5E5; font-size: 13px; color: #737373; line-height: 1.6;">${options.footerHtml}</div>` : ''}
+              ${options.footerHtml ? `<div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid #E5E5E5; font-size: 13px; color: #737373; line-height: 1.6;">${options.footerHtml}</div>` : ''}
             </td>
           </tr>
 
           <!-- Footer Area -->
           <tr>
-            <td style="background-color: #FAFAFA; padding: 24px 32px; border-top: 1px solid #000000; border-radius: 0; font-size: 12px; line-height: 1.6; color: #737373;">
+            <td style="background-color: #FAFAFA; padding: 22px 28px; border-top: 1px solid #000000; border-radius: 0; font-size: 12px; line-height: 1.6; color: #737373;">
               <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td>
-                    <p style="margin: 0 0 6px 0; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 0.5px;">
-                      ${brandName}
-                    </p>
-                    <p style="margin: 0 0 8px 0; color: #737373;">
-                      Questions or billing support? Reply directly to this email or contact <a href="mailto:${supportEmail}" style="color: #000000; font-weight: 700; text-decoration: underline;">${supportEmail}</a>
+                    <!-- Quick Navigation Links -->
+                    <div style="margin-bottom: 10px; font-size: 12px; font-weight: 700;">
+                      <a href="${env.APP_URL}/my-courses" style="color: #000000; text-decoration: none; margin-right: 14px;">My Courses &rarr;</a>
+                      <a href="${env.APP_URL}/terms" style="color: #737373; text-decoration: none; margin-right: 14px;">Terms</a>
+                      <a href="${env.APP_URL}/privacy" style="color: #737373; text-decoration: none; margin-right: 14px;">Privacy</a>
+                      <a href="${env.APP_URL}/refunds" style="color: #737373; text-decoration: none; margin-right: 14px;">Refunds</a>
+                      <a href="${env.APP_URL}/contact" style="color: #737373; text-decoration: none;">Contact</a>
+                    </div>
+                    <p style="margin: 0 0 6px 0; color: #737373; font-size: 12px;">
+                      Questions or billing assistance? Reply directly to this email or contact <a href="mailto:${supportEmail}" style="color: #000000; font-weight: 700; text-decoration: underline;">${supportEmail}</a>
                     </p>
                     <p style="margin: 0; color: #A3A3A3; font-size: 11px;">
                       &copy; ${year} ${brandName}. All rights reserved.
@@ -189,11 +196,13 @@ Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
     <p style="margin: 0 0 14px 0;">Hello <strong>${data.name}</strong>,</p>
     <p style="margin: 0 0 14px 0;">Thank you for registering at <strong>${brandName}</strong>.</p>
     <p style="margin: 0 0 14px 0;">Please use the 6-digit verification code below to activate your student account:</p>
-    <div style="text-align: center; margin: 28px 0;">
-      <div style="display: inline-block; padding: 16px 32px; background-color: #FAFAFA; border: 2px solid #000000; border-radius: 0; font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 32px; font-weight: 900; letter-spacing: 10px; color: #000000;">
+    
+    <div style="text-align: center; margin: 26px 0; padding: 22px 16px; background-color: #FAFAFA; border: 1px solid #000000; border-radius: 0;">
+      <div style="font-size: 11px; font-family: monospace; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #737373; margin-bottom: 10px;">Verification Code</div>
+      <div style="display: inline-block; padding: 12px 28px; background-color: #FFFFFF; border: 2px solid #000000; border-radius: 0; font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', monospace; font-size: 32px; font-weight: 900; letter-spacing: 10px; color: #000000;">
         ${data.token}
       </div>
-      <p style="margin: 12px 0 0 0; font-size: 12px; color: #737373;">This verification code will expire in <strong style="color: #000000;">15 minutes</strong>.</p>
+      <p style="margin: 12px 0 0 0; font-size: 12px; color: #737373;">This code will expire in <strong style="color: #000000;">15 minutes</strong>.</p>
     </div>
   `;
 
@@ -251,8 +260,10 @@ Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
     <p style="margin: 0 0 14px 0;">Hello <strong>${data.name}</strong>,</p>
     <p style="margin: 0 0 14px 0;">We received a request to reset the password for your account at <strong>${brandName}</strong>.</p>
     <p style="margin: 0 0 14px 0;">Please use the 6-digit password reset code below to create your new password:</p>
-    <div style="text-align: center; margin: 28px 0;">
-      <div style="display: inline-block; padding: 16px 32px; background-color: #FAFAFA; border: 2px solid #000000; border-radius: 0; font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size: 32px; font-weight: 900; letter-spacing: 10px; color: #000000;">
+    
+    <div style="text-align: center; margin: 26px 0; padding: 22px 16px; background-color: #FAFAFA; border: 1px solid #000000; border-radius: 0;">
+      <div style="font-size: 11px; font-family: monospace; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #737373; margin-bottom: 10px;">Reset Code</div>
+      <div style="display: inline-block; padding: 12px 28px; background-color: #FFFFFF; border: 2px solid #000000; border-radius: 0; font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', monospace; font-size: 32px; font-weight: 900; letter-spacing: 10px; color: #000000;">
         ${data.token}
       </div>
       <p style="margin: 12px 0 0 0; font-size: 12px; color: #737373;">This code will expire in <strong style="color: #000000;">15 minutes</strong>.</p>
@@ -348,7 +359,7 @@ export function getOrderReceiptTemplate(data: {
 }): { subject: string; html: string; text: string } {
   const brandName = data.brandName || 'Hydro Basics';
   const amountRupees = (data.amountPaise / 100).toFixed(2);
-  const myCoursesUrl = `${env.APP_URL}/account`;
+  const myCoursesUrl = `${env.APP_URL}/my-courses`;
   const invoiceDownloadUrl = `${env.APP_URL}/api/v1/orders/${data.orderId}/invoice`;
   const expiryText = data.expiresAt
     ? `Access Valid Until: ${data.expiresAt.toLocaleDateString('en-IN')}`
@@ -381,28 +392,28 @@ Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
     <p style="margin: 0 0 14px 0;">Hello <strong>${data.name}</strong>,</p>
     <p style="margin: 0 0 16px 0;">Thank you for enrolling in <strong>${data.courseTitle}</strong>. Your payment was processed successfully and your enrollment is active.</p>
 
-    <!-- Order Summary Table with Sharp Corners -->
+    <!-- Order Summary Table with Sharp Corners and Border-Touching Lines -->
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 24px 0; border: 1px solid #000000; background-color: #FAFAFA; border-radius: 0;">
       <tr>
-        <td style="padding: 12px 16px; border-bottom: 1px solid #E5E5E5; font-size: 12px; font-weight: 700; color: #737373; text-transform: uppercase; letter-spacing: 0.5px;">Course</td>
-        <td style="padding: 12px 16px; border-bottom: 1px solid #E5E5E5; font-size: 14px; font-weight: 800; color: #000000;" align="right">${data.courseTitle}</td>
+        <td style="padding: 13px 18px; border-bottom: 1px solid #E5E5E5; font-size: 12px; font-weight: 700; color: #737373; text-transform: uppercase; letter-spacing: 0.5px;">Enrolled Course</td>
+        <td style="padding: 13px 18px; border-bottom: 1px solid #E5E5E5; font-size: 14px; font-weight: 800; color: #000000;" align="right">${data.courseTitle}</td>
       </tr>
       <tr>
-        <td style="padding: 12px 16px; border-bottom: 1px solid #E5E5E5; font-size: 12px; font-weight: 700; color: #737373; text-transform: uppercase; letter-spacing: 0.5px;">Invoice Number</td>
-        <td style="padding: 12px 16px; border-bottom: 1px solid #E5E5E5; font-size: 13px; font-family: monospace; font-weight: 700; color: #000000;" align="right">${data.invoiceNumber}</td>
+        <td style="padding: 13px 18px; border-bottom: 1px solid #E5E5E5; font-size: 12px; font-weight: 700; color: #737373; text-transform: uppercase; letter-spacing: 0.5px;">Invoice Number</td>
+        <td style="padding: 13px 18px; border-bottom: 1px solid #E5E5E5; font-size: 13px; font-family: monospace; font-weight: 700; color: #000000;" align="right">${data.invoiceNumber}</td>
       </tr>
       <tr>
-        <td style="padding: 12px 16px; border-bottom: 1px solid #E5E5E5; font-size: 12px; font-weight: 700; color: #737373; text-transform: uppercase; letter-spacing: 0.5px;">Validity</td>
-        <td style="padding: 12px 16px; border-bottom: 1px solid #E5E5E5; font-size: 13px; font-weight: 700; color: #000000;" align="right">${expiryText}</td>
+        <td style="padding: 13px 18px; border-bottom: 1px solid #E5E5E5; font-size: 12px; font-weight: 700; color: #737373; text-transform: uppercase; letter-spacing: 0.5px;">Validity</td>
+        <td style="padding: 13px 18px; border-bottom: 1px solid #E5E5E5; font-size: 13px; font-weight: 700; color: #000000;" align="right">${expiryText}</td>
       </tr>
       <tr>
-        <td style="padding: 14px 16px; font-size: 13px; font-weight: 900; color: #000000; text-transform: uppercase; letter-spacing: 0.5px;">Total Amount Paid</td>
-        <td style="padding: 14px 16px; font-size: 17px; font-weight: 900; color: #000000;" align="right">₹${amountRupees}</td>
+        <td style="padding: 16px 18px; font-size: 13px; font-weight: 900; color: #000000; text-transform: uppercase; letter-spacing: 0.5px;">Total Paid (GST Incl.)</td>
+        <td style="padding: 16px 18px; font-size: 18px; font-weight: 900; font-family: monospace; color: #000000;" align="right">₹${amountRupees}</td>
       </tr>
     </table>
 
     <p style="margin: 16px 0 6px 0;">
-      <strong>Official Invoice:</strong> You can download your official GST Tax Invoice PDF anytime from your account dashboard or directly via:
+      <strong>Official Invoice:</strong> You can download your official GST Tax Invoice PDF anytime from your student dashboard or directly via:
       <br />
       <a href="${invoiceDownloadUrl}" style="color: #000000; font-weight: 800; text-decoration: underline;">Download Official Tax Invoice (PDF)</a>
     </p>
@@ -536,7 +547,7 @@ Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
   `;
 
   const footerHtml = `
-    <p style="margin: 0;">You can also access this course anytime by logging into your student dashboard at <a href="${env.APP_URL}/account" style="color: #000000; font-weight: 700; text-decoration: underline;">${env.APP_URL}/account</a>.</p>
+    <p style="margin: 0;">You can also access this course anytime by logging into your student dashboard at <a href="${env.APP_URL}/my-courses" style="color: #000000; font-weight: 700; text-decoration: underline;">${env.APP_URL}/my-courses</a>.</p>
   `;
 
   const html = buildEmailHtml({
