@@ -1090,7 +1090,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
               fill
               sizes="(max-width: 768px) 100vw, 320px"
               priority
-              style={{ objectPosition: '25% center' }}
+              style={{ objectPosition: '15% center' }}
               className="object-cover mix-blend-screen opacity-[0.07] select-none"
             />
           </div>
