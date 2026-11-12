@@ -38,7 +38,7 @@ export default function RefundPage() {
       {/* Right Column: Clean White Background */}
       <div className="w-full lg:w-1/2 h-full bg-white flex flex-col justify-between overflow-y-auto lg:overflow-hidden relative">
         {/* Top Header Bar */}
-        <header className="w-full flex items-center justify-between px-5 pt-4 sm:px-8 sm:pt-6 shrink-0 z-20">
+        <header className="w-full flex items-center justify-between px-5 pt-4 sm:px-8 sm:pt-6 shrink-0 z-20 lg:absolute lg:top-0 lg:inset-x-0">
           <Link
             href="/"
             className="text-neutral-500 hover:text-black font-semibold text-xs sm:text-sm tracking-normal transition-colors flex items-center gap-1.5 py-1"
@@ -60,22 +60,22 @@ export default function RefundPage() {
           </Link>
         </header>
 
-        {/* Center Content Card */}
-        <main className="my-auto w-full max-w-xl mx-auto px-4 sm:px-6 py-4 relative z-10 flex flex-col justify-center">
-          <div className="relative w-full bg-white border border-neutral-200/80 rounded-none p-5 sm:p-7 select-text overflow-hidden">
-            {/* Clean, compact header matching dashboard & checkout */}
-            <div className="space-y-1 mb-4 sm:mb-5">
+        {/* Center Content Card - Vertically Centered */}
+        <main className="my-auto w-full max-w-xl mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-0 relative z-10 flex flex-col justify-center">
+          <div className="relative w-full bg-white border border-neutral-200/80 rounded-none select-text overflow-hidden">
+            {/* Header: divider line touches outer box border */}
+            <div className="p-5 sm:p-6 border-b border-neutral-200/80">
               <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
                 Refund Policy
               </h1>
-              <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
+              <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed mt-1">
                 Clear 7-day money-back guarantee, progress criteria, and direct settlement terms.
               </p>
             </div>
 
-            {/* Concise 1-2 line points */}
-            <div className="divide-y divide-neutral-100 text-xs sm:text-[13px] text-neutral-700">
-              <div className="py-2.5 sm:py-3 first:pt-0">
+            {/* Concise 1-2 line points with full-width separation lines touching border */}
+            <div className="divide-y divide-neutral-200/80 text-xs sm:text-[13px] text-neutral-700">
+              <div className="px-5 sm:px-6 py-2.5 sm:py-3">
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">01.</span>
                   <strong className="font-bold text-neutral-950 mr-1">7-Day Guarantee:</strong>
@@ -83,7 +83,7 @@ export default function RefundPage() {
                 </p>
               </div>
 
-              <div className="py-2.5 sm:py-3">
+              <div className="px-5 sm:px-6 py-2.5 sm:py-3">
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">02.</span>
                   <strong className="font-bold text-neutral-950 mr-1">Eligibility Criteria:</strong>
@@ -91,7 +91,7 @@ export default function RefundPage() {
                 </p>
               </div>
 
-              <div className="py-2.5 sm:py-3">
+              <div className="px-5 sm:px-6 py-2.5 sm:py-3">
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">03.</span>
                   <strong className="font-bold text-neutral-950 mr-1">One-Time Payment:</strong>
@@ -99,7 +99,7 @@ export default function RefundPage() {
                 </p>
               </div>
 
-              <div className="py-2.5 sm:py-3">
+              <div className="px-5 sm:px-6 py-2.5 sm:py-3">
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">04.</span>
                   <strong className="font-bold text-neutral-950 mr-1">Direct Settlement:</strong>
@@ -107,7 +107,7 @@ export default function RefundPage() {
                 </p>
               </div>
 
-              <div className="py-2.5 sm:py-3 last:pb-0">
+              <div className="px-5 sm:px-6 py-2.5 sm:py-3 last:pb-0">
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">05.</span>
                   <strong className="font-bold text-neutral-950 mr-1">How to Apply:</strong>
@@ -123,16 +123,16 @@ export default function RefundPage() {
               </div>
             </div>
 
-            {/* Subtle metadata strip */}
-            <div className="pt-3 mt-4 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono text-neutral-400">
+            {/* Bottom metadata strip: divider line touches outer box border */}
+            <div className="px-5 sm:px-6 py-2.5 border-t border-neutral-200/80 flex items-center justify-between text-[11px] font-mono text-neutral-400 bg-neutral-50/50">
               <span>Settlement: Razorpay (5–7 Business Days)</span>
               <span>Updated: 2026</span>
             </div>
           </div>
         </main>
 
-        {/* Footer */}
-        <footer className="mt-auto py-3 px-5 sm:px-8 text-center shrink-0">
+        {/* Footer: Lifted up from bottom edge */}
+        <footer className="shrink-0 pb-6 sm:pb-8 lg:pb-7 px-5 sm:px-8 text-center z-20 lg:absolute lg:bottom-0 lg:inset-x-0">
           <nav
             aria-label="Footer Legal Links"
             className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-neutral-500 mb-1"
