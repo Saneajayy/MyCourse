@@ -294,7 +294,8 @@ export class AuthController {
         throw new UnauthorizedError('Authentication required');
       }
 
-      const { token } = adminTotpVerifySchema.parse(req.body);
+      const rawToken = req.body.token || req.body.code;
+      const { token } = adminTotpVerifySchema.parse({ token: rawToken });
       const result = await authService.verifyAndEnableAdmin2FA(
         req.user.id,
         token,

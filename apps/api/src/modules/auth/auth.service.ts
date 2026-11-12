@@ -1082,7 +1082,9 @@ export class AuthService {
    */
   public async setupAdmin2FA(adminUserId: string): Promise<{
     qrCodeDataUrl: string;
+    qrCode?: string;
     manualEntryKey: string;
+    manualSecret?: string;
     recoveryCodes: string[];
   }> {
     const user = await prisma.user.findUnique({ where: { id: adminUserId } });
@@ -1124,7 +1126,9 @@ export class AuthService {
 
     return {
       qrCodeDataUrl,
+      qrCode: qrCodeDataUrl,
       manualEntryKey: secret,
+      manualSecret: secret,
       recoveryCodes: plainRecoveryCodes,
     };
   }

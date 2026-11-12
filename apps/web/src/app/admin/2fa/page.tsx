@@ -4,12 +4,14 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../../context/auth-context';
 import { apiClient } from '../../../lib/api-client';
-import { Card, Button, Input, useToast } from '../../../components/ui';
-import { ShieldCheck, AlertCircle, QrCode, Key, Download, Check, Copy } from 'lucide-react';
+import { useToast } from '../../../components/ui';
+import { ShieldCheck, AlertCircle, Download, Check, Copy, ArrowRight } from 'lucide-react';
 
 interface Setup2FAResponse {
-  qrCode: string;
-  manualSecret: string;
+  qrCode?: string;
+  qrCodeDataUrl?: string;
+  manualSecret?: string;
+  manualEntryKey?: string;
   recoveryCodes: string[];
 }
 
@@ -31,6 +33,9 @@ function TwoFactorFlow() {
   const [setupData, setSetupData] = useState<Setup2FAResponse | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const [savedCodesConfirmed, setSavedCodesConfirmed] = useState(false);
+
+  const qrCodeImage = setupData?.qrCode || setupData?.qrCodeDataUrl;
+  const manualSecretKey = setupData?.manualSecret || setupData?.manualEntryKey;
 
   useEffect(() => {
     let mounted = true;
@@ -88,7 +93,7 @@ function TwoFactorFlow() {
     try {
       await apiClient('/auth/2fa/verify', {
         method: 'POST',
-        body: JSON.stringify({ code: code.trim() }),
+        body: JSON.stringify({ token: code.trim(), code: code.trim() }),
       });
 
       await refreshUser();
@@ -107,8 +112,8 @@ function TwoFactorFlow() {
   };
 
   const handleCopySecret = () => {
-    if (setupData?.manualSecret) {
-      navigator.clipboard.writeText(setupData.manualSecret);
+    if (manualSecretKey) {
+      navigator.clipboard.writeText(manualSecretKey);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     }
@@ -128,177 +133,245 @@ function TwoFactorFlow() {
   };
 
   return (
-    <Card variant="default" padding="lg" className="border-2 max-w-lg mx-auto">
-      <div className="text-center mb-6">
-        <div className="w-10 h-10 bg-course-darkBlue text-course-white inline-flex items-center justify-center border border-black mb-3">
-          <ShieldCheck className="w-5 h-5" />
+    <div className="w-full max-w-xl mx-auto bg-white border border-neutral-200/80 shadow-sm overflow-hidden select-text">
+      {/* Top Header Strip with edge-to-edge dividing border */}
+      <div className="p-5 sm:p-6 border-b border-neutral-200/80">
+        <div className="flex items-center justify-between mb-3">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-neutral-900 text-white font-mono text-[10px] uppercase font-bold tracking-wider">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Security Checkpoint</span>
+          </div>
+          <span className="text-[11px] font-mono text-neutral-400">TOTP RFC 6238</span>
         </div>
-        <h1 className="text-2xl font-black text-course-darkBlue tracking-tight">
+        <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
           {isEnrolling ? 'Enroll Two-Factor Authentication' : 'Two-Factor Authentication'}
         </h1>
-        <p className="text-xs text-course-navySubtle mt-1">
+        <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed mt-1">
           {isEnrolling
-            ? 'Mandatory security step to safeguard payments and student records'
-            : 'Enter the 6-digit code from Google Authenticator or a recovery code'}
+            ? 'Mandatory security step to safeguard customer data, course content, and financial transactions.'
+            : 'Enter the 6-digit verification code from Google Authenticator or an offline recovery code.'}
         </p>
       </div>
 
       {errorMsg && (
-        <div className="mb-6 p-4 border border-black bg-rose-50 text-rose-950 text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-rose-700 shrink-0" />
-          <span>{errorMsg}</span>
+        <div className="p-4 border-b border-rose-200 bg-rose-50 text-rose-950 text-xs flex items-center gap-2.5">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span className="font-medium">{errorMsg}</span>
         </div>
       )}
 
       {/* Case 1: First-time Enrollment Wizard */}
       {isEnrolling ? (
-        <div className="space-y-6">
+        <div>
           {setupData ? (
             <>
               {/* Step 1: Scan QR Code */}
-              <div className="p-4 border border-black bg-neutral-50 text-center space-y-3">
-                <div className="text-xs font-black uppercase tracking-wider text-course-darkBlue flex items-center justify-center gap-1.5">
-                  <QrCode className="w-4 h-4 text-course-orange" />
-                  <span>Step 1: Scan with Google Authenticator</span>
+              <div className="p-5 sm:p-6 border-b border-neutral-200/80 space-y-3 bg-neutral-50/40">
+                <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                  <span className="w-5 h-5 bg-neutral-900 text-white flex items-center justify-center font-mono text-[11px]">
+                    1
+                  </span>
+                  <span>Scan with Authenticator App</span>
                 </div>
-                {setupData.qrCode ? (
-                  <div className="inline-block p-2 bg-white border border-black">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={setupData.qrCode} alt="2FA QR Code" className="w-44 h-44 mx-auto" />
-                  </div>
-                ) : (
-                  <div className="p-4 text-xs font-mono">Loading QR Code...</div>
-                )}
+                <p className="text-xs text-neutral-500 leading-relaxed">
+                  Open Google Authenticator, Authy, or Apple Passwords on your phone and scan the code below.
+                </p>
 
-                <div className="text-[11px] text-course-navySubtle">
-                  Can&apos;t scan? Enter this secret manually in your app:
-                </div>
-                <div className="flex items-center justify-center gap-2">
-                  <code className="px-2 py-1 bg-white border border-black font-mono text-xs font-bold select-all">
-                    {setupData.manualSecret}
-                  </code>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCopySecret}
-                    className="text-xs py-1"
-                  >
-                    {isCopied ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pt-2">
+                  <div className="p-2.5 bg-white border border-neutral-200/90 shadow-sm shrink-0">
+                    {qrCodeImage ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={qrCodeImage}
+                        alt="2FA QR Code"
+                        className="w-36 h-36 mx-auto block"
+                      />
                     ) : (
-                      <Copy className="w-3.5 h-3.5" />
+                      <div className="w-36 h-36 flex items-center justify-center text-xs font-mono text-neutral-400">
+                        Loading QR...
+                      </div>
                     )}
-                  </Button>
+                  </div>
+
+                  <div className="flex-1 w-full space-y-2">
+                    <label className="text-[11px] font-semibold text-neutral-600 uppercase tracking-wider block">
+                      Or Enter Key Manually
+                    </label>
+                    <div className="flex items-center gap-1.5">
+                      <code className="flex-1 px-2.5 py-1.5 bg-white border border-neutral-200 font-mono text-xs font-bold text-neutral-800 select-all overflow-x-auto">
+                        {manualSecretKey || '...'}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={handleCopySecret}
+                        className="p-1.5 border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-700 min-h-[34px] min-w-[34px] inline-flex items-center justify-center transition-colors shrink-0"
+                        title="Copy Secret Key"
+                      >
+                        {isCopied ? (
+                          <Check className="w-4 h-4 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-neutral-400 leading-tight">
+                      Account name will appear as <strong>HydraulicEngineeringAcademy</strong>.
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Step 2: Save Recovery Codes */}
-              <div className="p-4 border border-black bg-neutral-50 space-y-3">
-                <div className="text-xs font-black uppercase tracking-wider text-course-darkBlue flex items-center gap-1.5">
-                  <Key className="w-4 h-4 text-course-orange" />
-                  <span>Step 2: Save Backup Recovery Codes</span>
+              <div className="p-5 sm:p-6 border-b border-neutral-200/80 space-y-3">
+                <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                  <span className="w-5 h-5 bg-neutral-900 text-white flex items-center justify-center font-mono text-[11px]">
+                    2
+                  </span>
+                  <span>Save Backup Recovery Codes</span>
                 </div>
-                <p className="text-[11px] text-course-navyMuted">
-                  If you ever lose your phone, each of these 10 backup codes can be used once to
-                  access the admin panel.
+                <p className="text-xs text-neutral-500 leading-relaxed">
+                  Store these 10 one-time recovery codes in a secure location. Each code can bypass 2FA once if you lose access to your device.
                 </p>
-                <div className="grid grid-cols-2 gap-1.5 p-3 bg-white border border-black font-mono text-[11px] text-center">
+
+                <div className="grid grid-cols-2 gap-1.5 p-3 bg-neutral-50 border border-neutral-200 font-mono text-xs text-center text-neutral-800 select-all">
                   {setupData.recoveryCodes.map((codeStr, idx) => (
-                    <div key={idx} className="p-1 bg-neutral-50 border border-neutral-200">
+                    <div
+                      key={idx}
+                      className="py-1 px-1.5 bg-white border border-neutral-200/80 font-bold"
+                    >
                       {codeStr}
                     </div>
                   ))}
                 </div>
-                <div className="flex items-center justify-between gap-3 pt-1">
-                  <Button
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+                  <button
                     type="button"
-                    variant="outline"
-                    size="sm"
                     onClick={handleDownloadCodes}
-                    className="text-xs font-bold uppercase tracking-wider"
+                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2 border border-neutral-300 hover:border-neutral-900 hover:bg-neutral-100 text-neutral-800 text-xs font-semibold tracking-wide transition-colors"
                   >
-                    <Download className="w-3.5 h-3.5 mr-1" />
-                    Download Backup Sheet
-                  </Button>
-                  <label className="flex items-center gap-2 text-xs font-bold text-course-darkBlue cursor-pointer">
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Download Backup Sheet</span>
+                  </button>
+
+                  <label className="flex items-center gap-2 text-xs font-medium text-neutral-800 cursor-pointer select-none">
                     <input
                       type="checkbox"
                       checked={savedCodesConfirmed}
                       onChange={(e) => setSavedCodesConfirmed(e.target.checked)}
-                      className="w-4 h-4 accent-course-orange"
+                      className="w-4 h-4 accent-neutral-900 rounded-none cursor-pointer"
                     />
-                    <span>I have saved my backup codes</span>
+                    <span>I have safely saved my backup codes</span>
                   </label>
                 </div>
               </div>
 
               {/* Step 3: Enter Code to Verify */}
-              <form onSubmit={handleEnrollmentSubmit} className="space-y-4 pt-2">
-                <Input
-                  label="Step 3: Enter 6-digit code to activate"
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="e.g. 123456"
-                  required
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  helperText="Generated by Google Authenticator"
-                />
-                <Button
+              <form onSubmit={handleEnrollmentSubmit} className="p-5 sm:p-6 space-y-4 bg-neutral-50/20">
+                <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                  <span className="w-5 h-5 bg-neutral-900 text-white flex items-center justify-center font-mono text-[11px]">
+                    3
+                  </span>
+                  <span>Enter Code to Activate</span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label htmlFor="auth-code" className="text-xs font-medium text-neutral-700 block">
+                    6-Digit Code from Authenticator App:
+                  </label>
+                  <input
+                    id="auth-code"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={6}
+                    placeholder="000000"
+                    required
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                    className="w-full px-4 py-3 bg-white border border-neutral-300 focus:border-neutral-900 focus:outline-none font-mono text-center text-xl tracking-[0.3em] font-bold text-neutral-900 placeholder:text-neutral-300 transition-colors"
+                  />
+                  <p className="text-[11px] text-neutral-400">
+                    Codes refresh every 30 seconds automatically.
+                  </p>
+                </div>
+
+                <button
                   type="submit"
-                  variant="primary"
-                  className="w-full text-xs font-black uppercase tracking-wider py-3"
-                  isLoading={isLoading}
+                  disabled={isLoading || !savedCodesConfirmed || code.length < 6}
+                  className="w-full py-3 px-4 bg-neutral-900 hover:bg-black text-white text-xs font-semibold uppercase tracking-wider transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
                 >
-                  Verify &amp; Activate 2FA
-                </Button>
+                  {isLoading ? (
+                    <span>Verifying Code...</span>
+                  ) : (
+                    <>
+                      <span>Verify &amp; Activate 2FA</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </button>
               </form>
             </>
           ) : (
-            <div className="py-8 text-center text-xs font-bold text-course-navySubtle">
-              Initializing 2FA enrollment credentials...
+            <div className="py-12 text-center text-xs text-neutral-400 space-y-2">
+              <div className="w-6 h-6 border-2 border-neutral-900 border-t-transparent animate-spin mx-auto" />
+              <p>Initializing 2FA enrollment credentials...</p>
             </div>
           )}
         </div>
       ) : (
         /* Case 2: Standard Login 2FA Challenge */
-        <form onSubmit={handleChallengeSubmit} className="space-y-4">
-          <Input
-            label="Verification Code"
-            type="text"
-            placeholder="e.g. 123456 or XXXX-XXXX-XXXX"
-            required
-            autoFocus
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            helperText="From Google Authenticator or your backup recovery sheet"
-          />
+        <form onSubmit={handleChallengeSubmit} className="p-6 space-y-5">
+          <div className="space-y-2">
+            <label htmlFor="challenge-code" className="text-xs font-bold uppercase tracking-wider text-neutral-700 block">
+              6-Digit Authenticator Code or Backup Code
+            </label>
+            <input
+              id="challenge-code"
+              type="text"
+              placeholder="e.g. 123456 or XXXX-XXXX-XXXX"
+              required
+              autoFocus
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              className="w-full px-4 py-3 bg-white border border-neutral-300 focus:border-neutral-900 focus:outline-none font-mono text-center text-lg font-bold text-neutral-900 tracking-wider transition-colors"
+            />
+            <p className="text-[11px] text-neutral-500">
+              Open Google Authenticator on your phone or paste an offline backup code.
+            </p>
+          </div>
 
-          <Button
+          <button
             type="submit"
-            variant="primary"
-            className="w-full text-xs font-black uppercase tracking-wider py-3"
-            isLoading={isLoading}
+            disabled={isLoading || !code.trim()}
+            className="w-full py-3 px-4 bg-neutral-900 hover:bg-black text-white text-xs font-semibold uppercase tracking-wider transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm"
           >
-            Verify &amp; Continue
-          </Button>
+            {isLoading ? <span>Verifying...</span> : <span>Verify &amp; Continue</span>}
+          </button>
         </form>
       )}
-    </Card>
+
+      {/* Footer metadata strip */}
+      <div className="px-5 sm:px-6 py-2.5 border-t border-neutral-200/80 bg-neutral-50/50 flex items-center justify-between text-[11px] font-mono text-neutral-400">
+        <span>AES-256 Encrypted</span>
+        <span>HMAC-SHA1 Time-based</span>
+      </div>
+    </div>
   );
 }
 
 export default function TwoFactorPage() {
   return (
-    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center px-4 py-12 bg-course-white">
-      <div className="w-full max-w-lg">
-        <Suspense
-          fallback={<div className="p-8 text-center text-sm font-bold">Loading 2FA...</div>}
-        >
-          <TwoFactorFlow />
-        </Suspense>
-      </div>
+    <div className="min-h-screen py-10 px-4 flex items-center justify-center bg-neutral-50/50 font-reddit">
+      <Suspense
+        fallback={
+          <div className="p-8 text-center text-xs text-neutral-500 font-mono">
+            Loading security module...
+          </div>
+        }
+      >
+        <TwoFactorFlow />
+      </Suspense>
     </div>
   );
 }

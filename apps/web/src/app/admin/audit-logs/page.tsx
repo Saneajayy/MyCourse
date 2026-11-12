@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { apiClient } from '../../../lib/api-client';
+import { AlertCircle, X } from 'lucide-react';
 
 interface AuditLogItem {
   id: string;
@@ -9,8 +10,8 @@ interface AuditLogItem {
   action: string;
   entityType: string;
   entityId: string | null;
-  beforeState: any;
-  afterState: any;
+  beforeState: unknown;
+  afterState: unknown;
   ipAddress: string | null;
   userAgent: string | null;
   createdAt: string;
@@ -65,8 +66,8 @@ export default function AdminAuditLogsPage() {
       setTotalPages(data.pagination.totalPages || 1);
       setTotalCount(data.pagination.total || 0);
       setPage(targetPage);
-    } catch (err: any) {
-      setError(err.message || 'Error loading audit logs');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error loading audit logs');
     } finally {
       setLoading(false);
     }
@@ -74,36 +75,45 @@ export default function AdminAuditLogsPage() {
 
   useEffect(() => {
     fetchAuditLogs(1);
-  }, [actionFilter, startDate, endDate]);
+  }, [actionFilter, startDate, endDate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-reddit">
       {/* Header */}
-      <div className="bg-white border border-black p-4">
-        <h1 className="text-2xl font-black text-[#0A192F]">System Audit Log</h1>
-        <p className="text-xs text-gray-600 mt-1">
-          Read-only, tamper-evident security audit trail of every administrative and financial
-          action taken in the academy.
-        </p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-neutral-200/80">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold tracking-tight text-neutral-950 uppercase">
+              Security Audit Log
+            </h1>
+            <span className="px-2 py-0.5 text-[10px] font-mono font-medium uppercase tracking-wider bg-neutral-100 text-neutral-600 border border-neutral-200">
+              Immutable Trail
+            </span>
+          </div>
+          <p className="text-xs text-neutral-500 mt-1">
+            Read-only, tamper-evident security audit log of administrative, pricing, and financial events
+          </p>
+        </div>
       </div>
 
       {error && (
-        <div className="bg-[#FCE8E6] border border-[#C5221F] text-[#C5221F] p-4 font-bold text-sm">
-          {error}
+        <div className="bg-rose-50 border border-rose-200 text-rose-950 p-3.5 text-xs flex items-center gap-2 font-semibold">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {/* Filter Bar */}
-      <div className="bg-white border border-black p-4 grid grid-cols-1 sm:grid-cols-4 gap-4 items-end text-sm">
-        <div>
-          <label htmlFor="filter-action" className="block text-xs font-bold uppercase mb-1">
+      <div className="border border-neutral-200/80 bg-white p-4 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end text-xs shadow-xs">
+        <div className="space-y-1">
+          <label htmlFor="filter-action" className="block text-xs font-semibold uppercase tracking-wider text-neutral-700">
             Filter by Action
           </label>
           <select
             id="filter-action"
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value)}
-            className="w-full border border-black p-2 bg-white text-xs"
+            className="w-full border border-neutral-300 p-2 bg-white text-xs text-neutral-900 focus:outline-none focus:border-neutral-900"
             aria-label="Filter by Action"
           >
             <option value="">All Recorded Actions</option>
@@ -127,8 +137,8 @@ export default function AdminAuditLogsPage() {
           </select>
         </div>
 
-        <div>
-          <label htmlFor="filter-start-date" className="block text-xs font-bold uppercase mb-1">
+        <div className="space-y-1">
+          <label htmlFor="filter-start-date" className="block text-xs font-semibold uppercase tracking-wider text-neutral-700">
             From Date
           </label>
           <input
@@ -136,13 +146,13 @@ export default function AdminAuditLogsPage() {
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-full border border-black p-2 text-xs"
+            className="w-full border border-neutral-300 p-2 text-xs font-mono bg-white text-neutral-900 focus:outline-none focus:border-neutral-900"
             aria-label="From Date"
           />
         </div>
 
-        <div>
-          <label htmlFor="filter-end-date" className="block text-xs font-bold uppercase mb-1">
+        <div className="space-y-1">
+          <label htmlFor="filter-end-date" className="block text-xs font-semibold uppercase tracking-wider text-neutral-700">
             To Date
           </label>
           <input
@@ -150,7 +160,7 @@ export default function AdminAuditLogsPage() {
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="w-full border border-black p-2 text-xs"
+            className="w-full border border-neutral-300 p-2 text-xs font-mono bg-white text-neutral-900 focus:outline-none focus:border-neutral-900"
             aria-label="To Date"
           />
         </div>
@@ -162,7 +172,7 @@ export default function AdminAuditLogsPage() {
               setStartDate('');
               setEndDate('');
             }}
-            className="w-full py-2 bg-gray-100 text-black font-bold border border-black hover:bg-gray-200 text-xs uppercase"
+            className="w-full py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-semibold border border-neutral-300 text-xs tracking-wide transition-colors"
           >
             Reset Filters
           </button>
@@ -170,71 +180,75 @@ export default function AdminAuditLogsPage() {
       </div>
 
       {/* Audit Log Table */}
-      <div className="bg-white border border-black overflow-hidden">
+      <div className="border border-neutral-200/80 bg-white shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500 font-bold">Querying audit trail...</div>
+          <div className="p-12 text-center text-xs font-mono text-neutral-500">
+            Querying audit trail...
+          </div>
         ) : logs.length === 0 ? (
           <div className="p-12 text-center space-y-2">
-            <h2 className="text-base font-bold text-gray-700">No matching audit events found</h2>
-            <p className="text-xs text-gray-500">
+            <h2 className="text-sm font-bold text-neutral-950 uppercase tracking-wider">
+              No matching audit events found
+            </h2>
+            <p className="text-xs text-neutral-500">
               Try broadening your date filter or clearing the action selection.
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-100 text-xs font-bold uppercase border-b border-black">
-                <tr>
-                  <th className="p-3 border-r border-black">Timestamp</th>
-                  <th className="p-3 border-r border-black">Action</th>
-                  <th className="p-3 border-r border-black">Actor / Operator</th>
-                  <th className="p-3 border-r border-black">Target Entity</th>
-                  <th className="p-3 border-r border-black">IP / Client</th>
-                  <th className="p-3 text-right">Details</th>
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="bg-neutral-50/75 border-b border-neutral-200/80">
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Timestamp</th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Action</th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Actor / Operator</th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Target Entity</th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">IP / Client</th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">Details</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-black font-medium">
+              <tbody className="divide-y divide-neutral-200/80">
                 {logs.map((log) => (
-                  <tr key={log.id} className="hover:bg-gray-50">
-                    <td className="p-3 border-r border-black font-mono text-xs whitespace-nowrap text-gray-700">
+                  <tr key={log.id} className="hover:bg-neutral-50/60 transition-colors">
+                    <td className="p-3.5 font-mono text-[11px] whitespace-nowrap text-neutral-500">
                       {new Date(log.createdAt).toLocaleString()}
                     </td>
-                    <td className="p-3 border-r border-black">
-                      <span className="font-mono font-bold text-xs px-2 py-0.5 border border-black bg-gray-100">
+                    <td className="p-3.5">
+                      <span className="font-mono font-semibold text-[10px] px-2 py-0.5 border border-neutral-200 bg-neutral-100 text-neutral-900 uppercase">
                         {log.action}
                       </span>
                     </td>
-                    <td className="p-3 border-r border-black text-xs">
+                    <td className="p-3.5 text-xs">
                       {log.actor ? (
                         <div>
-                          <div className="font-bold text-[#0A192F]">{log.actor.name}</div>
-                          <div className="text-gray-500 font-mono">{log.actor.email}</div>
+                          <div className="font-semibold text-neutral-950">{log.actor.name}</div>
+                          <div className="text-neutral-500 font-mono text-[11px]">{log.actor.email}</div>
                         </div>
                       ) : (
-                        <span className="text-gray-500 italic">System Automation</span>
+                        <span className="text-neutral-400 italic">System Automation</span>
                       )}
                     </td>
-                    <td className="p-3 border-r border-black text-xs">
-                      <div className="font-bold">{log.entityType}</div>
+                    <td className="p-3.5 text-xs">
+                      <div className="font-semibold text-neutral-900">{log.entityType}</div>
                       {log.entityId && (
-                        <div className="text-[11px] font-mono text-gray-500 truncate max-w-[140px]">
+                        <div className="text-[11px] font-mono text-neutral-400 truncate max-w-[140px]">
                           {log.entityId}
                         </div>
                       )}
                     </td>
-                    <td className="p-3 border-r border-black text-xs font-mono text-gray-600">
+                    <td className="p-3.5 text-xs font-mono text-neutral-500">
                       <div>{log.ipAddress || '—'}</div>
                     </td>
-                    <td className="p-3 text-right">
+                    <td className="p-3.5 text-right">
                       {log.beforeState || log.afterState ? (
                         <button
                           onClick={() => setSelectedLog(log)}
-                          className="px-2 py-1 text-xs font-bold border border-black hover:bg-[#0A192F] hover:text-white"
+                          className="px-2.5 py-1 text-xs font-semibold border border-neutral-300 hover:border-neutral-900 bg-white hover:bg-neutral-50 text-neutral-800 transition-colors"
                         >
                           View Diff
                         </button>
                       ) : (
-                        <span className="text-xs text-gray-400">—</span>
+                        <span className="text-neutral-300">—</span>
                       )}
                     </td>
                   </tr>
@@ -245,28 +259,28 @@ export default function AdminAuditLogsPage() {
         )}
 
         {/* Pagination Bar */}
-        <div className="p-4 bg-gray-50 border-t border-black flex flex-col sm:flex-row justify-between items-center gap-3 text-xs">
-          <div className="text-gray-600">
-            Showing <strong className="text-black">{logs.length}</strong> of{' '}
-            <strong className="text-black">{totalCount}</strong> total events recorded
+        <div className="p-3.5 bg-neutral-50/60 border-t border-neutral-200/80 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs">
+          <div className="text-neutral-500 font-mono">
+            Showing <strong className="text-neutral-950">{logs.length}</strong> of{' '}
+            <strong className="text-neutral-950">{totalCount}</strong> total events recorded
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => fetchAuditLogs(page - 1)}
               disabled={page <= 1 || loading}
-              className="px-3 py-1 border border-black font-bold disabled:opacity-30 hover:bg-white"
+              className="px-3 py-1.5 border border-neutral-300 hover:border-neutral-900 disabled:opacity-40 bg-white text-neutral-800 text-xs font-semibold tracking-wide transition-colors"
             >
-              &larr; Prev
+              Previous
             </button>
-            <span className="font-bold font-mono px-2">
+            <span className="font-semibold font-mono px-2 text-neutral-600">
               Page {page} of {totalPages}
             </span>
             <button
               onClick={() => fetchAuditLogs(page + 1)}
               disabled={page >= totalPages || loading}
-              className="px-3 py-1 border border-black font-bold disabled:opacity-30 hover:bg-white"
+              className="px-3 py-1.5 border border-neutral-300 hover:border-neutral-900 disabled:opacity-40 bg-white text-neutral-800 text-xs font-semibold tracking-wide transition-colors"
             >
-              Next &rarr;
+              Next
             </button>
           </div>
         </div>
@@ -274,52 +288,58 @@ export default function AdminAuditLogsPage() {
 
       {/* State Diff Modal */}
       {selectedLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-          <div className="bg-white border-2 border-black max-w-2xl w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
-            <div className="flex justify-between items-center border-b border-black pb-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+          <div className="bg-white border border-neutral-200/90 shadow-xl max-w-2xl w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b border-neutral-200/80 pb-3">
               <div>
-                <h3 className="text-base font-black text-[#0A192F]">Audit Event Details</h3>
-                <div className="text-xs font-mono text-gray-600 mt-0.5">
-                  Action: <strong className="text-black">{selectedLog.action}</strong> | Entity:{' '}
+                <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
+                  Audit Event Details
+                </h3>
+                <div className="text-xs font-mono text-neutral-500 mt-0.5">
+                  Action: <strong className="text-neutral-900">{selectedLog.action}</strong> • Entity:{' '}
                   {selectedLog.entityType} ({selectedLog.entityId})
                 </div>
               </div>
               <button
                 onClick={() => setSelectedLog(null)}
-                className="text-gray-500 hover:text-black font-black text-xl"
+                className="p-1 border border-neutral-200 hover:border-neutral-900 text-neutral-500 hover:text-neutral-900 min-h-[32px] min-w-[32px] inline-flex items-center justify-center transition-colors"
               >
-                &times;
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="space-y-4 text-xs">
-              {selectedLog.beforeState && (
-                <div>
-                  <h4 className="font-bold uppercase text-gray-600 mb-1">State Before Action</h4>
-                  <pre className="p-3 bg-gray-50 border border-gray-300 font-mono text-[11px] overflow-x-auto whitespace-pre-wrap">
+              {Boolean(selectedLog.beforeState) && (
+                <div className="space-y-1">
+                  <h4 className="font-semibold uppercase tracking-wider text-neutral-600 text-[10px]">
+                    State Before Action
+                  </h4>
+                  <pre className="p-3 bg-neutral-50 border border-neutral-200 font-mono text-[11px] overflow-x-auto whitespace-pre-wrap text-neutral-800">
                     {JSON.stringify(selectedLog.beforeState, null, 2)}
                   </pre>
                 </div>
               )}
 
-              {selectedLog.afterState && (
-                <div>
-                  <h4 className="font-bold uppercase text-[#137333] mb-1">State After Action</h4>
-                  <pre className="p-3 bg-[#E6F4EA]/30 border border-[#137333]/40 font-mono text-[11px] overflow-x-auto whitespace-pre-wrap">
+              {Boolean(selectedLog.afterState) && (
+                <div className="space-y-1">
+                  <h4 className="font-semibold uppercase tracking-wider text-emerald-800 text-[10px]">
+                    State After Action
+                  </h4>
+                  <pre className="p-3 bg-emerald-50/40 border border-emerald-200 font-mono text-[11px] overflow-x-auto whitespace-pre-wrap text-emerald-950">
                     {JSON.stringify(selectedLog.afterState, null, 2)}
                   </pre>
                 </div>
               )}
 
-              <div className="pt-2 text-gray-500 font-mono text-[11px] border-t border-gray-200">
+              <div className="pt-2 text-neutral-400 font-mono text-[11px] border-t border-neutral-100">
                 User Agent: {selectedLog.userAgent || 'N/A'}
               </div>
             </div>
 
-            <div className="flex justify-end pt-2 border-t border-black">
+            <div className="flex justify-end pt-3 border-t border-neutral-200/80">
               <button
                 onClick={() => setSelectedLog(null)}
-                className="px-4 py-2 border border-black font-bold hover:bg-gray-100 text-xs"
+                className="px-4 py-2 border border-neutral-300 hover:border-neutral-900 text-neutral-800 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors"
               >
                 Close
               </button>

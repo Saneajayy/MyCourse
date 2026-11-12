@@ -3,11 +3,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { apiClient } from '../../../lib/api-client';
-import { Card } from '../../../components/ui/Card';
-import { Button } from '../../../components/ui/Button';
 import { Input } from '../../../components/ui/Input';
 import { useToast } from '../../../components/ui/Toast';
-import { Search, Download, ArrowRight } from 'lucide-react';
+import { Search, Download, ArrowRight, RefreshCw, X } from 'lucide-react';
 
 interface OrderListItem {
   id: string;
@@ -107,7 +105,6 @@ export default function AdminOrdersPage() {
     if (exportStartDate) params.set('startDate', exportStartDate);
     if (exportEndDate) params.set('endDate', exportEndDate);
 
-    // Stream download protected from formula injection
     window.open(
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/v1/admin/export/orders.csv?${params.toString()}`,
       '_blank',
@@ -124,31 +121,45 @@ export default function AdminOrdersPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-reddit">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-black">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-neutral-200/80">
         <div>
-          <h1 className="text-2xl font-black text-course-darkBlue uppercase tracking-tight">
-            Orders &amp; Transactions
-          </h1>
-          <p className="text-xs text-course-navySubtle mt-0.5">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold tracking-tight text-neutral-950 uppercase">
+              Orders &amp; Transactions
+            </h1>
+            <span className="px-2 py-0.5 text-[10px] font-mono font-medium uppercase tracking-wider bg-neutral-100 text-neutral-600 border border-neutral-200">
+              {pagination.total} Total
+            </span>
+          </div>
+          <p className="text-xs text-neutral-500 mt-1">
             Real-time payments ledger, Razorpay gateway identifiers, and customer invoices
           </p>
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setExportModalOpen(true)}
-          className="text-xs font-bold uppercase tracking-wider py-2 self-start sm:self-auto"
-        >
-          <Download className="w-3.5 h-3.5 mr-1.5" />
-          Export Orders CSV
-        </Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => fetchOrders(pagination.page)}
+            title="Refresh orders"
+            className="p-2 border border-neutral-200/90 hover:border-neutral-900 text-neutral-600 hover:text-neutral-950 bg-white hover:bg-neutral-50 transition-colors"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setExportModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-neutral-300 hover:border-neutral-900 bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-semibold tracking-wide transition-colors"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export Orders CSV</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <Card variant="default" padding="md" className="border border-black space-y-3">
+      <div className="border border-neutral-200/80 bg-white p-4 space-y-3.5 shadow-xs">
         <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
           {/* Search form */}
           <form onSubmit={handleSearchSubmit} className="flex-1 flex gap-2">
@@ -158,18 +169,16 @@ export default function AdminOrdersPage() {
                 placeholder="Search by student email, order ID, or payment ID..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 border border-black bg-white text-xs text-course-darkBlue focus:outline-none focus:ring-2 focus:ring-course-orange"
+                className="w-full pl-9 pr-3 py-2 border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-none focus:border-neutral-900 transition-colors"
               />
-              <Search className="w-4 h-4 text-course-navySubtle absolute left-2.5 top-2.5" />
+              <Search className="w-4 h-4 text-neutral-400 absolute left-2.5 top-2.5" />
             </div>
-            <Button
+            <button
               type="submit"
-              variant="primary"
-              size="sm"
-              className="text-xs font-bold uppercase px-4"
+              className="px-4 py-2 bg-neutral-900 text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors"
             >
               Search
-            </Button>
+            </button>
           </form>
 
           {/* Date range filters */}
@@ -178,22 +187,22 @@ export default function AdminOrdersPage() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="p-1.5 border border-black bg-white text-xs font-mono"
+              className="p-2 border border-neutral-300 bg-white text-xs font-mono text-neutral-800 focus:outline-none focus:border-neutral-900"
               aria-label="Filter from date"
             />
-            <span className="text-xs font-bold text-course-navySubtle">to</span>
+            <span className="text-xs text-neutral-400">to</span>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="p-1.5 border border-black bg-white text-xs font-mono"
+              className="p-2 border border-neutral-300 bg-white text-xs font-mono text-neutral-800 focus:outline-none focus:border-neutral-900"
               aria-label="Filter to date"
             />
           </div>
         </div>
 
         {/* Status Filter Tabs */}
-        <div className="flex flex-wrap border border-black bg-white overflow-hidden text-xs">
+        <div className="flex flex-wrap p-0.5 border border-neutral-200/90 bg-neutral-100 text-xs gap-0.5">
           {[
             { id: 'ALL', label: 'All Orders' },
             { id: 'PAID', label: 'Paid' },
@@ -202,115 +211,113 @@ export default function AdminOrdersPage() {
             { id: 'FAILED', label: 'Failed' },
             { id: 'PARTIALLY_REFUNDED', label: 'Partial Refund' },
             { id: 'REFUNDED', label: 'Refunded' },
-          ].map((tab, idx) => (
+          ].map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setStatusFilter(tab.id)}
-              className={`px-3 py-1.5 font-bold uppercase min-h-[36px] transition-colors ${
-                idx > 0 ? 'border-l border-black' : ''
-              } ${
+              className={`px-3 py-1.5 text-xs font-semibold tracking-wide transition-colors ${
                 statusFilter === tab.id
-                  ? 'bg-course-darkBlue text-white'
-                  : 'text-course-darkBlue hover:bg-neutral-100'
+                  ? 'bg-white text-neutral-950 shadow-xs border border-neutral-200/60'
+                  : 'text-neutral-600 hover:text-neutral-900'
               }`}
             >
               {tab.label}
             </button>
           ))}
         </div>
-      </Card>
+      </div>
 
       {/* Orders Table */}
-      <Card variant="default" padding="none" className="border border-black overflow-hidden">
+      <div className="border border-neutral-200/80 bg-white shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-neutral-100 border-b border-black">
-                <th className="p-3 font-black text-course-darkBlue uppercase tracking-wider">
+              <tr className="bg-neutral-50/75 border-b border-neutral-200/80">
+                <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
                   Order ID
                 </th>
-                <th className="p-3 font-black text-course-darkBlue uppercase tracking-wider">
+                <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
                   Customer Email
                 </th>
-                <th className="p-3 font-black text-course-darkBlue uppercase tracking-wider">
+                <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
                   Course Package
                 </th>
-                <th className="p-3 font-black text-course-darkBlue uppercase tracking-wider">
+                <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
                   Amount (INR)
                 </th>
-                <th className="p-3 font-black text-course-darkBlue uppercase tracking-wider">
-                  Order Status
+                <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Status
                 </th>
-                <th className="p-3 font-black text-course-darkBlue uppercase tracking-wider">
+                <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
                   Date
                 </th>
-                <th className="p-3 font-black text-course-darkBlue uppercase tracking-wider text-right">
+                <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">
                   Action
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-black bg-white">
+            <tbody className="divide-y divide-neutral-200/80">
               {isLoading ? (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-course-navySubtle font-bold">
+                  <td colSpan={7} className="p-12 text-center text-neutral-500 font-mono">
                     Loading order records...
                   </td>
                 </tr>
               ) : orders.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-course-navySubtle">
+                  <td colSpan={7} className="p-12 text-center text-neutral-500">
                     No orders match your selected filters.
                   </td>
                 </tr>
               ) : (
                 orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-neutral-50 transition-colors">
-                    <td className="p-3 font-mono font-bold text-course-darkBlue">
+                  <tr key={order.id} className="hover:bg-neutral-50/60 transition-colors">
+                    <td className="p-3.5 font-mono font-medium text-neutral-900">
                       <Link
                         href={`/admin/orders/${order.id}`}
-                        className="hover:text-course-orange hover:underline font-black"
+                        className="hover:underline font-semibold text-neutral-950"
                       >
                         {order.id.slice(0, 13)}...
                       </Link>
                     </td>
 
-                    <td className="p-3 font-mono text-course-navyMuted">{order.user.email}</td>
+                    <td className="p-3.5 font-mono text-neutral-600">{order.user.email}</td>
 
-                    <td className="p-3 font-bold text-course-darkBlue truncate max-w-[200px]">
+                    <td className="p-3.5 font-medium text-neutral-900 truncate max-w-[200px]">
                       {order.product.title}
                     </td>
 
-                    <td className="p-3 font-mono font-black text-course-darkBlue">
+                    <td className="p-3.5 font-mono font-semibold text-neutral-950">
                       {formatRupees(order.totalPaise)}
                     </td>
 
-                    <td className="p-3">
+                    <td className="p-3.5">
                       <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 border border-black text-[9px] font-black uppercase tracking-wider ${
+                        className={`inline-flex items-center px-2 py-0.5 border text-[10px] font-semibold tracking-wide uppercase ${
                           order.status === 'PAID'
-                            ? 'bg-emerald-100 text-emerald-950'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                             : order.status === 'PENDING' || order.status === 'CREATED'
-                              ? 'bg-amber-100 text-amber-950'
+                              ? 'bg-amber-50 text-amber-800 border-amber-200'
                               : order.status === 'PARTIALLY_REFUNDED'
-                                ? 'bg-sky-100 text-sky-950'
+                                ? 'bg-sky-50 text-sky-800 border-sky-200'
                                 : order.status === 'REFUNDED'
-                                  ? 'bg-neutral-200 text-neutral-800'
-                                  : 'bg-rose-100 text-rose-950'
+                                  ? 'bg-neutral-100 text-neutral-700 border-neutral-200'
+                                  : 'bg-rose-50 text-rose-800 border-rose-200'
                         }`}
                       >
                         {order.status}
                       </span>
                     </td>
 
-                    <td className="p-3 font-mono text-course-navySubtle">
+                    <td className="p-3.5 font-mono text-neutral-500 text-[11px]">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
 
-                    <td className="p-3 text-right">
+                    <td className="p-3.5 text-right">
                       <Link
                         href={`/admin/orders/${order.id}`}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-course-orange hover:underline"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-900 hover:underline"
                       >
                         <span>Inspect</span>
                         <ArrowRight className="w-3 h-3" />
@@ -325,49 +332,56 @@ export default function AdminOrdersPage() {
 
         {/* Pagination Bar */}
         {pagination.totalPages > 1 && (
-          <div className="p-3 border-t border-black bg-neutral-50 flex items-center justify-between text-xs">
-            <span className="font-mono text-course-navySubtle">
+          <div className="p-3.5 border-t border-neutral-200/80 bg-neutral-50/60 flex items-center justify-between text-xs">
+            <span className="font-mono text-neutral-500">
               Page {pagination.page} of {pagination.totalPages} ({pagination.total} orders)
             </span>
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
+              <button
+                type="button"
                 disabled={pagination.page <= 1}
                 onClick={() => fetchOrders(pagination.page - 1)}
-                className="text-xs py-1"
+                className="px-3 py-1.5 border border-neutral-300 hover:border-neutral-900 disabled:opacity-40 bg-white text-neutral-800 text-xs font-semibold tracking-wide transition-colors"
               >
                 Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
+              </button>
+              <button
+                type="button"
                 disabled={pagination.page >= pagination.totalPages}
                 onClick={() => fetchOrders(pagination.page + 1)}
-                className="text-xs py-1"
+                className="px-3 py-1.5 border border-neutral-300 hover:border-neutral-900 disabled:opacity-40 bg-white text-neutral-800 text-xs font-semibold tracking-wide transition-colors"
               >
                 Next
-              </Button>
+              </button>
             </div>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* CSV Export Modal */}
       {exportModalOpen && (
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-course-darkBlue/75"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
         >
-          <div className="w-full max-w-md bg-course-white border-2 border-black p-6 space-y-4">
-            <div className="border-b border-black pb-2">
-              <h2 className="text-sm font-black text-course-darkBlue uppercase tracking-wider">
-                Export Orders to CSV
-              </h2>
-              <p className="text-xs text-course-navySubtle mt-0.5">
-                Stream server-generated CSV with formula injection protection (CWE-1236)
-              </p>
+          <div className="w-full max-w-md bg-white border border-neutral-200/90 shadow-xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200/80">
+              <div>
+                <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
+                  Export Orders to CSV
+                </h2>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Stream server-generated CSV with formula injection protection (CWE-1236)
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setExportModalOpen(false)}
+                className="p-1 border border-neutral-200 hover:border-neutral-900 text-neutral-500 hover:text-neutral-900 min-h-[32px] min-w-[32px] inline-flex items-center justify-center transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
             <div className="space-y-3">
@@ -385,24 +399,22 @@ export default function AdminOrdersPage() {
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-3 border-t border-black">
-              <Button
-                variant="outline"
-                size="sm"
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-neutral-200/80">
+              <button
+                type="button"
                 onClick={() => setExportModalOpen(false)}
-                className="text-xs font-bold uppercase"
+                className="px-4 py-2 border border-neutral-300 hover:border-neutral-900 text-neutral-700 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors"
               >
                 Cancel
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
+              </button>
+              <button
+                type="button"
                 onClick={handleDownloadCsv}
-                className="text-xs font-black uppercase tracking-wider"
+                className="inline-flex items-center gap-1.5 px-5 py-2 bg-neutral-900 text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors"
               >
-                <Download className="w-3.5 h-3.5 mr-1" />
-                Download CSV
-              </Button>
+                <Download className="w-3.5 h-3.5" />
+                <span>Download CSV</span>
+              </button>
             </div>
           </div>
         </div>

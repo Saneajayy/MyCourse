@@ -3,8 +3,6 @@
 import React, { useState, useEffect, useCallback, use } from 'react';
 import Link from 'next/link';
 import { apiClient } from '../../../../lib/api-client';
-import { Card } from '../../../../components/ui/Card';
-import { Button } from '../../../../components/ui/Button';
 import { Input } from '../../../../components/ui/Input';
 import { useToast } from '../../../../components/ui/Toast';
 import { ConfirmModal } from '../../../../components/admin/ConfirmModal';
@@ -18,6 +16,8 @@ import {
   Laptop,
   CheckCircle2,
   Mail,
+  History,
+  X,
 } from 'lucide-react';
 
 interface StudentDetailResponse {
@@ -138,7 +138,6 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
 
   useEffect(() => {
     fetchStudent();
-    // Also fetch courses for grant access dropdown
     apiClient<Array<{ id: string; title: string }>>('/admin/products')
       .then((prods) => {
         setCourses(prods.map((p) => ({ id: p.id, title: p.title })));
@@ -300,53 +299,63 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
 
   if (isLoading || !data) {
     return (
-      <div className="py-12 text-center text-xs font-bold text-course-navySubtle">
+      <div className="py-16 text-center text-xs font-mono text-neutral-500 font-reddit">
         Loading student record and audit history...
       </div>
     );
   }
 
   const student = data.student ||
-    (data as any).profile || { name: 'Unknown Student', status: 'ACTIVE', id: studentId };
+    (data as unknown as { profile?: typeof data.student }).profile || {
+      name: 'Unknown Student',
+      status: 'ACTIVE' as const,
+      id: studentId,
+      email: '',
+      phone: null,
+      role: 'STUDENT',
+      emailVerifiedAt: null,
+      createdAt: new Date().toISOString(),
+      lastLoginAt: null,
+    };
   const entitlements = data.entitlements || [];
   const orders = data.orders || [];
   const activeSessions = data.activeSessions || [];
   const progressSummary = data.progressSummary || {
-    totalProgressRecords: (data as any).progress?.lessonsWatchedCount || 0,
-    completedLessonsCount: (data as any).progress?.completedLessonsCount || 0,
-    totalWatchedMinutes: Math.round(((data as any).progress?.totalWatchedSeconds || 0) / 60),
+    totalProgressRecords: 0,
+    completedLessonsCount: 0,
+    totalWatchedMinutes: 0,
   };
   const auditLogs = data.auditLogs || [];
-  const emails = (data as any).emails || [];
+  const emails = data.emails || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-reddit">
       {/* Back button & Title */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-black">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-neutral-200/80">
         <div className="flex items-center gap-3">
           <Link
             href="/admin/students"
-            className="p-1.5 border border-black hover:bg-neutral-100 min-h-[36px] min-w-[36px] inline-flex items-center justify-center transition-colors"
+            className="p-2 border border-neutral-200/90 hover:border-neutral-900 bg-white hover:bg-neutral-50 text-neutral-700 min-h-[36px] min-w-[36px] inline-flex items-center justify-center transition-colors"
             aria-label="Back to students list"
           >
-            <ArrowLeft className="w-4 h-4 text-course-darkBlue" />
+            <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
             <div className="flex items-center gap-2">
               <span
-                className={`px-2 py-0.5 border border-black text-[10px] font-black uppercase tracking-wider ${
+                className={`px-2 py-0.5 border text-[10px] font-semibold tracking-wide uppercase ${
                   student.status === 'BANNED'
-                    ? 'bg-rose-100 text-rose-950'
-                    : 'bg-emerald-100 text-emerald-950'
+                    ? 'bg-rose-50 text-rose-800 border-rose-200'
+                    : 'bg-emerald-50 text-emerald-800 border-emerald-200'
                 }`}
               >
                 {student.status}
               </span>
-              <span className="text-xs font-mono text-course-navySubtle">
+              <span className="text-xs font-mono text-neutral-400">
                 ID: {student.id.slice(0, 8)}...
               </span>
             </div>
-            <h1 className="text-xl font-black text-course-darkBlue leading-tight mt-0.5">
+            <h1 className="text-lg font-bold text-neutral-950 mt-1">
               {student.name}
             </h1>
           </div>
@@ -354,63 +363,58 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
 
         {/* Action Controls */}
         <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="primary"
-            size="sm"
+          <button
+            type="button"
             onClick={() => setGrantModalOpen(true)}
-            className="text-xs font-black uppercase tracking-wider py-2"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-neutral-900 text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors"
           >
-            <Plus className="w-3.5 h-3.5 mr-1" />
-            Grant Access
-          </Button>
+            <Plus className="w-3.5 h-3.5" />
+            <span>Grant Access</span>
+          </button>
 
-          <Button
-            variant="outline"
-            size="sm"
+          <button
+            type="button"
             onClick={() => setLogoutModalOpen(true)}
-            className="text-xs font-bold uppercase tracking-wider py-2"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-neutral-300 hover:border-neutral-900 bg-white hover:bg-neutral-50 text-neutral-800 text-xs font-semibold tracking-wide transition-colors"
           >
-            <LogOut className="w-3.5 h-3.5 mr-1" />
-            Force Logout
-          </Button>
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Force Logout</span>
+          </button>
 
-          <Button
-            variant="outline"
-            size="sm"
+          <button
+            type="button"
             onClick={() => setBanModalOpen(true)}
-            className={`text-xs font-bold uppercase tracking-wider py-2 ${
-              student.status === 'BANNED' ? 'text-emerald-800' : 'text-rose-700'
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 border text-xs font-semibold tracking-wide transition-colors ${
+              student.status === 'BANNED'
+                ? 'border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100'
+                : 'border-rose-300 bg-rose-50 text-rose-900 hover:bg-rose-100'
             }`}
           >
-            <Ban className="w-3.5 h-3.5 mr-1" />
-            {student.status === 'BANNED' ? 'Unban Account' : 'Ban Account'}
-          </Button>
+            <Ban className="w-3.5 h-3.5" />
+            <span>{student.status === 'BANNED' ? 'Unban Account' : 'Ban Account'}</span>
+          </button>
         </div>
       </div>
 
       {/* Profile & Progress Highlights Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Profile Card */}
-        <Card
-          variant="default"
-          padding="md"
-          className="border border-black md:col-span-2 space-y-3"
-        >
-          <h2 className="text-xs font-black text-course-darkBlue uppercase tracking-wider border-b border-black pb-2">
+        <div className="border border-neutral-200/80 bg-white p-5 shadow-xs md:col-span-2 space-y-3">
+          <h2 className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500 border-b border-neutral-100 pb-2">
             Student Profile Details
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div>
-              <div className="text-[10px] uppercase font-bold text-course-navySubtle">
+              <div className="text-[10px] uppercase font-semibold text-neutral-400">
                 Full Name
               </div>
-              <div className="font-bold text-course-darkBlue mt-0.5">{student.name}</div>
+              <div className="font-semibold text-neutral-950 mt-0.5">{student.name}</div>
             </div>
             <div>
-              <div className="text-[10px] uppercase font-bold text-course-navySubtle">
+              <div className="text-[10px] uppercase font-semibold text-neutral-400">
                 Email Address
               </div>
-              <div className="font-mono text-course-darkBlue mt-0.5 flex items-center gap-1.5">
+              <div className="font-mono text-neutral-900 mt-0.5 flex items-center gap-1.5">
                 <span>{student.email}</span>
                 {student.emailVerifiedAt ? (
                   <span title="Email Verified">
@@ -420,7 +424,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                   <button
                     type="button"
                     onClick={handleResendVerification}
-                    className="text-[10px] text-course-orange font-bold hover:underline"
+                    className="text-[10px] text-neutral-900 font-semibold hover:underline"
                     title="Resend verification email"
                   >
                     Resend
@@ -429,118 +433,113 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
               </div>
             </div>
             <div>
-              <div className="text-[10px] uppercase font-bold text-course-navySubtle">
+              <div className="text-[10px] uppercase font-semibold text-neutral-400">
                 Phone Number
               </div>
-              <div className="font-mono text-course-darkBlue mt-0.5">{student.phone || '—'}</div>
+              <div className="font-mono text-neutral-900 mt-0.5">{student.phone || '—'}</div>
             </div>
             <div>
-              <div className="text-[10px] uppercase font-bold text-course-navySubtle">
+              <div className="text-[10px] uppercase font-semibold text-neutral-400">
                 Account Created
               </div>
-              <div className="font-mono text-course-darkBlue mt-0.5">
+              <div className="font-mono text-neutral-900 mt-0.5">
                 {new Date(student.createdAt).toLocaleDateString()}
               </div>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Progress Summary Card */}
-        <Card variant="default" padding="md" className="border border-black space-y-3">
-          <h2 className="text-xs font-black text-course-darkBlue uppercase tracking-wider border-b border-black pb-2">
-            Watch Progress
+        <div className="border border-neutral-200/80 bg-white p-5 shadow-xs space-y-3">
+          <h2 className="text-[11px] font-semibold uppercase tracking-wider text-neutral-500 border-b border-neutral-100 pb-2">
+            Watch Telemetry
           </h2>
           <div className="space-y-2 text-xs">
             <div className="flex justify-between">
-              <span className="text-course-navySubtle">Lessons Completed:</span>
-              <span className="font-mono font-bold text-course-darkBlue">
+              <span className="text-neutral-500">Lessons Completed:</span>
+              <span className="font-mono font-semibold text-neutral-950">
                 {progressSummary.completedLessonsCount}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-course-navySubtle">Total Watched Time:</span>
-              <span className="font-mono font-bold text-course-darkBlue">
+              <span className="text-neutral-500">Total Watched Time:</span>
+              <span className="font-mono font-semibold text-neutral-950">
                 {progressSummary.totalWatchedMinutes} mins
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-course-navySubtle">Active Device Sessions:</span>
-              <span className="font-mono font-bold text-course-darkBlue">
+              <span className="text-neutral-500">Active Device Sessions:</span>
+              <span className="font-mono font-semibold text-neutral-950">
                 {activeSessions.length} active
               </span>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* SECTION 1: Course Entitlements */}
-      <Card
-        variant="default"
-        padding="none"
-        className="border border-black overflow-hidden space-y-0"
-      >
-        <div className="p-3.5 bg-neutral-100 border-b border-black flex items-center justify-between">
+      <div className="border border-neutral-200/80 bg-white shadow-xs overflow-hidden">
+        <div className="p-3.5 bg-neutral-50/75 border-b border-neutral-200/80 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-course-orange" />
-            <h2 className="text-xs font-black text-course-darkBlue uppercase tracking-wider">
+            <ShieldCheck className="w-4 h-4 text-neutral-700" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
               Enrolled Course Entitlements ({entitlements.length})
             </h2>
           </div>
-          <Button
-            variant="primary"
-            size="sm"
+          <button
+            type="button"
             onClick={() => setGrantModalOpen(true)}
-            className="text-xs py-1 px-2.5 font-bold uppercase"
+            className="inline-flex items-center gap-1 px-2.5 py-1 bg-neutral-900 text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors"
           >
-            Grant Course
-          </Button>
+            <Plus className="w-3 h-3" />
+            <span>Grant Course</span>
+          </button>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-neutral-50 border-b border-black">
-                <th className="p-3 font-bold text-course-darkBlue">Course Title</th>
-                <th className="p-3 font-bold text-course-darkBlue">Access Source</th>
-                <th className="p-3 font-bold text-course-darkBlue">Granted Date</th>
-                <th className="p-3 font-bold text-course-darkBlue">Access Expiry</th>
-                <th className="p-3 font-bold text-course-darkBlue">Status</th>
-                <th className="p-3 font-bold text-course-darkBlue text-right">Actions</th>
+              <tr className="bg-neutral-50/50 border-b border-neutral-200/80">
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Course Title</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Access Source</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Granted Date</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Access Expiry</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Status</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-black bg-white">
+            <tbody className="divide-y divide-neutral-200/80">
               {entitlements.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-6 text-center text-course-navySubtle italic">
-                    This student does not currently hold access to any course. Click &quot;Grant
-                    Course&quot; to give access.
+                  <td colSpan={6} className="p-6 text-center text-neutral-500 italic">
+                    This student does not currently hold access to any course. Click &quot;Grant Course&quot; to provide access.
                   </td>
                 </tr>
               ) : (
                 entitlements.map((ent) => (
-                  <tr key={ent.id} className="hover:bg-neutral-50">
-                    <td className="p-3 font-bold text-course-darkBlue">{ent.product.title}</td>
-                    <td className="p-3 font-mono text-[11px] text-course-navySubtle">
+                  <tr key={ent.id} className="hover:bg-neutral-50/60 transition-colors">
+                    <td className="p-3 font-semibold text-neutral-950">{ent.product.title}</td>
+                    <td className="p-3 font-mono text-[11px] text-neutral-500">
                       {ent.source}
                     </td>
-                    <td className="p-3 font-mono text-course-navySubtle">
+                    <td className="p-3 font-mono text-neutral-500 text-[11px]">
                       {new Date(ent.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="p-3 font-mono">
+                    <td className="p-3 font-mono text-xs">
                       {ent.expiresAt ? (
-                        <span className="text-course-darkBlue">
+                        <span className="text-neutral-900">
                           {new Date(ent.expiresAt).toLocaleDateString()}
                         </span>
                       ) : (
-                        <span className="font-bold text-emerald-800">Lifetime</span>
+                        <span className="font-semibold text-emerald-800">Lifetime</span>
                       )}
                     </td>
                     <td className="p-3">
                       <span
-                        className={`px-2 py-0.5 border border-black text-[9px] font-black uppercase ${
+                        className={`px-2 py-0.5 border text-[10px] font-semibold uppercase tracking-wider ${
                           ent.status === 'ACTIVE'
-                            ? 'bg-emerald-100 text-emerald-950'
-                            : 'bg-rose-100 text-rose-950'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            : 'bg-rose-50 text-rose-800 border-rose-200'
                         }`}
                       >
                         {ent.status}
@@ -555,7 +554,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                               setSelectedEntitlementId(ent.id);
                               setExtendModalOpen(true);
                             }}
-                            className="text-xs font-bold text-course-darkBlue hover:text-course-orange hover:underline"
+                            className="text-xs font-semibold text-neutral-900 hover:underline"
                           >
                             Extend
                           </button>
@@ -566,7 +565,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                               setSelectedEntitlementId(ent.id);
                               setRevokeModalOpen(true);
                             }}
-                            className="text-xs font-bold text-rose-700 hover:underline"
+                            className="text-xs font-semibold text-rose-700 hover:underline"
                           >
                             Revoke
                           </button>
@@ -579,18 +578,14 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
             </tbody>
           </table>
         </div>
-      </Card>
+      </div>
 
       {/* SECTION 2: Orders & Payments */}
-      <Card
-        variant="default"
-        padding="none"
-        className="border border-black overflow-hidden space-y-0"
-      >
-        <div className="p-3.5 bg-neutral-100 border-b border-black flex items-center justify-between">
+      <div className="border border-neutral-200/80 bg-white shadow-xs overflow-hidden">
+        <div className="p-3.5 bg-neutral-50/75 border-b border-neutral-200/80 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ShoppingBag className="w-4 h-4 text-course-orange" />
-            <h2 className="text-xs font-black text-course-darkBlue uppercase tracking-wider">
+            <ShoppingBag className="w-4 h-4 text-neutral-700" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
               Purchase History ({orders.length})
             </h2>
           </div>
@@ -599,49 +594,49 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-neutral-50 border-b border-black">
-                <th className="p-3 font-bold text-course-darkBlue">Order ID</th>
-                <th className="p-3 font-bold text-course-darkBlue">Course Package</th>
-                <th className="p-3 font-bold text-course-darkBlue">Amount</th>
-                <th className="p-3 font-bold text-course-darkBlue">Date</th>
-                <th className="p-3 font-bold text-course-darkBlue">Status</th>
-                <th className="p-3 font-bold text-course-darkBlue text-right">Invoice / Details</th>
+              <tr className="bg-neutral-50/50 border-b border-neutral-200/80">
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Order ID</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Course Package</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Amount</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Date</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Status</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-black bg-white">
+            <tbody className="divide-y divide-neutral-200/80">
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-6 text-center text-course-navySubtle italic">
+                  <td colSpan={6} className="p-6 text-center text-neutral-500 italic">
                     No orders placed yet.
                   </td>
                 </tr>
               ) : (
                 orders.map((ord) => (
-                  <tr key={ord.id} className="hover:bg-neutral-50">
-                    <td className="p-3 font-mono text-[11px] font-bold text-course-darkBlue">
+                  <tr key={ord.id} className="hover:bg-neutral-50/60 transition-colors">
+                    <td className="p-3 font-mono text-[11px] font-semibold text-neutral-950">
                       <Link
                         href={`/admin/orders/${ord.id}`}
-                        className="hover:underline hover:text-course-orange"
+                        className="hover:underline"
                       >
                         {ord.id.slice(0, 13)}...
                       </Link>
                     </td>
-                    <td className="p-3 font-bold text-course-darkBlue">{ord.product.title}</td>
-                    <td className="p-3 font-mono font-bold text-course-darkBlue">
+                    <td className="p-3 font-medium text-neutral-900">{ord.product.title}</td>
+                    <td className="p-3 font-mono font-semibold text-neutral-950">
                       {formatRupees(ord.totalPaise)}
                     </td>
-                    <td className="p-3 font-mono text-course-navySubtle">
+                    <td className="p-3 font-mono text-neutral-500 text-[11px]">
                       {new Date(ord.createdAt).toLocaleDateString()}
                     </td>
                     <td className="p-3">
-                      <span className="px-2 py-0.5 border border-black text-[9px] font-black uppercase bg-neutral-100">
+                      <span className="px-2 py-0.5 border border-neutral-200 text-[10px] font-semibold uppercase bg-neutral-100 text-neutral-700">
                         {ord.status}
                       </span>
                     </td>
                     <td className="p-3 text-right">
                       <Link
                         href={`/admin/orders/${ord.id}`}
-                        className="text-xs font-bold text-course-orange hover:underline"
+                        className="text-xs font-semibold text-neutral-900 hover:underline"
                       >
                         View Order
                       </Link>
@@ -652,157 +647,143 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
             </tbody>
           </table>
         </div>
-      </Card>
+      </div>
 
       {/* SECTION 3: Active Device Sessions */}
-      <Card
-        variant="default"
-        padding="none"
-        className="border border-black overflow-hidden space-y-0"
-      >
-        <div className="p-3.5 bg-neutral-100 border-b border-black flex items-center justify-between">
+      <div className="border border-neutral-200/80 bg-white shadow-xs overflow-hidden">
+        <div className="p-3.5 bg-neutral-50/75 border-b border-neutral-200/80 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Laptop className="w-4 h-4 text-course-orange" />
-            <h2 className="text-xs font-black text-course-darkBlue uppercase tracking-wider">
-              Active Login &amp; Stream Sessions ({activeSessions.length})
+            <Laptop className="w-4 h-4 text-neutral-700" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
+              Active Streaming &amp; Device Sessions ({activeSessions.length})
             </h2>
           </div>
           {activeSessions.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
+            <button
+              type="button"
               onClick={() => setLogoutModalOpen(true)}
-              className="text-xs py-1 px-2.5 font-bold uppercase"
+              className="px-2.5 py-1 border border-neutral-300 hover:border-neutral-900 text-neutral-800 text-xs font-semibold tracking-wide transition-colors"
             >
               Terminate All
-            </Button>
+            </button>
           )}
         </div>
 
         <div className="p-3 bg-white space-y-2">
           {activeSessions.length === 0 ? (
-            <div className="p-4 text-center text-xs text-course-navySubtle italic">
-              No active sessions currently recorded.
+            <div className="p-4 text-center text-xs text-neutral-500 italic">
+              No active device sessions recorded.
             </div>
           ) : (
             activeSessions.map((session) => (
               <div
                 key={session.id}
-                className="p-3 border border-neutral-200 bg-neutral-50 flex items-center justify-between gap-3 text-xs"
+                className="p-3 border border-neutral-200/80 bg-neutral-50/40 flex items-center justify-between gap-3 text-xs"
               >
                 <div className="space-y-0.5 min-w-0">
-                  <div className="font-bold text-course-darkBlue truncate">{session.userAgent}</div>
-                  <div className="font-mono text-[11px] text-course-navySubtle">
+                  <div className="font-semibold text-neutral-900 truncate">{session.userAgent}</div>
+                  <div className="font-mono text-[11px] text-neutral-500">
                     IP Address: {session.ipAddress} • Last active:{' '}
                     {new Date(session.lastUsedAt).toLocaleString()}
                   </div>
                 </div>
-                <span className="px-2 py-0.5 bg-emerald-100 border border-black text-[9px] font-black text-emerald-950 uppercase shrink-0">
+                <span className="px-2 py-0.5 bg-emerald-50 border border-emerald-200 text-[10px] font-semibold text-emerald-800 uppercase shrink-0">
                   Active
                 </span>
               </div>
             ))
           )}
         </div>
-      </Card>
+      </div>
 
       {/* SECTION 4: User Audit Trail */}
-      <Card
-        variant="default"
-        padding="none"
-        className="border border-black overflow-hidden space-y-0"
-      >
-        <div className="p-3.5 bg-neutral-100 border-b border-black">
-          <h2 className="text-xs font-black text-course-darkBlue uppercase tracking-wider">
+      <div className="border border-neutral-200/80 bg-white shadow-xs overflow-hidden">
+        <div className="p-3.5 bg-neutral-50/75 border-b border-neutral-200/80 flex items-center gap-2">
+          <History className="w-4 h-4 text-neutral-700" />
+          <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
             Audit Trail for this Student ({auditLogs.length} events)
           </h2>
         </div>
 
         <div className="p-3 bg-white space-y-1.5 text-xs max-h-60 overflow-y-auto">
           {auditLogs.length === 0 ? (
-            <div className="p-4 text-center text-xs text-course-navySubtle italic">
+            <div className="p-4 text-center text-xs text-neutral-500 italic">
               No administrative audit entries logged yet.
             </div>
           ) : (
             auditLogs.map((log) => (
               <div
                 key={log.id}
-                className="p-2 border border-neutral-200 flex items-center justify-between text-xs"
+                className="p-2 border border-neutral-200/70 bg-neutral-50/30 flex items-center justify-between text-xs"
               >
-                <span className="font-bold font-mono text-course-darkBlue">{log.action}</span>
-                <span className="font-mono text-[11px] text-course-navySubtle">
+                <span className="font-mono font-medium text-neutral-900">{log.action}</span>
+                <span className="font-mono text-[11px] text-neutral-500">
                   {new Date(log.createdAt).toLocaleString()}
                 </span>
               </div>
             ))
           )}
         </div>
-      </Card>
+      </div>
 
       {/* SECTION 5: Recent Emails Sent */}
-      <Card
-        variant="default"
-        padding="none"
-        className="border border-black overflow-hidden space-y-0"
-      >
-        <div className="p-3.5 bg-neutral-100 border-b border-black flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Mail className="w-4 h-4 text-course-orange" />
-            <h2 className="text-xs font-black text-course-darkBlue uppercase tracking-wider">
-              Recent Emails Sent ({emails.length})
-            </h2>
-          </div>
+      <div className="border border-neutral-200/80 bg-white shadow-xs overflow-hidden">
+        <div className="p-3.5 bg-neutral-50/75 border-b border-neutral-200/80 flex items-center gap-2">
+          <Mail className="w-4 h-4 text-neutral-700" />
+          <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
+            Recent Emails Dispatched ({emails.length})
+          </h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-neutral-50 border-b border-black">
-                <th className="p-3 font-bold text-course-darkBlue">Template</th>
-                <th className="p-3 font-bold text-course-darkBlue">Subject</th>
-                <th className="p-3 font-bold text-course-darkBlue">Status</th>
-                <th className="p-3 font-bold text-course-darkBlue text-center">Attempts</th>
-                <th className="p-3 font-bold text-course-darkBlue text-right">Sent At</th>
+              <tr className="bg-neutral-50/50 border-b border-neutral-200/80">
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Template</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Subject</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Status</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-center">Attempts</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">Sent At</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-black bg-white">
+            <tbody className="divide-y divide-neutral-200/80">
               {emails.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-6 text-center text-course-navySubtle italic">
+                  <td colSpan={5} className="p-6 text-center text-neutral-500 italic">
                     No transactional emails logged for this student yet.
                   </td>
                 </tr>
               ) : (
-                emails.map((item: any) => {
-                  let badgeBg = 'bg-neutral-100 text-neutral-800';
-                  if (item.status === 'SENT') badgeBg = 'bg-emerald-100 text-emerald-950';
+                emails.map((item) => {
+                  let badgeCls = 'bg-neutral-100 text-neutral-800 border-neutral-200';
+                  if (item.status === 'SENT') badgeCls = 'bg-emerald-50 text-emerald-800 border-emerald-200';
                   else if (item.status === 'BOUNCED' || item.status === 'COMPLAINED')
-                    badgeBg = 'bg-rose-100 text-rose-950';
-                  else if (item.status === 'FAILED') badgeBg = 'bg-amber-100 text-amber-950';
-                  else if (item.status === 'QUEUED') badgeBg = 'bg-blue-100 text-blue-950';
+                    badgeCls = 'bg-rose-50 text-rose-800 border-rose-200';
+                  else if (item.status === 'FAILED') badgeCls = 'bg-amber-50 text-amber-800 border-amber-200';
+                  else if (item.status === 'QUEUED') badgeCls = 'bg-sky-50 text-sky-800 border-sky-200';
 
                   return (
-                    <tr key={item.id} className="hover:bg-neutral-50">
-                      <td className="p-3 font-mono font-bold text-course-darkBlue text-[11px]">
+                    <tr key={item.id} className="hover:bg-neutral-50/60 transition-colors">
+                      <td className="p-3 font-mono font-medium text-neutral-900 text-[11px]">
                         {item.template}
                       </td>
                       <td
-                        className="p-3 text-course-darkBlue font-medium max-w-xs truncate"
+                        className="p-3 text-neutral-800 font-medium max-w-xs truncate"
                         title={item.subject}
                       >
                         {item.subject}
                       </td>
                       <td className="p-3">
                         <span
-                          className={`px-2 py-0.5 border border-black text-[9px] font-black uppercase ${badgeBg}`}
+                          className={`px-2 py-0.5 border text-[10px] font-semibold uppercase tracking-wider ${badgeCls}`}
                         >
                           {item.status}
                         </span>
                       </td>
-                      <td className="p-3 font-mono text-center text-course-navySubtle">
+                      <td className="p-3 font-mono text-center text-neutral-500">
                         {item.attempts}
                       </td>
-                      <td className="p-3 font-mono text-right text-course-navySubtle text-[11px]">
+                      <td className="p-3 font-mono text-right text-neutral-500 text-[11px]">
                         {item.sentAt
                           ? new Date(item.sentAt).toLocaleString()
                           : new Date(item.createdAt).toLocaleString()}
@@ -814,25 +795,34 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
             </tbody>
           </table>
         </div>
-      </Card>
+      </div>
 
       {/* MODAL: Grant Course Access */}
       {grantModalOpen && (
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-course-darkBlue/75"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
         >
-          <div className="w-full max-w-lg bg-course-white border-2 border-black p-6 space-y-4">
-            <h2 className="text-sm font-black text-course-darkBlue uppercase tracking-wider border-b border-black pb-2">
-              Grant Course Access Manually
-            </h2>
+          <div className="w-full max-w-lg bg-white border border-neutral-200/90 shadow-xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200/80">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
+                Grant Course Access Manually
+              </h2>
+              <button
+                type="button"
+                onClick={() => setGrantModalOpen(false)}
+                className="p-1 border border-neutral-200 hover:border-neutral-900 text-neutral-500 hover:text-neutral-900 min-h-[32px] min-w-[32px] inline-flex items-center justify-center transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
             <form onSubmit={handleGrantAccess} className="space-y-4">
               <div className="space-y-1">
                 <label
                   htmlFor="grant-course-select"
-                  className="block text-xs font-bold uppercase text-course-darkBlue"
+                  className="block text-xs font-semibold uppercase tracking-wider text-neutral-700"
                 >
                   Select Course
                 </label>
@@ -840,7 +830,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                   id="grant-course-select"
                   value={selectedProductId}
                   onChange={(e) => setSelectedProductId(e.target.value)}
-                  className="w-full p-2.5 border border-black bg-white text-xs font-bold text-course-darkBlue"
+                  className="w-full p-2.5 border border-neutral-300 bg-white text-xs font-semibold text-neutral-900 focus:outline-none focus:border-neutral-900"
                   aria-label="Select Course to Grant"
                 >
                   {courses.map((c) => (
@@ -852,27 +842,27 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
               </div>
 
               <div className="space-y-2">
-                <label className="block text-xs font-bold uppercase text-course-darkBlue">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-700">
                   Access Duration
                 </label>
-                <div className="flex gap-3">
-                  <label className="flex items-center gap-1.5 text-xs font-bold cursor-pointer">
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 text-xs font-medium cursor-pointer text-neutral-900">
                     <input
                       type="radio"
                       name="grantAccessType"
                       checked={grantAccessType === 'lifetime'}
                       onChange={() => setGrantAccessType('lifetime')}
-                      className="accent-course-orange"
+                      className="accent-neutral-900"
                     />
                     <span>Lifetime Access</span>
                   </label>
-                  <label className="flex items-center gap-1.5 text-xs font-bold cursor-pointer">
+                  <label className="flex items-center gap-2 text-xs font-medium cursor-pointer text-neutral-900">
                     <input
                       type="radio"
                       name="grantAccessType"
                       checked={grantAccessType === 'custom'}
                       onChange={() => setGrantAccessType('custom')}
-                      className="accent-course-orange"
+                      className="accent-neutral-900"
                     />
                     <span>Custom Expiry Date</span>
                   </label>
@@ -893,30 +883,27 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                 label="Reason for Grant (Required for Audit Log)"
                 type="text"
                 required
-                placeholder="e.g. Offline cash payment received at training facility / scholarship"
+                placeholder="e.g. Offline cash payment received / institutional scholarship"
                 value={grantReason}
                 onChange={(e) => setGrantReason(e.target.value)}
-                helperText="This reason is permanently preserved in the security audit trail."
+                helperText="Preserved in the permanent security audit trail."
               />
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-black">
-                <Button
-                  variant="outline"
-                  size="sm"
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-neutral-200/80">
+                <button
+                  type="button"
                   onClick={() => setGrantModalOpen(false)}
-                  className="text-xs"
+                  className="px-4 py-2 border border-neutral-300 hover:border-neutral-900 text-neutral-700 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors"
                 >
                   Cancel
-                </Button>
-                <Button
+                </button>
+                <button
                   type="submit"
-                  variant="primary"
-                  size="sm"
-                  isLoading={actionLoading}
-                  className="text-xs font-black uppercase"
+                  disabled={actionLoading}
+                  className="px-5 py-2 bg-neutral-900 text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors disabled:opacity-50"
                 >
                   Grant Access
-                </Button>
+                </button>
               </div>
             </form>
           </div>

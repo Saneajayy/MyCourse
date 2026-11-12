@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Button } from '../ui/Button';
 import { AlertTriangle, X } from 'lucide-react';
 
 export interface ConfirmModalProps {
@@ -47,42 +46,42 @@ export function ConfirmModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="confirm-modal-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-course-darkBlue/75"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
     >
-      <div className="relative w-full max-w-lg bg-course-white border-2 border-black p-6 space-y-5">
+      <div className="relative w-full max-w-md bg-white border border-neutral-200/90 shadow-xl p-6 space-y-5 font-reddit">
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <div
-              className={`w-10 h-10 border border-black flex items-center justify-center shrink-0 ${
+              className={`w-10 h-10 border flex items-center justify-center shrink-0 ${
                 isDestructive
-                  ? 'bg-rose-100 text-rose-700'
-                  : 'bg-course-orangeSubtle text-course-orange'
+                  ? 'bg-rose-50 text-rose-600 border-rose-200'
+                  : 'bg-neutral-100 text-neutral-800 border-neutral-200'
               }`}
             >
-              <AlertTriangle className="w-5 h-5" />
+              <AlertTriangle className="w-4 h-4" />
             </div>
             <div>
-              <h3 id="confirm-modal-title" className="text-base font-black text-course-darkBlue">
+              <h3 id="confirm-modal-title" className="text-sm font-bold uppercase tracking-wider text-neutral-900">
                 {title}
               </h3>
-              <p className="text-xs text-course-navySubtle mt-0.5">Please confirm your action</p>
+              <p className="text-xs text-neutral-500 mt-0.5">Please confirm your action</p>
             </div>
           </div>
           <button
             type="button"
             onClick={handleClose}
             disabled={isLoading}
-            className="p-1 border border-black hover:bg-neutral-100 min-h-[32px] min-w-[32px] inline-flex items-center justify-center"
+            className="p-1 border border-neutral-200 hover:border-neutral-900 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 min-h-[32px] min-w-[32px] inline-flex items-center justify-center transition-colors"
             aria-label="Close dialog"
           >
-            <X className="w-4 h-4 text-course-darkBlue" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Description / Message */}
         {modalBody && (
-          <div className="p-3 bg-neutral-50 border border-black text-xs text-course-navyMuted space-y-2">
+          <div className="p-3 bg-neutral-50 border border-neutral-200/80 text-xs text-neutral-600 space-y-2">
             {typeof modalBody === 'string' ? (
               <p className="font-medium leading-relaxed">{modalBody}</p>
             ) : (
@@ -95,24 +94,23 @@ export function ConfirmModal({
         {children && <div className="space-y-3">{children}</div>}
 
         {/* Actions */}
-        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2 border-t border-black">
-          <Button
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 pt-3 border-t border-neutral-200/80">
+          <button
             type="button"
-            variant="outline"
             onClick={handleClose}
             disabled={isLoading}
-            className="text-xs font-bold uppercase tracking-wider py-2.5"
+            className="min-h-[38px] px-4 py-2 border border-neutral-300 hover:border-neutral-900 text-neutral-700 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors"
           >
             {cancelText}
-          </Button>
+          </button>
           <button
             type="button"
             onClick={onConfirm}
             disabled={isLoading}
-            className={`min-h-[44px] px-5 py-2.5 border border-black font-black text-xs uppercase tracking-wider transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2 ${
+            className={`min-h-[38px] px-5 py-2 text-xs font-semibold tracking-wide transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2 ${
               isDestructive
                 ? 'bg-rose-600 text-white hover:bg-rose-700'
-                : 'bg-course-orange text-white hover:bg-course-orangeHover'
+                : 'bg-neutral-900 text-white hover:bg-black'
             }`}
           >
             {isLoading ? 'Processing...' : confirmText}

@@ -3,8 +3,6 @@
 import React, { useState, useEffect, useCallback, use } from 'react';
 import Link from 'next/link';
 import { apiClient } from '../../../../../lib/api-client';
-import { Card } from '../../../../../components/ui/Card';
-import { Button } from '../../../../../components/ui/Button';
 import { Input } from '../../../../../components/ui/Input';
 import { useToast } from '../../../../../components/ui/Toast';
 import { ConfirmModal } from '../../../../../components/admin/ConfirmModal';
@@ -23,6 +21,7 @@ import {
   CheckCircle2,
   Clock,
   X,
+  Settings,
 } from 'lucide-react';
 
 interface LessonItem {
@@ -222,7 +221,7 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
     }
   };
 
-  // Reorder Sections (Accessible up/down buttons)
+  // Reorder Sections
   const handleMoveSection = async (index: number, direction: 'up' | 'down') => {
     if (!course) return;
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
@@ -245,7 +244,7 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
     }
   };
 
-  // Reorder Lessons (Accessible up/down buttons)
+  // Reorder Lessons
   const handleMoveLesson = async (
     sectionId: string,
     lessonIndex: number,
@@ -369,159 +368,159 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
 
   if (isLoading) {
     return (
-      <div className="py-12 text-center text-xs font-bold text-course-navySubtle">
+      <div className="py-16 text-center text-xs font-mono text-neutral-500 font-reddit">
         Loading curriculum and video statuses...
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-reddit">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-black">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-neutral-200/80">
         <div className="flex items-center gap-3">
           <Link
             href="/admin/courses"
-            className="p-1.5 border border-black hover:bg-neutral-100 min-h-[36px] min-w-[36px] inline-flex items-center justify-center transition-colors"
+            className="p-2 border border-neutral-200/90 hover:border-neutral-900 bg-white hover:bg-neutral-50 text-neutral-700 min-h-[36px] min-w-[36px] inline-flex items-center justify-center transition-colors"
             aria-label="Back to courses list"
           >
-            <ArrowLeft className="w-4 h-4 text-course-darkBlue" />
+            <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
             <div className="flex items-center gap-2">
               <span
-                className={`px-2 py-0.5 border border-black text-[10px] font-black uppercase tracking-wider ${
+                className={`px-2 py-0.5 border text-[10px] font-semibold tracking-wide uppercase ${
                   course?.status === 'PUBLISHED'
-                    ? 'bg-emerald-100 text-emerald-950'
-                    : 'bg-amber-100 text-amber-950'
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                    : 'bg-amber-50 text-amber-800 border-amber-200'
                 }`}
               >
                 {course?.status}
               </span>
-              <span className="text-xs font-mono text-course-navySubtle">/{course?.slug}</span>
+              <span className="text-xs font-mono text-neutral-400">/{course?.slug}</span>
             </div>
-            <h1 className="text-xl font-black text-course-darkBlue leading-tight mt-0.5">
-              {course?.title} — Curriculum Editor
+            <h1 className="text-lg font-bold text-neutral-950 mt-1">
+              {course?.title}
+              <span className="text-neutral-400 font-normal ml-2">— Curriculum Hierarchy</span>
             </h1>
           </div>
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <Button
-            variant="primary"
-            size="sm"
+          <button
+            type="button"
             onClick={() => setSectionModal({ isOpen: true, mode: 'create', title: '' })}
-            className="text-xs font-black uppercase tracking-wider py-2"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-neutral-900 text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors"
           >
-            <Plus className="w-4 h-4 mr-1" />
-            Add Section
-          </Button>
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add Section</span>
+          </button>
 
-          <Link href={`/admin/courses/${courseId}/edit`}>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-xs font-bold uppercase tracking-wider py-2"
-            >
-              <Edit className="w-3.5 h-3.5 mr-1" />
-              Course Settings
-            </Button>
+          <Link
+            href={`/admin/courses/${courseId}/edit`}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 border border-neutral-300 hover:border-neutral-900 text-neutral-800 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors"
+          >
+            <Settings className="w-3.5 h-3.5" />
+            <span>Course Settings</span>
           </Link>
         </div>
       </div>
 
       {/* Published Course Missing Video Alert */}
       {course?.hasMissingVideosWarning && (
-        <div className="p-3.5 border-2 border-amber-600 bg-amber-50 text-amber-950 text-xs space-y-1">
-          <div className="flex items-center gap-2 font-black uppercase tracking-wider text-amber-900">
-            <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0" />
+        <div className="p-3.5 border border-amber-300 bg-amber-50/70 text-amber-950 text-xs space-y-1">
+          <div className="flex items-center gap-2 font-semibold uppercase tracking-wider text-amber-900 text-[11px]">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
             <span>Missing Video Warning</span>
           </div>
-          <p className="font-medium">
-            This course is currently <strong>PUBLISHED</strong> to students, but{' '}
-            {course.missingVideosCount} lesson(s) are missing a video or are still processing.
-            Ensure all paid lessons have a READY video before advertising.
+          <p className="text-xs text-amber-900 leading-relaxed">
+            This course is marked <strong>PUBLISHED</strong>, but {course.missingVideosCount} lesson(s) lack a video stream or are still transcoding. Ensure all paid lessons have a ready video before launching promotions.
           </p>
         </div>
       )}
 
       {/* Error Banner */}
       {errorMessage && (
-        <div className="p-4 border border-black bg-rose-50 text-rose-950 text-xs flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold">
-            <AlertTriangle className="w-4 h-4 text-rose-700 shrink-0" />
+        <div className="p-3.5 border border-rose-200 bg-rose-50 text-rose-950 text-xs flex items-center justify-between">
+          <div className="flex items-center gap-2 font-medium">
+            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
             <span>{errorMessage}</span>
           </div>
-          <Button variant="outline" size="sm" onClick={fetchCurriculum} className="text-xs">
+          <button
+            type="button"
+            onClick={fetchCurriculum}
+            className="px-2.5 py-1 text-xs font-semibold border border-rose-300 bg-white text-rose-900 hover:bg-rose-50"
+          >
             Retry
-          </Button>
+          </button>
         </div>
       )}
 
       {/* Empty State */}
       {course?.sections.length === 0 && !errorMessage && (
-        <Card
-          variant="default"
-          padding="lg"
-          className="border-2 border-dashed border-black text-center py-12 space-y-3"
-        >
-          <div className="w-10 h-10 bg-neutral-100 text-course-darkBlue border border-black flex items-center justify-center mx-auto">
+        <div className="border border-dashed border-neutral-300 bg-white text-center py-16 px-6 space-y-4">
+          <div className="w-11 h-11 border border-neutral-200 bg-neutral-50 text-neutral-700 flex items-center justify-center mx-auto">
             <Plus className="w-5 h-5" />
           </div>
-          <h2 className="text-sm font-black text-course-darkBlue">No Curriculum Sections Yet</h2>
-          <p className="text-xs text-course-navySubtle max-w-sm mx-auto">
-            Click &quot;Add Section&quot; to begin building modules (e.g. &quot;Module 1: Hydraulic
-            Fluid Fundamentals&quot;).
-          </p>
-          <Button
-            variant="primary"
-            size="sm"
+          <div className="max-w-sm mx-auto space-y-1">
+            <h2 className="text-sm font-bold text-neutral-950 uppercase tracking-wider">
+              No Curriculum Sections Yet
+            </h2>
+            <p className="text-xs text-neutral-500">
+              Click &quot;Add Section&quot; to begin building modules (e.g. &quot;Module 1: Hydraulic Fluid Fundamentals&quot;).
+            </p>
+          </div>
+          <button
+            type="button"
             onClick={() => setSectionModal({ isOpen: true, mode: 'create', title: '' })}
-            className="text-xs font-bold uppercase tracking-wider"
+            className="inline-flex items-center gap-1.5 px-4 py-2 bg-neutral-900 text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors"
           >
+            <Plus className="w-3.5 h-3.5" />
             Create First Section
-          </Button>
-        </Card>
+          </button>
+        </div>
       )}
 
       {/* Sections and Lessons Hierarchy */}
-      <div className="space-y-6">
+      <div className="space-y-5">
         {course?.sections.map((section, sIndex) => (
-          <div key={section.id} className="border-2 border-black bg-course-white">
+          <div key={section.id} className="border border-neutral-200/80 bg-white shadow-xs overflow-hidden">
             {/* Section Header */}
-            <div className="p-3.5 bg-neutral-100 border-b border-black flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 bg-course-darkBlue text-white font-mono text-xs font-bold border border-black flex items-center justify-center shrink-0">
+            <div className="p-3.5 bg-neutral-50/80 border-b border-neutral-200/80 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <span className="w-6 h-6 bg-neutral-900 text-white font-mono text-xs font-semibold flex items-center justify-center shrink-0">
                   {sIndex + 1}
                 </span>
-                <h2 className="text-sm font-black text-course-darkBlue">{section.title}</h2>
-                <span className="text-[11px] font-mono text-course-navySubtle">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
+                  {section.title}
+                </h2>
+                <span className="text-[11px] font-mono text-neutral-500">
                   ({section.lessons.length} {section.lessons.length === 1 ? 'lesson' : 'lessons'})
                 </span>
               </div>
 
               {/* Section Controls */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                 {/* Up/Down buttons for mobile accessibility */}
                 <button
                   type="button"
                   disabled={sIndex === 0}
                   onClick={() => handleMoveSection(sIndex, 'up')}
-                  className="p-1 border border-black hover:bg-neutral-200 disabled:opacity-30 min-h-[32px] min-w-[32px] inline-flex items-center justify-center transition-colors"
+                  className="p-1 border border-neutral-200 hover:border-neutral-900 bg-white hover:bg-neutral-50 disabled:opacity-30 min-h-[30px] min-w-[30px] inline-flex items-center justify-center transition-colors"
                   aria-label="Move section up"
                   title="Move section up"
                 >
-                  <ChevronUp className="w-4 h-4 text-course-darkBlue" />
+                  <ChevronUp className="w-3.5 h-3.5 text-neutral-700" />
                 </button>
                 <button
                   type="button"
                   disabled={sIndex === course.sections.length - 1}
                   onClick={() => handleMoveSection(sIndex, 'down')}
-                  className="p-1 border border-black hover:bg-neutral-200 disabled:opacity-30 min-h-[32px] min-w-[32px] inline-flex items-center justify-center transition-colors"
+                  className="p-1 border border-neutral-200 hover:border-neutral-900 bg-white hover:bg-neutral-50 disabled:opacity-30 min-h-[30px] min-w-[30px] inline-flex items-center justify-center transition-colors"
                   aria-label="Move section down"
                   title="Move section down"
                 >
-                  <ChevronDown className="w-4 h-4 text-course-darkBlue" />
+                  <ChevronDown className="w-3.5 h-3.5 text-neutral-700" />
                 </button>
 
                 {/* Edit Section Title */}
@@ -535,11 +534,11 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                       title: section.title,
                     })
                   }
-                  className="p-1 border border-black hover:bg-neutral-200 min-h-[32px] min-w-[32px] inline-flex items-center justify-center transition-colors"
+                  className="p-1 border border-neutral-200 hover:border-neutral-900 bg-white hover:bg-neutral-50 min-h-[30px] min-w-[30px] inline-flex items-center justify-center transition-colors ml-1"
                   aria-label="Rename section"
                   title="Rename section"
                 >
-                  <Edit className="w-3.5 h-3.5 text-course-darkBlue" />
+                  <Edit className="w-3.5 h-3.5 text-neutral-700" />
                 </button>
 
                 {/* Delete Section */}
@@ -556,7 +555,7 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                       force: false,
                     })
                   }
-                  className="p-1 border border-black hover:bg-rose-50 text-rose-700 min-h-[32px] min-w-[32px] inline-flex items-center justify-center transition-colors"
+                  className="p-1 border border-neutral-200 hover:border-rose-300 bg-white hover:bg-rose-50 text-neutral-500 hover:text-rose-600 min-h-[30px] min-w-[30px] inline-flex items-center justify-center transition-colors"
                   aria-label="Delete section"
                   title="Delete section"
                 >
@@ -564,9 +563,8 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                 </button>
 
                 {/* Add Lesson Button */}
-                <Button
-                  variant="primary"
-                  size="sm"
+                <button
+                  type="button"
                   onClick={() =>
                     setLessonModal({
                       isOpen: true,
@@ -577,18 +575,18 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                       isFreePreview: false,
                     })
                   }
-                  className="text-xs font-bold uppercase tracking-wider py-1 px-2.5 ml-2"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-neutral-900 text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors ml-2"
                 >
-                  <Plus className="w-3.5 h-3.5 mr-1" />
-                  Add Lesson
-                </Button>
+                  <Plus className="w-3 h-3" />
+                  <span>Add Lesson</span>
+                </button>
               </div>
             </div>
 
             {/* Lessons List in Section */}
-            <div className="divide-y divide-black">
+            <div className="divide-y divide-neutral-200/80">
               {section.lessons.length === 0 ? (
-                <div className="p-4 text-center text-xs text-course-navySubtle italic">
+                <div className="p-4 text-center text-xs text-neutral-400 italic">
                   No lessons in this section. Click &quot;Add Lesson&quot; above to create one.
                 </div>
               ) : (
@@ -600,64 +598,64 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                     onDragStart={() => setDraggedLessonId(lesson.id)}
                     onDragOver={handleDragOver}
                     onDrop={() => handleDropLesson(section.id, lesson.id)}
-                    className="p-3 bg-white hover:bg-neutral-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors"
+                    className="p-3.5 bg-white hover:bg-neutral-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors"
                   >
                     {/* Left: Drag Handle, Number, Title & Badges */}
                     <div className="flex items-start sm:items-center gap-2.5 min-w-0">
                       {/* Drag Handle (Desktop) */}
                       <span
-                        className="hidden sm:inline-flex text-neutral-400 hover:text-black cursor-grab active:cursor-grabbing p-0.5"
+                        className="hidden sm:inline-flex text-neutral-300 hover:text-neutral-800 cursor-grab active:cursor-grabbing p-0.5"
                         title="Drag to reorder lesson"
                       >
                         <GripVertical className="w-4 h-4" />
                       </span>
 
                       {/* Lesson Number */}
-                      <span className="text-xs font-mono font-bold text-course-navySubtle shrink-0">
+                      <span className="text-xs font-mono font-semibold text-neutral-400 shrink-0">
                         {sIndex + 1}.{lIndex + 1}
                       </span>
 
                       {/* Title & Description preview */}
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-xs font-black text-course-darkBlue truncate">
+                          <span className="text-xs font-semibold text-neutral-900 truncate">
                             {lesson.title}
                           </span>
 
                           {/* Free Preview Badge */}
                           {lesson.isFreePreview ? (
-                            <span className="px-1.5 py-0.5 bg-emerald-100 border border-black text-[9px] font-black uppercase tracking-wider text-emerald-950">
+                            <span className="px-1.5 py-0.5 bg-emerald-50 border border-emerald-200 text-[10px] font-semibold uppercase tracking-wider text-emerald-800">
                               Free Preview
                             </span>
                           ) : (
-                            <span className="px-1.5 py-0.5 bg-neutral-100 border border-neutral-300 text-[9px] font-bold uppercase tracking-wider text-neutral-600">
+                            <span className="px-1.5 py-0.5 bg-neutral-100 border border-neutral-200 text-[10px] font-medium uppercase tracking-wider text-neutral-600">
                               Paid Only
                             </span>
                           )}
 
                           {/* Video Status Badge */}
                           {lesson.status === 'READY' && (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 border border-black text-[9px] font-bold text-emerald-800">
-                              <CheckCircle2 className="w-3 h-3 text-emerald-700" />
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-emerald-50 border border-emerald-200 text-[10px] font-medium text-emerald-800">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                               Ready ({formatDuration(lesson.durationSeconds)})
                             </span>
                           )}
                           {lesson.status === 'PROCESSING' && (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-50 border border-black text-[9px] font-bold text-amber-800">
-                              <Clock className="w-3 h-3 text-amber-700 animate-spin" />
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-50 border border-amber-200 text-[10px] font-medium text-amber-800">
+                              <Clock className="w-3 h-3 text-amber-600 animate-spin" />
                               Transcoding...
                             </span>
                           )}
                           {!lesson.videoProviderId && (
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-rose-50 border border-black text-[9px] font-bold text-rose-800">
-                              <AlertTriangle className="w-3 h-3 text-rose-700" />
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-rose-50 border border-rose-200 text-[10px] font-medium text-rose-800">
+                              <AlertTriangle className="w-3 h-3 text-rose-600" />
                               No Video
                             </span>
                           )}
                         </div>
 
                         {lesson.description && (
-                          <p className="text-[11px] text-course-navySubtle truncate max-w-md mt-0.5">
+                          <p className="text-[11px] text-neutral-500 truncate max-w-md mt-0.5">
                             {lesson.description}
                           </p>
                         )}
@@ -671,31 +669,31 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                         type="button"
                         disabled={lIndex === 0}
                         onClick={() => handleMoveLesson(section.id, lIndex, 'up')}
-                        className="p-1 border border-black hover:bg-neutral-200 disabled:opacity-30 min-h-[30px] min-w-[30px] inline-flex items-center justify-center transition-colors"
+                        className="p-1 border border-neutral-200 hover:border-neutral-900 bg-white hover:bg-neutral-50 disabled:opacity-30 min-h-[30px] min-w-[30px] inline-flex items-center justify-center transition-colors"
                         aria-label="Move lesson up"
                         title="Move lesson up"
                       >
-                        <ChevronUp className="w-3.5 h-3.5 text-course-darkBlue" />
+                        <ChevronUp className="w-3.5 h-3.5 text-neutral-700" />
                       </button>
                       <button
                         type="button"
                         disabled={lIndex === section.lessons.length - 1}
                         onClick={() => handleMoveLesson(section.id, lIndex, 'down')}
-                        className="p-1 border border-black hover:bg-neutral-200 disabled:opacity-30 min-h-[30px] min-w-[30px] inline-flex items-center justify-center transition-colors"
+                        className="p-1 border border-neutral-200 hover:border-neutral-900 bg-white hover:bg-neutral-50 disabled:opacity-30 min-h-[30px] min-w-[30px] inline-flex items-center justify-center transition-colors"
                         aria-label="Move lesson down"
                         title="Move lesson down"
                       >
-                        <ChevronDown className="w-3.5 h-3.5 text-course-darkBlue" />
+                        <ChevronDown className="w-3.5 h-3.5 text-neutral-700" />
                       </button>
 
                       {/* 1-Click Toggle Free Preview */}
                       <button
                         type="button"
                         onClick={() => handleTogglePreview(lesson)}
-                        className={`p-1.5 border border-black min-h-[30px] text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1 transition-colors ${
+                        className={`px-2 py-1 border min-h-[30px] text-[10px] font-semibold uppercase tracking-wider inline-flex items-center gap-1 transition-colors ${
                           lesson.isFreePreview
-                            ? 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
-                            : 'bg-white text-course-darkBlue hover:bg-neutral-100'
+                            ? 'border-emerald-300 bg-emerald-50 text-emerald-900 hover:bg-emerald-100'
+                            : 'border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50'
                         }`}
                         title={
                           lesson.isFreePreview
@@ -710,15 +708,18 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                       </button>
 
                       {/* Upload / Replace Video Button */}
-                      <Button
-                        variant={lesson.videoProviderId ? 'outline' : 'primary'}
-                        size="sm"
+                      <button
+                        type="button"
                         onClick={() => setVideoModal({ isOpen: true, lesson })}
-                        className="text-xs font-bold uppercase tracking-wider py-1 px-2.5 min-h-[30px]"
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold tracking-wide transition-colors min-h-[30px] ${
+                          lesson.videoProviderId
+                            ? 'border border-neutral-300 hover:border-neutral-900 text-neutral-800 bg-white hover:bg-neutral-50'
+                            : 'bg-neutral-900 text-white hover:bg-black'
+                        }`}
                       >
-                        <Video className="w-3.5 h-3.5 mr-1" />
-                        {lesson.videoProviderId ? 'Video' : 'Upload Video'}
-                      </Button>
+                        <Video className="w-3.5 h-3.5" />
+                        <span>{lesson.videoProviderId ? 'Manage Video' : 'Upload Video'}</span>
+                      </button>
 
                       {/* Edit Info Button */}
                       <button
@@ -734,11 +735,11 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                             isFreePreview: lesson.isFreePreview,
                           })
                         }
-                        className="p-1 border border-black hover:bg-neutral-100 min-h-[30px] min-w-[30px] inline-flex items-center justify-center transition-colors"
+                        className="p-1 border border-neutral-200 hover:border-neutral-900 bg-white hover:bg-neutral-50 min-h-[30px] min-w-[30px] inline-flex items-center justify-center transition-colors"
                         aria-label="Edit lesson info"
                         title="Edit lesson details"
                       >
-                        <Edit className="w-3.5 h-3.5 text-course-darkBlue" />
+                        <Edit className="w-3.5 h-3.5 text-neutral-700" />
                       </button>
 
                       {/* Delete Lesson Button */}
@@ -755,7 +756,7 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                             force: false,
                           })
                         }
-                        className="p-1 border border-black hover:bg-rose-50 text-rose-700 min-h-[30px] min-w-[30px] inline-flex items-center justify-center transition-colors"
+                        className="p-1 border border-neutral-200 hover:border-rose-300 bg-white hover:bg-rose-50 text-neutral-500 hover:text-rose-600 min-h-[30px] min-w-[30px] inline-flex items-center justify-center transition-colors"
                         aria-label="Delete lesson"
                         title="Delete lesson"
                       >
@@ -776,20 +777,20 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
           role="dialog"
           aria-modal="true"
           aria-labelledby="section-modal-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-course-darkBlue/75"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
         >
-          <div className="w-full max-w-md bg-course-white border-2 border-black p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-black">
+          <div className="w-full max-w-md bg-white border border-neutral-200/90 shadow-xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200/80">
               <h2
                 id="section-modal-title"
-                className="text-sm font-black text-course-darkBlue uppercase tracking-wider"
+                className="text-xs font-bold uppercase tracking-wider text-neutral-950"
               >
                 {sectionModal.mode === 'create' ? 'Add New Section' : 'Rename Section'}
               </h2>
               <button
                 type="button"
                 onClick={() => setSectionModal({ isOpen: false, mode: 'create', title: '' })}
-                className="p-1 border border-black min-h-[32px] min-w-[32px] inline-flex items-center justify-center"
+                className="p-1 border border-neutral-200 hover:border-neutral-900 text-neutral-500 hover:text-neutral-900 min-h-[32px] min-w-[32px] inline-flex items-center justify-center transition-colors"
                 aria-label="Close dialog"
               >
                 <X className="w-4 h-4" />
@@ -802,29 +803,27 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                 type="text"
                 required
                 autoFocus
-                placeholder="e.g. Module 2: Directional Control Valves &amp; Circuit Design"
+                placeholder="e.g. Module 2: Directional Control Valves & Circuit Design"
                 value={sectionModal.title}
                 onChange={(e) => setSectionModal({ ...sectionModal, title: e.target.value })}
                 helperText="Groups related lessons together in the student syllabus."
               />
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-black">
-                <Button
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-neutral-200/80">
+                <button
                   type="button"
-                  variant="outline"
                   onClick={() => setSectionModal({ isOpen: false, mode: 'create', title: '' })}
-                  className="text-xs font-bold uppercase tracking-wider"
+                  className="px-4 py-2 border border-neutral-300 hover:border-neutral-900 text-neutral-700 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors"
                 >
                   Cancel
-                </Button>
-                <Button
+                </button>
+                <button
                   type="submit"
-                  variant="primary"
-                  isLoading={isActionLoading}
-                  className="text-xs font-black uppercase tracking-wider"
+                  disabled={isActionLoading}
+                  className="px-5 py-2 bg-neutral-900 text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors disabled:opacity-50"
                 >
                   Save Section
-                </Button>
+                </button>
               </div>
             </form>
           </div>
@@ -837,13 +836,13 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
           role="dialog"
           aria-modal="true"
           aria-labelledby="lesson-modal-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-course-darkBlue/75"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
         >
-          <div className="w-full max-w-lg bg-course-white border-2 border-black p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-black">
+          <div className="w-full max-w-lg bg-white border border-neutral-200/90 shadow-xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200/80">
               <h2
                 id="lesson-modal-title"
-                className="text-sm font-black text-course-darkBlue uppercase tracking-wider"
+                className="text-xs font-bold uppercase tracking-wider text-neutral-950"
               >
                 {lessonModal.mode === 'create' ? 'Add New Lesson' : 'Edit Lesson Information'}
               </h2>
@@ -859,7 +858,7 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                     isFreePreview: false,
                   })
                 }
-                className="p-1 border border-black min-h-[32px] min-w-[32px] inline-flex items-center justify-center"
+                className="p-1 border border-neutral-200 hover:border-neutral-900 text-neutral-500 hover:text-neutral-900 min-h-[32px] min-w-[32px] inline-flex items-center justify-center transition-colors"
                 aria-label="Close dialog"
               >
                 <X className="w-4 h-4" />
@@ -872,13 +871,13 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                 type="text"
                 required
                 autoFocus
-                placeholder="e.g. Spool Valve Metering &amp; Flow Characteristics"
+                placeholder="e.g. Spool Valve Metering & Flow Characteristics"
                 value={lessonModal.title}
                 onChange={(e) => setLessonModal({ ...lessonModal, title: e.target.value })}
               />
 
-              <div className="space-y-1">
-                <label className="block text-xs font-black uppercase tracking-wider text-course-darkBlue">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-700">
                   Lesson Description / Notes (Optional)
                 </label>
                 <textarea
@@ -886,28 +885,27 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                   value={lessonModal.description}
                   onChange={(e) => setLessonModal({ ...lessonModal, description: e.target.value })}
                   placeholder="Summary of formulas, components, or schematics analyzed in this video."
-                  className="w-full p-2.5 border border-black bg-white text-xs text-course-darkBlue focus:outline-none focus:ring-2 focus:ring-course-orange"
+                  className="w-full p-3 border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-none focus:border-neutral-900 transition-colors"
                 />
               </div>
 
-              <div className="p-3 border border-black bg-neutral-50">
-                <label className="flex items-center gap-2.5 text-xs font-bold text-course-darkBlue cursor-pointer">
+              <div className="p-3.5 border border-neutral-200/80 bg-neutral-50">
+                <label className="flex items-center gap-2.5 text-xs font-medium text-neutral-900 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={lessonModal.isFreePreview}
                     onChange={(e) =>
                       setLessonModal({ ...lessonModal, isFreePreview: e.target.checked })
                     }
-                    className="w-4 h-4 accent-course-orange"
+                    className="w-4 h-4 accent-neutral-900"
                   />
-                  <span>Mark as Free Preview (Accessible without buying the course)</span>
+                  <span>Mark as Free Preview (Accessible without purchasing course)</span>
                 </label>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-black">
-                <Button
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-neutral-200/80">
+                <button
                   type="button"
-                  variant="outline"
                   onClick={() =>
                     setLessonModal({
                       isOpen: false,
@@ -918,18 +916,17 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                       isFreePreview: false,
                     })
                   }
-                  className="text-xs font-bold uppercase tracking-wider"
+                  className="px-4 py-2 border border-neutral-300 hover:border-neutral-900 text-neutral-700 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors"
                 >
                   Cancel
-                </Button>
-                <Button
+                </button>
+                <button
                   type="submit"
-                  variant="primary"
-                  isLoading={isActionLoading}
-                  className="text-xs font-black uppercase tracking-wider"
+                  disabled={isActionLoading}
+                  className="px-5 py-2 bg-neutral-900 text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors disabled:opacity-50"
                 >
                   Save Lesson
-                </Button>
+                </button>
               </div>
             </form>
           </div>
@@ -942,18 +939,18 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
           role="dialog"
           aria-modal="true"
           aria-labelledby="video-modal-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-course-darkBlue/75"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
         >
-          <div className="w-full max-w-xl bg-course-white border-2 border-black p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-black">
+          <div className="w-full max-w-xl bg-white border border-neutral-200/90 shadow-xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200/80">
               <div>
                 <h2
                   id="video-modal-title"
-                  className="text-sm font-black text-course-darkBlue uppercase tracking-wider"
+                  className="text-xs font-bold uppercase tracking-wider text-neutral-950"
                 >
                   Direct Video Upload
                 </h2>
-                <p className="text-xs text-course-navySubtle mt-0.5">
+                <p className="text-xs text-neutral-500 mt-0.5">
                   Lesson: {videoModal.lesson.title}
                 </p>
               </div>
@@ -963,7 +960,7 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                   setVideoModal({ isOpen: false, lesson: null });
                   fetchCurriculum();
                 }}
-                className="p-1 border border-black min-h-[32px] min-w-[32px] inline-flex items-center justify-center"
+                className="p-1 border border-neutral-200 hover:border-neutral-900 text-neutral-500 hover:text-neutral-900 min-h-[32px] min-w-[32px] inline-flex items-center justify-center transition-colors"
                 aria-label="Close dialog"
               >
                 <X className="w-4 h-4" />
@@ -981,18 +978,17 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
               }}
             />
 
-            <div className="pt-2 border-t border-black flex justify-end">
-              <Button
-                variant="outline"
-                size="sm"
+            <div className="pt-3 border-t border-neutral-200/80 flex justify-end">
+              <button
+                type="button"
                 onClick={() => {
                   setVideoModal({ isOpen: false, lesson: null });
                   fetchCurriculum();
                 }}
-                className="text-xs font-bold uppercase tracking-wider"
+                className="px-4 py-2 border border-neutral-300 hover:border-neutral-900 text-neutral-800 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors"
               >
                 Done
-              </Button>
+              </button>
             </div>
           </div>
         </div>
@@ -1020,9 +1016,9 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
             })
           }
         >
-          <div className="space-y-2.5 p-3 border border-black bg-rose-50 text-xs">
+          <div className="space-y-2.5 p-3.5 border border-rose-200 bg-rose-50 text-xs">
             {deleteConfirm.hasVideo && (
-              <label className="flex items-start gap-2 cursor-pointer font-bold text-rose-950">
+              <label className="flex items-start gap-2 cursor-pointer font-semibold text-rose-950">
                 <input
                   type="checkbox"
                   checked={deleteConfirm.confirmDeleteVideo}
@@ -1032,8 +1028,7 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                   className="w-4 h-4 accent-rose-600 mt-0.5 shrink-0"
                 />
                 <span>
-                  Confirm video deletion: Permanently delete the uploaded video from Bunny Stream
-                  CDN.
+                  Confirm video deletion: Permanently delete the uploaded video from Bunny Stream CDN.
                 </span>
               </label>
             )}
@@ -1046,8 +1041,7 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                 className="w-4 h-4 accent-rose-600 mt-0.5 shrink-0"
               />
               <span>
-                Force delete even if enrolled students already have watch progress recorded for this
-                item.
+                Force delete even if enrolled students already have watch progress recorded for this item.
               </span>
             </label>
           </div>

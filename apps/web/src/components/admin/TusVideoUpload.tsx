@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import * as tus from 'tus-js-client';
 import { apiClient } from '../../lib/api-client';
-import { Button } from '../ui/Button';
 import { ProgressBar } from '../ui/ProgressBar';
 import {
   UploadCloud,
@@ -252,41 +251,41 @@ export function TusVideoUpload({
   };
 
   return (
-    <div className="border border-black p-4 bg-course-white space-y-4">
+    <div className="border border-neutral-200/80 p-5 bg-white space-y-4 font-reddit">
       {/* Existing Status Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           {status === 'READY' && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-black text-xs font-bold uppercase tracking-wider">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold tracking-wide">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               Video Ready ({formatDuration(durationSeconds)})
               {currentVideoId && (
-                <span className="font-mono text-[10px] text-emerald-950 font-normal ml-1">
+                <span className="font-mono text-[10px] text-emerald-700 ml-1">
                   [{currentVideoId.slice(0, 8)}]
                 </span>
               )}
             </span>
           )}
           {status === 'PROCESSING' && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-800 border border-black text-xs font-bold uppercase tracking-wider">
-              <Clock className="w-3.5 h-3.5 text-amber-700 animate-spin" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 text-xs font-semibold tracking-wide">
+              <Clock className="w-3.5 h-3.5 text-amber-600 animate-spin" />
               Processing / Transcoding
             </span>
           )}
           {status === 'UPLOADING' && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-sky-50 text-sky-800 border border-black text-xs font-bold uppercase tracking-wider">
-              <UploadCloud className="w-3.5 h-3.5 text-sky-700 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-sky-50 text-sky-800 border border-sky-200 text-xs font-semibold tracking-wide">
+              <UploadCloud className="w-3.5 h-3.5 text-sky-600 animate-pulse" />
               Streaming to Bunny ({progressPercent}%)
             </span>
           )}
           {status === 'FAILED' && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-800 border border-black text-xs font-bold uppercase tracking-wider">
-              <AlertCircle className="w-3.5 h-3.5 text-rose-700" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-800 border border-rose-200 text-xs font-semibold tracking-wide">
+              <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
               Upload Error
             </span>
           )}
           {status === 'IDLE' && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-neutral-100 text-neutral-700 border border-black text-xs font-bold uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-neutral-100 text-neutral-700 border border-neutral-200 text-xs font-semibold tracking-wide">
               <PlayCircle className="w-3.5 h-3.5 text-neutral-500" />
               No Video Attached
             </span>
@@ -305,40 +304,36 @@ export function TusVideoUpload({
           />
 
           {(status === 'READY' || status === 'PROCESSING') && !selectedFile && (
-            <Button
+            <button
               type="button"
-              variant="outline"
-              size="sm"
               onClick={handleResetForReplace}
-              className="text-xs font-bold uppercase tracking-wider"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-neutral-300 hover:border-neutral-900 hover:bg-neutral-50 text-neutral-800 text-xs font-semibold transition-colors"
             >
-              <RotateCw className="w-3.5 h-3.5 mr-1" />
+              <RotateCw className="w-3.5 h-3.5" />
               Replace Video
-            </Button>
+            </button>
           )}
 
           {status === 'IDLE' && !selectedFile && (
-            <Button
+            <button
               type="button"
-              variant="primary"
-              size="sm"
               onClick={() => fileInputRef.current?.click()}
-              className="text-xs font-bold uppercase tracking-wider"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-neutral-900 text-white hover:bg-black text-xs font-semibold transition-colors"
             >
-              <UploadCloud className="w-3.5 h-3.5 mr-1" />
+              <UploadCloud className="w-3.5 h-3.5" />
               Select Video
-            </Button>
+            </button>
           )}
         </div>
       </div>
 
       {/* Error Alert */}
       {errorMessage && (
-        <div className="p-3 border border-black bg-rose-50 text-rose-950 text-xs flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-rose-700 shrink-0 mt-0.5" />
+        <div className="p-3 border border-rose-200 bg-rose-50 text-rose-950 text-xs flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <p className="font-bold">{errorMessage}</p>
-            <p className="text-[11px] text-rose-800">
+            <p className="font-semibold">{errorMessage}</p>
+            <p className="text-[11px] text-rose-700">
               Videos are uploaded directly to Bunny Stream CDN. Please ensure your internet
               connection is stable.
             </p>
@@ -348,74 +343,68 @@ export function TusVideoUpload({
 
       {/* Selected File Stage & Upload Controls */}
       {selectedFile && !isUploading && (
-        <div className="p-3 border border-black bg-neutral-50 space-y-3">
-          <div className="flex items-center justify-between text-xs font-bold text-course-darkBlue">
-            <span className="truncate max-w-[280px]">{selectedFile.name}</span>
-            <span className="font-mono text-course-navySubtle">
+        <div className="p-3.5 border border-neutral-200/80 bg-neutral-50 space-y-3">
+          <div className="flex items-center justify-between text-xs font-medium text-neutral-900">
+            <span className="truncate max-w-[280px] font-mono">{selectedFile.name}</span>
+            <span className="font-mono text-neutral-500">
               {formatFileSize(selectedFile.size)}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Button
+            <button
               type="button"
-              variant="primary"
-              size="sm"
               onClick={startUpload}
-              className="text-xs font-black uppercase tracking-wider"
+              className="px-4 py-2 bg-neutral-900 text-white hover:bg-black text-xs font-semibold transition-colors"
             >
-              Start Upload to Bunny
-            </Button>
-            <Button
+              Start Direct Upload
+            </button>
+            <button
               type="button"
-              variant="outline"
-              size="sm"
               onClick={() => {
                 setSelectedFile(null);
                 if (fileInputRef.current) fileInputRef.current.value = '';
               }}
-              className="text-xs font-bold uppercase tracking-wider"
+              className="px-3.5 py-2 border border-neutral-300 hover:border-neutral-900 text-neutral-700 hover:bg-white text-xs font-semibold transition-colors"
             >
               Cancel
-            </Button>
+            </button>
           </div>
         </div>
       )}
 
       {/* Live Upload Progress */}
       {isUploading && (
-        <div className="p-3 border border-black bg-sky-50 space-y-2.5">
-          <div className="flex items-center justify-between text-xs font-bold text-sky-950">
+        <div className="p-3.5 border border-sky-200 bg-sky-50/60 space-y-2.5">
+          <div className="flex items-center justify-between text-xs font-semibold text-sky-950">
             <span>Direct Stream: {progressPercent}%</span>
-            <span className="font-mono text-[11px]">
+            <span className="font-mono text-[11px] text-sky-800">
               {formatFileSize(bytesUploaded)} / {formatFileSize(totalBytes)}
             </span>
           </div>
 
-          <ProgressBar value={progressPercent} max={100} className="h-2.5" />
+          <ProgressBar value={progressPercent} max={100} className="h-2" />
 
           <div className="flex items-center justify-between pt-1">
-            <p className="text-[11px] text-sky-900 font-medium">
-              Uploading directly to Bunny Stream CDN. Do not close this tab.
+            <p className="text-[11px] text-sky-800 font-normal">
+              Streaming directly to Bunny CDN. Please keep this browser window open.
             </p>
-            <Button
+            <button
               type="button"
-              variant="outline"
-              size="sm"
               onClick={handlePauseResume}
-              className="text-xs font-bold uppercase tracking-wider py-1 px-3 bg-course-white"
+              className="inline-flex items-center gap-1.5 px-3 py-1 border border-neutral-300 hover:border-neutral-900 bg-white text-neutral-800 text-xs font-semibold transition-colors"
             >
               {isPaused ? (
                 <>
-                  <Play className="w-3.5 h-3.5 mr-1 text-emerald-600" />
+                  <Play className="w-3.5 h-3.5 text-emerald-600" />
                   Resume
                 </>
               ) : (
                 <>
-                  <Pause className="w-3.5 h-3.5 mr-1 text-amber-600" />
+                  <Pause className="w-3.5 h-3.5 text-amber-600" />
                   Pause
                 </>
               )}
-            </Button>
+            </button>
           </div>
         </div>
       )}

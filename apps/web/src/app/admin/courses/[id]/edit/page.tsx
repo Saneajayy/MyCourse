@@ -4,8 +4,6 @@ import React, { useState, useEffect, useCallback, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '../../../../../lib/api-client';
-import { Card } from '../../../../../components/ui/Card';
-import { Button } from '../../../../../components/ui/Button';
 import { Input } from '../../../../../components/ui/Input';
 import { useToast } from '../../../../../components/ui/Toast';
 import { ArrowLeft, Save, AlertCircle, UploadCloud, ImageIcon, ListOrdered } from 'lucide-react';
@@ -155,65 +153,62 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
 
   if (isLoading) {
     return (
-      <div className="py-12 text-center text-xs font-bold text-course-navySubtle">
+      <div className="py-16 text-center text-xs font-mono text-neutral-500 font-reddit">
         Loading course information...
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="max-w-3xl space-y-6 font-reddit">
       {/* Header */}
-      <div className="flex items-center justify-between pb-2 border-b border-black">
+      <div className="flex items-center justify-between pb-4 border-b border-neutral-200/80">
         <div className="flex items-center gap-3">
           <Link
             href="/admin/courses"
-            className="p-1.5 border border-black hover:bg-neutral-100 min-h-[36px] min-w-[36px] inline-flex items-center justify-center transition-colors"
+            className="p-2 border border-neutral-200/90 hover:border-neutral-900 bg-white hover:bg-neutral-50 text-neutral-700 min-h-[36px] min-w-[36px] inline-flex items-center justify-center transition-colors"
             aria-label="Back to courses list"
           >
-            <ArrowLeft className="w-4 h-4 text-course-darkBlue" />
+            <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <h1 className="text-xl font-black text-course-darkBlue uppercase tracking-tight">
+            <h1 className="text-xl font-bold tracking-tight text-neutral-950 uppercase">
               Edit Course Details
             </h1>
-            <p className="text-xs text-course-navySubtle mt-0.5">Editing: {course?.title}</p>
+            <p className="text-xs text-neutral-500 mt-0.5">Editing: {course?.title}</p>
           </div>
         </div>
 
-        <Link href={`/admin/courses/${courseId}/curriculum`}>
-          <Button
-            variant="outline"
-            size="sm"
-            className="text-xs font-bold uppercase tracking-wider py-1.5"
-          >
-            <ListOrdered className="w-3.5 h-3.5 mr-1" />
-            Curriculum Editor
-          </Button>
+        <Link
+          href={`/admin/courses/${courseId}/curriculum`}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-neutral-300 hover:border-neutral-900 text-neutral-800 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors"
+        >
+          <ListOrdered className="w-3.5 h-3.5" />
+          <span>Curriculum Editor</span>
         </Link>
       </div>
 
       {errorMessage && (
-        <div className="p-4 border border-black bg-rose-50 text-rose-950 text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-rose-700 shrink-0" />
-          <span className="font-bold">{errorMessage}</span>
+        <div className="p-3.5 border border-rose-200 bg-rose-50 text-rose-950 text-xs flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+          <span className="font-semibold">{errorMessage}</span>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Thumbnail Upload Card */}
-        <Card variant="default" padding="lg" className="border border-black space-y-4">
-          <div className="border-b border-black pb-2">
-            <h2 className="text-sm font-black text-course-darkBlue uppercase tracking-wider">
+        <div className="border border-neutral-200/80 bg-white p-6 space-y-4 shadow-xs">
+          <div className="border-b border-neutral-200/80 pb-3">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
               Course Card Thumbnail
             </h2>
-            <p className="text-xs text-course-navySubtle mt-0.5">
+            <p className="text-xs text-neutral-500 mt-0.5">
               Recommended: 1280x720 aspect ratio (16:9), max 5 MB JPG/PNG/WebP
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-6">
-            <div className="w-48 h-28 border border-black bg-neutral-100 flex items-center justify-center overflow-hidden shrink-0">
+            <div className="w-48 h-28 border border-neutral-200 bg-neutral-100 flex items-center justify-center overflow-hidden shrink-0">
               {thumbnailUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -222,9 +217,9 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="text-center p-3 text-course-navySubtle">
-                  <ImageIcon className="w-8 h-8 mx-auto opacity-50 mb-1" />
-                  <span className="text-[10px] font-bold">No Image Uploaded</span>
+                <div className="text-center p-3 text-neutral-400">
+                  <ImageIcon className="w-7 h-7 mx-auto mb-1 opacity-60" />
+                  <span className="text-[10px] font-mono uppercase">No Thumbnail</span>
                 </div>
               )}
             </div>
@@ -238,33 +233,30 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                   onChange={handleThumbnailUpload}
                   disabled={thumbnailUploading}
                 />
-                <Button
+                <button
                   type="button"
-                  variant="outline"
-                  size="sm"
-                  className="text-xs font-bold uppercase tracking-wider"
-                  isLoading={thumbnailUploading}
+                  disabled={thumbnailUploading}
                   onClick={(e) => {
                     const input = e.currentTarget.parentElement?.querySelector('input');
                     input?.click();
                   }}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-neutral-300 hover:border-neutral-900 text-neutral-800 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors"
                 >
-                  <UploadCloud className="w-3.5 h-3.5 mr-1.5" />
-                  {thumbnailUrl ? 'Change Thumbnail' : 'Upload Image'}
-                </Button>
+                  <UploadCloud className="w-3.5 h-3.5" />
+                  <span>{thumbnailUploading ? 'Uploading...' : thumbnailUrl ? 'Change Thumbnail' : 'Upload Image'}</span>
+                </button>
               </label>
-              <p className="text-[11px] text-course-navySubtle">
-                Note: Thumbnail images are stored locally and will be migrated to persistent object
-                storage in production.
+              <p className="text-[11px] text-neutral-500">
+                Thumbnails are optimized and rendered across public sales and student catalog pages.
               </p>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* General Info */}
-        <Card variant="default" padding="lg" className="border border-black space-y-5">
-          <div className="border-b border-black pb-2">
-            <h2 className="text-sm font-black text-course-darkBlue uppercase tracking-wider">
+        <div className="border border-neutral-200/80 bg-white p-6 space-y-5 shadow-xs">
+          <div className="border-b border-neutral-200/80 pb-3">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
               Course Information
             </h2>
           </div>
@@ -287,7 +279,7 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
           />
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-black uppercase tracking-wider text-course-darkBlue">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-700">
               Description &amp; Syllabus Overview
             </label>
             <textarea
@@ -295,15 +287,15 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-3 border border-black bg-course-white text-xs text-course-darkBlue focus:outline-none focus:ring-2 focus:ring-course-orange"
+              className="w-full p-3 border border-neutral-300 bg-white text-xs text-neutral-900 focus:outline-none focus:border-neutral-900 transition-colors"
             />
           </div>
-        </Card>
+        </div>
 
         {/* Pricing */}
-        <Card variant="default" padding="lg" className="border border-black space-y-5">
-          <div className="border-b border-black pb-2">
-            <h2 className="text-sm font-black text-course-darkBlue uppercase tracking-wider">
+        <div className="border border-neutral-200/80 bg-white p-6 space-y-5 shadow-xs">
+          <div className="border-b border-neutral-200/80 pb-3">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
               Pricing &amp; Discounts
             </h2>
           </div>
@@ -326,22 +318,22 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
               onChange={(e) => setCompareAtPriceRupees(e.target.value)}
             />
           </div>
-        </Card>
+        </div>
 
         {/* Validity */}
-        <Card variant="default" padding="lg" className="border border-black space-y-5">
-          <div className="border-b border-black pb-2">
-            <h2 className="text-sm font-black text-course-darkBlue uppercase tracking-wider">
+        <div className="border border-neutral-200/80 bg-white p-6 space-y-5 shadow-xs">
+          <div className="border-b border-neutral-200/80 pb-3">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-neutral-950">
               Access Duration &amp; Renewals
             </h2>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
             <label
-              className={`flex-1 p-3 border border-black cursor-pointer text-xs font-bold ${
+              className={`flex-1 p-4 border cursor-pointer text-xs transition-colors ${
                 accessType === 'lifetime'
-                  ? 'bg-course-darkBlue text-white'
-                  : 'bg-white text-course-darkBlue hover:bg-neutral-50'
+                  ? 'bg-neutral-900 text-white border-neutral-900 shadow-xs'
+                  : 'bg-white text-neutral-800 hover:bg-neutral-50 border-neutral-200'
               }`}
             >
               <input
@@ -351,14 +343,17 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                 checked={accessType === 'lifetime'}
                 onChange={() => setAccessType('lifetime')}
               />
-              <div className="text-sm font-black">Lifetime Access</div>
+              <div className="text-xs font-bold uppercase tracking-wider">Lifetime Access</div>
+              <div className={`text-[11px] mt-1 ${accessType === 'lifetime' ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                Students retain access indefinitely
+              </div>
             </label>
 
             <label
-              className={`flex-1 p-3 border border-black cursor-pointer text-xs font-bold ${
+              className={`flex-1 p-4 border cursor-pointer text-xs transition-colors ${
                 accessType === 'limited'
-                  ? 'bg-course-darkBlue text-white'
-                  : 'bg-white text-course-darkBlue hover:bg-neutral-50'
+                  ? 'bg-neutral-900 text-white border-neutral-900 shadow-xs'
+                  : 'bg-white text-neutral-800 hover:bg-neutral-50 border-neutral-200'
               }`}
             >
               <input
@@ -368,12 +363,15 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                 checked={accessType === 'limited'}
                 onChange={() => setAccessType('limited')}
               />
-              <div className="text-sm font-black">Limited Validity</div>
+              <div className="text-xs font-bold uppercase tracking-wider">Limited Validity</div>
+              <div className={`text-[11px] mt-1 ${accessType === 'limited' ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                Access expires after a fixed number of calendar days
+              </div>
             </label>
           </div>
 
           {accessType === 'limited' && (
-            <div className="p-3 border border-black bg-neutral-50 space-y-4">
+            <div className="p-4 border border-neutral-200/80 bg-neutral-50 space-y-4">
               <Input
                 label="Access Validity Window (Days)"
                 type="number"
@@ -383,39 +381,35 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                 onChange={(e) => setValidityDays(e.target.value)}
               />
 
-              <label className="flex items-center gap-2 text-xs font-bold text-course-darkBlue cursor-pointer">
+              <label className="flex items-center gap-2 text-xs font-medium text-neutral-900 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={allowRenewals}
                   onChange={(e) => setAllowRenewals(e.target.checked)}
-                  className="w-4 h-4 accent-course-orange"
+                  className="w-4 h-4 accent-neutral-900"
                 />
-                <span>Allow existing students to renew before expiry</span>
+                <span>Allow existing enrolled students to renew before expiry</span>
               </label>
             </div>
           )}
-        </Card>
+        </div>
 
         {/* Submit */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-black">
-          <Link href="/admin/courses">
-            <Button
-              type="button"
-              variant="outline"
-              className="text-xs font-bold uppercase tracking-wider py-2.5"
-            >
-              Cancel
-            </Button>
-          </Link>
-          <Button
-            type="submit"
-            variant="primary"
-            isLoading={isSaving}
-            className="text-xs font-black uppercase tracking-wider py-2.5 px-6"
+        <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-neutral-200/80">
+          <Link
+            href="/admin/courses"
+            className="px-4 py-2 border border-neutral-300 hover:border-neutral-900 text-neutral-700 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors"
           >
-            <Save className="w-4 h-4 mr-1.5" />
-            Save Changes
-          </Button>
+            Cancel
+          </Link>
+          <button
+            type="submit"
+            disabled={isSaving}
+            className="inline-flex items-center gap-1.5 px-5 py-2 bg-neutral-900 text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors disabled:opacity-50"
+          >
+            <Save className="w-3.5 h-3.5" />
+            <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
+          </button>
         </div>
       </form>
     </div>
