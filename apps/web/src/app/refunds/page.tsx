@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { siteConfig } from '../../config/site';
-import { RefreshCw, CheckCircle2 } from 'lucide-react';
 
 export default function RefundPage() {
   useEffect(() => {
@@ -30,20 +29,19 @@ export default function RefundPage() {
           sizes="50vw"
           className="object-cover object-center mix-blend-screen opacity-95 select-none"
         />
-        {/* Soft overlay gradient for subtle depth */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000000]/80 via-transparent to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none"
           aria-hidden="true"
         />
       </div>
 
-      {/* Right Column: Clean White Background with Scrollable Content */}
-      <div className="w-full lg:w-1/2 h-full bg-white flex flex-col overflow-y-auto relative">
-        {/* Top Header Bar inside right side area */}
-        <header className="w-full flex items-center justify-between px-5 pt-5 sm:px-8 sm:pt-8 shrink-0 z-20">
+      {/* Right Column: Clean White Background */}
+      <div className="w-full lg:w-1/2 h-full bg-white flex flex-col justify-between overflow-y-auto lg:overflow-hidden relative">
+        {/* Top Header Bar */}
+        <header className="w-full flex items-center justify-between px-5 pt-4 sm:px-8 sm:pt-6 shrink-0 z-20">
           <Link
             href="/"
-            className="text-neutral-600 hover:text-black font-semibold text-xs sm:text-sm tracking-normal transition-colors flex items-center gap-1.5 py-1"
+            className="text-neutral-500 hover:text-black font-semibold text-xs sm:text-sm tracking-normal transition-colors flex items-center gap-1.5 py-1"
           >
             <span aria-hidden="true">&larr;</span> Back to Course
           </Link>
@@ -62,128 +60,100 @@ export default function RefundPage() {
           </Link>
         </header>
 
-        {/* Content Container */}
-        <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10 relative z-10 flex-1">
-          {/* Main Card with border matching separation line, all separation lines touching the box border */}
-          <div className="relative w-full bg-white border border-neutral-200 rounded-none select-text overflow-hidden shadow-none">
-            {/* Document Header Section with full-width bottom border */}
-            <header className="p-6 sm:p-8 md:p-10 pb-6 sm:pb-8 border-b border-neutral-200">
-              <div className="flex items-center gap-2 text-xs font-mono font-medium text-neutral-500 uppercase tracking-widest mb-2.5">
-                <RefreshCw className="w-4 h-4 text-black shrink-0" />
-                <span>100% Engineering Satisfaction Guarantee</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-neutral-950 uppercase tracking-tight">
+        {/* Center Content Card */}
+        <main className="my-auto w-full max-w-xl mx-auto px-4 sm:px-6 py-4 relative z-10 flex flex-col justify-center">
+          <div className="relative w-full bg-white border border-neutral-200/80 rounded-none p-5 sm:p-7 select-text overflow-hidden">
+            {/* Clean, compact header matching dashboard & checkout */}
+            <div className="space-y-1 mb-4 sm:mb-5">
+              <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
                 Refund Policy
               </h1>
-              <p className="text-neutral-600 font-medium text-xs sm:text-sm mt-2 leading-relaxed">
-                Fair, transparent 7-day evaluation window, Razorpay settlement guidelines, and zero hidden recurring charges.
+              <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
+                Clear 7-day money-back guarantee, progress criteria, and direct settlement terms.
               </p>
-              <div className="-mx-6 sm:-mx-8 md:-mx-10 px-6 sm:px-8 md:px-10 pt-4 mt-4 border-t border-neutral-200 flex flex-wrap items-center justify-between gap-2 text-[11px] sm:text-xs font-mono text-neutral-500">
-                <span>Direct Settlement via Razorpay • 5–7 Business Days</span>
-                <span>Updated: October 2026</span>
+            </div>
+
+            {/* Concise 1-2 line points */}
+            <div className="divide-y divide-neutral-100 text-xs sm:text-[13px] text-neutral-700">
+              <div className="py-2.5 sm:py-3 first:pt-0">
+                <p className="leading-relaxed">
+                  <span className="font-mono font-bold text-neutral-900 mr-2">01.</span>
+                  <strong className="font-bold text-neutral-950 mr-1">7-Day Guarantee:</strong>
+                  If the curriculum does not meet your expectations, request a 100% full refund within 7 calendar days of your enrollment.
+                </p>
               </div>
-            </header>
 
-            {/* Policy Body */}
-            <div className="p-6 sm:p-8 md:p-10 space-y-8 text-neutral-800 text-xs sm:text-sm leading-relaxed">
-              <section className="space-y-2">
-                <h2 className="text-sm sm:text-base font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-black font-mono font-bold">01.</span> Free Previews Before Purchase
-                </h2>
-                <p className="text-neutral-600 leading-relaxed">
-                  We provide free, full-length preview video lessons on our homepage for all prospective students. We strongly encourage you to watch the free preview videos, inspect the curriculum syllabus, and verify seamless video streaming on your plant device prior to purchasing enrollment.
+              <div className="py-2.5 sm:py-3">
+                <p className="leading-relaxed">
+                  <span className="font-mono font-bold text-neutral-900 mr-2">02.</span>
+                  <strong className="font-bold text-neutral-950 mr-1">Eligibility Criteria:</strong>
+                  Eligible if you have completed less than 20% of video lessons and have not downloaded proprietary circuit blueprints.
                 </p>
-              </section>
+              </div>
 
-              <section className="space-y-2">
-                <h2 className="text-sm sm:text-base font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-black font-mono font-bold">02.</span> 7-Day Money-Back Evaluation Window
-                </h2>
-                <p className="text-neutral-600 leading-relaxed">
-                  We want you to be completely confident in the practical, industrial value of this training. If you determine that the course does not meet your engineering expectations, you are eligible for a <strong className="text-neutral-950">100% full refund</strong> within <strong className="text-neutral-950">7 calendar days</strong> of purchase, provided:
+              <div className="py-2.5 sm:py-3">
+                <p className="leading-relaxed">
+                  <span className="font-mono font-bold text-neutral-900 mr-2">03.</span>
+                  <strong className="font-bold text-neutral-950 mr-1">One-Time Payment:</strong>
+                  No recurring subscriptions, auto-debits, or surprise charges; you only pay once for your full 365-day access.
                 </p>
-                <div className="p-4 bg-neutral-50 border border-neutral-200 rounded-none space-y-2 text-xs text-neutral-700">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-black shrink-0" />
-                    <span>Your request is received within 7 calendar days of the payment timestamp.</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-black shrink-0" />
-                    <span>You have watched less than <strong className="text-neutral-950">20% of the total course video curriculum</strong>.</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-black shrink-0" />
-                    <span>You have not downloaded all supplementary blueprint files or proprietary calculators.</span>
-                  </div>
-                </div>
-              </section>
+              </div>
 
-              <section className="space-y-2">
-                <h2 className="text-sm sm:text-base font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-black font-mono font-bold">03.</span> How to Initiate a Refund
-                </h2>
-                <p className="text-neutral-600 leading-relaxed">
-                  To request a refund, simply send an email from your registered account email address to{' '}
+              <div className="py-2.5 sm:py-3">
+                <p className="leading-relaxed">
+                  <span className="font-mono font-bold text-neutral-900 mr-2">04.</span>
+                  <strong className="font-bold text-neutral-950 mr-1">Direct Settlement:</strong>
+                  Approved reversals are credited back to your original payment method in 5–7 business days via Razorpay.
+                </p>
+              </div>
+
+              <div className="py-2.5 sm:py-3 last:pb-0">
+                <p className="leading-relaxed">
+                  <span className="font-mono font-bold text-neutral-900 mr-2">05.</span>
+                  <strong className="font-bold text-neutral-950 mr-1">How to Apply:</strong>
+                  Send your Order ID from your registered address to{' '}
                   <a
                     href={`mailto:${siteConfig.supportEmail}`}
-                    className="font-bold underline text-black hover:opacity-80"
+                    className="font-semibold underline text-black hover:opacity-80"
                   >
                     {siteConfig.supportEmail}
                   </a>{' '}
-                  with the subject line: <code className="text-xs font-mono bg-neutral-100 border border-neutral-200 px-1.5 py-0.5 rounded-none text-neutral-900">Refund Request - [Your Order ID]</code>.
+                  for prompt, no-hassle review.
                 </p>
-                <p className="text-xs text-neutral-500">
-                  Please include your registered phone number and a short note on how we can improve our curriculum.
-                </p>
-              </section>
+              </div>
+            </div>
 
-              <section className="space-y-2">
-                <h2 className="text-sm sm:text-base font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-black font-mono font-bold">04.</span> Settlement Timeline &amp; Reversal
-                </h2>
-                <p className="text-neutral-600 leading-relaxed">
-                  Approved refunds are processed immediately through our Razorpay merchant integration. Funds are credited back to your original payment source (Bank Account, Credit/Debit Card, or UPI handle) within <strong className="text-neutral-950">5 to 7 business days</strong> according to banking clearing cycles.
-                </p>
-                <p className="text-xs text-neutral-500">
-                  Upon refund execution, your course license will be automatically revoked and a GST credit note will be issued against the initial tax invoice.
-                </p>
-              </section>
-
-              <section className="space-y-2">
-                <h2 className="text-sm sm:text-base font-bold text-neutral-950 flex items-center gap-2">
-                  <span className="text-black font-mono font-bold">05.</span> No Recurring Subscriptions or Hidden Charges
-                </h2>
-                <p className="text-neutral-600 leading-relaxed">
-                  Course enrollment is strictly a single, one-time payment providing 365 days of streaming access. We do NOT maintain auto-debits, recurring subscriptions, or surprise renewal fees. You remain in complete control of your payment transactions.
-                </p>
-              </section>
+            {/* Subtle metadata strip */}
+            <div className="pt-3 mt-4 border-t border-neutral-100 flex items-center justify-between text-[11px] font-mono text-neutral-400">
+              <span>Settlement: Razorpay (5–7 Business Days)</span>
+              <span>Updated: 2026</span>
             </div>
           </div>
+        </main>
 
-          {/* Quick Legal Nav below card */}
-          <footer className="mt-6 sm:mt-8 pb-4 text-center">
-            <nav
-              aria-label="Footer Legal Links"
-              className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-neutral-500 mb-2"
-            >
-              <Link href="/terms" className="hover:text-black transition-colors">
-                Terms
-              </Link>
-              <Link href="/privacy" className="hover:text-black transition-colors">
-                Privacy
-              </Link>
-              <Link href="/refunds" className="text-black font-bold">
-                Refunds
-              </Link>
-              <Link href="/contact" className="hover:text-black transition-colors">
-                Contact
-              </Link>
-            </nav>
-            <p className="text-[11px] text-neutral-400">
-              © {currentYear} Hydro Basics. All rights reserved.
-            </p>
-          </footer>
-        </div>
+        {/* Footer */}
+        <footer className="mt-auto py-3 px-5 sm:px-8 text-center shrink-0">
+          <nav
+            aria-label="Footer Legal Links"
+            className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-neutral-500 mb-1"
+          >
+            <Link href="/terms" className="hover:text-black transition-colors">
+              Terms
+            </Link>
+            <Link href="/privacy" className="hover:text-black transition-colors">
+              Privacy
+            </Link>
+            <Link href="/refunds" className="text-black font-bold">
+              Refunds
+            </Link>
+            <Link href="/contact" className="hover:text-black transition-colors">
+              Contact
+            </Link>
+          </nav>
+          <p className="text-[11px] text-neutral-400">
+            &copy; {currentYear} Hydro Basics. All rights reserved.
+          </p>
+        </footer>
       </div>
     </div>
   );
