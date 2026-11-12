@@ -711,24 +711,24 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
   return (
     <div className="relative w-full h-[100dvh] max-h-[100dvh] flex flex-col bg-black overflow-hidden font-reddit select-none text-white overscroll-none max-w-full">
       {/* Main Split Layout: On mobile: video player is fixed at the top, syllabus scrolls below. On desktop: 2-panel with Syllabus on left and Video on right. */}
-      <div className="flex-1 flex flex-col md:flex-row-reverse overflow-hidden min-h-0 bg-[#121417] w-full max-w-full">
+      <div className="flex-1 flex flex-col md:flex-row-reverse overflow-hidden min-h-0 bg-white w-full max-w-full">
         {/* MAIN VIDEO & PLAYER AREA: On mobile: shrink-0 (FIXED at top, does not scroll). On desktop: flex-1 md:h-full md:overflow-y-auto */}
-        <main className="w-full shrink-0 md:shrink md:flex-1 flex flex-col md:h-full md:overflow-y-auto bg-[#121417] min-w-0 max-w-full border-b md:border-b-0 border-white/20">
+        <main className="w-full shrink-0 md:shrink md:flex-1 flex flex-col md:h-full md:overflow-y-auto bg-white min-w-0 max-w-full border-b md:border-b-0 border-neutral-200">
           {/* Top Breadcrumb/Header Strip above video player */}
-          <div className="flex px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 bg-[#16191d] border-b border-white/10 items-center justify-between gap-4 shrink-0">
+          <div className="flex px-4 sm:px-6 lg:px-8 py-3 sm:py-3.5 bg-neutral-50/90 border-b border-neutral-200 items-center justify-between gap-4 shrink-0">
             <div className="min-w-0 flex items-center gap-2.5">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-white/50 shrink-0">
+              <span className="text-[11px] font-mono uppercase tracking-wider text-neutral-500 shrink-0">
                 {currentSection ? `Module ${currentSectionIdx + 1}` : 'Curriculum'}
               </span>
-              <span className="text-white/30 text-xs">/</span>
-              <h1 className="text-sm lg:text-[15px] font-bold text-white truncate">
+              <span className="text-neutral-300 text-xs">/</span>
+              <h1 className="text-sm lg:text-[15px] font-bold text-neutral-900 truncate">
                 {currentLessonTitle}
               </h1>
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
               {isCurrentCompleted && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white/10 text-white border border-white/20 text-[11px] font-mono font-medium rounded-md">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-neutral-100 text-neutral-800 border border-neutral-300 text-[11px] font-mono font-semibold rounded-md">
                   <Check className="w-3 h-3 stroke-[3]" />
                   Completed
                 </span>
@@ -744,7 +744,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 className={`relative bg-black select-none max-w-full transition-all ${
                   isFullscreen
                     ? 'fixed inset-0 z-[9999] w-full h-[100dvh] flex flex-col justify-center items-center bg-black rounded-none border-none overflow-hidden'
-                    : 'w-full aspect-video max-h-[46vh] sm:max-h-[56vh] md:max-h-[76vh] lg:max-h-[80vh] xl:max-h-[82vh] mx-auto rounded-xl sm:rounded-2xl border border-white/15 overflow-hidden'
+                    : 'w-full aspect-video max-h-[46vh] sm:max-h-[56vh] md:max-h-[76vh] lg:max-h-[80vh] xl:max-h-[82vh] mx-auto rounded-xl sm:rounded-2xl border border-neutral-200 shadow-md overflow-hidden'
                 }`}
               >
                 {/* Floating Exit Fullscreen Button (always accessible when fullscreen is active) */}
@@ -1050,8 +1050,8 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                   disabled={!hasPrevLesson}
                   className={`inline-flex items-center justify-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-3.5 sm:px-5 text-xs sm:text-sm font-semibold tracking-wide rounded-lg sm:rounded-xl border transition-all ${
                     hasPrevLesson
-                      ? 'border-white/25 bg-white/10 hover:bg-white/15 text-white cursor-pointer active:scale-95'
-                      : 'border-white/10 bg-white/[0.03] text-white/30 cursor-not-allowed'
+                      ? 'border-neutral-300 bg-white hover:bg-neutral-100 text-neutral-800 cursor-pointer shadow-sm active:scale-95'
+                      : 'border-neutral-200 bg-neutral-100/60 text-neutral-400 cursor-not-allowed'
                   }`}
                 >
                   <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -1065,8 +1065,8 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                   disabled={!hasNextLesson}
                   className={`inline-flex items-center justify-center gap-1.5 sm:gap-2 h-9 sm:h-10 px-4 sm:px-5 text-xs sm:text-sm font-bold tracking-wide rounded-lg sm:rounded-xl border transition-all ${
                     hasNextLesson
-                      ? 'bg-white hover:bg-neutral-200 text-black border-white cursor-pointer active:scale-95'
-                      : 'border-white/10 bg-white/[0.03] text-white/30 cursor-not-allowed'
+                      ? 'bg-black hover:bg-neutral-800 text-white border-black cursor-pointer shadow-sm active:scale-95'
+                      : 'border-neutral-200 bg-neutral-100/60 text-neutral-400 cursor-not-allowed'
                   }`}
                 >
                   <span className="sm:hidden">Next</span>
