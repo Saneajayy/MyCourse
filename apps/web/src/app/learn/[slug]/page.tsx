@@ -226,7 +226,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         const { default: HlsClass } = await import('hls.js');
         if (isCancelled || !videoRef.current) return;
 
-        if (HlsClass.isSupported() && url.endsWith('.m3u8')) {
+        const isHls = url.includes('.m3u8');
+
+        if (HlsClass.isSupported() && isHls) {
           const hls = new HlsClass({
             enableWorker: true,
             lowLatencyMode: false,
@@ -280,6 +282,10 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
           if (resumePos > 5) {
             video.currentTime = resumePos;
           }
+          video.play().catch(() => setIsPlaying(false));
+        } else {
+          // Direct fallback for non-HLS or browsers natively supporting the source
+          video.src = url;
           video.play().catch(() => setIsPlaying(false));
         }
       } catch (err) {
@@ -344,7 +350,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
   const togglePlay = useCallback(() => {
     if (!videoRef.current) return;
     if (videoRef.current.paused) {
-      videoRef.current.play();
+      videoRef.current.play().catch((err) => {
+        console.warn('Video playback play() promise rejected:', err);
+      });
       setIsPlaying(true);
     } else {
       videoRef.current.pause();

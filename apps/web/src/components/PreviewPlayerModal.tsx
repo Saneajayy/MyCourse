@@ -119,7 +119,9 @@ export function PreviewPlayerModal({
         const { default: HlsClass } = await import('hls.js');
         if (isCancelled || !videoRef.current) return;
 
-        if (HlsClass.isSupported() && playbackUrl && playbackUrl.endsWith('.m3u8')) {
+        const isHls = playbackUrl?.includes('.m3u8');
+
+        if (HlsClass.isSupported() && playbackUrl && isHls) {
           const hls = new HlsClass({
             enableWorker: true,
             lowLatencyMode: false,
@@ -153,8 +155,8 @@ export function PreviewPlayerModal({
               }
             }
           });
-        } else if (playbackUrl && video.canPlayType('application/vnd.apple.mpegurl')) {
-          // Native Safari HLS
+        } else if (playbackUrl && (video.canPlayType('application/vnd.apple.mpegurl') || !isHls)) {
+          // Native Safari HLS or direct fallback
           video.src = playbackUrl;
           video.play().catch(() => setIsPlaying(false));
         }
@@ -181,7 +183,9 @@ export function PreviewPlayerModal({
   const togglePlay = useCallback(() => {
     if (!videoRef.current) return;
     if (videoRef.current.paused) {
-      videoRef.current.play();
+      videoRef.current.play().catch((err) => {
+        console.warn('Preview video play() promise rejected:', err);
+      });
       setIsPlaying(true);
     } else {
       videoRef.current.pause();
