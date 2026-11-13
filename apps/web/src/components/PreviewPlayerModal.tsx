@@ -35,9 +35,6 @@ export function PreviewPlayerModal({
   const [duration, setDuration] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
 
-  // Watermark position state
-  const [watermarkPos, setWatermarkPos] = useState({ top: '15%', left: '20%' });
-
   // Handle Escape key and body scroll lock
   useEffect(() => {
     if (!isOpen) return;
@@ -56,17 +53,6 @@ export function PreviewPlayerModal({
       document.body.style.overflow = '';
     };
   }, [isOpen, onClose]);
-
-  // Move watermark every 8 seconds
-  useEffect(() => {
-    if (!isOpen) return;
-    const interval = setInterval(() => {
-      const top = `${Math.floor(Math.random() * 70) + 10}%`;
-      const left = `${Math.floor(Math.random() * 60) + 10}%`;
-      setWatermarkPos({ top, left });
-    }, 8000);
-    return () => clearInterval(interval);
-  }, [isOpen]);
 
   // Fetch preview token & HLS URL
   useEffect(() => {
@@ -343,15 +329,6 @@ export function PreviewPlayerModal({
                     }}
                     onClick={togglePlay}
                   />
-
-                  {/* Subtle Anti-Piracy Watermark: small greyed-out HSB text, not a bold button */}
-                  <div
-                    className="absolute pointer-events-none transition-all duration-700 ease-in-out font-mono font-medium text-[11px] sm:text-xs text-white/35 select-none tracking-widest uppercase"
-                    style={{ top: watermarkPos.top, left: watermarkPos.left }}
-                    aria-hidden="true"
-                  >
-                    HSB
-                  </div>
 
                   {/* Custom Video Controls Bar */}
                   <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-3 sm:p-4 text-white">

@@ -90,7 +90,6 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
   const [streamError, setStreamError] = useState<string | null>(null);
   const [isEvicted, setIsEvicted] = useState(false); // Session takeover by another device
   const [useEmbed, setUseEmbed] = useState(false); // Fallback to verified Bunny Embed iframe if CDN HLS has referrer/token restriction
-  const [watermarkPos, setWatermarkPos] = useState({ top: '15%', left: '20%' });
 
   // Player Controls State
   const [isPlaying, setIsPlaying] = useState(false);
@@ -321,17 +320,6 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       }
     };
   }, [playbackData, selectedLessonId, loadLessonStream, useEmbed]);
-
-  // Periodic anti-piracy watermark shift
-  useEffect(() => {
-    if (!playbackData) return;
-    const interval = setInterval(() => {
-      const top = Math.floor(Math.random() * 65 + 15) + '%';
-      const left = Math.floor(Math.random() * 65 + 15) + '%';
-      setWatermarkPos({ top, left });
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [playbackData]);
 
   // 5. Heartbeat loop (every 20s) - keeps session alive in Redis even when paused
   useEffect(() => {
@@ -921,16 +909,6 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                     >
                       Resume Watching Here
                     </Button>
-                  </div>
-                )}
-
-                {/* Dynamic Moving Watermark Overlay (Anti-Piracy) */}
-                {playbackData?.watermark?.text && (
-                  <div
-                    className="absolute pointer-events-none select-none text-[11px] font-mono text-white/35 font-bold tracking-widest px-2.5 py-1 bg-black/40 backdrop-blur-[2px] border border-white/10 rounded-none transition-all duration-1000 ease-in-out z-20"
-                    style={{ top: watermarkPos.top, left: watermarkPos.left }}
-                  >
-                    {playbackData.watermark.text}
                   </div>
                 )}
 
