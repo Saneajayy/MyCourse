@@ -557,19 +557,37 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     };
   }, []);
 
-  // Prevent background document scroll and eliminate mobile WebKit touch hit-test offset bug
+  // Prevent background document scroll, reset scroll offset, and eliminate mobile WebKit touch hit-test offset bug
   useEffect(() => {
+    // 1. Force the window scroll to top immediately (instant, overriding any smooth scroll)
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
     const originalHtmlOverflow = document.documentElement.style.overflow;
     const originalBodyOverflow = document.body.style.overflow;
+    const originalBodyPosition = document.body.style.position;
+    const originalBodyTop = document.body.style.top;
+    const originalBodyLeft = document.body.style.left;
+    const originalBodyWidth = document.body.style.width;
     const originalBodyHeight = document.body.style.height;
 
+    // Standard iOS Safari lock: fix body at (0, 0)
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = '0px';
+    document.body.style.left = '0px';
+    document.body.style.width = '100%';
     document.body.style.height = '100%';
 
     return () => {
       document.documentElement.style.overflow = originalHtmlOverflow;
       document.body.style.overflow = originalBodyOverflow;
+      document.body.style.position = originalBodyPosition;
+      document.body.style.top = originalBodyTop;
+      document.body.style.left = originalBodyLeft;
+      document.body.style.width = originalBodyWidth;
       document.body.style.height = originalBodyHeight;
     };
   }, []);
@@ -709,7 +727,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
   const isCurrentCompleted = currentLesson?.isCompleted || false;
 
   return (
-    <div className="relative w-full h-[100dvh] max-h-[100dvh] flex flex-col bg-black overflow-hidden font-reddit select-none text-white overscroll-none max-w-full">
+    <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] flex flex-col bg-black overflow-hidden font-reddit select-none text-white overscroll-none max-w-full z-10">
       {/* Main Split Layout: On mobile: video player is fixed at the top, syllabus scrolls below. On desktop: 2-panel with Syllabus on left and Video on right. */}
       <div className="flex-1 flex flex-col md:flex-row-reverse overflow-hidden min-h-0 bg-white w-full max-w-full">
         {/* MAIN VIDEO & PLAYER AREA: On mobile: shrink-0 (FIXED at top, does not scroll). On desktop: flex-1 md:h-full md:overflow-y-auto */}
