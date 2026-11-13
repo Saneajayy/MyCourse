@@ -48,7 +48,15 @@ export function validateCookieCsrf(req: Request, _res: Response, next: NextFunct
     const reqHost = req.headers['host']?.toLowerCase();
     const isSameHost = reqHost !== undefined && originHost === reqHost;
 
-    if (!isAllowedOrigin && !isSameHost) {
+    // In non-production, permit Cloudflare tunnels and ngrok for mobile device testing
+    const isDevTunnel =
+      env.NODE_ENV !== 'production' &&
+      (originHost.endsWith('.trycloudflare.com') ||
+        originHost.endsWith('.ngrok-free.app') ||
+        originHost.endsWith('.ngrok.io') ||
+        originHost.endsWith('.loca.lt'));
+
+    if (!isAllowedOrigin && !isSameHost && !isDevTunnel) {
       return next(
         new ForbiddenError(
           `Cross-origin request rejected: Origin [${originHost}] is not authorized for cookie authentication`,
