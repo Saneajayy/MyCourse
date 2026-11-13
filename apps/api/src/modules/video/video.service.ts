@@ -18,7 +18,10 @@ if ((env.VIDEO_PROVIDER === 'bunny' || hasRealBunnyCredentials) && env.VIDEO_PRO
     libraryId: env.BUNNY_STREAM_LIBRARY_ID,
     apiKey: env.BUNNY_STREAM_API_KEY,
     tokenSecurityKey: env.BUNNY_STREAM_TOKEN_AUTH_KEY,
-    readOnlyApiKey: env.BUNNY_STREAM_READ_ONLY_API_KEY || env.BUNNY_STREAM_WEBHOOK_SECRET,
+    readOnlyApiKey:
+      env.BUNNY_STREAM_READ_ONLY_API_KEY ||
+      env.BUNNY_STREAM_WEBHOOK_SECRET ||
+      env.BUNNY_STREAM_API_KEY,
     webhookSecret: env.BUNNY_STREAM_WEBHOOK_SECRET,
     cdnHostname: env.BUNNY_STREAM_CDN_HOSTNAME,
   });
