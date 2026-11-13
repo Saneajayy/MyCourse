@@ -29,6 +29,7 @@ import {
   X,
   ArrowLeft,
   ArrowRight,
+  RefreshCw,
 } from 'lucide-react';
 
 interface LessonProgressItem {
@@ -88,6 +89,8 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
   const [streamLoading, setStreamLoading] = useState(false);
   const [streamError, setStreamError] = useState<string | null>(null);
   const [isEvicted, setIsEvicted] = useState(false); // Session takeover by another device
+  const [useEmbed, setUseEmbed] = useState(false); // Fallback to verified Bunny Embed iframe if CDN HLS has referrer/token restriction
+  const [watermarkPos, setWatermarkPos] = useState({ top: '15%', left: '20%' });
 
   // Player Controls State
   const [isPlaying, setIsPlaying] = useState(false);
@@ -214,7 +217,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
   // 4. Initialize Hls.js dynamically on video element
   useEffect(() => {
-    if (!playbackData || !videoRef.current) return;
+    if (useEmbed || !playbackData || !videoRef.current) return;
 
     const video = videoRef.current;
     const url = playbackData.playbackUrl;
@@ -261,9 +264,15 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             if (errData.fatal) {
               switch (errData.type) {
                 case HlsClass.ErrorTypes.NETWORK_ERROR:
-                  // Quiet token refresh on 403 or network failure
-                  if (selectedLessonId) {
-                    loadLessonStream(selectedLessonId);
+                  console.warn(
+                    'Direct HLS network error (403/CORS); falling back to verified Bunny Embed Player',
+                  );
+                  hls.destroy();
+                  hlsRef.current = null;
+                  if (playbackData?.embedUrl) {
+                    setUseEmbed(true);
+                  } else {
+                    setStreamError('Network error loading stream. Please check connection.');
                   }
                   break;
                 case HlsClass.ErrorTypes.MEDIA_ERROR:
@@ -271,7 +280,12 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                   break;
                 default:
                   hls.destroy();
-                  setStreamError('Media playback error. Re-acquiring stream...');
+                  hlsRef.current = null;
+                  if (playbackData?.embedUrl) {
+                    setUseEmbed(true);
+                  } else {
+                    setStreamError('Media playback error. Please retry.');
+                  }
                   break;
               }
             }
@@ -306,7 +320,18 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         video.src = '';
       }
     };
-  }, [playbackData, selectedLessonId, loadLessonStream]);
+  }, [playbackData, selectedLessonId, loadLessonStream, useEmbed]);
+
+  // Periodic anti-piracy watermark shift
+  useEffect(() => {
+    if (!playbackData) return;
+    const interval = setInterval(() => {
+      const top = Math.floor(Math.random() * 65 + 15) + '%';
+      const left = Math.floor(Math.random() * 65 + 15) + '%';
+      setWatermarkPos({ top, left });
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [playbackData]);
 
   // 5. Heartbeat loop (every 20s) - keeps session alive in Redis even when paused
   useEffect(() => {
@@ -314,18 +339,20 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
     const interval = setInterval(async () => {
       const video = videoRef.current;
-      if (!video) return;
+      const curPos = video ? Math.floor(video.currentTime) : Math.floor(currentTime);
+      const curDur = Math.floor(video?.duration || duration || playbackData.durationSeconds);
+      const isCurrentlyPlaying = video ? !video.paused : isPlaying;
 
       try {
         await apiClient(`/lessons/${selectedLessonId}/heartbeat`, {
           method: 'POST',
           body: JSON.stringify({
             sessionId: playbackData.sessionId,
-            positionSeconds: Math.floor(video.currentTime),
-            durationSeconds: Math.floor(video.duration || playbackData.durationSeconds),
-            watchedSeconds: Math.floor(video.currentTime),
-            isPlaying: !video.paused,
-            state: video.paused ? 'paused' : 'playing',
+            positionSeconds: curPos,
+            durationSeconds: curDur,
+            watchedSeconds: curPos,
+            isPlaying: isCurrentlyPlaying,
+            state: isCurrentlyPlaying ? 'playing' : 'paused',
           }),
         });
       } catch (err: unknown) {
@@ -344,7 +371,64 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       clearInterval(interval);
       heartbeatTimerRef.current = null;
     };
-  }, [playbackData, selectedLessonId]);
+  }, [playbackData, selectedLessonId, currentTime, duration, isPlaying]);
+
+  // 5b. Listen for Player.js postMessage events from Bunny Embed iframe
+  useEffect(() => {
+    if (!useEmbed || !playbackData) return;
+
+    function handlePlayerMessage(event: MessageEvent) {
+      if (typeof event.origin === 'string' && !event.origin.includes('mediadelivery.net')) return;
+      try {
+        const payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (!payload) return;
+
+        const eventType = payload.event || payload.method;
+        if (eventType === 'timeupdate') {
+          const val = payload.value || payload.data;
+          if (val?.seconds !== undefined) setCurrentTime(val.seconds);
+          if (val?.duration !== undefined) setDuration(val.duration);
+        } else if (eventType === 'play') {
+          setIsPlaying(true);
+        } else if (eventType === 'pause') {
+          setIsPlaying(false);
+        } else if (eventType === 'ended') {
+          setIsPlaying(false);
+          if (selectedLessonId) {
+            setSections((prev) =>
+              prev.map((sec) => ({
+                ...sec,
+                lessons: sec.lessons.map((l) =>
+                  l.lessonId === selectedLessonId ? { ...l, isCompleted: true } : l,
+                ),
+              })),
+            );
+            if (playbackData) {
+              apiClient(`/lessons/${selectedLessonId}/heartbeat`, {
+                method: 'POST',
+                body: JSON.stringify({
+                  sessionId: playbackData.sessionId,
+                  positionSeconds: Math.floor(duration || playbackData.durationSeconds),
+                  durationSeconds: Math.floor(duration || playbackData.durationSeconds),
+                  watchedSeconds: Math.floor(duration || playbackData.durationSeconds),
+                  isPlaying: false,
+                  state: 'completed',
+                }),
+              }).catch(() => {});
+            }
+            fetchCurriculum();
+          }
+        }
+      } catch {
+        // Ignore non-JSON or unrelated messages
+      }
+    }
+
+    window.addEventListener('message', handlePlayerMessage);
+    return () => {
+      window.removeEventListener('message', handlePlayerMessage);
+    };
+  }, [useEmbed, playbackData, selectedLessonId, duration, fetchCurriculum]);
 
   // 6. Player Control Handlers
   const togglePlay = useCallback(() => {
@@ -745,6 +829,17 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
+              {playbackData?.embedUrl && (
+                <button
+                  type="button"
+                  onClick={() => setUseEmbed((prev) => !prev)}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white hover:bg-neutral-100 text-neutral-700 border border-neutral-300 text-[11px] font-mono font-medium rounded-md transition-colors cursor-pointer shadow-xs"
+                  title="Switch between Direct HLS Player and Bunny Embed Player"
+                >
+                  <RefreshCw className="w-3 h-3 text-neutral-500" />
+                  <span>{useEmbed ? 'Embed Player' : 'Direct Player'}</span>
+                </button>
+              )}
               {isCurrentCompleted && (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-neutral-100 text-neutral-800 border border-neutral-300 text-[11px] font-mono font-semibold rounded-md">
                   <Check className="w-3 h-3 stroke-[3]" />
@@ -829,244 +924,276 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                   </div>
                 )}
 
-                {/* HTML5 Video Element */}
-                <video
-                  ref={videoRef}
-                  playsInline
-                  className="w-full h-full object-contain max-w-full"
-                  onPlay={() => setIsPlaying(true)}
-                  onPause={() => setIsPlaying(false)}
-                  onTimeUpdate={() => {
-                    if (videoRef.current) {
-                      setCurrentTime(videoRef.current.currentTime);
-                      setDuration(videoRef.current.duration || 0);
-                    }
-                  }}
-                  onEnded={() => {
-                    setIsPlaying(false);
-                    if (selectedLessonId) {
-                      setSections((prev) =>
-                        prev.map((sec) => ({
-                          ...sec,
-                          lessons: sec.lessons.map((l) =>
-                            l.lessonId === selectedLessonId ? { ...l, isCompleted: true } : l,
-                          ),
-                        })),
-                      );
-                      if (playbackData) {
-                        apiClient(`/lessons/${selectedLessonId}/heartbeat`, {
-                          method: 'POST',
-                          body: JSON.stringify({
-                            sessionId: playbackData.sessionId,
-                            positionSeconds: Math.floor(duration || playbackData.durationSeconds),
-                            durationSeconds: Math.floor(duration || playbackData.durationSeconds),
-                            watchedSeconds: Math.floor(duration || playbackData.durationSeconds),
-                            isPlaying: false,
-                            state: 'completed',
-                          }),
-                        }).catch(() => {});
-                      }
-                      fetchCurriculum();
-                    }
-                  }}
-                  onClick={togglePlay}
-                />
-
-                {/* Big Center Play Button Overlay with rounded aesthetic */}
-                {!isPlaying && !streamLoading && !streamError && !isEvicted && (
-                  <button
-                    type="button"
-                    onClick={togglePlay}
-                    aria-label="Play video"
-                    className="absolute inset-0 m-auto w-14 h-14 sm:w-18 sm:h-18 bg-black/60 hover:bg-black/80 text-white rounded-full border border-white/40 backdrop-blur-sm flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95 z-10 shadow-2xl group"
+                {/* Dynamic Moving Watermark Overlay (Anti-Piracy) */}
+                {playbackData?.watermark?.text && (
+                  <div
+                    className="absolute pointer-events-none select-none text-[11px] font-mono text-white/35 font-bold tracking-widest px-2.5 py-1 bg-black/40 backdrop-blur-[2px] border border-white/10 rounded-none transition-all duration-1000 ease-in-out z-20"
+                    style={{ top: watermarkPos.top, left: watermarkPos.left }}
                   >
-                    <Play className="w-6 h-6 sm:w-8 sm:h-8 fill-white group-hover:scale-110 transition-transform ml-0.5" />
-                  </button>
+                    {playbackData.watermark.text}
+                  </div>
                 )}
 
-                {/* Custom Video Control Bar (Floating seamlessly over video without top dividing border line) */}
-                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/65 to-transparent px-3 py-2 sm:px-4 sm:py-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-col gap-1.5 sm:gap-2 text-white max-w-full">
-                  {/* Scrubbing timeline slider with timestamps at ends */}
-                  <div className="flex items-center gap-2 sm:gap-3 w-full">
-                    <span className="text-[11px] sm:text-xs font-mono text-white/90 shrink-0">
-                      {formatTime(currentTime)}
-                    </span>
-                    <input
-                      type="range"
-                      min={0}
-                      max={duration || 100}
-                      value={currentTime}
-                      onChange={handleSeek}
-                      aria-label="Video seek slider"
-                      className="flex-1 h-1 bg-white/25 accent-white cursor-pointer"
+                {useEmbed && playbackData?.embedUrl ? (
+                  /* Verified Bunny Stream Embed Player (High-performance adaptive iframe) */
+                  <iframe
+                    src={playbackData.embedUrl}
+                    title={currentLessonTitle}
+                    loading="lazy"
+                    className="w-full h-full border-0 absolute inset-0 z-10"
+                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                    allowFullScreen
+                  />
+                ) : (
+                  <>
+                    {/* HTML5 Video Element */}
+                    <video
+                      ref={videoRef}
+                      playsInline
+                      className="w-full h-full object-contain max-w-full"
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
+                      onTimeUpdate={() => {
+                        if (videoRef.current) {
+                          setCurrentTime(videoRef.current.currentTime);
+                          setDuration(videoRef.current.duration || 0);
+                        }
+                      }}
+                      onEnded={() => {
+                        setIsPlaying(false);
+                        if (selectedLessonId) {
+                          setSections((prev) =>
+                            prev.map((sec) => ({
+                              ...sec,
+                              lessons: sec.lessons.map((l) =>
+                                l.lessonId === selectedLessonId ? { ...l, isCompleted: true } : l,
+                              ),
+                            })),
+                          );
+                          if (playbackData) {
+                            apiClient(`/lessons/${selectedLessonId}/heartbeat`, {
+                              method: 'POST',
+                              body: JSON.stringify({
+                                sessionId: playbackData.sessionId,
+                                positionSeconds: Math.floor(
+                                  duration || playbackData.durationSeconds,
+                                ),
+                                durationSeconds: Math.floor(
+                                  duration || playbackData.durationSeconds,
+                                ),
+                                watchedSeconds: Math.floor(
+                                  duration || playbackData.durationSeconds,
+                                ),
+                                isPlaying: false,
+                                state: 'completed',
+                              }),
+                            }).catch(() => {});
+                          }
+                          fetchCurriculum();
+                        }
+                      }}
+                      onClick={togglePlay}
                     />
-                    <span className="text-[11px] sm:text-xs font-mono text-white/70 shrink-0">
-                      {formatTime(duration)}
-                    </span>
-                  </div>
 
-                  <div className="flex items-center justify-between gap-2 w-full">
-                    <div className="flex items-center gap-1 sm:gap-2">
+                    {/* Big Center Play Button Overlay with rounded aesthetic */}
+                    {!isPlaying && !streamLoading && !streamError && !isEvicted && (
                       <button
                         type="button"
                         onClick={togglePlay}
-                        aria-label={isPlaying ? 'Pause video (Space)' : 'Play video (Space)'}
-                        className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
+                        aria-label="Play video"
+                        className="absolute inset-0 m-auto w-14 h-14 sm:w-18 sm:h-18 bg-black/60 hover:bg-black/80 text-white rounded-full border border-white/40 backdrop-blur-sm flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95 z-10 shadow-2xl group"
                       >
-                        {isPlaying ? (
-                          <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
-                        ) : (
-                          <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
-                        )}
+                        <Play className="w-6 h-6 sm:w-8 sm:h-8 fill-white group-hover:scale-110 transition-transform ml-0.5" />
                       </button>
+                    )}
 
-                      <button
-                        type="button"
-                        onClick={toggleMute}
-                        aria-label={isMuted ? 'Unmute (M)' : 'Mute (M)'}
-                        className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
-                      >
-                        {isMuted ? (
-                          <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" />
-                        ) : (
-                          <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                        )}
-                      </button>
+                    {/* Custom Video Control Bar (Floating seamlessly over video without top dividing border line) */}
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/65 to-transparent px-3 py-2 sm:px-4 sm:py-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-col gap-1.5 sm:gap-2 text-white max-w-full">
+                      {/* Scrubbing timeline slider with timestamps at ends */}
+                      <div className="flex items-center gap-2 sm:gap-3 w-full">
+                        <span className="text-[11px] sm:text-xs font-mono text-white/90 shrink-0">
+                          {formatTime(currentTime)}
+                        </span>
+                        <input
+                          type="range"
+                          min={0}
+                          max={duration || 100}
+                          value={currentTime}
+                          onChange={handleSeek}
+                          aria-label="Video seek slider"
+                          className="flex-1 h-1 bg-white/25 accent-white cursor-pointer"
+                        />
+                        <span className="text-[11px] sm:text-xs font-mono text-white/70 shrink-0">
+                          {formatTime(duration)}
+                        </span>
+                      </div>
 
-                      {/* Volume Slider hidden on mobile */}
-                      <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.05}
-                        value={isMuted ? 0 : volume}
-                        onChange={handleVolumeChange}
-                        aria-label="Volume slider"
-                        className="w-16 md:w-20 h-1 bg-white/20 accent-white hidden sm:block"
-                      />
-                    </div>
+                      <div className="flex items-center justify-between gap-2 w-full">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <button
+                            type="button"
+                            onClick={togglePlay}
+                            aria-label={isPlaying ? 'Pause video (Space)' : 'Play video (Space)'}
+                            className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
+                          >
+                            {isPlaying ? (
+                              <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
+                            ) : (
+                              <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
+                            )}
+                          </button>
 
-                    <div className="flex items-center gap-1 sm:gap-1.5">
-                      {/* Settings Menu (Speed & Quality) */}
-                      <div className="relative">
-                        <button
-                          type="button"
-                          onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-                          aria-label="Player settings"
-                          className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
-                        >
-                          <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
-                        </button>
+                          <button
+                            type="button"
+                            onClick={toggleMute}
+                            aria-label={isMuted ? 'Unmute (M)' : 'Mute (M)'}
+                            className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
+                          >
+                            {isMuted ? (
+                              <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" />
+                            ) : (
+                              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                            )}
+                          </button>
 
-                        {showSettingsMenu && (
-                          <div className="absolute right-0 bottom-12 sm:bottom-14 w-52 bg-black/80 backdrop-blur-2xl border border-white/20 p-3.5 space-y-3 z-30 shadow-2xl rounded-xl sm:rounded-2xl text-xs text-white select-none">
-                            {/* Playback speed */}
-                            <div>
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-white/60">
-                                  Playback Speed
-                                </span>
-                                <span className="text-[10px] font-mono font-bold text-white/80">
-                                  {playbackRate}x
-                                </span>
-                              </div>
-                              <div className="grid grid-cols-3 gap-1.5">
-                                {[0.75, 1, 1.25, 1.5, 1.75, 2].map((s) => (
-                                  <button
-                                    key={s}
-                                    type="button"
-                                    onClick={() => handleSpeedChange(s)}
-                                    className={`py-1.5 text-xs font-mono font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center ${
-                                      playbackRate === s
-                                        ? 'bg-white text-black border border-white shadow-sm'
-                                        : 'bg-white/10 hover:bg-white/20 text-white border border-white/10 hover:border-white/25 active:scale-95'
-                                    }`}
-                                  >
-                                    {s}x
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
+                          {/* Volume Slider hidden on mobile */}
+                          <input
+                            type="range"
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            value={isMuted ? 0 : volume}
+                            onChange={handleVolumeChange}
+                            aria-label="Volume slider"
+                            className="w-16 md:w-20 h-1 bg-white/20 accent-white hidden sm:block"
+                          />
+                        </div>
 
-                            {/* Quality selector */}
-                            {qualityLevels.length > 0 && (
-                              <div className="border-t border-white/15 pt-2.5">
-                                <div className="flex items-center justify-between mb-2">
-                                  <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-white/60">
-                                    Quality
-                                  </span>
-                                  <span className="text-[10px] font-mono text-white/80">
-                                    {currentQuality === -1
-                                      ? 'Auto'
-                                      : qualityLevels.find((q) => q.id === currentQuality)?.label ||
-                                        'Auto'}
-                                  </span>
+                        <div className="flex items-center gap-1 sm:gap-1.5">
+                          {/* Settings Menu (Speed & Quality) */}
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+                              aria-label="Player settings"
+                              className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
+                            >
+                              <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
+                            </button>
+
+                            {showSettingsMenu && (
+                              <div className="absolute right-0 bottom-12 sm:bottom-14 w-52 bg-black/80 backdrop-blur-2xl border border-white/20 p-3.5 space-y-3 z-30 shadow-2xl rounded-xl sm:rounded-2xl text-xs text-white select-none">
+                                {/* Playback speed */}
+                                <div>
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-white/60">
+                                      Playback Speed
+                                    </span>
+                                    <span className="text-[10px] font-mono font-bold text-white/80">
+                                      {playbackRate}x
+                                    </span>
+                                  </div>
+                                  <div className="grid grid-cols-3 gap-1.5">
+                                    {[0.75, 1, 1.25, 1.5, 1.75, 2].map((s) => (
+                                      <button
+                                        key={s}
+                                        type="button"
+                                        onClick={() => handleSpeedChange(s)}
+                                        className={`py-1.5 text-xs font-mono font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center ${
+                                          playbackRate === s
+                                            ? 'bg-white text-black border border-white shadow-sm'
+                                            : 'bg-white/10 hover:bg-white/20 text-white border border-white/10 hover:border-white/25 active:scale-95'
+                                        }`}
+                                      >
+                                        {s}x
+                                      </button>
+                                    ))}
+                                  </div>
                                 </div>
-                                <div className="space-y-1">
-                                  <button
-                                    type="button"
-                                    onClick={() => handleQualityChange(-1)}
-                                    className={`w-full px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-between ${
-                                      currentQuality === -1
-                                        ? 'bg-white text-black border border-white shadow-sm'
-                                        : 'bg-white/5 hover:bg-white/15 text-white/90 hover:text-white border border-white/10 hover:border-white/20 active:scale-95'
-                                    }`}
-                                  >
-                                    <span>Auto</span>
-                                    {currentQuality === -1 && (
-                                      <Check className="w-3 h-3 stroke-[3]" />
-                                    )}
-                                  </button>
-                                  {qualityLevels.map((lvl) => (
-                                    <button
-                                      key={lvl.id}
-                                      type="button"
-                                      onClick={() => handleQualityChange(lvl.id)}
-                                      className={`w-full px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-between ${
-                                        currentQuality === lvl.id
-                                          ? 'bg-white text-black border border-white shadow-sm'
-                                          : 'bg-white/5 hover:bg-white/15 text-white/90 hover:text-white border border-white/10 hover:border-white/20 active:scale-95'
-                                      }`}
-                                    >
-                                      <span>{lvl.label}</span>
-                                      {currentQuality === lvl.id && (
-                                        <Check className="w-3 h-3 stroke-[3]" />
-                                      )}
-                                    </button>
-                                  ))}
-                                </div>
+
+                                {/* Quality selector */}
+                                {qualityLevels.length > 0 && (
+                                  <div className="border-t border-white/15 pt-2.5">
+                                    <div className="flex items-center justify-between mb-2">
+                                      <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-white/60">
+                                        Quality
+                                      </span>
+                                      <span className="text-[10px] font-mono text-white/80">
+                                        {currentQuality === -1
+                                          ? 'Auto'
+                                          : qualityLevels.find((q) => q.id === currentQuality)
+                                              ?.label || 'Auto'}
+                                      </span>
+                                    </div>
+                                    <div className="space-y-1">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleQualityChange(-1)}
+                                        className={`w-full px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-between ${
+                                          currentQuality === -1
+                                            ? 'bg-white text-black border border-white shadow-sm'
+                                            : 'bg-white/5 hover:bg-white/15 text-white/90 hover:text-white border border-white/10 hover:border-white/20 active:scale-95'
+                                        }`}
+                                      >
+                                        <span>Auto</span>
+                                        {currentQuality === -1 && (
+                                          <Check className="w-3 h-3 stroke-[3]" />
+                                        )}
+                                      </button>
+                                      {qualityLevels.map((lvl) => (
+                                        <button
+                                          key={lvl.id}
+                                          type="button"
+                                          onClick={() => handleQualityChange(lvl.id)}
+                                          className={`w-full px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-between ${
+                                            currentQuality === lvl.id
+                                              ? 'bg-white text-black border border-white shadow-sm'
+                                              : 'bg-white/5 hover:bg-white/15 text-white/90 hover:text-white border border-white/10 hover:border-white/20 active:scale-95'
+                                          }`}
+                                        >
+                                          <span>{lvl.label}</span>
+                                          {currentQuality === lvl.id && (
+                                            <Check className="w-3 h-3 stroke-[3]" />
+                                          )}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
-                        )}
+
+                          {/* Next Lesson Trigger */}
+                          <button
+                            type="button"
+                            onClick={handleNextLesson}
+                            aria-label="Next lesson"
+                            className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
+                          >
+                            <SkipForward className="w-4 h-4 sm:w-5 sm:h-5" />
+                          </button>
+
+                          {/* Fullscreen Button */}
+                          <button
+                            type="button"
+                            onClick={toggleCustomFullscreen}
+                            aria-label={
+                              isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'
+                            }
+                            className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
+                          >
+                            {isFullscreen ? (
+                              <Minimize className="w-4 h-4 sm:w-5 sm:h-5" />
+                            ) : (
+                              <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
+                            )}
+                          </button>
+                        </div>
                       </div>
-
-                      {/* Next Lesson Trigger */}
-                      <button
-                        type="button"
-                        onClick={handleNextLesson}
-                        aria-label="Next lesson"
-                        className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
-                      >
-                        <SkipForward className="w-4 h-4 sm:w-5 sm:h-5" />
-                      </button>
-
-                      {/* Fullscreen Button */}
-                      <button
-                        type="button"
-                        onClick={toggleCustomFullscreen}
-                        aria-label={isFullscreen ? 'Exit fullscreen (F)' : 'Enter fullscreen (F)'}
-                        className="w-8 h-8 sm:w-9 sm:h-9 inline-flex items-center justify-center text-white hover:text-white/80 transition-colors cursor-pointer shrink-0"
-                      >
-                        {isFullscreen ? (
-                          <Minimize className="w-4 h-4 sm:w-5 sm:h-5" />
-                        ) : (
-                          <Maximize className="w-4 h-4 sm:w-5 sm:h-5" />
-                        )}
-                      </button>
                     </div>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
 
               {/* Independently Floating Previous & Next Video Buttons (not in any box) */}

@@ -27,6 +27,8 @@ export function PreviewPlayerModal({
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [playbackUrl, setPlaybackUrl] = useState<string | null>(null);
+  const [embedUrl, setEmbedUrl] = useState<string | null>(null);
+  const [useEmbed, setUseEmbed] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -86,7 +88,9 @@ export function PreviewPlayerModal({
         }
 
         if (isMounted) {
-          setPlaybackUrl(data.data.playbackUrl || data.data.embedUrl);
+          setPlaybackUrl(data.data.playbackUrl || null);
+          setEmbedUrl(data.data.embedUrl || null);
+          setUseEmbed(false);
         }
       } catch (err: unknown) {
         if (isMounted) {
@@ -108,7 +112,7 @@ export function PreviewPlayerModal({
 
   // Initialize HLS dynamically on demand
   useEffect(() => {
-    if (!playbackUrl || !videoRef.current) return;
+    if (useEmbed || !playbackUrl || !videoRef.current) return;
 
     const video = videoRef.current;
     let hlsInstance: Hls | null = null;
@@ -141,17 +145,24 @@ export function PreviewPlayerModal({
 
           hls.on(HlsClass.Events.ERROR, (_event, data) => {
             if (data.fatal) {
-              switch (data.type) {
-                case HlsClass.ErrorTypes.NETWORK_ERROR:
-                  hls.startLoad();
-                  break;
-                case HlsClass.ErrorTypes.MEDIA_ERROR:
-                  hls.recoverMediaError();
-                  break;
-                default:
-                  hls.destroy();
-                  setErrorMsg('Playback error encountered. Please try again.');
-                  break;
+              if (embedUrl) {
+                console.warn('Preview direct stream error; falling back to Bunny Embed Player');
+                hls.destroy();
+                hlsRef.current = null;
+                setUseEmbed(true);
+              } else {
+                switch (data.type) {
+                  case HlsClass.ErrorTypes.NETWORK_ERROR:
+                    hls.startLoad();
+                    break;
+                  case HlsClass.ErrorTypes.MEDIA_ERROR:
+                    hls.recoverMediaError();
+                    break;
+                  default:
+                    hls.destroy();
+                    setErrorMsg('Playback error encountered. Please try again.');
+                    break;
+                }
               }
             }
           });
@@ -178,7 +189,7 @@ export function PreviewPlayerModal({
         video.src = '';
       }
     };
-  }, [playbackUrl]);
+  }, [playbackUrl, embedUrl, useEmbed]);
 
   const togglePlay = useCallback(() => {
     if (!videoRef.current) return;
@@ -307,96 +318,113 @@ export function PreviewPlayerModal({
 
           {!isLoading && !errorMsg && (
             <>
-              <video
-                ref={videoRef}
-                playsInline
-                className="w-full h-full object-contain cursor-pointer"
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
-                onTimeUpdate={() => {
-                  if (videoRef.current) {
-                    setCurrentTime(videoRef.current.currentTime);
-                    setDuration(videoRef.current.duration || 0);
-                  }
-                }}
-                onClick={togglePlay}
-              />
+              {useEmbed && embedUrl ? (
+                <iframe
+                  src={embedUrl}
+                  title={lessonTitle || 'Free Preview'}
+                  loading="lazy"
+                  className="w-full h-full border-0 absolute inset-0 z-10"
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                  allowFullScreen
+                />
+              ) : (
+                <>
+                  <video
+                    ref={videoRef}
+                    playsInline
+                    className="w-full h-full object-contain cursor-pointer"
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
+                    onTimeUpdate={() => {
+                      if (videoRef.current) {
+                        setCurrentTime(videoRef.current.currentTime);
+                        setDuration(videoRef.current.duration || 0);
+                      }
+                    }}
+                    onClick={togglePlay}
+                  />
 
-              {/* Subtle Anti-Piracy Watermark: small greyed-out HSB text, not a bold button */}
-              <div
-                className="absolute pointer-events-none transition-all duration-700 ease-in-out font-mono font-medium text-[11px] sm:text-xs text-white/35 select-none tracking-widest uppercase"
-                style={{ top: watermarkPos.top, left: watermarkPos.left }}
-                aria-hidden="true"
-              >
-                HSB
-              </div>
-
-              {/* Custom Video Controls Bar */}
-              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-3 sm:p-4 text-white">
-                {/* Scrubber Progress Bar */}
-                <div
-                  className="w-full h-1.5 hover:h-2 bg-white/25 rounded-none cursor-pointer transition-all duration-150 mb-2.5 relative group/bar"
-                  onClick={handleSeek}
-                >
+                  {/* Subtle Anti-Piracy Watermark: small greyed-out HSB text, not a bold button */}
                   <div
-                    className="h-full bg-white rounded-none transition-all duration-75 relative"
-                    style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                    className="absolute pointer-events-none transition-all duration-700 ease-in-out font-mono font-medium text-[11px] sm:text-xs text-white/35 select-none tracking-widest uppercase"
+                    style={{ top: watermarkPos.top, left: watermarkPos.left }}
+                    aria-hidden="true"
                   >
-                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-none shadow opacity-0 group-hover/bar:opacity-100 transition-opacity" />
-                  </div>
-                </div>
-
-                {/* Control Buttons Row */}
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 sm:gap-2.5">
-                    <button
-                      type="button"
-                      onClick={togglePlay}
-                      aria-label={isPlaying ? 'Pause video' : 'Play video'}
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-none bg-white text-black flex items-center justify-center hover:bg-white/90 active:scale-95 transition-all shadow-md cursor-pointer"
-                    >
-                      {isPlaying ? (
-                        <Pause className="w-4 h-4 fill-current" />
-                      ) : (
-                        <Play className="w-4 h-4 fill-current translate-x-0.5" />
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={toggleMute}
-                      aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-none bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer"
-                    >
-                      {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                    </button>
-
-                    <span className="text-xs sm:text-[13px] font-mono font-medium text-white/90">
-                      {formatTime(currentTime)} / {formatTime(duration)}
-                    </span>
+                    HSB
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={changeSpeed}
-                      aria-label={`Current speed ${playbackRate}x. Click to change.`}
-                      className="px-2 py-1 rounded-none bg-white/15 hover:bg-white/25 active:scale-95 text-white font-mono text-xs font-bold border border-white/20 transition-all cursor-pointer"
+                  {/* Custom Video Controls Bar */}
+                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/70 to-transparent p-3 sm:p-4 text-white">
+                    {/* Scrubber Progress Bar */}
+                    <div
+                      className="w-full h-1.5 hover:h-2 bg-white/25 rounded-none cursor-pointer transition-all duration-150 mb-2.5 relative group/bar"
+                      onClick={handleSeek}
                     >
-                      {playbackRate}x
-                    </button>
+                      <div
+                        className="h-full bg-white rounded-none transition-all duration-75 relative"
+                        style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                      >
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white rounded-none shadow opacity-0 group-hover/bar:opacity-100 transition-opacity" />
+                      </div>
+                    </div>
 
-                    <button
-                      type="button"
-                      onClick={toggleFullscreen}
-                      aria-label="Toggle Fullscreen"
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-none bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer"
-                    >
-                      <Maximize className="w-4 h-4" />
-                    </button>
+                    {/* Control Buttons Row */}
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 sm:gap-2.5">
+                        <button
+                          type="button"
+                          onClick={togglePlay}
+                          aria-label={isPlaying ? 'Pause video' : 'Play video'}
+                          className="w-8 h-8 sm:w-9 sm:h-9 rounded-none bg-white text-black flex items-center justify-center hover:bg-white/90 active:scale-95 transition-all shadow-md cursor-pointer"
+                        >
+                          {isPlaying ? (
+                            <Pause className="w-4 h-4 fill-current" />
+                          ) : (
+                            <Play className="w-4 h-4 fill-current translate-x-0.5" />
+                          )}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={toggleMute}
+                          aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+                          className="w-8 h-8 sm:w-9 sm:h-9 rounded-none bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer"
+                        >
+                          {isMuted ? (
+                            <VolumeX className="w-4 h-4" />
+                          ) : (
+                            <Volume2 className="w-4 h-4" />
+                          )}
+                        </button>
+
+                        <span className="text-xs sm:text-[13px] font-mono font-medium text-white/90">
+                          {formatTime(currentTime)} / {formatTime(duration)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={changeSpeed}
+                          aria-label={`Current speed ${playbackRate}x. Click to change.`}
+                          className="px-2 py-1 rounded-none bg-white/15 hover:bg-white/25 active:scale-95 text-white font-mono text-xs font-bold border border-white/20 transition-all cursor-pointer"
+                        >
+                          {playbackRate}x
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={toggleFullscreen}
+                          aria-label="Toggle Fullscreen"
+                          className="w-8 h-8 sm:w-9 sm:h-9 rounded-none bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer"
+                        >
+                          <Maximize className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </>
+              )}
             </>
           )}
         </div>
