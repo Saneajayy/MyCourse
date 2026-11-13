@@ -98,7 +98,9 @@ export function PaymentPendingCard({
               </span>
             )}
             <span className="text-[10px] sm:text-[11px] text-neutral-400 font-medium block">
-              {isTimedOut ? 'Bank Clearing' : `Attempt ${Math.min(pollCount + 1, maxPoll)}/${maxPoll}`}
+              {isTimedOut
+                ? 'Bank Clearing'
+                : `Attempt ${Math.min(pollCount + 1, maxPoll)}/${maxPoll}`}
             </span>
           </div>
         </div>

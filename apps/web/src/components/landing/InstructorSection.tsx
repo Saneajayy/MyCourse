@@ -10,7 +10,6 @@ export function InstructorSection() {
       id="instructor"
       className="relative w-full py-16 sm:py-20 md:py-24 pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 pr-6 sm:pr-8 md:pr-12 lg:pr-16 font-reddit select-none bg-transparent scroll-mt-12 md:scroll-mt-16"
     >
-
       <div className="max-w-[1440px] w-full">
         {/* 2-Column Layout: Left Text Details, Right Pure Card Element */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-start lg:items-stretch">

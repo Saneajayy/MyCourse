@@ -107,7 +107,8 @@ function ResetPasswordForm() {
               Verification Code Required
             </h2>
             <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
-              To reset your password, please start by requesting a 6-digit code for your email address.
+              To reset your password, please start by requesting a 6-digit code for your email
+              address.
             </p>
             <div className="pt-4 border-t border-neutral-200">
               <Link
@@ -177,7 +178,10 @@ function ResetPasswordForm() {
 
               {/* Confirm New Password */}
               <div className="space-y-1.5 text-left">
-                <label htmlFor="reset-confirm-password" className="text-sm font-bold text-neutral-900">
+                <label
+                  htmlFor="reset-confirm-password"
+                  className="text-sm font-bold text-neutral-900"
+                >
                   Confirm New Password
                 </label>
                 <div className="relative">
@@ -213,7 +217,9 @@ function ResetPasswordForm() {
                   disabled={isLoading}
                   className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-none transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  {isLoading && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
+                  {isLoading && (
+                    <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />
+                  )}
                   <span>{isLoading ? 'Updating Password...' : 'Save New Password'}</span>
                 </button>
               </div>
@@ -297,7 +303,13 @@ export default function ResetPasswordPage() {
 
         {/* Perfectly Centered Card */}
         <div className="m-auto w-full max-w-[420px] sm:max-w-[440px] px-4 py-6 sm:py-8 relative z-10">
-          <Suspense fallback={<div className="p-8 text-center text-sm font-mono text-neutral-500">Loading reset form...</div>}>
+          <Suspense
+            fallback={
+              <div className="p-8 text-center text-sm font-mono text-neutral-500">
+                Loading reset form...
+              </div>
+            }
+          >
             <ResetPasswordForm />
           </Suspense>
         </div>

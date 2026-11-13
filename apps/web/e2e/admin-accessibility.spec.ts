@@ -66,7 +66,9 @@ test.describe('Automated WCAG AA Accessibility Audits: Admin Panel', () => {
     test.setTimeout(90000);
     // 1. Log in with 2FA
     await page.goto('/login');
-    await page.getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i).fill(adminEmail);
+    await page
+      .getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i)
+      .fill(adminEmail);
     await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill(adminPassword);
     await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
 

@@ -261,7 +261,8 @@ export default function AdminDashboardPage() {
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span className="font-medium">
-                  All systems operating normally. Zero stuck orders, payment discrepancies, or webhook failures.
+                  All systems operating normally. Zero stuck orders, payment discrepancies, or
+                  webhook failures.
                 </span>
               </div>
               <span className="font-mono text-[10px] text-emerald-700 uppercase tracking-wider font-semibold">
@@ -304,9 +305,7 @@ export default function AdminDashboardPage() {
               <div className="text-2xl font-bold font-mono text-neutral-950 tracking-tight">
                 {isLoading ? '...' : (data?.ordersCount ?? 0)}
               </div>
-              <p className="text-[11px] text-neutral-400">
-                Successfully paid student transactions
-              </p>
+              <p className="text-[11px] text-neutral-400">Successfully paid student transactions</p>
             </div>
             <div className="w-9 h-9 border border-neutral-200 bg-neutral-50 text-neutral-800 flex items-center justify-center shrink-0">
               <ShoppingBag className="w-4 h-4" />
@@ -324,9 +323,7 @@ export default function AdminDashboardPage() {
               <div className="text-2xl font-bold font-mono text-neutral-950 tracking-tight">
                 {isLoading ? '...' : (data?.newStudentsCount ?? 0)}
               </div>
-              <p className="text-[11px] text-neutral-400">
-                Unique student accounts created
-              </p>
+              <p className="text-[11px] text-neutral-400">Unique student accounts created</p>
             </div>
             <div className="w-9 h-9 border border-neutral-200 bg-neutral-50 text-neutral-800 flex items-center justify-center shrink-0">
               <Users className="w-4 h-4" />
@@ -364,9 +361,7 @@ export default function AdminDashboardPage() {
               <div className="text-2xl font-bold font-mono text-neutral-950 tracking-tight">
                 {isLoading ? '...' : (data?.failedPaymentsCount ?? 0)}
               </div>
-              <p className="text-[11px] text-neutral-400">
-                Bank or UPI card declines
-              </p>
+              <p className="text-[11px] text-neutral-400">Bank or UPI card declines</p>
             </div>
             <div className="w-9 h-9 border border-rose-200 bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
               <AlertTriangle className="w-4 h-4" />
@@ -384,9 +379,7 @@ export default function AdminDashboardPage() {
               <div className="text-2xl font-bold font-mono text-neutral-950 tracking-tight">
                 {isLoading ? '...' : (data?.refundsCount ?? 0)}
               </div>
-              <p className="text-[11px] text-neutral-400">
-                Full or partial refunds processed
-              </p>
+              <p className="text-[11px] text-neutral-400">Full or partial refunds processed</p>
             </div>
             <div className="w-9 h-9 border border-neutral-200 bg-neutral-50 text-neutral-800 flex items-center justify-center shrink-0">
               <RotateCcw className="w-4 h-4" />

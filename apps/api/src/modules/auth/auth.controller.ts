@@ -38,7 +38,11 @@ export class AuthController {
   public async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const validatedInput = verifyEmailSchema.parse(req.body);
-      const result = await authService.verifyEmail(validatedInput, req.ip, req.headers['user-agent']);
+      const result = await authService.verifyEmail(
+        validatedInput,
+        req.ip,
+        req.headers['user-agent'],
+      );
 
       if (result.refreshToken) {
         setRefreshTokenCookie(res, result.refreshToken);

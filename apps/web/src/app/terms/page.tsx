@@ -79,45 +79,59 @@ export default function TermsPage() {
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">01.</span>
                   <strong className="font-bold text-neutral-950 mr-1">License &amp; Access:</strong>
-                  Single-user streaming license valid for 365 days from enrollment; sharing accounts or login credentials is strictly prohibited.
+                  Single-user streaming license valid for 365 days from enrollment; sharing accounts
+                  or login credentials is strictly prohibited.
                 </p>
               </div>
 
               <div className="px-5 sm:px-6 py-2.5 sm:py-3">
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">02.</span>
-                  <strong className="font-bold text-neutral-950 mr-1">Anti-Piracy Watermarking:</strong>
-                  All video lectures carry cryptographic watermarks with your ID; ripping, recording, or redistributing materials revokes access immediately.
+                  <strong className="font-bold text-neutral-950 mr-1">
+                    Anti-Piracy Watermarking:
+                  </strong>
+                  All video lectures carry cryptographic watermarks with your ID; ripping,
+                  recording, or redistributing materials revokes access immediately.
                 </p>
               </div>
 
               <div className="px-5 sm:px-6 py-2.5 sm:py-3">
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">03.</span>
-                  <strong className="font-bold text-neutral-950 mr-1">Engineering Safety Notice:</strong>
-                  Instructional demonstrations only. Plant hydraulic circuits exceed 200 bar—always verify OEM manuals and enforce strict LOTO protocols.
+                  <strong className="font-bold text-neutral-950 mr-1">
+                    Engineering Safety Notice:
+                  </strong>
+                  Instructional demonstrations only. Plant hydraulic circuits exceed 200 bar—always
+                  verify OEM manuals and enforce strict LOTO protocols.
                 </p>
               </div>
 
               <div className="px-5 sm:px-6 py-2.5 sm:py-3">
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">04.</span>
-                  <strong className="font-bold text-neutral-950 mr-1">Payments &amp; Tax Invoices:</strong>
-                  One-time payment processed securely via Razorpay. GST-compliant tax invoices are automatically available for download in your dashboard.
+                  <strong className="font-bold text-neutral-950 mr-1">
+                    Payments &amp; Tax Invoices:
+                  </strong>
+                  One-time payment processed securely via Razorpay. GST-compliant tax invoices are
+                  automatically available for download in your dashboard.
                 </p>
               </div>
 
               <div className="px-5 sm:px-6 py-2.5 sm:py-3">
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">05.</span>
-                  <strong className="font-bold text-neutral-950 mr-1">Jurisdiction &amp; Inquiries:</strong>
-                  Governed by the laws of {siteConfig.contact.jurisdiction}. For legal notices or enrollment queries, contact{' '}
+                  <strong className="font-bold text-neutral-950 mr-1">
+                    Jurisdiction &amp; Inquiries:
+                  </strong>
+                  Governed by the laws of {siteConfig.contact.jurisdiction}. For legal notices or
+                  enrollment queries, contact{' '}
                   <a
                     href={`mailto:${siteConfig.supportEmail}`}
                     className="font-semibold underline text-black hover:opacity-80"
                   >
                     {siteConfig.supportEmail}
-                  </a>.
+                  </a>
+                  .
                 </p>
               </div>
             </div>

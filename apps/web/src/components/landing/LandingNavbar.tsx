@@ -93,12 +93,16 @@ export function LandingNavbar() {
             >
               <Menu
                 className={`w-5 h-5 absolute transition-all duration-300 ease-in-out ${
-                  isMobileMenuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
+                  isMobileMenuOpen
+                    ? 'opacity-0 rotate-90 scale-75'
+                    : 'opacity-100 rotate-0 scale-100'
                 }`}
               />
               <X
                 className={`w-5 h-5 absolute transition-all duration-300 ease-in-out ${
-                  isMobileMenuOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'
+                  isMobileMenuOpen
+                    ? 'opacity-100 rotate-0 scale-100'
+                    : 'opacity-0 -rotate-90 scale-75'
                 }`}
               />
             </button>

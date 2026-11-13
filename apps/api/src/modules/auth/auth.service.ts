@@ -241,7 +241,7 @@ export class AuthService {
     refreshToken?: string;
     defaultRedirect?: string;
   }> {
-    const rawCode = typeof input === 'string' ? input : (input.otp || input.token || '');
+    const rawCode = typeof input === 'string' ? input : input.otp || input.token || '';
     const code = rawCode.trim();
     if (!code) {
       throw new BadRequestError('Verification code is required');
@@ -288,10 +288,7 @@ export class AuthService {
         });
 
         for (const t of activeTokens) {
-          if (
-            t.tokenHash === hashToken(code) ||
-            t.tokenHash === hashToken(`${email}:${code}`)
-          ) {
+          if (t.tokenHash === hashToken(code) || t.tokenHash === hashToken(`${email}:${code}`)) {
             tokenRecord = t;
             break;
           }

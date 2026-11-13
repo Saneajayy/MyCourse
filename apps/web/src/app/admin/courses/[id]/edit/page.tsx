@@ -243,7 +243,13 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-neutral-300 hover:border-neutral-900 text-neutral-800 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors"
                 >
                   <UploadCloud className="w-3.5 h-3.5" />
-                  <span>{thumbnailUploading ? 'Uploading...' : thumbnailUrl ? 'Change Thumbnail' : 'Upload Image'}</span>
+                  <span>
+                    {thumbnailUploading
+                      ? 'Uploading...'
+                      : thumbnailUrl
+                        ? 'Change Thumbnail'
+                        : 'Upload Image'}
+                  </span>
                 </button>
               </label>
               <p className="text-[11px] text-neutral-500">
@@ -344,7 +350,9 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                 onChange={() => setAccessType('lifetime')}
               />
               <div className="text-xs font-bold uppercase tracking-wider">Lifetime Access</div>
-              <div className={`text-[11px] mt-1 ${accessType === 'lifetime' ? 'text-neutral-300' : 'text-neutral-500'}`}>
+              <div
+                className={`text-[11px] mt-1 ${accessType === 'lifetime' ? 'text-neutral-300' : 'text-neutral-500'}`}
+              >
                 Students retain access indefinitely
               </div>
             </label>
@@ -364,7 +372,9 @@ export default function EditCoursePage({ params }: { params: Promise<{ id: strin
                 onChange={() => setAccessType('limited')}
               />
               <div className="text-xs font-bold uppercase tracking-wider">Limited Validity</div>
-              <div className={`text-[11px] mt-1 ${accessType === 'limited' ? 'text-neutral-300' : 'text-neutral-500'}`}>
+              <div
+                className={`text-[11px] mt-1 ${accessType === 'limited' ? 'text-neutral-300' : 'text-neutral-500'}`}
+              >
                 Access expires after a fixed number of calendar days
               </div>
             </label>

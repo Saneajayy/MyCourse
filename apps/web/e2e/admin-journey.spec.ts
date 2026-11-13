@@ -68,7 +68,9 @@ test.describe('Admin Panel End-to-End Lifecycle (Phase 7)', () => {
     // Step 2: Admin Login with 2FA
     // -------------------------------------------------------------------------
     await page.goto('/login');
-    await page.getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i).fill(adminEmail);
+    await page
+      .getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i)
+      .fill(adminEmail);
     await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill(adminPassword);
     await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
 
@@ -176,7 +178,9 @@ test.describe('Admin Panel End-to-End Lifecycle (Phase 7)', () => {
 
     // Student Login
     await page.goto('/login');
-    await page.getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i).fill(student1Email);
+    await page
+      .getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i)
+      .fill(student1Email);
     await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill('StudentPass#2026!');
     await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
     await page.waitForURL('**/my-courses');
@@ -208,7 +212,9 @@ test.describe('Admin Panel End-to-End Lifecycle (Phase 7)', () => {
 
     // Log back in as Admin
     await page.goto('/login');
-    await page.getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i).fill(adminEmail);
+    await page
+      .getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i)
+      .fill(adminEmail);
     await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill(adminPassword);
     await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
 

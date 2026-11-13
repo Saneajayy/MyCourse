@@ -91,7 +91,8 @@ export default function AdminAuditLogsPage() {
             </span>
           </div>
           <p className="text-xs text-neutral-500 mt-1">
-            Read-only, tamper-evident security audit log of administrative, pricing, and financial events
+            Read-only, tamper-evident security audit log of administrative, pricing, and financial
+            events
           </p>
         </div>
       </div>
@@ -106,7 +107,10 @@ export default function AdminAuditLogsPage() {
       {/* Filter Bar */}
       <div className="border border-neutral-200/80 bg-white p-4 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end text-xs shadow-xs">
         <div className="space-y-1">
-          <label htmlFor="filter-action" className="block text-xs font-semibold uppercase tracking-wider text-neutral-700">
+          <label
+            htmlFor="filter-action"
+            className="block text-xs font-semibold uppercase tracking-wider text-neutral-700"
+          >
             Filter by Action
           </label>
           <select
@@ -138,7 +142,10 @@ export default function AdminAuditLogsPage() {
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="filter-start-date" className="block text-xs font-semibold uppercase tracking-wider text-neutral-700">
+          <label
+            htmlFor="filter-start-date"
+            className="block text-xs font-semibold uppercase tracking-wider text-neutral-700"
+          >
             From Date
           </label>
           <input
@@ -152,7 +159,10 @@ export default function AdminAuditLogsPage() {
         </div>
 
         <div className="space-y-1">
-          <label htmlFor="filter-end-date" className="block text-xs font-semibold uppercase tracking-wider text-neutral-700">
+          <label
+            htmlFor="filter-end-date"
+            className="block text-xs font-semibold uppercase tracking-wider text-neutral-700"
+          >
             To Date
           </label>
           <input
@@ -199,12 +209,24 @@ export default function AdminAuditLogsPage() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-neutral-50/75 border-b border-neutral-200/80">
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Timestamp</th>
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Action</th>
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Actor / Operator</th>
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Target Entity</th>
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">IP / Client</th>
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">Details</th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                    Timestamp
+                  </th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                    Action
+                  </th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                    Actor / Operator
+                  </th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                    Target Entity
+                  </th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                    IP / Client
+                  </th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">
+                    Details
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-200/80">
@@ -222,7 +244,9 @@ export default function AdminAuditLogsPage() {
                       {log.actor ? (
                         <div>
                           <div className="font-semibold text-neutral-950">{log.actor.name}</div>
-                          <div className="text-neutral-500 font-mono text-[11px]">{log.actor.email}</div>
+                          <div className="text-neutral-500 font-mono text-[11px]">
+                            {log.actor.email}
+                          </div>
                         </div>
                       ) : (
                         <span className="text-neutral-400 italic">System Automation</span>
@@ -296,8 +320,8 @@ export default function AdminAuditLogsPage() {
                   Audit Event Details
                 </h3>
                 <div className="text-xs font-mono text-neutral-500 mt-0.5">
-                  Action: <strong className="text-neutral-900">{selectedLog.action}</strong> • Entity:{' '}
-                  {selectedLog.entityType} ({selectedLog.entityId})
+                  Action: <strong className="text-neutral-900">{selectedLog.action}</strong> •
+                  Entity: {selectedLog.entityType} ({selectedLog.entityId})
                 </div>
               </div>
               <button

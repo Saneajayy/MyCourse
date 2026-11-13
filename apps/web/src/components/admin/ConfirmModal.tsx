@@ -62,7 +62,10 @@ export function ConfirmModal({
               <AlertTriangle className="w-4 h-4" />
             </div>
             <div>
-              <h3 id="confirm-modal-title" className="text-sm font-bold uppercase tracking-wider text-neutral-900">
+              <h3
+                id="confirm-modal-title"
+                className="text-sm font-bold uppercase tracking-wider text-neutral-900"
+              >
                 {title}
               </h3>
               <p className="text-xs text-neutral-500 mt-0.5">Please confirm your action</p>

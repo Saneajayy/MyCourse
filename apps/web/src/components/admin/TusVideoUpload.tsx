@@ -346,9 +346,7 @@ export function TusVideoUpload({
         <div className="p-3.5 border border-neutral-200/80 bg-neutral-50 space-y-3">
           <div className="flex items-center justify-between text-xs font-medium text-neutral-900">
             <span className="truncate max-w-[280px] font-mono">{selectedFile.name}</span>
-            <span className="font-mono text-neutral-500">
-              {formatFileSize(selectedFile.size)}
-            </span>
+            <span className="font-mono text-neutral-500">{formatFileSize(selectedFile.size)}</span>
           </div>
           <div className="flex items-center gap-2">
             <button

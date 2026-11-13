@@ -93,7 +93,6 @@ interface OrderHistoryItem {
   }>;
 }
 
-
 function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
   const clamped = Math.max(0, Math.min(100, Math.round(percent)));
 
@@ -340,9 +339,7 @@ function StudentDashboardContent() {
     if (!searchQuery.trim()) return courses;
     const q = searchQuery.toLowerCase().trim();
     return courses.filter(
-      (c) =>
-        c.product.title.toLowerCase().includes(q) ||
-        c.product.slug.toLowerCase().includes(q),
+      (c) => c.product.title.toLowerCase().includes(q) || c.product.slug.toLowerCase().includes(q),
     );
   }, [courses, searchQuery]);
 
@@ -401,22 +398,27 @@ function StudentDashboardContent() {
             className="h-10 w-10 relative flex items-center justify-center text-white hover:bg-white/10 rounded-none transition-colors focus:outline-none cursor-pointer"
           >
             <Menu
-              className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
-                }`}
+              className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${
+                isMobileMenuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
+              }`}
             />
             <X
-              className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'
-                }`}
+              className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${
+                isMobileMenuOpen
+                  ? 'opacity-100 rotate-0 scale-100'
+                  : 'opacity-0 -rotate-90 scale-75'
+              }`}
             />
           </button>
         </div>
 
         {/* Dropping Column when opened: Expands on top of screen and collapses smoothly without affecting content */}
         <div
-          className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isMobileMenuOpen
-            ? 'grid-rows-[1fr] opacity-100 pointer-events-auto visible'
-            : 'grid-rows-[0fr] opacity-0 pointer-events-none invisible'
-            }`}
+          className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
+            isMobileMenuOpen
+              ? 'grid-rows-[1fr] opacity-100 pointer-events-auto visible'
+              : 'grid-rows-[0fr] opacity-0 pointer-events-none invisible'
+          }`}
         >
           <div className="overflow-hidden relative bg-black border-t border-white/50">
             {/* Background halftone image shifted to the right, full-bleed with no left cut-off */}
@@ -446,10 +448,11 @@ function StudentDashboardContent() {
                       handleTabChange(tab.id);
                       setIsMobileMenuOpen(false);
                     }}
-                    className={`w-full text-left px-6 py-4 text-[15px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${isActive
-                      ? 'bg-white text-black font-extrabold'
-                      : 'bg-transparent text-white hover:bg-white/10'
-                      }`}
+                    className={`w-full text-left px-6 py-4 text-[15px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
+                      isActive
+                        ? 'bg-white text-black font-extrabold'
+                        : 'bg-transparent text-white hover:bg-white/10'
+                    }`}
                   >
                     {tab.label}
                   </button>
@@ -486,8 +489,9 @@ function StudentDashboardContent() {
 
       {/* Dimming Backdrop Overlay: Fixed over the screen behind the header (No blur, pure neutral opacity dimming) */}
       <div
-        className={`md:hidden fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 ease-in-out ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-          }`}
+        className={`md:hidden fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 ease-in-out ${
+          isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
         onClick={() => setIsMobileMenuOpen(false)}
         aria-hidden="true"
       />
@@ -524,7 +528,10 @@ function StudentDashboardContent() {
         </div>
 
         {/* Navigation Tabs with Thin White Dividing Borders & Contrasting Active Tab */}
-        <nav aria-label="Student Dashboard Navigation" className="relative z-10 flex flex-col w-full">
+        <nav
+          aria-label="Student Dashboard Navigation"
+          className="relative z-10 flex flex-col w-full"
+        >
           {navTabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -532,10 +539,11 @@ function StudentDashboardContent() {
                 key={tab.id}
                 type="button"
                 onClick={() => handleTabChange(tab.id)}
-                className={`w-full text-left px-6 sm:px-7 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${isActive
-                  ? 'bg-white text-black font-extrabold'
-                  : 'bg-transparent text-white hover:bg-white/10'
-                  }`}
+                className={`w-full text-left px-6 sm:px-7 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
+                  isActive
+                    ? 'bg-white text-black font-extrabold'
+                    : 'bg-transparent text-white hover:bg-white/10'
+                }`}
               >
                 {tab.label}
               </button>
@@ -572,7 +580,6 @@ function StudentDashboardContent() {
       {/* ============================================================== */}
       <main className="flex-1 md:pl-64 lg:pl-72 w-full min-h-screen bg-white flex flex-col pt-16 sm:pt-20 md:pt-0">
         <div className="w-full max-w-4xl xl:max-w-5xl p-6 sm:p-8 lg:p-10 space-y-6 text-left">
-
           {/* TAB 1: MY COURSES */}
           {activeTab === 'courses' && (
             <div className="space-y-6 text-left">
@@ -621,9 +628,12 @@ function StudentDashboardContent() {
               {courses.length === 0 && !coursesError && (
                 <div className="bg-white border border-neutral-200 rounded-none p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
                   <div className="space-y-1">
-                    <h2 className="text-lg font-bold text-neutral-900 uppercase">NO ACTIVE COURSES.</h2>
+                    <h2 className="text-lg font-bold text-neutral-900 uppercase">
+                      NO ACTIVE COURSES.
+                    </h2>
                     <p className="text-xs text-neutral-500 leading-relaxed">
-                      You are not currently enrolled in any courses. Explore our masterclass to start learning.
+                      You are not currently enrolled in any courses. Explore our masterclass to
+                      start learning.
                     </p>
                   </div>
                   <div>
@@ -658,9 +668,13 @@ function StudentDashboardContent() {
               {filteredCourses.length > 0 && (
                 <div className="w-full flex flex-col gap-6 items-start text-left">
                   {filteredCourses.map((c) => {
-                    const percent = Math.min(100, Math.max(0, Math.round(c.progress?.percentComplete ?? 0)));
+                    const percent = Math.min(
+                      100,
+                      Math.max(0, Math.round(c.progress?.percentComplete ?? 0)),
+                    );
                     const totalVideos = c.product.totalVideos ?? c.progress?.totalLessons ?? 16;
-                    const durationSeconds = c.product.totalDurationSeconds ?? c.progress?.totalDurationSeconds ?? 17830;
+                    const durationSeconds =
+                      c.product.totalDurationSeconds ?? c.progress?.totalDurationSeconds ?? 17830;
                     const durationText = formatCourseDuration(durationSeconds);
 
                     return (
@@ -741,7 +755,14 @@ function StudentDashboardContent() {
                                 aria-label={percent > 0 ? 'Continue Learning' : 'Start Learning'}
                                 className="h-10 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-medium text-xs sm:text-sm rounded-none flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
                               >
-                                <span>{percent > 0 ? (percent >= 90 ? 'Review Course' : 'Continue Learning') : 'Start Learning'} &rarr;</span>
+                                <span>
+                                  {percent > 0
+                                    ? percent >= 90
+                                      ? 'Review Course'
+                                      : 'Continue Learning'
+                                    : 'Start Learning'}{' '}
+                                  &rarr;
+                                </span>
                               </Link>
                               <Link
                                 href={`/learn/${c.product.slug}`}
@@ -768,16 +789,20 @@ function StudentDashboardContent() {
                   My Certificates
                 </h1>
                 <p className="text-xs sm:text-sm text-neutral-500 mt-1">
-                  Official certificates of completion signed by instructor {siteConfig.instructor.name}.
+                  Official certificates of completion signed by instructor{' '}
+                  {siteConfig.instructor.name}.
                 </p>
               </div>
 
               {completedCourses.length === 0 ? (
                 <div className="bg-white border border-neutral-200 rounded-none p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
                   <div className="space-y-1">
-                    <h2 className="text-lg font-bold text-neutral-900 uppercase">NO CERTIFICATES EARNED YET.</h2>
+                    <h2 className="text-lg font-bold text-neutral-900 uppercase">
+                      NO CERTIFICATES EARNED YET.
+                    </h2>
                     <p className="text-xs text-neutral-500 leading-relaxed">
-                      Complete all lesson modules and practical evaluations in your enrolled courses to automatically unlock your verified certificate.
+                      Complete all lesson modules and practical evaluations in your enrolled courses
+                      to automatically unlock your verified certificate.
                     </p>
                   </div>
                   <div>
@@ -813,8 +838,14 @@ function StudentDashboardContent() {
                       </div>
 
                       <div className="p-3.5 rounded-none bg-neutral-50 border border-neutral-200 text-xs text-neutral-600 space-y-1">
-                        <p><strong className="text-neutral-900">Credential:</strong> Verified Certificate of Completion</p>
-                        <p><strong className="text-neutral-900">Instructor:</strong> {siteConfig.instructor.name}</p>
+                        <p>
+                          <strong className="text-neutral-900">Credential:</strong> Verified
+                          Certificate of Completion
+                        </p>
+                        <p>
+                          <strong className="text-neutral-900">Instructor:</strong>{' '}
+                          {siteConfig.instructor.name}
+                        </p>
                       </div>
 
                       <Link
@@ -850,14 +881,19 @@ function StudentDashboardContent() {
                   {/* Header with border joining outer outline */}
                   <div className="px-5 sm:px-7 py-4 sm:py-4.5 border-b border-neutral-200 flex items-center gap-2.5">
                     <UserIcon className="w-4 h-4 text-neutral-900" />
-                    <h2 className="text-base sm:text-[17px] font-bold text-neutral-900">Personal Information</h2>
+                    <h2 className="text-base sm:text-[17px] font-bold text-neutral-900">
+                      Personal Information
+                    </h2>
                   </div>
 
                   <div className="p-5 sm:p-7">
                     <form onSubmit={handleSaveProfile} className="space-y-4 sm:space-y-4.5">
                       {/* Name Input */}
                       <div className="space-y-1.5 text-left">
-                        <label htmlFor="profile-name" className="text-sm font-bold text-neutral-900 block">
+                        <label
+                          htmlFor="profile-name"
+                          className="text-sm font-bold text-neutral-900 block"
+                        >
                           Full Name
                         </label>
                         <input
@@ -872,7 +908,10 @@ function StudentDashboardContent() {
 
                       {/* Email Address */}
                       <div className="space-y-1.5 text-left">
-                        <label htmlFor="profile-email" className="text-sm font-bold text-neutral-900 block">
+                        <label
+                          htmlFor="profile-email"
+                          className="text-sm font-bold text-neutral-900 block"
+                        >
                           Email Address
                         </label>
                         <input
@@ -904,7 +943,10 @@ function StudentDashboardContent() {
 
                       {/* Phone Input */}
                       <div className="space-y-1.5 text-left">
-                        <label htmlFor="profile-phone" className="text-sm font-bold text-neutral-900 block">
+                        <label
+                          htmlFor="profile-phone"
+                          className="text-sm font-bold text-neutral-900 block"
+                        >
                           Phone Number
                         </label>
                         <input
@@ -936,7 +978,9 @@ function StudentDashboardContent() {
                   {/* Header with border joining outer outline */}
                   <div className="px-5 sm:px-7 py-4 sm:py-4.5 border-b border-neutral-200 flex items-center gap-2.5">
                     <Lock className="w-4 h-4 text-neutral-900" />
-                    <h2 className="text-base sm:text-[17px] font-bold text-neutral-900">Security &amp; Password</h2>
+                    <h2 className="text-base sm:text-[17px] font-bold text-neutral-900">
+                      Security &amp; Password
+                    </h2>
                   </div>
 
                   <div className="p-5 sm:p-7">
@@ -949,7 +993,10 @@ function StudentDashboardContent() {
 
                       {/* Current Password */}
                       <div className="space-y-1.5 text-left">
-                        <label htmlFor="profile-current-password" className="text-sm font-bold text-neutral-900 block">
+                        <label
+                          htmlFor="profile-current-password"
+                          className="text-sm font-bold text-neutral-900 block"
+                        >
                           Current Password
                         </label>
                         <div className="relative">
@@ -968,14 +1015,21 @@ function StudentDashboardContent() {
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
                             aria-label={showCurrentPassword ? 'Hide password' : 'Show password'}
                           >
-                            {showCurrentPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                            {showCurrentPassword ? (
+                              <Eye className="w-4 h-4" />
+                            ) : (
+                              <EyeOff className="w-4 h-4" />
+                            )}
                           </button>
                         </div>
                       </div>
 
                       {/* New Password */}
                       <div className="space-y-1.5 text-left">
-                        <label htmlFor="profile-new-password" className="text-sm font-bold text-neutral-900 block">
+                        <label
+                          htmlFor="profile-new-password"
+                          className="text-sm font-bold text-neutral-900 block"
+                        >
                           New Password
                         </label>
                         <div className="relative">
@@ -994,14 +1048,21 @@ function StudentDashboardContent() {
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
                             aria-label={showNewPassword ? 'Hide password' : 'Show password'}
                           >
-                            {showNewPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                            {showNewPassword ? (
+                              <Eye className="w-4 h-4" />
+                            ) : (
+                              <EyeOff className="w-4 h-4" />
+                            )}
                           </button>
                         </div>
                       </div>
 
                       {/* Confirm Password */}
                       <div className="space-y-1.5 text-left">
-                        <label htmlFor="profile-confirm-password" className="text-sm font-bold text-neutral-900 block">
+                        <label
+                          htmlFor="profile-confirm-password"
+                          className="text-sm font-bold text-neutral-900 block"
+                        >
                           Confirm New Password
                         </label>
                         <div className="relative">
@@ -1020,7 +1081,11 @@ function StudentDashboardContent() {
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
                             aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                           >
-                            {showConfirmPassword ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                            {showConfirmPassword ? (
+                              <Eye className="w-4 h-4" />
+                            ) : (
+                              <EyeOff className="w-4 h-4" />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -1050,7 +1115,8 @@ function StudentDashboardContent() {
                   Payment Orders &amp; Invoices
                 </h1>
                 <p className="text-xs sm:text-sm text-neutral-500 mt-1">
-                  Download official GST tax invoices in PDF format for company or personal reimbursement.
+                  Download official GST tax invoices in PDF format for company or personal
+                  reimbursement.
                 </p>
               </div>
 
@@ -1064,7 +1130,8 @@ function StudentDashboardContent() {
                   <div className="space-y-1.5">
                     <h2 className="text-lg font-bold text-neutral-900">No payment history yet</h2>
                     <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
-                      Once you enroll in a course, your official GST tax invoices and payment receipts will appear here.
+                      Once you enroll in a course, your official GST tax invoices and payment
+                      receipts will appear here.
                     </p>
                   </div>
                   <div>
@@ -1081,7 +1148,11 @@ function StudentDashboardContent() {
                 <div className="space-y-4 w-full max-w-lg lg:max-w-[480px] text-left">
                   {orders.map((ord) => {
                     const amountFormatted = (
-                      ((ord.totalPaise ?? ord.amountPaise ?? ord.invoice?.totalPaise ?? ord.payments?.[0]?.amountPaise ?? 0)) / 100
+                      (ord.totalPaise ??
+                        ord.amountPaise ??
+                        ord.invoice?.totalPaise ??
+                        ord.payments?.[0]?.amountPaise ??
+                        0) / 100
                     ).toLocaleString('en-IN');
 
                     return (
@@ -1131,9 +1202,7 @@ function StudentDashboardContent() {
                             <h2 className="text-base sm:text-[17px] font-bold text-neutral-900 leading-snug">
                               {ord.product.title}
                             </h2>
-                            <p className="text-xs text-neutral-500 font-medium">
-                              12 Months Access
-                            </p>
+                            <p className="text-xs text-neutral-500 font-medium">12 Months Access</p>
                           </div>
 
                           {/* Actions: Download Invoice & Access Course equally spread on bottom */}
@@ -1170,7 +1239,6 @@ function StudentDashboardContent() {
               )}
             </div>
           )}
-
         </div>
       </main>
     </div>

@@ -163,17 +163,18 @@ function ForgotPasswordContent() {
     setIsVerifying(true);
 
     try {
-      const res = await apiClient<{ success?: boolean; resetToken?: string; data?: { resetToken?: string } }>(
-        '/auth/verify-reset-otp',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            email: email.trim().toLowerCase(),
-            otp: otpCode.trim(),
-          }),
-          skipAuth: true,
-        },
-      );
+      const res = await apiClient<{
+        success?: boolean;
+        resetToken?: string;
+        data?: { resetToken?: string };
+      }>('/auth/verify-reset-otp', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          otp: otpCode.trim(),
+        }),
+        skipAuth: true,
+      });
 
       const token = res?.resetToken || res?.data?.resetToken;
       if (!token) {
@@ -182,7 +183,9 @@ function ForgotPasswordContent() {
 
       toastSuccess('Code Verified', 'Please enter your new password.');
       // Keep isVerifyingRef.current = true during route transition so no subsequent submit can trigger
-      router.push(`/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email.trim().toLowerCase())}`);
+      router.push(
+        `/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email.trim().toLowerCase())}`,
+      );
     } catch (err: unknown) {
       // Only unlock on error so user can re-try
       isVerifyingRef.current = false;
@@ -245,10 +248,7 @@ function ForgotPasswordContent() {
           {/* Email Input Form */}
           <form onSubmit={handleSendCode} className="space-y-4">
             <div className="space-y-1.5 text-left">
-              <label
-                htmlFor="forgot-email"
-                className="text-sm font-bold text-neutral-900"
-              >
+              <label htmlFor="forgot-email" className="text-sm font-bold text-neutral-900">
                 Registered Email
               </label>
               <div className="relative">
@@ -277,7 +277,9 @@ function ForgotPasswordContent() {
                 disabled={isLoading || !email.trim()}
                 className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-none transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
               >
-                {isLoading && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
+                {isLoading && (
+                  <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />
+                )}
                 <span>{isLoading ? 'Sending Code...' : 'Send Reset Code'}</span>
               </button>
             </div>
@@ -315,7 +317,6 @@ function ForgotPasswordContent() {
             </h1>
             <div className="text-neutral-600 text-[13px] sm:text-[14px] font-normal mt-1.5 space-y-0.5">
               <p>Enter the 6 digit OTP we sent to your email.</p>
-
             </div>
           </div>
 
@@ -334,7 +335,10 @@ function ForgotPasswordContent() {
             }}
             className="space-y-5"
           >
-            <div className="flex items-center justify-center gap-2 sm:gap-2.5 my-2" onPaste={handlePaste}>
+            <div
+              className="flex items-center justify-center gap-2 sm:gap-2.5 my-2"
+              onPaste={handlePaste}
+            >
               {digits.map((digit, index) => (
                 <input
                   key={index}
@@ -364,7 +368,9 @@ function ForgotPasswordContent() {
                 disabled={!isComplete || isVerifying}
                 className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-none transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
               >
-                {isVerifying && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
+                {isVerifying && (
+                  <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />
+                )}
                 <span>{isVerifying ? 'Verifying Code...' : 'Verify & Continue'}</span>
               </button>
             </div>
@@ -375,9 +381,7 @@ function ForgotPasswordContent() {
             <div className="flex items-center gap-1.5 flex-wrap justify-center">
               <span>Didn&apos;t receive the email?</span>
               {resendCooldown > 0 ? (
-                <span className="text-neutral-400 font-normal">
-                  Resend in {resendCooldown}s
-                </span>
+                <span className="text-neutral-400 font-normal">Resend in {resendCooldown}s</span>
               ) : (
                 <button
                   type="button"
@@ -475,7 +479,13 @@ export default function ForgotPasswordPage() {
 
         {/* Centered OTP Verification Area */}
         <div className="m-auto w-full max-w-[420px] sm:max-w-[440px] px-4 py-6 sm:py-8 relative z-10">
-          <Suspense fallback={<div className="p-8 text-center text-sm font-mono text-neutral-500">Loading form...</div>}>
+          <Suspense
+            fallback={
+              <div className="p-8 text-center text-sm font-mono text-neutral-500">
+                Loading form...
+              </div>
+            }
+          >
             <ForgotPasswordContent />
           </Suspense>
         </div>

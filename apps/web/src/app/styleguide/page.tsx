@@ -365,25 +365,13 @@ export default function StyleguidePage() {
           Interactive triggers to preview each modal state identically to live checkout:
         </p>
         <div className="flex flex-wrap gap-3">
-          <Button
-            size="md"
-            variant="primary"
-            onClick={() => setPreviewModal('success')}
-          >
+          <Button size="md" variant="primary" onClick={() => setPreviewModal('success')}>
             Preview Payment Success Card
           </Button>
-          <Button
-            size="md"
-            variant="outline"
-            onClick={() => setPreviewModal('failed')}
-          >
+          <Button size="md" variant="outline" onClick={() => setPreviewModal('failed')}>
             Preview Payment Failed Card
           </Button>
-          <Button
-            size="md"
-            variant="outline"
-            onClick={() => setPreviewModal('pending')}
-          >
+          <Button size="md" variant="outline" onClick={() => setPreviewModal('pending')}>
             Preview Payment Verifying Card
           </Button>
         </div>

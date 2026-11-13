@@ -85,10 +85,7 @@ export default async function HomePage() {
       <HeroSection courseSlug="hydraulic-engineering-mastery" />
 
       {/* Course Syllabus & Overview Section */}
-      <SyllabusSection
-        courseSlug="hydraulic-engineering-mastery"
-        sections={sections}
-      />
+      <SyllabusSection courseSlug="hydraulic-engineering-mastery" sections={sections} />
 
       {/* Course Outcomes & Practical Skills */}
       <OutcomesSection />

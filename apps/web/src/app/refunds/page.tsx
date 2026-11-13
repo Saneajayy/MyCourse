@@ -79,7 +79,8 @@ export default function RefundPage() {
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">01.</span>
                   <strong className="font-bold text-neutral-950 mr-1">7-Day Guarantee:</strong>
-                  If the curriculum does not meet your expectations, request a 100% full refund within 7 calendar days of your enrollment.
+                  If the curriculum does not meet your expectations, request a 100% full refund
+                  within 7 calendar days of your enrollment.
                 </p>
               </div>
 
@@ -87,7 +88,8 @@ export default function RefundPage() {
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">02.</span>
                   <strong className="font-bold text-neutral-950 mr-1">Eligibility Criteria:</strong>
-                  Eligible if you have completed less than 20% of video lessons and have not downloaded proprietary circuit blueprints.
+                  Eligible if you have completed less than 20% of video lessons and have not
+                  downloaded proprietary circuit blueprints.
                 </p>
               </div>
 
@@ -95,7 +97,8 @@ export default function RefundPage() {
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">03.</span>
                   <strong className="font-bold text-neutral-950 mr-1">One-Time Payment:</strong>
-                  No recurring subscriptions, auto-debits, or surprise charges; you only pay once for your full 365-day access.
+                  No recurring subscriptions, auto-debits, or surprise charges; you only pay once
+                  for your full 365-day access.
                 </p>
               </div>
 
@@ -103,7 +106,8 @@ export default function RefundPage() {
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">04.</span>
                   <strong className="font-bold text-neutral-950 mr-1">Direct Settlement:</strong>
-                  Approved reversals are credited back to your original payment method in 5–7 business days via Razorpay.
+                  Approved reversals are credited back to your original payment method in 5–7
+                  business days via Razorpay.
                 </p>
               </div>
 

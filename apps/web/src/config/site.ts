@@ -21,8 +21,7 @@ export const siteConfig = {
       'Hydraulic engineer with over 20 years of field experience in industrial plants, hydraulic systems, and circuit design. Teaches practical engineering and troubleshooting on YouTube (70k subscribers).',
     youtubeUrl:
       process.env.NEXT_PUBLIC_YOUTUBE_URL || 'https://www.youtube.com/@HYDRAULICSYSTEMbasics',
-    linkedinUrl:
-      process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linkedin.com',
+    linkedinUrl: process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://www.linkedin.com',
   },
 
   // Official support email
@@ -37,12 +36,10 @@ export const siteConfig = {
   },
 
   contact: {
-    address:
-      process.env.NEXT_PUBLIC_BUSINESS_ADDRESS || 'Rudrapur, Uttarakhand, India',
+    address: process.env.NEXT_PUBLIC_BUSINESS_ADDRESS || 'Rudrapur, Uttarakhand, India',
     hours: 'Monday – Friday, 9:00 AM – 6:00 PM IST',
     phone: process.env.NEXT_PUBLIC_SUPPORT_PHONE || '+91 97582 62351',
-    jurisdiction:
-      process.env.NEXT_PUBLIC_LEGAL_JURISDICTION || 'Rudrapur, Uttarakhand, India',
+    jurisdiction: process.env.NEXT_PUBLIC_LEGAL_JURISDICTION || 'Rudrapur, Uttarakhand, India',
   },
 
   urls: {
@@ -51,7 +48,9 @@ export const siteConfig = {
       (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'),
     api:
       process.env.NEXT_PUBLIC_API_URL ||
-      (typeof window !== 'undefined' ? '' : process.env.INTERNAL_API_URL || 'http://localhost:4000'),
+      (typeof window !== 'undefined'
+        ? ''
+        : process.env.INTERNAL_API_URL || 'http://localhost:4000'),
   },
 
   razorpayKeyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_ToZGDbt27ZdYCc',

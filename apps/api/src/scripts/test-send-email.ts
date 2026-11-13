@@ -47,7 +47,9 @@ async function main() {
 main().catch((err) => {
   console.error('\n❌ Failed to send email:');
   if (err.message && err.message.includes('validation_error')) {
-    console.error('Note: When using onboarding@resend.dev, Resend only allows sending to the email you used to register your Resend account.\n');
+    console.error(
+      'Note: When using onboarding@resend.dev, Resend only allows sending to the email you used to register your Resend account.\n',
+    );
   }
   console.error(err.message || err);
   process.exit(1);

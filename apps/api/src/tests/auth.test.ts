@@ -280,7 +280,9 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
-      expect(res.body.data.message).toContain('If an account exists, a new verification code has been sent');
+      expect(res.body.data.message).toContain(
+        'If an account exists, a new verification code has been sent',
+      );
     });
 
     it('locks out verification attempts after 5 incorrect OTP attempts', async () => {
@@ -621,13 +623,11 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
       const newPassword = 'BrandNewValidPassword2026!';
 
       // 1. Register student
-      const reg = await request(app)
-        .post('/api/v1/auth/register')
-        .send({
-          email: studentEmail,
-          password: originalPassword,
-          name: 'Reset Student',
-        });
+      const reg = await request(app).post('/api/v1/auth/register').send({
+        email: studentEmail,
+        password: originalPassword,
+        name: 'Reset Student',
+      });
       expect(reg.status).toBe(201);
 
       // 2. Request password reset (generates 6-digit OTP)

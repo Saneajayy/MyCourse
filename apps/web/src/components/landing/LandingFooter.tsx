@@ -85,7 +85,10 @@ export function LandingFooter({ showQuickLinks = true }: LandingFooterProps) {
                 <span className="text-xs sm:text-sm font-bold text-white/50 uppercase tracking-[0.2em] mb-3 sm:mb-4 select-none">
                   Quick Links
                 </span>
-                <nav aria-label="Footer Quick Links" className="flex flex-col space-y-2 sm:space-y-2.5 text-sm sm:text-base font-medium text-white/75">
+                <nav
+                  aria-label="Footer Quick Links"
+                  className="flex flex-col space-y-2 sm:space-y-2.5 text-sm sm:text-base font-medium text-white/75"
+                >
                   <Link href="/#syllabus" className="hover:text-white transition-colors">
                     Syllabus
                   </Link>
@@ -109,7 +112,10 @@ export function LandingFooter({ showQuickLinks = true }: LandingFooterProps) {
                 <span className="text-xs font-bold text-white/50 uppercase tracking-[0.2em] mb-3 select-none">
                   Legal
                 </span>
-                <nav aria-label="Footer Legal Links" className="flex flex-col space-y-2 text-sm font-medium text-white/75">
+                <nav
+                  aria-label="Footer Legal Links"
+                  className="flex flex-col space-y-2 text-sm font-medium text-white/75"
+                >
                   <Link href="/terms" className="hover:text-white transition-colors">
                     Terms &amp; Conditions
                   </Link>
@@ -130,7 +136,10 @@ export function LandingFooter({ showQuickLinks = true }: LandingFooterProps) {
               <span className="text-xs sm:text-sm font-bold text-white/50 uppercase tracking-[0.2em] mb-3 select-none">
                 Legal &amp; Support
               </span>
-              <nav aria-label="Footer Legal Links" className="flex flex-col space-y-2.5 text-sm font-medium text-white/75">
+              <nav
+                aria-label="Footer Legal Links"
+                className="flex flex-col space-y-2.5 text-sm font-medium text-white/75"
+              >
                 <Link href="/terms" className="hover:text-white transition-colors">
                   Terms &amp; Conditions
                 </Link>

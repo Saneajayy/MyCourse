@@ -9,6 +9,9 @@ export function formatDisplayOrderId(id: string | null | undefined): string {
   if (/^ORD-#[A-Z0-9]+$/i.test(id)) {
     return id.toUpperCase();
   }
-  const clean = id.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase();
+  const clean = id
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .slice(0, 8)
+    .toUpperCase();
   return `ORD-#${clean}`;
 }

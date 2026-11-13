@@ -174,7 +174,8 @@ function TwoFactorFlow() {
                   <span>Scan with Authenticator App</span>
                 </div>
                 <p className="text-xs text-neutral-500 leading-relaxed">
-                  Open Google Authenticator, Authy, or Apple Passwords on your phone and scan the code below.
+                  Open Google Authenticator, Authy, or Apple Passwords on your phone and scan the
+                  code below.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pt-2">
@@ -230,7 +231,8 @@ function TwoFactorFlow() {
                   <span>Save Backup Recovery Codes</span>
                 </div>
                 <p className="text-xs text-neutral-500 leading-relaxed">
-                  Store these 10 one-time recovery codes in a secure location. Each code can bypass 2FA once if you lose access to your device.
+                  Store these 10 one-time recovery codes in a secure location. Each code can bypass
+                  2FA once if you lose access to your device.
                 </p>
 
                 <div className="grid grid-cols-2 gap-1.5 p-3 bg-neutral-50 border border-neutral-200 font-mono text-xs text-center text-neutral-800 select-all">
@@ -267,7 +269,10 @@ function TwoFactorFlow() {
               </div>
 
               {/* Step 3: Enter Code to Verify */}
-              <form onSubmit={handleEnrollmentSubmit} className="p-5 sm:p-6 space-y-4 bg-neutral-50/20">
+              <form
+                onSubmit={handleEnrollmentSubmit}
+                className="p-5 sm:p-6 space-y-4 bg-neutral-50/20"
+              >
                 <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
                   <span className="w-5 h-5 bg-neutral-900 text-white flex items-center justify-center font-mono text-[11px]">
                     3
@@ -323,7 +328,10 @@ function TwoFactorFlow() {
         /* Case 2: Standard Login 2FA Challenge */
         <form onSubmit={handleChallengeSubmit} className="p-6 space-y-5">
           <div className="space-y-2">
-            <label htmlFor="challenge-code" className="text-xs font-bold uppercase tracking-wider text-neutral-700 block">
+            <label
+              htmlFor="challenge-code"
+              className="text-xs font-bold uppercase tracking-wider text-neutral-700 block"
+            >
               6-Digit Authenticator Code or Backup Code
             </label>
             <input

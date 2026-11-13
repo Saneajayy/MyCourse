@@ -6,15 +6,7 @@ import Image from 'next/image';
 import { siteConfig } from '../../config/site';
 import { useToast } from '../../components/ui';
 import { apiClient } from '../../lib/api-client';
-import {
-  Mail,
-  MessageSquare,
-  X,
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-  Send,
-} from 'lucide-react';
+import { Mail, MessageSquare, X, Loader2, CheckCircle2, AlertCircle, Send } from 'lucide-react';
 
 export default function ContactPage() {
   useEffect(() => {
@@ -73,7 +65,8 @@ export default function ContactPage() {
         'Our engineering support team will respond within 24 business hours.',
       );
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Unable to submit inquiry. Please try again.';
+      const msg =
+        err instanceof Error ? err.message : 'Unable to submit inquiry. Please try again.';
       setErrorMessage(msg);
       toastError('Submission Failed', msg);
     } finally {
@@ -133,7 +126,8 @@ export default function ContactPage() {
                 Contact Support
               </h1>
               <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed mt-1">
-                Reach our engineering desk for technical support, billing inquiries, or enterprise access.
+                Reach our engineering desk for technical support, billing inquiries, or enterprise
+                access.
               </p>
             </div>
 
@@ -149,7 +143,8 @@ export default function ContactPage() {
                     className="font-semibold underline text-black hover:opacity-80"
                   >
                     {siteConfig.supportEmail}
-                  </a>; answered within 24 business hours.
+                  </a>
+                  ; answered within 24 business hours.
                 </p>
               </div>
 
@@ -179,8 +174,11 @@ export default function ContactPage() {
               <div className="px-5 sm:px-6 py-2.5 sm:py-3 last:pb-0">
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">04.</span>
-                  <strong className="font-bold text-neutral-950 mr-1">Corporate &amp; Enterprise:</strong>
-                  For bulk engineering enrollments, custom plant training, or GST tax invoices, reach out directly.
+                  <strong className="font-bold text-neutral-950 mr-1">
+                    Corporate &amp; Enterprise:
+                  </strong>
+                  For bulk engineering enrollments, custom plant training, or GST tax invoices,
+                  reach out directly.
                 </p>
               </div>
             </div>
@@ -252,7 +250,10 @@ export default function ContactPage() {
             {/* Modal Header */}
             <div className="flex items-start justify-between gap-3 border-b border-neutral-200 pb-3">
               <div>
-                <h2 id="contact-modal-title" className="text-lg font-bold text-neutral-900 tracking-tight">
+                <h2
+                  id="contact-modal-title"
+                  className="text-lg font-bold text-neutral-900 tracking-tight"
+                >
                   Send Support Inquiry
                 </h2>
                 <p className="text-xs text-neutral-500 mt-0.5">
@@ -274,11 +275,10 @@ export default function ContactPage() {
                 <div className="w-10 h-10 bg-black text-white inline-flex items-center justify-center">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-bold text-neutral-900">
-                  Message Sent Successfully
-                </h3>
+                <h3 className="text-base font-bold text-neutral-900">Message Sent Successfully</h3>
                 <p className="text-xs text-neutral-600 max-w-xs mx-auto leading-relaxed">
-                  Thank you for reaching out. We have received your inquiry and will respond to {email} shortly.
+                  Thank you for reaching out. We have received your inquiry and will respond to{' '}
+                  {email} shortly.
                 </p>
                 <div className="pt-2">
                   <button

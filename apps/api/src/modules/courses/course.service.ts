@@ -649,8 +649,7 @@ export class CourseService {
     let videoId = lesson.videoProviderId;
 
     const isGuid = Boolean(
-      videoId &&
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(videoId),
+      videoId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(videoId),
     );
 
     // In Bunny Stream, each video upload requires a real video object in Bunny.

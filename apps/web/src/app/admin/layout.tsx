@@ -337,8 +337,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span>30m Inactivity Guard</span>
             </div>
             <p className="text-[11px] text-neutral-400 leading-snug">
-              Session terminates automatically if inactive to safeguard payment and student
-              records.
+              Session terminates automatically if inactive to safeguard payment and student records.
             </p>
           </div>
         </aside>

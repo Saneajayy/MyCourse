@@ -106,7 +106,7 @@ export function ReviewsSection() {
       name: 'Ankit Mishra',
       role: 'Industrial Automation Specialist',
       content:
-        '“The greatest strength of this course is Hira Lal Sir’s authentic teaching style. He speaks the real language of the shop floor and explains the \'why\' behind every valve setting. It bridges mechanical automation and fluid power better than any program.”',
+        "“The greatest strength of this course is Hira Lal Sir’s authentic teaching style. He speaks the real language of the shop floor and explains the 'why' behind every valve setting. It bridges mechanical automation and fluid power better than any program.”",
       rating: 5,
     },
   ];
@@ -119,7 +119,6 @@ export function ReviewsSection() {
       id="reviews"
       className="relative w-full py-16 sm:py-20 md:py-24 font-reddit select-none bg-transparent overflow-hidden scroll-mt-12 md:scroll-mt-16"
     >
-
       {/* Header Container matching optical left padding */}
       <div className="w-full pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 pr-6 sm:pr-8 md:pr-12 lg:pr-16 mb-10 sm:mb-12 md:mb-14">
         <h2 className="font-extrabold text-white uppercase leading-[0.88] tracking-[-0.02em] text-5xl sm:text-6xl md:text-7xl lg:text-[76px] xl:text-[84px] select-none">

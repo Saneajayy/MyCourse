@@ -213,9 +213,7 @@ export default function AdminCoursesPage() {
                     >
                       {course.status}
                     </span>
-                    <span className="text-[11px] font-mono text-neutral-400">
-                      /{course.slug}
-                    </span>
+                    <span className="text-[11px] font-mono text-neutral-400">/{course.slug}</span>
                   </div>
                   <h2 className="text-sm font-bold text-neutral-950 leading-snug">
                     {course.title}
@@ -239,7 +237,8 @@ export default function AdminCoursesPage() {
                 <div className="p-2.5 border border-amber-200 bg-amber-50/70 text-amber-950 text-xs flex items-center gap-2">
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                   <span className="font-medium text-[11px]">
-                    Warning: Course is live but {course.missingVideosCount} lesson(s) lack ready video streams.
+                    Warning: Course is live but {course.missingVideosCount} lesson(s) lack ready
+                    video streams.
                   </span>
                 </div>
               )}
@@ -256,9 +255,7 @@ export default function AdminCoursesPage() {
                 <span className="text-neutral-300">•</span>
                 <span>{course._count?.orders || 0} Enrolled</span>
                 <span className="text-neutral-300">•</span>
-                <span>
-                  {course.validityDays ? `${course.validityDays}d Access` : 'Lifetime'}
-                </span>
+                <span>{course.validityDays ? `${course.validityDays}d Access` : 'Lifetime'}</span>
               </div>
             </div>
 

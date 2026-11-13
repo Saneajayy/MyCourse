@@ -282,7 +282,10 @@ export class InvoiceService {
           align: 'right',
         })
         .text(
-          `Order Ref: ORD-#${order.id.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8).toUpperCase()}`,
+          `Order Ref: ORD-#${order.id
+            .replace(/[^a-zA-Z0-9]/g, '')
+            .slice(0, 8)
+            .toUpperCase()}`,
           400,
           105,
           { align: 'right' },

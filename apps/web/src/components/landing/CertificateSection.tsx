@@ -11,7 +11,6 @@ export function CertificateSection() {
       id="certificate"
       className="relative w-full py-16 sm:py-20 md:py-24 pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 pr-6 sm:pr-8 md:pr-12 lg:pr-16 font-reddit select-none bg-transparent overflow-visible scroll-mt-12 md:scroll-mt-16"
     >
-
       {/* Self-contained Font-face to guarantee Shalimar loads in all mobile & desktop viewports */}
       <style>{`
         @font-face {
@@ -90,7 +89,10 @@ export function CertificateSection() {
 
                 {/* 5. Course Completion Description */}
                 <p className="text-black/80 font-light text-[12px] sm:text-[13px] leading-[1.45] text-left select-none max-w-[340px]">
-                  For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong> by Mr. Hira lal, covering the<br />
+                  For completing the course of{' '}
+                  <strong className="font-bold text-black">Hydraulic System Basics</strong> by Mr.
+                  Hira lal, covering the
+                  <br />
                   Fundamentals of Hydraulic systems, components and circuit designs.
                 </p>
 
@@ -187,8 +189,11 @@ export function CertificateSection() {
 
                     {/* 3. Course Description */}
                     <p className="mt-1 md:mt-1.5 text-black/80 font-light text-[13px] md:text-[14px] lg:text-[15px] leading-[1.55] text-left select-none max-w-[490px] lg:max-w-[540px]">
-                      For completing the course of <strong className="font-bold text-black">Hydraulic System Basics</strong><br className="hidden md:inline" />
-                      by Mr. Hira Lal, covering the Fundamentals of Hydraulic<br className="hidden md:inline" />
+                      For completing the course of{' '}
+                      <strong className="font-bold text-black">Hydraulic System Basics</strong>
+                      <br className="hidden md:inline" />
+                      by Mr. Hira Lal, covering the Fundamentals of Hydraulic
+                      <br className="hidden md:inline" />
                       systems, components and circuit designs.
                     </p>
                   </div>

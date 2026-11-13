@@ -32,7 +32,7 @@ export function TiltCard({
       }
       onMouseEnter?.(e);
     },
-    [onMouseEnter]
+    [onMouseEnter],
   );
 
   const handleMouseMove = useCallback(
@@ -50,7 +50,7 @@ export function TiltCard({
       cardRef.current.style.transform = `perspective(${perspective}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(${scale}, ${scale}, ${scale})`;
       onMouseMove?.(e);
     },
-    [maxTilt, scale, perspective, onMouseMove]
+    [maxTilt, scale, perspective, onMouseMove],
   );
 
   const handleMouseLeave = useCallback(
@@ -60,7 +60,7 @@ export function TiltCard({
       cardRef.current.style.transform = `perspective(${perspective}px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
       onMouseLeave?.(e);
     },
-    [perspective, onMouseLeave]
+    [perspective, onMouseLeave],
   );
 
   return (

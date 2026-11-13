@@ -44,9 +44,8 @@ function LoginForm() {
 
       // Admin users MUST ALWAYS be redirected directly to Admin Panel, never to student pages
       if (result.user?.role === 'ADMIN') {
-        const adminDest = explicitRedirect && explicitRedirect.startsWith('/admin')
-          ? explicitRedirect
-          : '/admin';
+        const adminDest =
+          explicitRedirect && explicitRedirect.startsWith('/admin') ? explicitRedirect : '/admin';
         toastSuccess('Welcome Admin', 'Redirecting to Admin Console...');
         router.push(adminDest);
         return;
@@ -213,7 +212,9 @@ function LoginForm() {
               disabled={isLoading}
               className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-none transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
             >
-              {isLoading && <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />}
+              {isLoading && (
+                <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />
+              )}
               <span>{isLoading ? 'Signing in...' : 'Sign in'}</span>
             </button>
           </div>
@@ -223,7 +224,9 @@ function LoginForm() {
         <div className="mt-5 text-center text-sm text-neutral-600">
           New here?{' '}
           <Link
-            href={redirectUrl ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : '/register'}
+            href={
+              redirectUrl ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : '/register'
+            }
             className="font-bold text-black underline hover:text-[#262626] ml-1"
           >
             Create an account

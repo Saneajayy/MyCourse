@@ -45,7 +45,9 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
 
     // 5. Log in
     await page.goto('/login');
-    await page.getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i).fill(testStudent.email);
+    await page
+      .getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i)
+      .fill(testStudent.email);
     await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill(testStudent.password);
     await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
     await page.waitForURL('**/my-courses');
@@ -101,7 +103,9 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
     await page.waitForURL(/\/login/);
 
     // 12. Log back in and verify resume state
-    await page.getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i).fill(testStudent.email);
+    await page
+      .getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i)
+      .fill(testStudent.email);
     await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill(testStudent.password);
     await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
     await page.waitForURL((url) => url.pathname === '/my-courses' || url.pathname === '/account');
@@ -123,7 +127,9 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
 
     // Log in directly without verification
     await page.goto('/login');
-    await page.getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i).fill(unverifiedEmail);
+    await page
+      .getByPlaceholder(/Username or Email|Registered Email|engineer@plant\.com/i)
+      .fill(unverifiedEmail);
     await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill('RobustHydraulics#2026!Key');
     await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
     await page.waitForURL('**/my-courses');

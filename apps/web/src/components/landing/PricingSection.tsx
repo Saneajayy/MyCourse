@@ -12,9 +12,7 @@ interface PricingSectionProps {
   courseSlug?: string;
 }
 
-export function PricingSection({
-  priceFormatted = '$4999',
-}: PricingSectionProps) {
+export function PricingSection({ priceFormatted = '$4999' }: PricingSectionProps) {
   const features = [
     '60 video lessons in Hindi.',
     '12 months of access.',
@@ -29,7 +27,6 @@ export function PricingSection({
       id="pricing"
       className="relative w-full py-16 sm:py-20 md:py-24 pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 pr-6 sm:pr-8 md:pr-12 lg:pr-16 font-reddit select-none bg-transparent overflow-visible scroll-mt-12 md:scroll-mt-16"
     >
-
       {/* 3D Hydraulic Component Pixelated Graphic (Flipped horizontally and positioned on Left Side) */}
       <div className="absolute -left-[10vw] sm:-left-[14vw] lg:-left-[18vw] xl:-left-[20vw] top-1/2 -translate-y-[45%] sm:-translate-y-[35%] -translate-x-[10%] sm:translate-x-0 w-[103vw] sm:w-[86vw] max-w-[1650px] min-w-[840px] sm:min-w-[700px] pointer-events-none flex items-center justify-start z-0">
         <ScatterCanvas

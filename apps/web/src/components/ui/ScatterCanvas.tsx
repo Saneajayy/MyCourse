@@ -270,8 +270,8 @@ export function ScatterCanvas({
           currentStrength += diffStrength * 0.14;
 
           if (mouse.active) {
-            currentMouseX += (mouse.x - currentMouseX) * 0.20;
-            currentMouseY += (mouse.y - currentMouseY) * 0.20;
+            currentMouseX += (mouse.x - currentMouseX) * 0.2;
+            currentMouseY += (mouse.y - currentMouseY) * 0.2;
           }
 
           gl.uniform2f(uMouseLoc, currentMouseX, currentMouseY);

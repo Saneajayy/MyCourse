@@ -105,7 +105,9 @@ export default function AdminSettingsPage() {
         }),
       });
 
-      setToast('Store settings saved successfully. New orders will utilize these updated parameters.');
+      setToast(
+        'Store settings saved successfully. New orders will utilize these updated parameters.',
+      );
       await fetchSettings();
     } catch (err: unknown) {
       if (err instanceof ApiError && err.requestId) {
@@ -171,7 +173,9 @@ export default function AdminSettingsPage() {
             <span>{error}</span>
           </div>
           {requestId && (
-            <div className="text-[11px] font-mono text-rose-700 ml-6">Reference ID: {requestId}</div>
+            <div className="text-[11px] font-mono text-rose-700 ml-6">
+              Reference ID: {requestId}
+            </div>
           )}
         </div>
       )}
@@ -241,7 +245,8 @@ export default function AdminSettingsPage() {
               2. Indian GST &amp; Tax Configuration
             </h2>
             <p className="text-xs text-neutral-500 mt-0.5">
-              Tax rules strictly affect NEW orders. Past orders and existing generated invoices will not be altered.
+              Tax rules strictly affect NEW orders. Past orders and existing generated invoices will
+              not be altered.
             </p>
           </div>
 
@@ -258,7 +263,8 @@ export default function AdminSettingsPage() {
                 className="w-full border border-neutral-300 p-2.5 text-xs font-mono uppercase bg-white text-neutral-900 focus:outline-none focus:border-neutral-900"
               />
               <p className="text-[11px] text-neutral-500">
-                Leave blank if below GST threshold. If empty, tax lines will NOT be displayed at checkout.
+                Leave blank if below GST threshold. If empty, tax lines will NOT be displayed at
+                checkout.
               </p>
             </div>
 
@@ -295,7 +301,8 @@ export default function AdminSettingsPage() {
               </span>
             </label>
             <p className="text-[11px] text-neutral-500 mt-1 pl-6">
-              When checked, a ₹4,999 course already includes GST in the ₹4,999 price (subtotal will be calculated backwards on invoice). When unchecked, GST is added on top at checkout.
+              When checked, a ₹4,999 course already includes GST in the ₹4,999 price (subtotal will
+              be calculated backwards on invoice). When unchecked, GST is added on top at checkout.
             </p>
           </div>
         </div>
@@ -388,7 +395,9 @@ export default function AdminSettingsPage() {
           <div className="space-y-3">
             <p>You are updating the GST tax rate or tax-inclusivity settings.</p>
             <div className="bg-amber-50 border border-amber-200 text-amber-900 p-3 text-xs leading-relaxed">
-              <strong>Important:</strong> This change will affect NEW orders placed after this moment only. Past orders, captured payments, and existing issued tax invoices will remain strictly unchanged.
+              <strong>Important:</strong> This change will affect NEW orders placed after this
+              moment only. Past orders, captured payments, and existing issued tax invoices will
+              remain strictly unchanged.
             </div>
             <p className="text-xs text-neutral-600">
               Are you sure you want to apply these tax configuration changes?

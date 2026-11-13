@@ -230,7 +230,9 @@ export default function NewCoursePage() {
                   onChange={() => setAccessType('lifetime')}
                 />
                 <div className="text-xs font-bold uppercase tracking-wider">Lifetime Access</div>
-                <div className={`text-[11px] mt-1 ${accessType === 'lifetime' ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                <div
+                  className={`text-[11px] mt-1 ${accessType === 'lifetime' ? 'text-neutral-300' : 'text-neutral-500'}`}
+                >
                   Students retain access to all modules indefinitely
                 </div>
               </label>
@@ -250,7 +252,9 @@ export default function NewCoursePage() {
                   onChange={() => setAccessType('limited')}
                 />
                 <div className="text-xs font-bold uppercase tracking-wider">Limited Validity</div>
-                <div className={`text-[11px] mt-1 ${accessType === 'limited' ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                <div
+                  className={`text-[11px] mt-1 ${accessType === 'limited' ? 'text-neutral-300' : 'text-neutral-500'}`}
+                >
                   Access expires after a fixed number of calendar days
                 </div>
               </label>

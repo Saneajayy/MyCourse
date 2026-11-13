@@ -355,9 +355,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                 ID: {student.id.slice(0, 8)}...
               </span>
             </div>
-            <h1 className="text-lg font-bold text-neutral-950 mt-1">
-              {student.name}
-            </h1>
+            <h1 className="text-lg font-bold text-neutral-950 mt-1">{student.name}</h1>
           </div>
         </div>
 
@@ -405,9 +403,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div>
-              <div className="text-[10px] uppercase font-semibold text-neutral-400">
-                Full Name
-              </div>
+              <div className="text-[10px] uppercase font-semibold text-neutral-400">Full Name</div>
               <div className="font-semibold text-neutral-950 mt-0.5">{student.name}</div>
             </div>
             <div>
@@ -500,28 +496,39 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-neutral-50/50 border-b border-neutral-200/80">
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Course Title</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Access Source</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Granted Date</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Access Expiry</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Status</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">Actions</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Course Title
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Access Source
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Granted Date
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Access Expiry
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Status
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-200/80">
               {entitlements.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="p-6 text-center text-neutral-500 italic">
-                    This student does not currently hold access to any course. Click &quot;Grant Course&quot; to provide access.
+                    This student does not currently hold access to any course. Click &quot;Grant
+                    Course&quot; to provide access.
                   </td>
                 </tr>
               ) : (
                 entitlements.map((ent) => (
                   <tr key={ent.id} className="hover:bg-neutral-50/60 transition-colors">
                     <td className="p-3 font-semibold text-neutral-950">{ent.product.title}</td>
-                    <td className="p-3 font-mono text-[11px] text-neutral-500">
-                      {ent.source}
-                    </td>
+                    <td className="p-3 font-mono text-[11px] text-neutral-500">{ent.source}</td>
                     <td className="p-3 font-mono text-neutral-500 text-[11px]">
                       {new Date(ent.createdAt).toLocaleDateString()}
                     </td>
@@ -595,12 +602,24 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-neutral-50/50 border-b border-neutral-200/80">
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Order ID</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Course Package</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Amount</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Date</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Status</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">Details</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Order ID
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Course Package
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Amount
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Date
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Status
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">
+                  Details
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-200/80">
@@ -614,10 +633,7 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
                 orders.map((ord) => (
                   <tr key={ord.id} className="hover:bg-neutral-50/60 transition-colors">
                     <td className="p-3 font-mono text-[11px] font-semibold text-neutral-950">
-                      <Link
-                        href={`/admin/orders/${ord.id}`}
-                        className="hover:underline"
-                      >
+                      <Link href={`/admin/orders/${ord.id}`} className="hover:underline">
                         {ord.id.slice(0, 13)}...
                       </Link>
                     </td>
@@ -739,11 +755,21 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-neutral-50/50 border-b border-neutral-200/80">
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Template</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Subject</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Status</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-center">Attempts</th>
-                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">Sent At</th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Template
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Subject
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                  Status
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-center">
+                  Attempts
+                </th>
+                <th className="p-3 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">
+                  Sent At
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-200/80">
@@ -756,11 +782,14 @@ export default function StudentDetailPage({ params }: { params: Promise<{ id: st
               ) : (
                 emails.map((item) => {
                   let badgeCls = 'bg-neutral-100 text-neutral-800 border-neutral-200';
-                  if (item.status === 'SENT') badgeCls = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+                  if (item.status === 'SENT')
+                    badgeCls = 'bg-emerald-50 text-emerald-800 border-emerald-200';
                   else if (item.status === 'BOUNCED' || item.status === 'COMPLAINED')
                     badgeCls = 'bg-rose-50 text-rose-800 border-rose-200';
-                  else if (item.status === 'FAILED') badgeCls = 'bg-amber-50 text-amber-800 border-amber-200';
-                  else if (item.status === 'QUEUED') badgeCls = 'bg-sky-50 text-sky-800 border-sky-200';
+                  else if (item.status === 'FAILED')
+                    badgeCls = 'bg-amber-50 text-amber-800 border-amber-200';
+                  else if (item.status === 'QUEUED')
+                    badgeCls = 'bg-sky-50 text-sky-800 border-sky-200';
 
                   return (
                     <tr key={item.id} className="hover:bg-neutral-50/60 transition-colors">

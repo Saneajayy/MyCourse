@@ -8,7 +8,23 @@ interface HeroSectionProps {
   courseSlug?: string;
 }
 
-const TARGET_LETTERS = ['L', 'E', 'A', 'R', 'N', 'A', 'P', 'P', 'L', 'Y', 'S', 'O', 'L', 'V', 'E'] as const;
+const TARGET_LETTERS = [
+  'L',
+  'E',
+  'A',
+  'R',
+  'N',
+  'A',
+  'P',
+  'P',
+  'L',
+  'Y',
+  'S',
+  'O',
+  'L',
+  'V',
+  'E',
+] as const;
 const LETTER_POOL = ['L', 'E', 'A', 'R', 'N', 'A', 'P', 'P', 'L', 'Y', 'S', 'O', 'L', 'V', 'E'];
 
 function MantraShuffle() {
@@ -43,7 +59,7 @@ function MantraShuffle() {
 
         const nextLetters = TARGET_LETTERS.map((targetChar, i) => {
           // Lock threshold: progressively lock left to right from 20% to 92%
-          const lockThreshold = 0.20 + (i / 15) * 0.72;
+          const lockThreshold = 0.2 + (i / 15) * 0.72;
           if (progress >= lockThreshold) {
             return targetChar;
           }
@@ -87,7 +103,8 @@ function MantraShuffle() {
       <span className="inline-flex items-center">
         {letters.slice(startIdx, endIdx).map((char, localIdx) => {
           const globalIdx = startIdx + localIdx;
-          const isLocked = !isShufflingRef.current || letters[globalIdx] === TARGET_LETTERS[globalIdx];
+          const isLocked =
+            !isShufflingRef.current || letters[globalIdx] === TARGET_LETTERS[globalIdx];
           return (
             <span
               key={localIdx}

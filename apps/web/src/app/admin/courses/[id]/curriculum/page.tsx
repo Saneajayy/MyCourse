@@ -434,7 +434,9 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
             <span>Missing Video Warning</span>
           </div>
           <p className="text-xs text-amber-900 leading-relaxed">
-            This course is marked <strong>PUBLISHED</strong>, but {course.missingVideosCount} lesson(s) lack a video stream or are still transcoding. Ensure all paid lessons have a ready video before launching promotions.
+            This course is marked <strong>PUBLISHED</strong>, but {course.missingVideosCount}{' '}
+            lesson(s) lack a video stream or are still transcoding. Ensure all paid lessons have a
+            ready video before launching promotions.
           </p>
         </div>
       )}
@@ -467,7 +469,8 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
               No Curriculum Sections Yet
             </h2>
             <p className="text-xs text-neutral-500">
-              Click &quot;Add Section&quot; to begin building modules (e.g. &quot;Module 1: Hydraulic Fluid Fundamentals&quot;).
+              Click &quot;Add Section&quot; to begin building modules (e.g. &quot;Module 1:
+              Hydraulic Fluid Fundamentals&quot;).
             </p>
           </div>
           <button
@@ -484,7 +487,10 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
       {/* Sections and Lessons Hierarchy */}
       <div className="space-y-5">
         {course?.sections.map((section, sIndex) => (
-          <div key={section.id} className="border border-neutral-200/80 bg-white shadow-xs overflow-hidden">
+          <div
+            key={section.id}
+            className="border border-neutral-200/80 bg-white shadow-xs overflow-hidden"
+          >
             {/* Section Header */}
             <div className="p-3.5 bg-neutral-50/80 border-b border-neutral-200/80 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
@@ -950,9 +956,7 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                 >
                   Direct Video Upload
                 </h2>
-                <p className="text-xs text-neutral-500 mt-0.5">
-                  Lesson: {videoModal.lesson.title}
-                </p>
+                <p className="text-xs text-neutral-500 mt-0.5">Lesson: {videoModal.lesson.title}</p>
               </div>
               <button
                 type="button"
@@ -1028,7 +1032,8 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                   className="w-4 h-4 accent-rose-600 mt-0.5 shrink-0"
                 />
                 <span>
-                  Confirm video deletion: Permanently delete the uploaded video from Bunny Stream CDN.
+                  Confirm video deletion: Permanently delete the uploaded video from Bunny Stream
+                  CDN.
                 </span>
               </label>
             )}
@@ -1041,7 +1046,8 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                 className="w-4 h-4 accent-rose-600 mt-0.5 shrink-0"
               />
               <span>
-                Force delete even if enrolled students already have watch progress recorded for this item.
+                Force delete even if enrolled students already have watch progress recorded for this
+                item.
               </span>
             </label>
           </div>

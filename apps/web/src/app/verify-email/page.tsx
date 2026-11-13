@@ -272,7 +272,10 @@ function VerifyEmailForm() {
 
         {/* 6 Digit OTP Inputs Form */}
         <form onSubmit={handleManualSubmit} className="space-y-5">
-          <div className="flex items-center justify-center gap-2 sm:gap-2.5 my-2" onPaste={handlePaste}>
+          <div
+            className="flex items-center justify-center gap-2 sm:gap-2.5 my-2"
+            onPaste={handlePaste}
+          >
             {digits.map((digit, index) => (
               <input
                 key={index}
@@ -324,9 +327,7 @@ function VerifyEmailForm() {
           <div className="flex items-center gap-1.5 flex-wrap justify-center">
             <span>Didn&apos;t receive the email?</span>
             {resendCooldown > 0 ? (
-              <span className="text-neutral-400 font-normal">
-                Resend in {resendCooldown}s
-              </span>
+              <span className="text-neutral-400 font-normal">Resend in {resendCooldown}s</span>
             ) : (
               <button
                 type="button"

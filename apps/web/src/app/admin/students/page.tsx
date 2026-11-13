@@ -5,7 +5,16 @@ import Link from 'next/link';
 import { apiClient } from '../../../lib/api-client';
 import { Input } from '../../../components/ui/Input';
 import { useToast } from '../../../components/ui/Toast';
-import { Search, Download, CheckCircle2, XCircle, Ban, ArrowRight, RefreshCw, X } from 'lucide-react';
+import {
+  Search,
+  Download,
+  CheckCircle2,
+  XCircle,
+  Ban,
+  ArrowRight,
+  RefreshCw,
+  X,
+} from 'lucide-react';
 
 interface StudentListItem {
   id: string;
@@ -237,10 +246,7 @@ export default function AdminStudentsPage() {
                 students.map((student) => (
                   <tr key={student.id} className="hover:bg-neutral-50/60 transition-colors">
                     <td className="p-3.5 font-semibold text-neutral-950">
-                      <Link
-                        href={`/admin/students/${student.id}`}
-                        className="hover:underline"
-                      >
+                      <Link href={`/admin/students/${student.id}`} className="hover:underline">
                         {student.name}
                       </Link>
                     </td>
@@ -264,7 +270,8 @@ export default function AdminStudentsPage() {
                     </td>
 
                     <td className="p-3.5 font-mono font-semibold text-center text-neutral-900">
-                      {student._count.entitlements} {student._count.entitlements === 1 ? 'course' : 'courses'}
+                      {student._count.entitlements}{' '}
+                      {student._count.entitlements === 1 ? 'course' : 'courses'}
                     </td>
 
                     <td className="p-3.5">

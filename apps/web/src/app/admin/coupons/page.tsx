@@ -295,8 +295,8 @@ export default function AdminCouponsPage() {
                 No Discount Coupons Created Yet
               </h2>
               <p className="text-xs text-neutral-500">
-                Create your first promotional discount coupon code (e.g. <strong>WELCOME50</strong> or{' '}
-                <strong>FLAT500</strong>) to share with your YouTube audience.
+                Create your first promotional discount coupon code (e.g. <strong>WELCOME50</strong>{' '}
+                or <strong>FLAT500</strong>) to share with your YouTube audience.
               </p>
             </div>
             <button
@@ -312,14 +312,30 @@ export default function AdminCouponsPage() {
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-neutral-50/75 border-b border-neutral-200/80">
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Code</th>
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Discount</th>
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Redemptions</th>
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Limits</th>
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Course Scope</th>
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Expiry</th>
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">Status</th>
-                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">Actions</th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                    Code
+                  </th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                    Discount
+                  </th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                    Redemptions
+                  </th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                    Limits
+                  </th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                    Course Scope
+                  </th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                    Expiry
+                  </th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px]">
+                    Status
+                  </th>
+                  <th className="p-3.5 font-semibold text-neutral-600 uppercase tracking-wider text-[11px] text-right">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-200/80">
@@ -338,11 +354,11 @@ export default function AdminCouponsPage() {
                           : `₹${(coupon.value / 100).toFixed(2)} OFF`}
                       </td>
                       <td className="p-3.5 font-mono text-xs">
-                        <strong className="text-neutral-950">{coupon._count?.redemptions ?? 0}</strong>
+                        <strong className="text-neutral-950">
+                          {coupon._count?.redemptions ?? 0}
+                        </strong>
                         <span className="text-neutral-400">
-                          {coupon.maxRedemptions
-                            ? ` / ${coupon.maxRedemptions}`
-                            : ' (Unlimited)'}
+                          {coupon.maxRedemptions ? ` / ${coupon.maxRedemptions}` : ' (Unlimited)'}
                         </span>
                       </td>
                       <td className="p-3.5 text-xs text-neutral-600">
@@ -350,7 +366,9 @@ export default function AdminCouponsPage() {
                       </td>
                       <td className="p-3.5 text-xs">
                         {coupon.product ? (
-                          <span className="font-semibold text-neutral-900">{coupon.product.title}</span>
+                          <span className="font-semibold text-neutral-900">
+                            {coupon.product.title}
+                          </span>
                         ) : (
                           <span className="text-neutral-400 italic">All Store Courses</span>
                         )}
@@ -358,7 +376,9 @@ export default function AdminCouponsPage() {
                       <td className="p-3.5 text-xs font-mono">
                         {coupon.validUntil ? (
                           <span
-                            className={isExpired ? 'text-rose-700 font-semibold' : 'text-neutral-600'}
+                            className={
+                              isExpired ? 'text-rose-700 font-semibold' : 'text-neutral-600'
+                            }
                           >
                             {new Date(coupon.validUntil).toLocaleDateString()}
                             {isExpired && ' (Expired)'}
@@ -673,7 +693,10 @@ export default function AdminCouponsPage() {
                   onChange={(e) => setEditIsActive(e.target.checked)}
                   className="w-4 h-4 accent-neutral-900"
                 />
-                <label htmlFor="editIsActive" className="text-xs font-medium text-neutral-900 cursor-pointer">
+                <label
+                  htmlFor="editIsActive"
+                  className="text-xs font-medium text-neutral-900 cursor-pointer"
+                >
                   Coupon is Active (Students can apply during checkout)
                 </label>
               </div>
@@ -711,11 +734,14 @@ export default function AdminCouponsPage() {
           message={
             selectedCoupon.isActive ? (
               <p>
-                Deactivating <strong>{selectedCoupon.code}</strong> will immediately prevent students from applying it during checkout. Students who already completed orders with this coupon will not be affected.
+                Deactivating <strong>{selectedCoupon.code}</strong> will immediately prevent
+                students from applying it during checkout. Students who already completed orders
+                with this coupon will not be affected.
               </p>
             ) : (
               <p>
-                Reactivating <strong>{selectedCoupon.code}</strong> will make it immediately valid again for checkouts (subject to expiration date and usage limits).
+                Reactivating <strong>{selectedCoupon.code}</strong> will make it immediately valid
+                again for checkouts (subject to expiration date and usage limits).
               </p>
             )
           }

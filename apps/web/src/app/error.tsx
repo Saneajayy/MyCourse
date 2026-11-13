@@ -84,7 +84,8 @@ export default function GlobalError({
                 Operation Interrupted
               </h1>
               <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed mt-1">
-                An unexpected error occurred while loading this page. Our technical monitoring team has been notified.
+                An unexpected error occurred while loading this page. Our technical monitoring team
+                has been notified.
               </p>
             </div>
 
@@ -94,7 +95,8 @@ export default function GlobalError({
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">01.</span>
                   <strong className="font-bold text-neutral-950 mr-1">Immediate Recovery:</strong>
-                  Click &quot;Try Again&quot; below to re-execute the request or reload your browser window.
+                  Click &quot;Try Again&quot; below to re-execute the request or reload your browser
+                  window.
                 </p>
               </div>
 
@@ -108,7 +110,8 @@ export default function GlobalError({
                     className="font-semibold underline text-black hover:opacity-80"
                   >
                     {siteConfig.supportEmail}
-                  </a>.
+                  </a>
+                  .
                 </p>
               </div>
 

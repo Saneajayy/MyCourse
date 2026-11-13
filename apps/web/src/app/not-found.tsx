@@ -75,7 +75,8 @@ export default function NotFound() {
                 Page Not Located
               </h1>
               <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed mt-1">
-                The hydraulic schematic, course module, or page you requested does not exist or may have been relocated.
+                The hydraulic schematic, course module, or page you requested does not exist or may
+                have been relocated.
               </p>
             </div>
 
@@ -94,9 +95,13 @@ export default function NotFound() {
                   <span className="font-mono font-bold text-neutral-900 mr-2">02.</span>
                   <strong className="font-bold text-neutral-950 mr-1">Enrolled Students:</strong>
                   Access your course lessons and certificate progress directly in your{' '}
-                  <Link href="/my-courses" className="font-semibold underline text-black hover:opacity-80">
+                  <Link
+                    href="/my-courses"
+                    className="font-semibold underline text-black hover:opacity-80"
+                  >
                     Student Dashboard
-                  </Link>.
+                  </Link>
+                  .
                 </p>
               </div>
 
@@ -105,7 +110,10 @@ export default function NotFound() {
                   <span className="font-mono font-bold text-neutral-900 mr-2">03.</span>
                   <strong className="font-bold text-neutral-950 mr-1">Need Assistance:</strong>
                   If you followed a broken link, reach our desk via the{' '}
-                  <Link href="/contact" className="font-semibold underline text-black hover:opacity-80">
+                  <Link
+                    href="/contact"
+                    className="font-semibold underline text-black hover:opacity-80"
+                  >
                     Contact Support
                   </Link>{' '}
                   page.

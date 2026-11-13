@@ -3,16 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type Hls from 'hls.js';
 import { siteConfig } from '../config/site';
-import {
-  Play,
-  Pause,
-  Volume2,
-  VolumeX,
-  Maximize,
-  AlertCircle,
-  Loader2,
-  X,
-} from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Maximize, AlertCircle, Loader2, X } from 'lucide-react';
 
 interface PreviewPlayerModalProps {
   isOpen: boolean;
@@ -248,16 +239,10 @@ export function PreviewPlayerModal({
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/75 backdrop-blur-md animate-in fade-in duration-200"
     >
       {/* Backdrop Click Dismiss */}
-      <div
-        className="fixed inset-0"
-        aria-hidden="true"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0" aria-hidden="true" onClick={onClose} />
 
       {/* Modal Dialog Card */}
-      <div
-        className="relative z-10 w-full max-w-4xl bg-gradient-to-b from-[#000000] via-[#171717] to-[#000000] border border-white/25 rounded-none p-5 sm:p-7 md:p-8 max-h-[92vh] overflow-y-auto font-reddit text-white shadow-[0_25px_80px_rgba(0,0,0,0.65)] select-none"
-      >
+      <div className="relative z-10 w-full max-w-4xl bg-gradient-to-b from-[#000000] via-[#171717] to-[#000000] border border-white/25 rounded-none p-5 sm:p-7 md:p-8 max-h-[92vh] overflow-y-auto font-reddit text-white shadow-[0_25px_80px_rgba(0,0,0,0.65)] select-none">
         {/* Modal Header: Big standalone FREE PREVIEW heading & standalone rotating cross mark */}
         <div className="flex items-start justify-between gap-4 mb-4 sm:mb-5">
           <div className="min-w-0">
@@ -269,10 +254,9 @@ export function PreviewPlayerModal({
             </h2>
             <p className="text-white/85 font-medium text-base sm:text-lg mt-2 sm:mt-2.5 tracking-tight">
               {(() => {
-                const cleaned = (lessonTitle || 'How hydraulic systems work').replace(
-                  /^Lesson\s*\d+(\.\d+)?\s*[:-]?\s*/i,
-                  '',
-                ).trim();
+                const cleaned = (lessonTitle || 'How hydraulic systems work')
+                  .replace(/^Lesson\s*\d+(\.\d+)?\s*[:-]?\s*/i, '')
+                  .trim();
                 return `Lesson 1 - ${cleaned || 'How hydraulic systems work'}`;
               })()}
             </p>

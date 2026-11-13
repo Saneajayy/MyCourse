@@ -66,8 +66,7 @@ function createBurstParticles(cx: number, cy: number, count = 28): ConfettiParti
     const shape: 'rect' | 'circle' | 'sparkle' =
       randType > 0.4 ? 'rect' : randType > 0.15 ? 'circle' : 'sparkle';
 
-    const color =
-      CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)] ?? '#000000';
+    const color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)] ?? '#000000';
 
     particles.push({
       x: cx + Math.cos(angle) * spawnDist,
@@ -118,12 +117,12 @@ function ConfettiBurst() {
     timers.push(
       setTimeout(() => {
         particles.push(...createBurstParticles(cx, cy, 22));
-      }, 350)
+      }, 350),
     );
     timers.push(
       setTimeout(() => {
         particles.push(...createBurstParticles(cx, cy, 20));
-      }, 750)
+      }, 750),
     );
 
     // Continuous celebratory bursts
@@ -223,9 +222,7 @@ export function PaymentSuccessCard({
       ? 'Hydraulic System Basics'
       : data.courseTitle || 'Hydraulic System Basics';
 
-  const validityLabel = data.validityDays
-    ? `${data.validityDays} Days Access`
-    : '365 Days Access';
+  const validityLabel = data.validityDays ? `${data.validityDays} Days Access` : '365 Days Access';
 
   return (
     <div className="relative w-full max-w-[420px] sm:max-w-[440px] mx-auto bg-white rounded-none p-6 sm:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-neutral-100 select-none font-reddit text-left space-y-4">
@@ -286,9 +283,7 @@ export function PaymentSuccessCard({
             <span className="font-bold text-neutral-900 text-sm sm:text-base block truncate">
               {displayCourse}
             </span>
-            <span className="text-xs font-semibold text-neutral-500 block">
-              {validityLabel}
-            </span>
+            <span className="text-xs font-semibold text-neutral-500 block">{validityLabel}</span>
           </div>
 
           {/* Right: Price & Taxes note */}
@@ -305,9 +300,7 @@ export function PaymentSuccessCard({
 
       {/* 3. Confirmation Notice (Email on second line) */}
       <div className="pt-1 text-center space-y-0.5">
-        <p className="text-xs text-neutral-500 font-normal">
-          Payment receipt has been sent to
-        </p>
+        <p className="text-xs text-neutral-500 font-normal">Payment receipt has been sent to</p>
         <p className="text-xs font-semibold text-neutral-800 break-all">
           {data.studentEmail || 'your email'}
         </p>

@@ -78,8 +78,11 @@ export default function PrivacyPage() {
               <div className="px-5 sm:px-6 py-2.5 sm:py-3">
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">01.</span>
-                  <strong className="font-bold text-neutral-950 mr-1">Information Collected:</strong>
-                  Student name, email, phone number, and optional GSTIN collected solely for authentication and tax invoicing.
+                  <strong className="font-bold text-neutral-950 mr-1">
+                    Information Collected:
+                  </strong>
+                  Student name, email, phone number, and optional GSTIN collected solely for
+                  authentication and tax invoicing.
                 </p>
               </div>
 
@@ -87,7 +90,8 @@ export default function PrivacyPage() {
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">02.</span>
                   <strong className="font-bold text-neutral-950 mr-1">Payment Security:</strong>
-                  We never store card numbers, CVVs, or UPI PINs; all transactions are processed securely by RBI-authorized Razorpay (PCI-DSS Level 1).
+                  We never store card numbers, CVVs, or UPI PINs; all transactions are processed
+                  securely by RBI-authorized Razorpay (PCI-DSS Level 1).
                 </p>
               </div>
 
@@ -95,7 +99,8 @@ export default function PrivacyPage() {
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">03.</span>
                   <strong className="font-bold text-neutral-950 mr-1">Session Protection:</strong>
-                  Access tokens reside in volatile memory and encrypted httpOnly cookies to prevent session hijacking and cross-site scripting (XSS).
+                  Access tokens reside in volatile memory and encrypted httpOnly cookies to prevent
+                  session hijacking and cross-site scripting (XSS).
                 </p>
               </div>
 
@@ -103,21 +108,26 @@ export default function PrivacyPage() {
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">04.</span>
                   <strong className="font-bold text-neutral-950 mr-1">Zero Data Selling:</strong>
-                  We strictly do not sell, rent, or trade your personal information or contact details to third-party marketing networks.
+                  We strictly do not sell, rent, or trade your personal information or contact
+                  details to third-party marketing networks.
                 </p>
               </div>
 
               <div className="px-5 sm:px-6 py-2.5 sm:py-3">
                 <p className="leading-relaxed">
                   <span className="font-mono font-bold text-neutral-900 mr-2">05.</span>
-                  <strong className="font-bold text-neutral-950 mr-1">Student Privacy Rights:</strong>
-                  Under DPDP Act 2023, you can view your data, download invoices, or request permanent account erasure at{' '}
+                  <strong className="font-bold text-neutral-950 mr-1">
+                    Student Privacy Rights:
+                  </strong>
+                  Under DPDP Act 2023, you can view your data, download invoices, or request
+                  permanent account erasure at{' '}
                   <a
                     href={`mailto:${siteConfig.supportEmail}`}
                     className="font-semibold underline text-black hover:opacity-80"
                   >
                     {siteConfig.supportEmail}
-                  </a>.
+                  </a>
+                  .
                 </p>
               </div>
             </div>

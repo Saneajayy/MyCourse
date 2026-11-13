@@ -4,7 +4,14 @@ import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { ConfirmModal } from '@/components/admin/ConfirmModal';
 import { apiClient } from '@/lib/api-client';
-import { ArrowLeft, Download, RefreshCcw, ExternalLink, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  Download,
+  RefreshCcw,
+  ExternalLink,
+  AlertTriangle,
+  CheckCircle2,
+} from 'lucide-react';
 
 interface PaymentRefund {
   id: string;
@@ -485,7 +492,10 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         ) : (
           <div className="space-y-4">
             {order.payments.map((pmt) => (
-              <div key={pmt.id} className="border border-neutral-200/80 p-4 space-y-3 bg-neutral-50/30">
+              <div
+                key={pmt.id}
+                className="border border-neutral-200/80 p-4 space-y-3 bg-neutral-50/30"
+              >
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 border border-neutral-200 bg-white text-neutral-600">
@@ -618,7 +628,9 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         message={
           <div className="space-y-4">
             <div className="bg-amber-50 border border-amber-200 text-amber-900 p-3 text-xs leading-relaxed">
-              <strong>Caution:</strong> Issuing a refund communicates live with Razorpay and records an immutable entry in the audit log. The refund will display as <strong>PENDING</strong> until confirmed by Razorpay webhook.
+              <strong>Caution:</strong> Issuing a refund communicates live with Razorpay and records
+              an immutable entry in the audit log. The refund will display as{' '}
+              <strong>PENDING</strong> until confirmed by Razorpay webhook.
             </div>
 
             <div className="space-y-4 text-left">
@@ -666,14 +678,16 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     className="w-full border border-neutral-300 p-2 font-mono text-xs text-neutral-900 focus:outline-none focus:border-neutral-900"
                   />
                   <p className="text-[11px] text-neutral-500">
-                    Note: Partial refunds will not automatically revoke course access unless manually revoked on the Student page.
+                    Note: Partial refunds will not automatically revoke course access unless
+                    manually revoked on the Student page.
                   </p>
                 </div>
               )}
 
               {refundType === 'FULL' && (
                 <div className="p-3 bg-rose-50 border border-rose-200 text-rose-900 text-xs">
-                  Full refund effect: Student course access will be automatically revoked once the refund settles.
+                  Full refund effect: Student course access will be automatically revoked once the
+                  refund settles.
                 </div>
               )}
 
