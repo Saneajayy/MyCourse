@@ -648,7 +648,21 @@ export class CourseService {
     const provider = getVideoProvider();
     let videoId = lesson.videoProviderId;
 
-    if (!videoId) {
+    const isGuid = Boolean(
+      videoId &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(videoId),
+    );
+
+    // In Bunny Stream, each video upload requires a real video object in Bunny.
+    // If the videoId is missing, a sample placeholder, or if the lesson is already READY/FAILED
+    // (meaning the admin is uploading a replacement file), create a fresh video object in Bunny:
+    const needsNewVideo =
+      !videoId ||
+      !isGuid ||
+      lesson.status === LessonStatus.READY ||
+      lesson.status === LessonStatus.FAILED;
+
+    if (needsNewVideo) {
       const created = await provider.createVideo(lesson.title);
       videoId = created.videoId;
 
@@ -669,7 +683,7 @@ export class CourseService {
       });
     }
 
-    return provider.generateUploadTicket(videoId, lesson.title);
+    return provider.generateUploadTicket(videoId!, lesson.title);
   }
 
   /**
