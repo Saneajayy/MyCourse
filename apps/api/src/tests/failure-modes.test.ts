@@ -317,6 +317,11 @@ describe('Phase 9 Failure Modes and Graceful Degradation Suite', () => {
     });
 
     it('playback token request degrades gracefully when video provider signing fails', async () => {
+      await prisma.lesson.update({
+        where: { id: testLessonId },
+        data: { status: LessonStatus.READY },
+      });
+
       vi.spyOn(fakeVideoProvider, 'generatePlaybackToken').mockRejectedValue(
         new Error('Bunny Stream Token Signing Service Unavailable'),
       );

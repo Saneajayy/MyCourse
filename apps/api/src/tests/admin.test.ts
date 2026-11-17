@@ -1290,13 +1290,20 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
         },
       });
 
-      // Order A: placed at 23:50 IST on Oct 15 => 18:20 UTC on Oct 15
-      const paidAtOrderA = new Date('2026-10-15T18:20:00.000Z');
-      expect(toKolkataDateString(paidAtOrderA)).toBe('2026-10-15');
+      // Dynamic timestamps within the 30-day window: 3 days ago in IST
+      // At 23:50 IST (18:20 UTC on that day) and 00:10 IST (18:40 UTC, 20 minutes later on the next day)
+      const baseDate = new Date();
+      baseDate.setDate(baseDate.getDate() - 3);
+      const dateAStr = toKolkataDateString(baseDate);
 
-      // Order B: placed at 00:10 IST on Oct 16 => 18:40 UTC on Oct 15
-      const paidAtOrderB = new Date('2026-10-15T18:40:00.000Z');
-      expect(toKolkataDateString(paidAtOrderB)).toBe('2026-10-16');
+      const [year, month, day] = dateAStr.split('-').map(Number);
+      const paidAtOrderA = new Date(Date.UTC(year!, month! - 1, day!, 18, 20, 0, 0));
+      const paidAtOrderB = new Date(Date.UTC(year!, month! - 1, day!, 18, 40, 0, 0));
+      const refundAtIST = new Date(Date.UTC(year!, month! - 1, day!, 18, 25, 0, 0));
+
+      const dateBStr = toKolkataDateString(paidAtOrderB);
+      expect(toKolkataDateString(paidAtOrderA)).toBe(dateAStr);
+      expect(dateBStr).not.toBe(dateAStr);
 
       // Clean up any existing records for these exact test timestamps
       await prisma.refund.deleteMany({
@@ -1336,7 +1343,7 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
         },
       });
 
-      // Order B: placed at 00:10 IST on Oct 16
+      // Order B: placed at 00:10 IST on next day
       await prisma.order.create({
         data: {
           id: uuidv7(),
@@ -1351,8 +1358,7 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
         },
       });
 
-      // Processed refund of ₹300 (30,000 paise) on Order A on Oct 15 (23:55 IST)
-      const refundAtIST = new Date('2026-10-15T18:25:00.000Z');
+      // Processed refund of ₹300 (30,000 paise) on Order A on Day A (23:55 IST)
       await prisma.refund.create({
         data: {
           id: uuidv7(),
@@ -1375,8 +1381,8 @@ describe('Admin Panel API & Security Authorization Suite (Phase 7)', () => {
       expect(data.refundsPaise).toBeGreaterThanOrEqual(30000);
       expect(data.revenuePaise).toBe(Math.max(0, data.grossRevenuePaise - data.refundsPaise));
 
-      const bucketA = data.revenueByDay.find((b: any) => b.date === '2026-10-15');
-      const bucketB = data.revenueByDay.find((b: any) => b.date === '2026-10-16');
+      const bucketA = data.revenueByDay.find((b: any) => b.date === dateAStr);
+      const bucketB = data.revenueByDay.find((b: any) => b.date === dateBStr);
 
       expect(bucketA).toBeDefined();
       expect(bucketB).toBeDefined();
