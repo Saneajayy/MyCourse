@@ -22,6 +22,8 @@ import {
   Clock,
   X,
   Settings,
+  Image as ImageIcon,
+  UploadCloud,
 } from 'lucide-react';
 
 interface LessonItem {
@@ -31,6 +33,7 @@ interface LessonItem {
   description: string | null;
   position: number;
   videoProviderId: string | null;
+  thumbnailUrl?: string | null;
   durationSeconds: number;
   isFreePreview: boolean;
   status: 'PROCESSING' | 'READY' | 'FAILED';
@@ -95,6 +98,13 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
     isOpen: boolean;
     lesson: LessonItem | null;
   }>({ isOpen: false, lesson: null });
+
+  // Lesson Thumbnail Upload Modal state
+  const [thumbnailModal, setThumbnailModal] = useState<{
+    isOpen: boolean;
+    lesson: LessonItem | null;
+  }>({ isOpen: false, lesson: null });
+  const [thumbnailUploading, setThumbnailUploading] = useState(false);
 
   // Delete Confirmation Modal state
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -218,6 +228,72 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
       toastError('Lesson Action Failed', err instanceof Error ? err.message : 'Error');
     } finally {
       setIsActionLoading(false);
+    }
+  };
+
+  // Lesson Thumbnail Upload Handlers
+  const handleLessonThumbnailUpload = async (
+    lessonId: string,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      toastError('Invalid File Type', 'Please upload a JPG, PNG, or WebP image.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toastError('File Too Large', 'Maximum image size is 5 MB.');
+      return;
+    }
+
+    setThumbnailUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('thumbnail', file);
+
+      const res = await apiClient<{ thumbnailUrl: string }>(
+        `/admin/lessons/${lessonId}/thumbnail`,
+        {
+          method: 'POST',
+          body: formData,
+        },
+      );
+
+      setThumbnailModal((prev) => ({
+        ...prev,
+        lesson: prev.lesson ? { ...prev.lesson, thumbnailUrl: res.thumbnailUrl } : null,
+      }));
+
+      toastSuccess('Thumbnail Uploaded', 'Lesson video thumbnail updated.');
+      await fetchCurriculum();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to upload thumbnail';
+      toastError('Upload Failed', msg);
+    } finally {
+      setThumbnailUploading(false);
+    }
+  };
+
+  const handleRemoveLessonThumbnail = async (lessonId: string) => {
+    setThumbnailUploading(true);
+    try {
+      await apiClient(`/admin/lessons/${lessonId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ thumbnailUrl: null }),
+      });
+      setThumbnailModal((prev) => ({
+        ...prev,
+        lesson: prev.lesson ? { ...prev.lesson, thumbnailUrl: null } : null,
+      }));
+      toastSuccess('Thumbnail Removed', 'Lesson thumbnail removed.');
+      await fetchCurriculum();
+    } catch (err: unknown) {
+      toastError('Remove Failed', err instanceof Error ? err.message : 'Error removing thumbnail');
+    } finally {
+      setThumbnailUploading(false);
     }
   };
 
@@ -621,6 +697,27 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                         {sIndex + 1}.{lIndex + 1}
                       </span>
 
+                      {/* Lesson Thumbnail Mini Preview */}
+                      <button
+                        type="button"
+                        onClick={() => setThumbnailModal({ isOpen: true, lesson })}
+                        className="group relative w-12 h-7 sm:w-14 sm:h-8 border border-neutral-200 bg-neutral-100 flex items-center justify-center overflow-hidden shrink-0 transition-all hover:border-neutral-900 cursor-pointer"
+                        title={lesson.thumbnailUrl ? 'Click to view or change thumbnail' : 'Click to add thumbnail'}
+                      >
+                        {lesson.thumbnailUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={lesson.thumbnailUrl}
+                            alt={lesson.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center text-neutral-400 group-hover:text-neutral-900">
+                            <ImageIcon className="w-3.5 h-3.5 opacity-60" />
+                          </div>
+                        )}
+                      </button>
+
                       {/* Title & Description preview */}
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
@@ -725,6 +822,23 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                       >
                         <Video className="w-3.5 h-3.5" />
                         <span>{lesson.videoProviderId ? 'Manage Video' : 'Upload Video'}</span>
+                      </button>
+
+                      {/* Thumbnail Action Button */}
+                      <button
+                        type="button"
+                        onClick={() => setThumbnailModal({ isOpen: true, lesson })}
+                        className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium tracking-wide transition-colors min-h-[30px] border ${
+                          lesson.thumbnailUrl
+                            ? 'border-neutral-300 hover:border-neutral-900 text-neutral-800 bg-white hover:bg-neutral-50'
+                            : 'border-dashed border-neutral-300 hover:border-neutral-900 text-neutral-600 bg-white hover:bg-neutral-50'
+                        }`}
+                        title={lesson.thumbnailUrl ? 'Change or view video thumbnail' : 'Upload video thumbnail'}
+                      >
+                        <ImageIcon className="w-3.5 h-3.5 text-neutral-600" />
+                        <span className="hidden xl:inline">
+                          {lesson.thumbnailUrl ? 'Thumbnail' : 'Add Thumbnail'}
+                        </span>
                       </button>
 
                       {/* Edit Info Button */}
@@ -1052,6 +1166,115 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
             </label>
           </div>
         </ConfirmModal>
+      )}
+
+      {/* MODAL 5: Lesson Thumbnail Upload Modal */}
+      {thumbnailModal.isOpen && thumbnailModal.lesson && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="thumbnail-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 font-reddit"
+        >
+          <div className="w-full max-w-lg bg-white border border-neutral-200/90 shadow-xl p-6 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-neutral-200/80">
+              <div>
+                <h2
+                  id="thumbnail-modal-title"
+                  className="text-xs font-bold uppercase tracking-wider text-neutral-950"
+                >
+                  Lesson Video Thumbnail
+                </h2>
+                <p className="text-xs text-neutral-500 mt-0.5">Lesson: {thumbnailModal.lesson.title}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setThumbnailModal({ isOpen: false, lesson: null })}
+                className="p-1 border border-neutral-200 hover:border-neutral-900 text-neutral-500 hover:text-neutral-900 min-h-[32px] min-w-[32px] inline-flex items-center justify-center transition-colors"
+                aria-label="Close dialog"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-xs text-neutral-600">
+                This thumbnail is shown on the learning portal before students click play.
+              </p>
+
+              {/* Thumbnail Preview Area */}
+              <div className="w-full aspect-video max-w-md mx-auto border border-neutral-200 bg-neutral-100 flex items-center justify-center overflow-hidden relative">
+                {thumbnailModal.lesson.thumbnailUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={thumbnailModal.lesson.thumbnailUrl}
+                    alt={thumbnailModal.lesson.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-center p-6 text-neutral-400">
+                    <ImageIcon className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                    <span className="text-xs font-mono uppercase">No Thumbnail Uploaded</span>
+                    <p className="text-[11px] text-neutral-400 mt-1">Recommended 16:9 (1280x720), max 5MB JPG/PNG/WebP</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Upload & Action Controls */}
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={(e) => handleLessonThumbnailUpload(thumbnailModal.lesson!.id, e)}
+                    disabled={thumbnailUploading}
+                  />
+                  <button
+                    type="button"
+                    disabled={thumbnailUploading}
+                    onClick={(e) => {
+                      const input = e.currentTarget.parentElement?.querySelector('input');
+                      input?.click();
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-neutral-900 text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors disabled:opacity-50 cursor-pointer"
+                  >
+                    <UploadCloud className="w-4 h-4" />
+                    <span>
+                      {thumbnailUploading
+                        ? 'Uploading...'
+                        : thumbnailModal.lesson.thumbnailUrl
+                          ? 'Change Thumbnail'
+                          : 'Upload Thumbnail'}
+                    </span>
+                  </button>
+                </label>
+
+                {thumbnailModal.lesson.thumbnailUrl && (
+                  <button
+                    type="button"
+                    disabled={thumbnailUploading}
+                    onClick={() => handleRemoveLessonThumbnail(thumbnailModal.lesson!.id)}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 border border-rose-300 text-rose-700 hover:bg-rose-50 text-xs font-semibold tracking-wide transition-colors disabled:opacity-50 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Remove</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end pt-3 border-t border-neutral-200/80">
+              <button
+                type="button"
+                onClick={() => setThumbnailModal({ isOpen: false, lesson: null })}
+                className="px-4 py-2 border border-neutral-300 hover:border-neutral-900 text-neutral-800 hover:bg-neutral-50 text-xs font-semibold tracking-wide transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

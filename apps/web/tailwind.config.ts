@@ -28,10 +28,10 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['"Reddit Sans"', 'var(--font-inclusive)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-reddit)', '"Reddit Sans"', 'system-ui', 'sans-serif'],
         inclusive: ['var(--font-inclusive)', 'Inclusive Sans', 'sans-serif'],
-        heading: ['"Reddit Sans"', 'system-ui', 'sans-serif'],
-        reddit: ['"Reddit Sans"', 'sans-serif'],
+        heading: ['var(--font-reddit)', '"Reddit Sans"', 'system-ui', 'sans-serif'],
+        reddit: ['var(--font-reddit)', '"Reddit Sans"', 'sans-serif'],
         elms: ['"Elms Sans"', 'sans-serif'],
         poppins: ['"Poppins"', 'sans-serif'],
         questrial: ['"Questrial"', 'sans-serif'],

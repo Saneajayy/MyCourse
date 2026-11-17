@@ -205,6 +205,7 @@ model Lesson {
   description     String?        @db.Text
   position        Int
   videoProviderId String?
+  thumbnailUrl    String?
   durationSeconds Int            @default(0)
   isFreePreview   Boolean        @default(false)
   isPublished     Boolean        @default(true)

@@ -14,10 +14,14 @@ import { LandingFooter } from '../components/landing/LandingFooter';
 // Fetch course data on server with ISR revalidation (5 minutes)
 async function getCourseData() {
   try {
-    const res = await fetch(`${siteConfig.urls.api}/api/v1/courses/hydraulic-engineering-mastery`, {
+    let res = await fetch(`${siteConfig.urls.api}/api/v1/courses/hydraulic-system-basics`, {
       next: { revalidate: 300 },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      res = await fetch(`${siteConfig.urls.api}/api/v1/courses`);
+      const json = await res.json();
+      return json.success && Array.isArray(json.data) && json.data.length > 0 ? json.data[0] : null;
+    }
     const json = await res.json();
     return json.success ? json.data : null;
   } catch {
@@ -82,10 +86,10 @@ export default async function HomePage() {
       <LandingNavbar />
 
       {/* Hero Section matching the screenshot */}
-      <HeroSection courseSlug="hydraulic-engineering-mastery" />
+      <HeroSection courseSlug="hydraulic-system-basics" />
 
       {/* Course Syllabus & Overview Section */}
-      <SyllabusSection courseSlug="hydraulic-engineering-mastery" sections={sections} />
+      <SyllabusSection courseSlug="hydraulic-system-basics" sections={sections} />
 
       {/* Course Outcomes & Practical Skills */}
       <OutcomesSection />
@@ -103,7 +107,7 @@ export default async function HomePage() {
       <PricingSection
         priceFormatted={priceFormatted}
         originalPriceFormatted={originalPriceFormatted}
-        courseSlug="hydraulic-engineering-mastery"
+        courseSlug="hydraulic-system-basics"
       />
 
       {/* Frequently Asked Questions */}

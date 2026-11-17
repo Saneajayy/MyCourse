@@ -3,7 +3,7 @@ import { prisma } from '../../common/db/prisma.js';
 import { getVideoProvider } from './video.service.js';
 import { streamService } from './stream.service.js';
 import { entitlementService } from '../entitlements/entitlement.service.js';
-import { EntitlementStatus, LessonStatus, UserStatus, HeartbeatInput } from '@course/shared';
+import { EntitlementStatus, LessonStatus, UserStatus, HeartbeatInput, ProductStatus } from '@course/shared';
 import {
   NotFoundError,
   ForbiddenError,
@@ -15,6 +15,7 @@ export interface PlaybackResult {
   sessionId: string;
   lessonId: string;
   title: string;
+  thumbnailUrl?: string | null;
   durationSeconds: number;
   playbackUrl: string;
   embedUrl: string;
@@ -82,7 +83,7 @@ export class PlaybackService {
       where: { id: lessonId },
       include: {
         product: {
-          select: { id: true, slug: true, status: true },
+          select: { id: true, slug: true, status: true, thumbnailUrl: true },
         },
       },
     });
@@ -145,6 +146,7 @@ export class PlaybackService {
       sessionId,
       lessonId: lesson.id,
       title: lesson.title,
+      thumbnailUrl: lesson.thumbnailUrl ?? null,
       durationSeconds: lesson.durationSeconds,
       playbackUrl: playbackInfo.playbackUrl,
       embedUrl: playbackInfo.embedUrl,
@@ -370,7 +372,7 @@ export class PlaybackService {
    * IDOR protected: Caller must own active access to the course.
    */
   public async getCourseProgress(userId: string, courseSlug: string) {
-    const product = await prisma.product.findUnique({
+    let product = await prisma.product.findUnique({
       where: { slug: courseSlug },
       include: {
         sections: {
@@ -384,6 +386,27 @@ export class PlaybackService {
         },
       },
     });
+
+    if (!product && (courseSlug === 'hydraulic-engineering-mastery' || courseSlug === 'hydraulic-system-basics')) {
+      product = await prisma.product.findFirst({
+        where: {
+          slug: { in: ['hydraulic-system-basics', 'hydraulic-engineering-mastery'] },
+          status: ProductStatus.PUBLISHED,
+          deletedAt: null,
+        },
+        include: {
+          sections: {
+            orderBy: { position: 'asc' },
+            include: {
+              lessons: {
+                where: { isPublished: true },
+                orderBy: { position: 'asc' },
+              },
+            },
+          },
+        },
+      });
+    }
 
     if (!product) {
       throw new NotFoundError('Course not found');
@@ -414,6 +437,7 @@ export class PlaybackService {
           lessonId: lesson.id,
           title: lesson.title,
           durationSeconds: lesson.durationSeconds,
+          thumbnailUrl: lesson.thumbnailUrl ?? null,
           isCompleted: !!prog?.completedAt,
           completedAt: prog?.completedAt ?? null,
           lastPositionSeconds: prog?.lastPositionSeconds ?? 0,

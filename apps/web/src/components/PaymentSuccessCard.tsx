@@ -310,7 +310,7 @@ export function PaymentSuccessCard({
       <div className="space-y-2.5 pt-2">
         {/* Primary CTA */}
         <Link
-          href={`/learn/${data.courseSlug || 'hydraulic-engineering-mastery'}`}
+          href={`/learn/${data.courseSlug || 'hydraulic-system-basics'}`}
           className="w-full h-12 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-sm sm:text-[15px] rounded-none shadow-sm hover:shadow transition-all flex items-center justify-center cursor-pointer tracking-wide"
         >
           <span>Start learning</span>

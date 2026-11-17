@@ -77,7 +77,14 @@ export function InstructorSection() {
                 </a>
               </div>
 
-              <div className="w-full h-full" />
+              {/* Instructor Portrait Image */}
+              <div className="w-full h-full flex items-center justify-center">
+                <img
+                  src="/instructor.png"
+                  alt={siteConfig.instructor.name}
+                  className="w-full h-full object-contain object-center"
+                />
+              </div>
             </TiltCard>
           </div>
         </div>

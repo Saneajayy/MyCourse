@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { orderService } from './order.service.js';
-import { createOrderSchema, createRefundSchema, verifyPaymentSchema } from '@course/shared';
+import { createOrderSchema, createRefundSchema, verifyPaymentSchema, OrderStatus } from '@course/shared';
 import { BadRequestError, ForbiddenError, NotFoundError } from '../../common/errors/app-error.js';
 import { prisma } from '../../common/db/prisma.js';
+import { getPaymentGateway } from '../payments/payment.service.js';
+import { logger } from '../../common/logger/logger.js';
 
 export class OrderController {
   public async createOrder(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -50,7 +52,7 @@ export class OrderController {
         throw new NotFoundError('Order not found');
       }
 
-      const order = await prisma.order.findUnique({
+      let order = await prisma.order.findUnique({
         where: { id: orderId },
         include: {
           product: true,
@@ -67,6 +69,37 @@ export class OrderController {
 
       if (order.userId !== req.user!.id && req.user!.role !== 'ADMIN') {
         throw new ForbiddenError('You do not have permission to view this order.');
+      }
+
+      // Proactively check payment gateway if order is not marked PAID yet
+      if (order.status !== OrderStatus.PAID && order.razorpayOrderId) {
+        try {
+          const gateway = getPaymentGateway();
+          const payments = await gateway.fetchOrderPayments(order.razorpayOrderId);
+          const captured = payments.find((p) => p.status === 'captured');
+          if (captured) {
+            await orderService.markOrderPaid(order.id, {
+              paymentId: captured.id,
+              amountPaise: captured.amountPaise,
+              currency: captured.currency,
+              status: captured.status,
+              method: captured.method,
+              rawGatewayPayload: captured,
+            });
+            order = await prisma.order.findUnique({
+              where: { id: orderId },
+              include: {
+                product: true,
+                coupon: true,
+                payments: true,
+                invoice: true,
+                entitlements: true,
+              },
+            });
+          }
+        } catch (gatewayErr) {
+          logger.warn({ gatewayErr, orderId }, 'Proactive gateway check on getOrderById failed');
+        }
       }
 
       res.status(200).json({

@@ -207,7 +207,7 @@ function RazorpayLogo({ className = 'h-3.5 w-auto' }: { className?: string }) {
 function CheckoutContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const courseSlugParam = searchParams.get('course') || 'hydraulic-engineering-mastery';
+  const courseSlugParam = searchParams.get('course') || 'hydraulic-system-basics';
 
   const { user, isAuthenticated, isLoading: authLoading, refreshUser } = useAuth();
   const { error: toastError, success: toastSuccess, info: toastInfo } = useToast();
@@ -327,8 +327,16 @@ function CheckoutContent() {
   useEffect(() => {
     async function fetchCourse() {
       try {
-        const res = await fetch(`${siteConfig.urls.api}/api/v1/courses/${courseSlugParam}`);
-        const data = await res.json();
+        let res = await fetch(`${siteConfig.urls.api}/api/v1/courses/${courseSlugParam}`);
+        let data = await res.json();
+        if (!data.success || !data.data) {
+          // Fallback to fetch public course list
+          const listRes = await fetch(`${siteConfig.urls.api}/api/v1/courses`);
+          const listData = await listRes.json();
+          if (listData.success && Array.isArray(listData.data) && listData.data.length > 0) {
+            data = { success: true, data: listData.data[0] };
+          }
+        }
         if (data.success && data.data) {
           setCourse({
             id: data.data.id,
@@ -343,11 +351,11 @@ function CheckoutContent() {
           throw new Error('Course not found');
         }
       } catch {
-        // Fallback default
+        // Fallback default with valid database product ID
         setCourse({
-          id: '01a13c1f-b373-7703-bd58-313c435411e1',
+          id: '01a1cf18-f27b-739f-9768-b29c028212b6',
           title: 'Hydraulic System Basics',
-          slug: 'hydraulic-engineering-mastery',
+          slug: 'hydraulic-system-basics',
           pricePaise: 499900,
           compareAtPricePaise: 999900,
           validityDays: 365,
@@ -568,12 +576,8 @@ function CheckoutContent() {
     setIsSubmitting(true);
 
     try {
-      // 1. Generate or retrieve Idempotency-Key
-      let idempotencyKey = sessionStorage.getItem('checkout_idempotency_key');
-      if (!idempotencyKey) {
-        idempotencyKey = `ord_idem_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-        sessionStorage.setItem('checkout_idempotency_key', idempotencyKey);
-      }
+      // 1. Generate fresh Idempotency-Key for this checkout attempt
+      const idempotencyKey = `ord_idem_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
       // 2. Read UTM parameters
       const utmSource = sessionStorage.getItem('utm_source') || undefined;
@@ -743,6 +747,7 @@ function CheckoutContent() {
         modal: {
           ondismiss: () => {
             setIsSubmitting(false);
+            sessionStorage.removeItem('checkout_idempotency_key');
           },
         },
       };

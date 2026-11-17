@@ -98,6 +98,11 @@ adminCourseRouter.get('/lessons/:id/status', (req, res, next) =>
 adminCourseRouter.post('/lessons/:id/free-preview', (req, res, next) =>
   courseController.toggleFreePreview(req, res, next),
 );
+adminCourseRouter.post(
+  '/lessons/:id/thumbnail',
+  thumbnailUpload.single('thumbnail'),
+  (req, res, next) => courseController.uploadLessonThumbnail(req, res, next),
+);
 
 // ---------------------------------------------------------------------------
 // PUBLIC COURSE CATALOG ROUTES

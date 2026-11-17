@@ -22,7 +22,7 @@ interface SyllabusSectionProps {
 }
 
 export function SyllabusSection({
-  courseSlug: _courseSlug = 'hydraulic-engineering-mastery',
+  courseSlug: _courseSlug = 'hydraulic-system-basics',
   sections,
 }: SyllabusSectionProps) {
   // Fallback curriculum matching the exact Figma design
@@ -39,7 +39,7 @@ export function SyllabusSection({
         },
         {
           id: '01a13c1f-b379-7851-9c08-3d938832bd40',
-          title: 'Pressure, flow and power in simple terms',
+          title: 'Pressure, flow and power',
           durationSeconds: 980,
           isFreePreview: false,
         },

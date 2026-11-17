@@ -331,6 +331,23 @@ export class CourseController {
       next(err);
     }
   }
+
+  public async uploadLessonThumbnail(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.file) {
+        throw new BadRequestError('No image file provided');
+      }
+      const actorUserId = req.user!.id;
+      const result = await courseService.uploadLessonThumbnail(
+        req.params.id as string,
+        req.file,
+        actorUserId,
+      );
+      res.status(200).json({ success: true, data: result });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export const courseController = new CourseController();

@@ -26,8 +26,9 @@ import {
   Video,
   Clock,
 } from 'lucide-react';
+import { HydraulicCalculator } from '../../components/calculator/HydraulicCalculator';
 
-export type DashboardTab = 'courses' | 'certificates' | 'profile' | 'orders';
+export type DashboardTab = 'courses' | 'certificates' | 'calculator' | 'profile' | 'orders';
 
 interface EnrolledCourse {
   product: {
@@ -149,7 +150,7 @@ function StudentDashboardContent() {
 
   const tabParam = searchParams.get('tab') as DashboardTab | null;
   const [activeTab, setActiveTab] = useState<DashboardTab>(
-    tabParam && ['courses', 'certificates', 'profile', 'orders'].includes(tabParam)
+    tabParam && ['courses', 'certificates', 'calculator', 'profile', 'orders'].includes(tabParam)
       ? tabParam
       : 'courses',
   );
@@ -362,6 +363,7 @@ function StudentDashboardContent() {
   const navTabs: { id: DashboardTab; label: string }[] = [
     { id: 'courses', label: 'My Courses' },
     { id: 'certificates', label: 'My Certificates' },
+    { id: 'calculator', label: 'Calculator' },
     { id: 'profile', label: 'Profile' },
     { id: 'orders', label: 'Payment Orders' },
   ];
@@ -862,7 +864,10 @@ function StudentDashboardContent() {
             </div>
           )}
 
-          {/* TAB 3: PROFILE */}
+          {/* TAB 3: HYDRAULIC SYSTEM CALCULATOR */}
+          {activeTab === 'calculator' && <HydraulicCalculator />}
+
+          {/* TAB 4: PROFILE */}
           {activeTab === 'profile' && (
             <div className="space-y-6 text-left">
               <div>

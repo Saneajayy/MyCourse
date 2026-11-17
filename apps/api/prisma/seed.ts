@@ -203,7 +203,7 @@ async function main() {
             videoProviderId: 'sample-bunny-video-01',
           },
           {
-            title: 'Pressure, flow and power in simple terms',
+            title: 'Pressure, flow and power',
             description:
               'Understanding Pascal’s law, pressure vs flow relationships, and calculating actuator power without heavy math.',
             durationSeconds: 980,
