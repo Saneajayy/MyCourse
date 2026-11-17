@@ -851,7 +851,10 @@ export class CourseService {
       },
     });
 
-    if (!product && (slug === 'hydraulic-engineering-mastery' || slug === 'hydraulic-system-basics')) {
+    if (
+      !product &&
+      (slug === 'hydraulic-engineering-mastery' || slug === 'hydraulic-system-basics')
+    ) {
       product = await prisma.product.findFirst({
         where: {
           slug: { in: ['hydraulic-system-basics', 'hydraulic-engineering-mastery'] },

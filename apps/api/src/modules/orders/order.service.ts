@@ -1030,7 +1030,7 @@ export class OrderService {
     });
 
     if (result.isFullRefund && result.userId) {
-      await streamService.clearUserSessions(result.userId).catch(() => { });
+      await streamService.clearUserSessions(result.userId).catch(() => {});
     }
 
     if (result.success && !result.alreadyProcessed && (result as any).refundId) {
@@ -1230,7 +1230,10 @@ export class OrderService {
       product = await prisma.product.findUnique({
         where: { id: productId, deletedAt: null },
       });
-      if ((!product || product.status !== ProductStatus.PUBLISHED) && productId === '01a13c1f-b373-7703-bd58-313c435411e1') {
+      if (
+        (!product || product.status !== ProductStatus.PUBLISHED) &&
+        productId === '01a13c1f-b373-7703-bd58-313c435411e1'
+      ) {
         product = await prisma.product.findFirst({
           where: { status: ProductStatus.PUBLISHED, deletedAt: null },
         });
@@ -1239,7 +1242,10 @@ export class OrderService {
       product = await prisma.product.findFirst({
         where: { slug: courseSlug, deletedAt: null },
       });
-      if (!product && (courseSlug === 'hydraulic-engineering-mastery' || courseSlug === 'hydraulic-system-basics')) {
+      if (
+        !product &&
+        (courseSlug === 'hydraulic-engineering-mastery' || courseSlug === 'hydraulic-system-basics')
+      ) {
         product = await prisma.product.findFirst({
           where: {
             slug: { in: ['hydraulic-system-basics', 'hydraulic-engineering-mastery'] },

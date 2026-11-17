@@ -332,7 +332,11 @@ export class CourseController {
     }
   }
 
-  public async uploadLessonThumbnail(req: Request, res: Response, next: NextFunction): Promise<void> {
+  public async uploadLessonThumbnail(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> {
     try {
       if (!req.file) {
         throw new BadRequestError('No image file provided');

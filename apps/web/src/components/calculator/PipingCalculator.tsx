@@ -1,16 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import {
-  Sigma,
-  Copy,
-  RotateCcw,
-  Check,
-  ChevronDown,
-  X,
-  Pipette,
-  FlaskConical,
-} from 'lucide-react';
+import { Sigma, Copy, RotateCcw, Check, ChevronDown, X, Pipette, FlaskConical } from 'lucide-react';
 
 export type PipingSubSection = 'using-kinematic' | 'using-absolute';
 
@@ -107,7 +98,9 @@ function VelocityIcon({ className = 'w-5 h-5 text-black' }: { className?: string
 
 function ReynoldsIcon({ className = 'text-black' }: { className?: string }) {
   return (
-    <span className={`font-serif font-bold text-base leading-none select-none inline-flex items-baseline ${className}`}>
+    <span
+      className={`font-serif font-bold text-base leading-none select-none inline-flex items-baseline ${className}`}
+    >
       R<sub className="font-sans text-[10px] font-bold">e</sub>
     </span>
   );
@@ -201,11 +194,7 @@ interface UnitDropdownProps<T extends string> {
   onSelect: (newUnit: T) => void;
 }
 
-function UnitDropdown<T extends string>({
-  currentUnit,
-  options,
-  onSelect,
-}: UnitDropdownProps<T>) {
+function UnitDropdown<T extends string>({ currentUnit, options, onSelect }: UnitDropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -222,11 +211,7 @@ function UnitDropdown<T extends string>({
 
       {isOpen && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-            aria-hidden="true"
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
           <div className="absolute right-0 top-full mt-1 w-full min-w-full bg-white border border-neutral-300 shadow-lg z-50 py-1 rounded-none">
             {options.map((opt) => (
               <button
@@ -243,7 +228,9 @@ function UnitDropdown<T extends string>({
                 }`}
               >
                 <span className="whitespace-nowrap">{UNIT_DISPLAY[opt] || opt}</span>
-                {opt === currentUnit && <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />}
+                {opt === currentUnit && (
+                  <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />
+                )}
               </button>
             ))}
           </div>
@@ -254,8 +241,7 @@ function UnitDropdown<T extends string>({
 }
 
 export function PipingCalculator() {
-  const [activeSubSection, setActiveSubSection] =
-    useState<PipingSubSection>('using-kinematic');
+  const [activeSubSection, setActiveSubSection] = useState<PipingSubSection>('using-kinematic');
   const [isSubSectionMenuOpen, setIsSubSectionMenuOpen] = useState(false);
   const [showFormulaModal, setShowFormulaModal] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -375,9 +361,7 @@ export function PipingCalculator() {
 
   // Active outputs depending on selected subsection
   const currentCalculations =
-    activeSubSection === 'using-kinematic'
-      ? kinematicCalculations
-      : absoluteCalculations;
+    activeSubSection === 'using-kinematic' ? kinematicCalculations : absoluteCalculations;
 
   const areaFormatted = currentCalculations.areaBase
     ? formatResult(areaFromBase(currentCalculations.areaBase, areaUnit))
@@ -523,9 +507,7 @@ export function PipingCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Flow rate
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -603,9 +585,7 @@ export function PipingCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Flow rate
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -724,9 +704,7 @@ export function PipingCalculator() {
       <div className="px-4 sm:px-6 py-3.5 bg-neutral-50/50 border-b border-neutral-300 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
           <VelocityIcon className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-          <span className="text-xs sm:text-sm font-bold text-neutral-900">
-            Velocity
-          </span>
+          <span className="text-xs sm:text-sm font-bold text-neutral-900">Velocity</span>
         </div>
         <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
           <div className="w-full h-10 px-3 bg-neutral-100 border border-neutral-300 flex items-center justify-end font-mono text-sm font-bold text-neutral-900">
@@ -746,9 +724,7 @@ export function PipingCalculator() {
           <div className="w-5 h-5 flex items-center justify-center shrink-0">
             <ReynoldsIcon className="text-black" />
           </div>
-          <span className="text-xs sm:text-sm font-bold text-neutral-900">
-            Reynolds number
-          </span>
+          <span className="text-xs sm:text-sm font-bold text-neutral-900">Reynolds number</span>
         </div>
         <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
           <div className="w-full h-10 px-3 bg-neutral-100 border border-neutral-300 flex items-center justify-end font-mono text-sm font-bold text-neutral-900">
@@ -841,7 +817,9 @@ export function PipingCalculator() {
                       <span className="italic font-bold">Re</span>
                       <span>=</span>
                       <div className="inline-flex flex-col items-center">
-                        <span className="border-b-2 border-black px-3 pb-0.5 italic">1000 × v × d</span>
+                        <span className="border-b-2 border-black px-3 pb-0.5 italic">
+                          1000 × v × d
+                        </span>
                         <span className="pt-0.5 italic">ν</span>
                       </div>
                     </div>
@@ -850,7 +828,8 @@ export function PipingCalculator() {
                   {/* Legend */}
                   <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
                     <p>
-                      <span className="font-extrabold text-black">A</span> = Cross-sectional area;&nbsp;
+                      <span className="font-extrabold text-black">A</span> = Cross-sectional
+                      area;&nbsp;
                       <span className="font-extrabold text-black">d</span> = Inside pipe diameter;
                     </p>
                     <p>
@@ -899,7 +878,9 @@ export function PipingCalculator() {
                       <span className="italic font-bold">Re</span>
                       <span>=</span>
                       <div className="inline-flex flex-col items-center">
-                        <span className="border-b-2 border-black px-3 pb-0.5 italic">1000 × v × d × S<sub>g</sub></span>
+                        <span className="border-b-2 border-black px-3 pb-0.5 italic">
+                          1000 × v × d × S<sub>g</sub>
+                        </span>
                         <span className="pt-0.5 italic">μ</span>
                       </div>
                     </div>
@@ -908,7 +889,8 @@ export function PipingCalculator() {
                   {/* Legend */}
                   <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
                     <p>
-                      <span className="font-extrabold text-black">A</span> = Cross-sectional area;&nbsp;
+                      <span className="font-extrabold text-black">A</span> = Cross-sectional
+                      area;&nbsp;
                       <span className="font-extrabold text-black">d</span> = Inside pipe diameter;
                     </p>
                     <p>
@@ -917,7 +899,10 @@ export function PipingCalculator() {
                       <span className="font-extrabold text-black">Re</span> = Reynolds number;
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">S<sub>g</sub></span> = Specific gravity;&nbsp;
+                      <span className="font-extrabold text-black">
+                        S<sub>g</sub>
+                      </span>{' '}
+                      = Specific gravity;&nbsp;
                       <span className="font-extrabold text-black">μ</span> = Absolute viscosity
                     </p>
                   </div>

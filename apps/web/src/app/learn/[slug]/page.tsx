@@ -569,7 +569,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                   isPlaying: false,
                   state: 'completed',
                 }),
-              }).catch(() => { });
+              }).catch(() => {});
             }
             fetchCurriculum();
           }
@@ -1162,8 +1162,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                       </div>
                     )}
                     <ChevronDown
-                      className={`w-3.5 h-3.5 transition-transform duration-200 ${isExpanded ? 'rotate-180 text-white/80' : 'text-white/40'
-                        }`}
+                      className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                        isExpanded ? 'rotate-180 text-white/80' : 'text-white/40'
+                      }`}
                     />
                   </div>
                 </button>
@@ -1187,20 +1188,23 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             <div className="absolute left-[7px] top-0 bottom-0 w-3.5 pointer-events-none">
                               {/* Top vertical entry + curved L-bend into lesson title */}
                               <div
-                                className={`absolute left-0 ${lIdx === 0 ? '-top-2 h-[27px]' : 'top-0 h-[19px]'
-                                  } w-3.5 border-b border-l rounded-bl-[6px] ${isCurrent
+                                className={`absolute left-0 ${
+                                  lIdx === 0 ? '-top-2 h-[27px]' : 'top-0 h-[19px]'
+                                } w-3.5 border-b border-l rounded-bl-[6px] ${
+                                  isCurrent
                                     ? 'border-l-white border-b-white'
                                     : isAboveActive
                                       ? 'border-l-white border-b-white/15'
                                       : 'border-l-white/15 border-b-white/15'
-                                  } transition-colors`}
+                                } transition-colors`}
                               />
 
                               {/* Bottom continuing vertical stem */}
                               {!isLast && (
                                 <div
-                                  className={`absolute left-0 top-[19px] bottom-0 w-px ${isAboveActive ? 'bg-white' : 'bg-white/15'
-                                    } transition-colors`}
+                                  className={`absolute left-0 top-[19px] bottom-0 w-px ${
+                                    isAboveActive ? 'bg-white' : 'bg-white/15'
+                                  } transition-colors`}
                                 />
                               )}
                             </div>
@@ -1209,17 +1213,19 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             <button
                               type="button"
                               onClick={() => handleSelectLesson(lesson.lessonId)}
-                              className={`ml-5 w-full text-left px-3 py-2 flex flex-col justify-center transition-all cursor-pointer select-none rounded-xl group ${isCurrent
-                                ? 'bg-white/10 text-white shadow-xs'
-                                : 'bg-transparent hover:bg-white/5 text-white/70 hover:text-white'
-                                }`}
+                              className={`ml-5 w-full text-left px-3 py-2 flex flex-col justify-center transition-all cursor-pointer select-none rounded-xl group ${
+                                isCurrent
+                                  ? 'bg-white/10 text-white shadow-xs'
+                                  : 'bg-transparent hover:bg-white/5 text-white/70 hover:text-white'
+                              }`}
                             >
                               <div className="flex items-start justify-between gap-2 w-full">
                                 <span
-                                  className={`text-[12px] sm:text-[13px] leading-snug whitespace-normal break-words ${isCurrent
-                                    ? 'font-semibold text-white'
-                                    : 'font-normal text-white/80 group-hover:text-white'
-                                    }`}
+                                  className={`text-[12px] sm:text-[13px] leading-snug whitespace-normal break-words ${
+                                    isCurrent
+                                      ? 'font-semibold text-white'
+                                      : 'font-normal text-white/80 group-hover:text-white'
+                                  }`}
                                 >
                                   {lesson.title}
                                 </span>
@@ -1293,8 +1299,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 onMouseDown={handleDragStart}
                 onTouchStart={handleTouchDragStart}
                 onDoubleClick={() => setVideoOffsetY(0)}
-                className={`z-20 hidden md:flex w-10 h-3.5 bg-black rounded-t-[6px] items-center justify-center select-none shadow-sm transition-colors ${isDragging ? 'cursor-grabbing' : 'cursor-grab'
-                  }`}
+                className={`z-20 hidden md:flex w-10 h-3.5 bg-black rounded-t-[6px] items-center justify-center select-none shadow-sm transition-colors ${
+                  isDragging ? 'cursor-grabbing' : 'cursor-grab'
+                }`}
                 title="Drag up or down to adjust video position (Double-click to reset)"
               >
                 <div className="grid grid-cols-3 gap-1 pointer-events-none">
@@ -1311,10 +1318,11 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             <div
               ref={containerRef}
               onMouseMove={resetControlsTimeout}
-              className={`relative bg-black select-none max-w-full transition-all ${isFullscreen
-                ? 'fixed inset-0 z-[9999] w-full h-[100dvh] flex flex-col justify-center items-center bg-black rounded-none border-none overflow-hidden'
-                : 'w-full aspect-video max-h-[46vh] sm:max-h-[56vh] md:max-h-[74vh] lg:max-h-[78vh] mx-auto rounded-none shadow-2xl overflow-hidden'
-                }`}
+              className={`relative bg-black select-none max-w-full transition-all ${
+                isFullscreen
+                  ? 'fixed inset-0 z-[9999] w-full h-[100dvh] flex flex-col justify-center items-center bg-black rounded-none border-none overflow-hidden'
+                  : 'w-full aspect-video max-h-[46vh] sm:max-h-[56vh] md:max-h-[74vh] lg:max-h-[78vh] mx-auto rounded-none shadow-2xl overflow-hidden'
+              }`}
             >
               {!hasStartedWatching ? (
                 <div
@@ -1359,8 +1367,11 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                       type="button"
                       onClick={toggleCustomFullscreen}
                       aria-label="Exit fullscreen"
-                      className={`absolute top-4 right-4 z-50 p-2.5 bg-black/80 hover:bg-black text-white rounded-full border border-white/30 backdrop-blur-md shadow-2xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 group ${areControlsVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-                        }`}
+                      className={`absolute top-4 right-4 z-50 p-2.5 bg-black/80 hover:bg-black text-white rounded-full border border-white/30 backdrop-blur-md shadow-2xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95 group ${
+                        areControlsVisible
+                          ? 'opacity-100 pointer-events-auto'
+                          : 'opacity-0 pointer-events-none'
+                      }`}
                     >
                       <X className="w-5 h-5 text-white group-hover:rotate-90 transition-transform" />
                     </button>
@@ -1400,8 +1411,8 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                           You started watching on another device
                         </h3>
                         <p className="text-xs text-gray-300 leading-relaxed">
-                          Your streaming session was paused because playback was initiated on another
-                          browser or device.
+                          Your streaming session was paused because playback was initiated on
+                          another browser or device.
                         </p>
                       </div>
                       <Button
@@ -1469,7 +1480,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                                   isPlaying: false,
                                   state: 'completed',
                                 }),
-                              }).catch(() => { });
+                              }).catch(() => {});
                             }
                             fetchCurriculum();
                           }
@@ -1481,8 +1492,11 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                       {/* Double-tap / Double-click 10-second Seek Feedback Overlay (Minimal white text) */}
                       {seekFeedback && (
                         <div
-                          className={`absolute top-0 bottom-0 ${seekFeedback.direction === 'backward' ? 'left-6 sm:left-12' : 'right-6 sm:right-12'
-                            } flex items-center justify-center pointer-events-none z-30`}
+                          className={`absolute top-0 bottom-0 ${
+                            seekFeedback.direction === 'backward'
+                              ? 'left-6 sm:left-12'
+                              : 'right-6 sm:right-12'
+                          } flex items-center justify-center pointer-events-none z-30`}
                         >
                           <div className="text-xs sm:text-sm font-mono font-bold text-white tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)] select-none animate-in fade-in zoom-in-95 duration-150">
                             {seekFeedback.direction === 'backward'
@@ -1521,8 +1535,11 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                         onClick={(e) => e.stopPropagation()}
                         onMouseEnter={resetControlsTimeout}
                         onTouchStart={resetControlsTimeout}
-                        className={`absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/65 to-transparent px-3 py-2 sm:px-4 sm:py-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-col gap-1.5 sm:gap-2 text-white max-w-full transition-opacity duration-300 z-20 ${areControlsVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-                          }`}
+                        className={`absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/65 to-transparent px-3 py-2 sm:px-4 sm:py-2.5 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-col gap-1.5 sm:gap-2 text-white max-w-full transition-opacity duration-300 z-20 ${
+                          areControlsVisible
+                            ? 'opacity-100 pointer-events-auto'
+                            : 'opacity-0 pointer-events-none'
+                        }`}
                       >
                         {/* Scrubbing timeline slider with timestamps at ends */}
                         <div className="flex items-center gap-2 sm:gap-3 w-full">
@@ -1651,7 +1668,8 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                                             <span className="text-xs">
                                               {currentQuality === -1
                                                 ? 'Auto'
-                                                : qualityLevels.find((q) => q.id === currentQuality)?.label || 'Auto'}
+                                                : qualityLevels.find((q) => q.id === currentQuality)
+                                                    ?.label || 'Auto'}
                                             </span>
                                             <ChevronRight className="w-3.5 h-3.5" />
                                           </div>

@@ -73,11 +73,7 @@ interface UnitDropdownProps<T extends string> {
   onSelect: (newUnit: T) => void;
 }
 
-function UnitDropdown<T extends string>({
-  currentUnit,
-  options,
-  onSelect,
-}: UnitDropdownProps<T>) {
+function UnitDropdown<T extends string>({ currentUnit, options, onSelect }: UnitDropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -94,11 +90,7 @@ function UnitDropdown<T extends string>({
 
       {isOpen && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-            aria-hidden="true"
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
           <div className="absolute right-0 top-full mt-1 w-full min-w-full bg-white border border-neutral-300 shadow-lg z-50 py-1 rounded-none">
             {options.map((opt) => (
               <button
@@ -115,7 +107,9 @@ function UnitDropdown<T extends string>({
                 }`}
               >
                 <span className="whitespace-nowrap">{UNIT_DISPLAY[opt] || opt}</span>
-                {opt === currentUnit && <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />}
+                {opt === currentUnit && (
+                  <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />
+                )}
               </button>
             ))}
           </div>
@@ -176,9 +170,8 @@ export function PressureDropCalculator() {
     return resultKpa;
   }, [flowStr, flowUnit, diamStr, diamUnit, coeffStr, sgStr]);
 
-  const pressureDropFormatted = deltaPKpa !== null
-    ? formatResult(pressureFromKpa(deltaPKpa, resultUnit))
-    : '';
+  const pressureDropFormatted =
+    deltaPKpa !== null ? formatResult(pressureFromKpa(deltaPKpa, resultUnit)) : '';
 
   // Reset
   const handleReset = () => {
@@ -232,9 +225,7 @@ export function PressureDropCalculator() {
         <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
             <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900">
-              Flow rate
-            </span>
+            <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
           </div>
           <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
             <input
@@ -257,9 +248,7 @@ export function PressureDropCalculator() {
         <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
             <CircleDot className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900">
-              Diameter
-            </span>
+            <span className="text-xs sm:text-sm font-bold text-neutral-900">Diameter</span>
           </div>
           <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
             <input
@@ -404,7 +393,9 @@ export function PressureDropCalculator() {
                 </div>
                 <span className="text-2xl sm:text-3xl font-light">]²</span>
                 <span>×</span>
-                <span className="italic font-serif">S<sub>g</sub></span>
+                <span className="italic font-serif">
+                  S<sub>g</sub>
+                </span>
               </div>
 
               {/* Legend */}
@@ -415,7 +406,10 @@ export function PressureDropCalculator() {
                 </p>
                 <p>
                   <span className="font-extrabold text-black">d</span> = Diameter;&nbsp;
-                  <span className="font-extrabold text-black">S<sub>g</sub></span> = Specific gravity of fluid
+                  <span className="font-extrabold text-black">
+                    S<sub>g</sub>
+                  </span>{' '}
+                  = Specific gravity of fluid
                 </p>
               </div>
             </div>

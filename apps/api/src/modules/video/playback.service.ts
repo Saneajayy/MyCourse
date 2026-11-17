@@ -3,7 +3,13 @@ import { prisma } from '../../common/db/prisma.js';
 import { getVideoProvider } from './video.service.js';
 import { streamService } from './stream.service.js';
 import { entitlementService } from '../entitlements/entitlement.service.js';
-import { EntitlementStatus, LessonStatus, UserStatus, HeartbeatInput, ProductStatus } from '@course/shared';
+import {
+  EntitlementStatus,
+  LessonStatus,
+  UserStatus,
+  HeartbeatInput,
+  ProductStatus,
+} from '@course/shared';
 import {
   NotFoundError,
   ForbiddenError,
@@ -387,7 +393,10 @@ export class PlaybackService {
       },
     });
 
-    if (!product && (courseSlug === 'hydraulic-engineering-mastery' || courseSlug === 'hydraulic-system-basics')) {
+    if (
+      !product &&
+      (courseSlug === 'hydraulic-engineering-mastery' || courseSlug === 'hydraulic-system-basics')
+    ) {
       product = await prisma.product.findFirst({
         where: {
           slug: { in: ['hydraulic-system-basics', 'hydraulic-engineering-mastery'] },

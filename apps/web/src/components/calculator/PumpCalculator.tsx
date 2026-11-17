@@ -35,10 +35,7 @@ function EnergyRatingIcon({ className = 'w-5 h-5 text-black' }: { className?: st
 }
 
 export type PumpSubSection =
-  | 'flow-rate'
-  | 'displacement'
-  | 'electric-motor-power'
-  | 'total-efficiency';
+  'flow-rate' | 'displacement' | 'electric-motor-power' | 'total-efficiency';
 
 const SUBSECTIONS: { id: PumpSubSection; label: string; available: boolean }[] = [
   { id: 'flow-rate', label: 'Flow rate', available: true },
@@ -135,11 +132,7 @@ interface UnitDropdownProps<T extends string> {
   onSelect: (newUnit: T) => void;
 }
 
-function UnitDropdown<T extends string>({
-  currentUnit,
-  options,
-  onSelect,
-}: UnitDropdownProps<T>) {
+function UnitDropdown<T extends string>({ currentUnit, options, onSelect }: UnitDropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -156,11 +149,7 @@ function UnitDropdown<T extends string>({
 
       {isOpen && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-            aria-hidden="true"
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
           <div className="absolute right-0 top-full mt-1 w-full min-w-full bg-white border border-neutral-300 shadow-lg z-50 py-1 rounded-none">
             {options.map((opt) => (
               <button
@@ -177,7 +166,9 @@ function UnitDropdown<T extends string>({
                 }`}
               >
                 <span className="whitespace-nowrap">{UNIT_DISPLAY[opt] || opt}</span>
-                {opt === currentUnit && <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />}
+                {opt === currentUnit && (
+                  <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />
+                )}
               </button>
             ))}
           </div>
@@ -545,9 +536,7 @@ export function PumpCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Displacement
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Displacement</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -570,9 +559,7 @@ export function PumpCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Speed
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Speed</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -643,9 +630,7 @@ export function PumpCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Flow rate
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -668,9 +653,7 @@ export function PumpCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Speed
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Speed</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -741,9 +724,7 @@ export function PumpCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Displacement
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Displacement</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -766,9 +747,7 @@ export function PumpCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Pressure
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Pressure</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -791,9 +770,7 @@ export function PumpCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Speed
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Speed</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -839,9 +816,7 @@ export function PumpCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Flow rate
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1009,10 +984,10 @@ export function PumpCalculator() {
                 {activeSubSection === 'electric-motor-power'
                   ? 'Pump - Electric motor power formula'
                   : activeSubSection === 'total-efficiency'
-                  ? 'Pump - Total efficiency formula'
-                  : activeSubSection === 'displacement'
-                  ? 'Pump - Displacement formula'
-                  : 'Pump - Flow rate formula'}
+                    ? 'Pump - Total efficiency formula'
+                    : activeSubSection === 'displacement'
+                      ? 'Pump - Displacement formula'
+                      : 'Pump - Flow rate formula'}
               </h3>
               <button
                 type="button"
@@ -1043,7 +1018,9 @@ export function PumpCalculator() {
                         <span className="italic font-serif">2π</span>
                         <span className="px-0.5">×</span>
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>m</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>m</sub>
+                          </span>
                           <span>100</span>
                         </div>
                       </div>
@@ -1054,9 +1031,7 @@ export function PumpCalculator() {
                     OR
                   </div>
 
-                  <div className="text-xs font-bold text-neutral-600">
-                    (Using flow rate)
-                  </div>
+                  <div className="text-xs font-bold text-neutral-600">(Using flow rate)</div>
 
                   {/* Formula 2 */}
                   <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
@@ -1068,16 +1043,16 @@ export function PumpCalculator() {
                         <span className="italic font-serif">2π</span>
                         <span className="px-0.5">×</span>
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>m</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>m</sub>
+                          </span>
                           <span>100</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="text-xs font-bold text-neutral-600">
-                    Where
-                  </div>
+                  <div className="text-xs font-bold text-neutral-600">Where</div>
 
                   {/* Formula 3 (Where V = ...) */}
                   <div className="inline-flex items-center gap-3 font-serif text-base sm:text-xl text-neutral-900">
@@ -1089,7 +1064,9 @@ export function PumpCalculator() {
                         <span className="italic font-serif">N</span>
                         <span className="px-0.5">×</span>
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>v</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>v</sub>
+                          </span>
                           <span>100</span>
                         </div>
                       </div>
@@ -1104,9 +1081,15 @@ export function PumpCalculator() {
                       <span className="font-extrabold text-black">N</span> = Speed
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">η<sub>m</sub></span> = Mechanical efficiency;&nbsp;
+                      <span className="font-extrabold text-black">
+                        η<sub>m</sub>
+                      </span>{' '}
+                      = Mechanical efficiency;&nbsp;
                       <span className="font-extrabold text-black">Q</span> = Flow rate;&nbsp;
-                      <span className="font-extrabold text-black">η<sub>v</sub></span> = Volumetric efficiency
+                      <span className="font-extrabold text-black">
+                        η<sub>v</sub>
+                      </span>{' '}
+                      = Volumetric efficiency
                     </p>
                   </div>
                 </div>
@@ -1121,12 +1104,16 @@ export function PumpCalculator() {
                     <span className="italic font-bold">η</span>
                     <span>=</span>
                     <div className="inline-flex flex-col items-center text-xs sm:text-sm font-sans font-medium">
-                      <span className="border-b border-black px-1.5 pb-0.5 italic">η<sub>m</sub></span>
+                      <span className="border-b border-black px-1.5 pb-0.5 italic">
+                        η<sub>m</sub>
+                      </span>
                       <span>100</span>
                     </div>
                     <span>×</span>
                     <div className="inline-flex flex-col items-center text-xs sm:text-sm font-sans font-medium">
-                      <span className="border-b border-black px-1.5 pb-0.5 italic">η<sub>v</sub></span>
+                      <span className="border-b border-black px-1.5 pb-0.5 italic">
+                        η<sub>v</sub>
+                      </span>
                       <span>100</span>
                     </div>
                     <span>× 100</span>
@@ -1135,8 +1122,14 @@ export function PumpCalculator() {
                   {/* Legend */}
                   <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
                     <p>
-                      <span className="font-extrabold text-black">η<sub>m</sub></span> = Mechanical efficiency;&nbsp;
-                      <span className="font-extrabold text-black">η<sub>v</sub></span> = Volumetric efficiency
+                      <span className="font-extrabold text-black">
+                        η<sub>m</sub>
+                      </span>{' '}
+                      = Mechanical efficiency;&nbsp;
+                      <span className="font-extrabold text-black">
+                        η<sub>v</sub>
+                      </span>{' '}
+                      = Volumetric efficiency
                     </p>
                   </div>
                 </div>
@@ -1156,7 +1149,9 @@ export function PumpCalculator() {
                         <span className="italic font-serif">N</span>
                         <span className="px-0.5">×</span>
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>v</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>v</sub>
+                          </span>
                           <span>100</span>
                         </div>
                       </div>
@@ -1168,7 +1163,10 @@ export function PumpCalculator() {
                     <p>
                       <span className="font-extrabold text-black">Q</span> = Flow rate;&nbsp;
                       <span className="font-extrabold text-black">N</span> = Speed;&nbsp;
-                      <span className="font-extrabold text-black">η<sub>v</sub></span> = Volumetric efficiency
+                      <span className="font-extrabold text-black">
+                        η<sub>v</sub>
+                      </span>{' '}
+                      = Volumetric efficiency
                     </p>
                   </div>
                 </div>
@@ -1184,7 +1182,9 @@ export function PumpCalculator() {
                     <span>=</span>
                     <span className="italic font-serif">V × N × </span>
                     <div className="inline-flex flex-col items-center text-xs sm:text-sm font-sans font-medium">
-                      <span className="border-b-2 border-black px-1.5 pb-0.5 italic">η<sub>v</sub></span>
+                      <span className="border-b-2 border-black px-1.5 pb-0.5 italic">
+                        η<sub>v</sub>
+                      </span>
                       <span>100</span>
                     </div>
                   </div>
@@ -1194,7 +1194,10 @@ export function PumpCalculator() {
                     <p>
                       <span className="font-extrabold text-black">V</span> = Displacement;&nbsp;
                       <span className="font-extrabold text-black">N</span> = Speed;&nbsp;
-                      <span className="font-extrabold text-black">η<sub>v</sub></span> = Volumetric efficiency
+                      <span className="font-extrabold text-black">
+                        η<sub>v</sub>
+                      </span>{' '}
+                      = Volumetric efficiency
                     </p>
                   </div>
                 </div>

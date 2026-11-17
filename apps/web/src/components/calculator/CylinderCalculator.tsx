@@ -162,11 +162,7 @@ interface UnitDropdownProps<T extends string> {
   onSelect: (newUnit: T) => void;
 }
 
-function UnitDropdown<T extends string>({
-  currentUnit,
-  options,
-  onSelect,
-}: UnitDropdownProps<T>) {
+function UnitDropdown<T extends string>({ currentUnit, options, onSelect }: UnitDropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -183,11 +179,7 @@ function UnitDropdown<T extends string>({
 
       {isOpen && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-            aria-hidden="true"
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
           <div className="absolute right-0 top-full mt-1 w-full min-w-full bg-white border border-neutral-300 shadow-lg z-50 py-1 rounded-none">
             {options.map((opt) => (
               <button
@@ -204,7 +196,9 @@ function UnitDropdown<T extends string>({
                 }`}
               >
                 <span className="whitespace-nowrap">{UNIT_DISPLAY[opt] || opt}</span>
-                {opt === currentUnit && <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />}
+                {opt === currentUnit && (
+                  <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />
+                )}
               </button>
             ))}
           </div>
@@ -238,13 +232,7 @@ export function CylinderCalculator() {
   const [outflowUnit, setOutflowUnit] = useState<FlowUnit>('lpm');
 
   // Interactive Editable Fields in Results Section (Force, Time, Velocity)
-  type EditableField =
-    | 'forceBore'
-    | 'forceRod'
-    | 'timeBore'
-    | 'timeRod'
-    | 'velBore'
-    | 'velRod';
+  type EditableField = 'forceBore' | 'forceRod' | 'timeBore' | 'timeRod' | 'velBore' | 'velRod';
 
   const [activeField, setActiveField] = useState<EditableField | null>(null);
   const [localInputValues, setLocalInputValues] = useState<Record<string, string>>({});
@@ -264,7 +252,8 @@ export function CylinderCalculator() {
     const D = !isNaN(boreNum) && boreNum > 0 ? lengthToBase(boreNum, boreUnit) : null;
     const d = !isNaN(rodNum) && rodNum > 0 ? lengthToBase(rodNum, rodUnit) : null;
     const L = !isNaN(strokeNum) && strokeNum > 0 ? lengthToBase(strokeNum, strokeUnit) : null;
-    const P = !isNaN(pressureNum) && pressureNum > 0 ? pressureToBase(pressureNum, pressureUnit) : null;
+    const P =
+      !isNaN(pressureNum) && pressureNum > 0 ? pressureToBase(pressureNum, pressureUnit) : null;
     const Q = !isNaN(flowNum) && flowNum > 0 ? flowToBase(flowNum, flowUnit) : null;
 
     if (!D) return null;
@@ -532,9 +521,7 @@ export function CylinderCalculator() {
         <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
             <Circle className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900">
-              Rod Diameter
-            </span>
+            <span className="text-xs sm:text-sm font-bold text-neutral-900">Rod Diameter</span>
           </div>
           <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
             <input
@@ -545,11 +532,7 @@ export function CylinderCalculator() {
               onChange={(e) => setRodStr(e.target.value)}
               className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
             />
-            <UnitDropdown
-              currentUnit={rodUnit}
-              options={['mm', 'cm', 'm']}
-              onSelect={setRodUnit}
-            />
+            <UnitDropdown currentUnit={rodUnit} options={['mm', 'cm', 'm']} onSelect={setRodUnit} />
           </div>
         </div>
 
@@ -557,9 +540,7 @@ export function CylinderCalculator() {
         <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
             <Ruler className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900">
-              Stroke
-            </span>
+            <span className="text-xs sm:text-sm font-bold text-neutral-900">Stroke</span>
           </div>
           <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
             <input
@@ -582,9 +563,7 @@ export function CylinderCalculator() {
         <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
             <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900">
-              Pressure
-            </span>
+            <span className="text-xs sm:text-sm font-bold text-neutral-900">Pressure</span>
           </div>
           <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
             <input
@@ -607,9 +586,7 @@ export function CylinderCalculator() {
         <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
             <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900">
-              Oil Flow
-            </span>
+            <span className="text-xs sm:text-sm font-bold text-neutral-900">Oil Flow</span>
           </div>
           <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
             <input
@@ -870,7 +847,8 @@ export function CylinderCalculator() {
               </div>
               <p className="text-[11px] text-neutral-600 font-mono -mt-2">
                 <span className="font-extrabold text-black">R</span> = Radius of piston/Bore;&nbsp;
-                <span className="font-extrabold text-black">X</span> = Area on piston/Bore side;&nbsp;
+                <span className="font-extrabold text-black">X</span> = Area on piston/Bore
+                side;&nbsp;
                 <span className="font-extrabold text-black">r</span> = Radius of rod
               </p>
 
@@ -884,7 +862,8 @@ export function CylinderCalculator() {
                 <div className="text-center font-mono font-bold text-sm">X − π × r² × L</div>
               </div>
               <p className="text-[11px] text-neutral-600 font-mono -mt-2">
-                <span className="font-extrabold text-black">X</span> = Volume on piston/Bore side;&nbsp;
+                <span className="font-extrabold text-black">X</span> = Volume on piston/Bore
+                side;&nbsp;
                 <span className="font-extrabold text-black">L</span> = Stroke length
               </p>
 

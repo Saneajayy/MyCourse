@@ -18,12 +18,7 @@ import {
 } from 'lucide-react';
 
 export type MotorSubSection =
-  | 'flow-rate'
-  | 'pressure'
-  | 'displacement'
-  | 'speed'
-  | 'torque'
-  | 'power';
+  'flow-rate' | 'pressure' | 'displacement' | 'speed' | 'torque' | 'power';
 
 const SUBSECTIONS: { id: MotorSubSection; label: string; available: boolean }[] = [
   { id: 'flow-rate', label: 'Flow rate', available: true },
@@ -153,11 +148,7 @@ interface UnitDropdownProps<T extends string> {
   onSelect: (newUnit: T) => void;
 }
 
-function UnitDropdown<T extends string>({
-  currentUnit,
-  options,
-  onSelect,
-}: UnitDropdownProps<T>) {
+function UnitDropdown<T extends string>({ currentUnit, options, onSelect }: UnitDropdownProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -174,11 +165,7 @@ function UnitDropdown<T extends string>({
 
       {isOpen && (
         <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-            aria-hidden="true"
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
           <div className="absolute right-0 top-full mt-1 w-full min-w-full bg-white border border-neutral-300 shadow-lg z-50 py-1 rounded-none">
             {options.map((opt) => (
               <button
@@ -195,7 +182,9 @@ function UnitDropdown<T extends string>({
                 }`}
               >
                 <span className="whitespace-nowrap">{UNIT_DISPLAY[opt] || opt}</span>
-                {opt === currentUnit && <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />}
+                {opt === currentUnit && (
+                  <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />
+                )}
               </button>
             ))}
           </div>
@@ -508,7 +497,7 @@ export function MotorCalculator() {
 
     // Method 2: N = P / T -> in rad/s, so rps = (P / T) / (2 * PI)
     if (P !== null && T !== null) {
-      const nBaseRps = (P / T) / (2 * Math.PI);
+      const nBaseRps = P / T / (2 * Math.PI);
       return nBaseRps;
     }
 
@@ -851,9 +840,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Displacement
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Displacement</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -876,9 +863,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Speed
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Speed</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -924,9 +909,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Power
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Power</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -949,9 +932,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Pressure
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Pressure</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1022,9 +1003,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Power
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Power</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1047,9 +1026,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Flow rate
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1118,9 +1095,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <RotateCw className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Torque
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Torque</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1143,9 +1118,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Displacement
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Displacement</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1193,9 +1166,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <RotateCw className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Torque
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Torque</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1241,9 +1212,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Pressure
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Pressure</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1266,9 +1235,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Flow rate
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1314,9 +1281,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Speed
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Speed</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1364,9 +1329,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Flow rate
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1412,9 +1375,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Displacement
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Displacement</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1437,9 +1398,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Power
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Power</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1462,9 +1421,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <RotateCw className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Torque
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Torque</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1535,9 +1492,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Displacement
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Displacement</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1560,9 +1515,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Pressure
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Pressure</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1585,9 +1538,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Power
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Power</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1610,9 +1561,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Speed
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Speed</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1660,9 +1609,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Torque
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Torque</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1685,9 +1632,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Speed
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Speed</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1710,9 +1655,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Flow rate
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1735,9 +1678,7 @@ export function MotorCalculator() {
           <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
               <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Pressure
-              </span>
+              <span className="text-xs sm:text-sm font-bold text-neutral-900">Pressure</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1859,14 +1800,14 @@ export function MotorCalculator() {
                 {activeSubSection === 'power'
                   ? 'Motor - Power formula'
                   : activeSubSection === 'torque'
-                  ? 'Motor - Torque formula'
-                  : activeSubSection === 'displacement'
-                  ? 'Motor - Displacement formula'
-                  : activeSubSection === 'speed'
-                  ? 'Motor - Speed formula'
-                  : activeSubSection === 'pressure'
-                  ? 'Motor - Pressure formula'
-                  : 'Motor - Flow rate formula'}
+                    ? 'Motor - Torque formula'
+                    : activeSubSection === 'displacement'
+                      ? 'Motor - Displacement formula'
+                      : activeSubSection === 'speed'
+                        ? 'Motor - Speed formula'
+                        : activeSubSection === 'pressure'
+                          ? 'Motor - Pressure formula'
+                          : 'Motor - Flow rate formula'}
               </h3>
               <button
                 type="button"
@@ -1894,7 +1835,9 @@ export function MotorCalculator() {
                     <div className="inline-flex flex-col items-center">
                       <div className="border-b-2 border-black px-4 pb-0.5 flex items-center gap-1 text-xs sm:text-sm font-sans font-medium">
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>m</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>m</sub>
+                          </span>
                           <span>100</span>
                         </div>
                         <span className="px-0.5">×</span>
@@ -1923,7 +1866,10 @@ export function MotorCalculator() {
                   {/* Legend */}
                   <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
                     <p>
-                      <span className="font-extrabold text-black">η<sub>m</sub></span> = Mechanical efficiency;&nbsp;
+                      <span className="font-extrabold text-black">
+                        η<sub>m</sub>
+                      </span>{' '}
+                      = Mechanical efficiency;&nbsp;
                       <span className="font-extrabold text-black">p</span> = Pressure;&nbsp;
                       <span className="font-extrabold text-black">V</span> = Displacement
                     </p>
@@ -1957,12 +1903,16 @@ export function MotorCalculator() {
                     <span>=</span>
                     <span className="italic">Q × p × </span>
                     <div className="inline-flex flex-col items-center text-xs sm:text-sm font-sans font-medium">
-                      <span className="border-b border-black px-1 pb-0.5 italic">η<sub>v</sub></span>
+                      <span className="border-b border-black px-1 pb-0.5 italic">
+                        η<sub>v</sub>
+                      </span>
                       <span>100</span>
                     </div>
                     <span>×</span>
                     <div className="inline-flex flex-col items-center text-xs sm:text-sm font-sans font-medium">
-                      <span className="border-b border-black px-1 pb-0.5 italic">η<sub>m</sub></span>
+                      <span className="border-b border-black px-1 pb-0.5 italic">
+                        η<sub>m</sub>
+                      </span>
                       <span>100</span>
                     </div>
                   </div>
@@ -1976,8 +1926,14 @@ export function MotorCalculator() {
                     </p>
                     <p>
                       <span className="font-extrabold text-black">p</span> = Pressure;&nbsp;
-                      <span className="font-extrabold text-black">η<sub>v</sub></span> = Volumetric efficiency;&nbsp;
-                      <span className="font-extrabold text-black">η<sub>m</sub></span> = Mechanical efficiency
+                      <span className="font-extrabold text-black">
+                        η<sub>v</sub>
+                      </span>{' '}
+                      = Volumetric efficiency;&nbsp;
+                      <span className="font-extrabold text-black">
+                        η<sub>m</sub>
+                      </span>{' '}
+                      = Mechanical efficiency
                     </p>
                   </div>
                 </div>
@@ -1996,7 +1952,9 @@ export function MotorCalculator() {
                       <span className="border-b-2 border-black px-4 pb-0.5 italic">T × 2π</span>
                       <div className="flex items-center gap-1 pt-1 text-xs sm:text-sm font-sans font-medium">
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>m</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>m</sub>
+                          </span>
                           <span>100</span>
                         </div>
                         <span className="px-0.5">×</span>
@@ -2018,7 +1976,9 @@ export function MotorCalculator() {
                         <span className="italic font-serif">Q</span>
                         <span>×</span>
                         <div className="flex flex-col items-center text-xs sm:text-sm font-sans font-medium">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>v</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>v</sub>
+                          </span>
                           <span>100</span>
                         </div>
                       </div>
@@ -2030,12 +1990,18 @@ export function MotorCalculator() {
                   <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
                     <p>
                       <span className="font-extrabold text-black">T</span> = Torque;&nbsp;
-                      <span className="font-extrabold text-black">η<sub>m</sub></span> = Mechanical efficiency;&nbsp;
+                      <span className="font-extrabold text-black">
+                        η<sub>m</sub>
+                      </span>{' '}
+                      = Mechanical efficiency;&nbsp;
                       <span className="font-extrabold text-black">p</span> = Pressure
                     </p>
                     <p>
                       <span className="font-extrabold text-black">Q</span> = Flow rate;&nbsp;
-                      <span className="font-extrabold text-black">η<sub>v</sub></span> = Volumetric efficiency;&nbsp;
+                      <span className="font-extrabold text-black">
+                        η<sub>v</sub>
+                      </span>{' '}
+                      = Volumetric efficiency;&nbsp;
                       <span className="font-extrabold text-black">N</span> = Speed
                     </p>
                   </div>
@@ -2056,7 +2022,9 @@ export function MotorCalculator() {
                         <span className="italic font-serif">Q</span>
                         <span>×</span>
                         <div className="flex flex-col items-center text-xs sm:text-sm font-sans font-medium">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>v</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>v</sub>
+                          </span>
                           <span>100</span>
                         </div>
                       </div>
@@ -2082,7 +2050,10 @@ export function MotorCalculator() {
                   <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
                     <p>
                       <span className="font-extrabold text-black">Q</span> = Flow rate;&nbsp;
-                      <span className="font-extrabold text-black">η<sub>v</sub></span> = Volumetric efficiency;&nbsp;
+                      <span className="font-extrabold text-black">
+                        η<sub>v</sub>
+                      </span>{' '}
+                      = Volumetric efficiency;&nbsp;
                       <span className="font-extrabold text-black">V</span> = Displacement
                     </p>
                     <p>
@@ -2106,12 +2077,16 @@ export function MotorCalculator() {
                       <span className="border-b-2 border-black px-4 pb-0.5 italic">P</span>
                       <div className="flex items-center gap-1 pt-1 text-xs sm:text-sm font-sans font-medium">
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>v</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>v</sub>
+                          </span>
                           <span>100</span>
                         </div>
                         <span className="px-0.5">×</span>
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>m</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>m</sub>
+                          </span>
                           <span>100</span>
                         </div>
                         <span className="px-0.5">×</span>
@@ -2132,7 +2107,9 @@ export function MotorCalculator() {
                       <span className="border-b-2 border-black px-4 pb-0.5 italic">T × 2π</span>
                       <div className="flex items-center gap-1 pt-1 text-xs sm:text-sm font-sans font-medium">
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>m</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>m</sub>
+                          </span>
                           <span>100</span>
                         </div>
                         <span className="px-0.5">×</span>
@@ -2145,10 +2122,16 @@ export function MotorCalculator() {
                   <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
                     <p>
                       <span className="font-extrabold text-black">P</span> = Power;&nbsp;
-                      <span className="font-extrabold text-black">η<sub>v</sub></span> = Volumetric efficiency;
+                      <span className="font-extrabold text-black">
+                        η<sub>v</sub>
+                      </span>{' '}
+                      = Volumetric efficiency;
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">η<sub>m</sub></span> = Mechanical efficiency;&nbsp;
+                      <span className="font-extrabold text-black">
+                        η<sub>m</sub>
+                      </span>{' '}
+                      = Mechanical efficiency;&nbsp;
                       <span className="font-extrabold text-black">Q</span> = Flow rate;
                     </p>
                     <p>
@@ -2171,7 +2154,9 @@ export function MotorCalculator() {
                     <div className="inline-flex flex-col items-center">
                       <span className="border-b-2 border-black px-4 pb-0.5 italic">V × N</span>
                       <div className="flex flex-col items-center pt-1 text-xs sm:text-sm font-sans font-medium">
-                        <span className="border-b border-black px-1.5 pb-0.5 italic">η<sub>v</sub></span>
+                        <span className="border-b border-black px-1.5 pb-0.5 italic">
+                          η<sub>v</sub>
+                        </span>
                         <span>100</span>
                       </div>
                     </div>
@@ -2189,12 +2174,16 @@ export function MotorCalculator() {
                       <span className="border-b-2 border-black px-4 pb-0.5 italic">P</span>
                       <div className="flex items-center gap-1 pt-1 text-xs sm:text-sm font-sans font-medium">
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>v</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>v</sub>
+                          </span>
                           <span>100</span>
                         </div>
                         <span className="px-0.5">×</span>
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">η<sub>m</sub></span>
+                          <span className="border-b border-black px-1 pb-0.5 italic">
+                            η<sub>m</sub>
+                          </span>
                           <span>100</span>
                         </div>
                         <span className="px-0.5">×</span>
@@ -2210,11 +2199,17 @@ export function MotorCalculator() {
                       <span className="font-extrabold text-black">N</span> = Speed;
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">η<sub>v</sub></span> = Volumetric efficiency;&nbsp;
+                      <span className="font-extrabold text-black">
+                        η<sub>v</sub>
+                      </span>{' '}
+                      = Volumetric efficiency;&nbsp;
                       <span className="font-extrabold text-black">P</span> = Power;
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">η<sub>m</sub></span> = Mechanical efficiency;&nbsp;
+                      <span className="font-extrabold text-black">
+                        η<sub>m</sub>
+                      </span>{' '}
+                      = Mechanical efficiency;&nbsp;
                       <span className="font-extrabold text-black">p</span> = Pressure
                     </p>
                   </div>

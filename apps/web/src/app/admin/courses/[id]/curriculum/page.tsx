@@ -702,7 +702,11 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                         type="button"
                         onClick={() => setThumbnailModal({ isOpen: true, lesson })}
                         className="group relative w-12 h-7 sm:w-14 sm:h-8 border border-neutral-200 bg-neutral-100 flex items-center justify-center overflow-hidden shrink-0 transition-all hover:border-neutral-900 cursor-pointer"
-                        title={lesson.thumbnailUrl ? 'Click to view or change thumbnail' : 'Click to add thumbnail'}
+                        title={
+                          lesson.thumbnailUrl
+                            ? 'Click to view or change thumbnail'
+                            : 'Click to add thumbnail'
+                        }
                       >
                         {lesson.thumbnailUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
@@ -833,7 +837,11 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                             ? 'border-neutral-300 hover:border-neutral-900 text-neutral-800 bg-white hover:bg-neutral-50'
                             : 'border-dashed border-neutral-300 hover:border-neutral-900 text-neutral-600 bg-white hover:bg-neutral-50'
                         }`}
-                        title={lesson.thumbnailUrl ? 'Change or view video thumbnail' : 'Upload video thumbnail'}
+                        title={
+                          lesson.thumbnailUrl
+                            ? 'Change or view video thumbnail'
+                            : 'Upload video thumbnail'
+                        }
                       >
                         <ImageIcon className="w-3.5 h-3.5 text-neutral-600" />
                         <span className="hidden xl:inline">
@@ -1185,7 +1193,9 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                 >
                   Lesson Video Thumbnail
                 </h2>
-                <p className="text-xs text-neutral-500 mt-0.5">Lesson: {thumbnailModal.lesson.title}</p>
+                <p className="text-xs text-neutral-500 mt-0.5">
+                  Lesson: {thumbnailModal.lesson.title}
+                </p>
               </div>
               <button
                 type="button"
@@ -1215,7 +1225,9 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                   <div className="text-center p-6 text-neutral-400">
                     <ImageIcon className="w-10 h-10 mx-auto mb-2 opacity-50" />
                     <span className="text-xs font-mono uppercase">No Thumbnail Uploaded</span>
-                    <p className="text-[11px] text-neutral-400 mt-1">Recommended 16:9 (1280x720), max 5MB JPG/PNG/WebP</p>
+                    <p className="text-[11px] text-neutral-400 mt-1">
+                      Recommended 16:9 (1280x720), max 5MB JPG/PNG/WebP
+                    </p>
                   </div>
                 )}
               </div>

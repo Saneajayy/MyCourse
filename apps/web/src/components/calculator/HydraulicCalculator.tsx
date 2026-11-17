@@ -1,13 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  Cylinder,
-  RotateCw,
-  Gauge,
-  TrendingDown,
-  GitFork,
-} from 'lucide-react';
+import { Cylinder, RotateCw, Gauge, TrendingDown, GitFork } from 'lucide-react';
 import { CylinderCalculator } from './CylinderCalculator';
 import { MotorCalculator } from './MotorCalculator';
 import { PumpCalculator } from './PumpCalculator';
@@ -81,10 +75,11 @@ export function HydraulicCalculator() {
               key={tab.id}
               type="button"
               onClick={() => setActiveSection(tab.id)}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 sm:px-5 sm:py-3 text-xs sm:text-sm font-bold border transition-colors cursor-pointer rounded-none select-none ${isActive
-                ? 'border-black bg-black text-white font-extrabold shadow-xs'
-                : 'border-neutral-300 bg-white text-neutral-800 hover:border-black hover:bg-neutral-50'
-                }`}
+              className={`inline-flex items-center gap-2 px-4 py-2.5 sm:px-5 sm:py-3 text-xs sm:text-sm font-bold border transition-colors cursor-pointer rounded-none select-none ${
+                isActive
+                  ? 'border-black bg-black text-white font-extrabold shadow-xs'
+                  : 'border-neutral-300 bg-white text-neutral-800 hover:border-black hover:bg-neutral-50'
+              }`}
             >
               <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-neutral-800'}`} />
               <span>{tab.label}</span>
