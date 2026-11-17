@@ -1047,18 +1047,6 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     return `${mins}:${rem < 10 ? '0' : ''}${rem}`;
   };
 
-  if (authLoading || curriculumLoading) {
-    return (
-      <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-hidden flex flex-col justify-center items-center space-y-4">
-        <div className="noise-texture" aria-hidden="true" />
-        <Loader2 className="w-10 h-10 animate-spin text-white" />
-        <p className="text-sm font-semibold tracking-wider uppercase text-white/80">
-          Loading Classroom &amp; Video Streams...
-        </p>
-      </div>
-    );
-  }
-
   if (curriculumError) {
     return (
       <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-hidden flex flex-col justify-center items-center p-4">
@@ -1081,6 +1069,8 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       </div>
     );
   }
+
+  const isPageLoading = authLoading || curriculumLoading;
 
   return (
     <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit select-none z-10 flex flex-col md:flex-row gap-2.5 sm:gap-3">
@@ -1117,143 +1107,170 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
         {/* Small Name of Course (without separation line below it) */}
         <div className="px-5 pt-3.5 pb-2 flex items-center justify-between shrink-0">
-          <span className="text-[12px] font-medium text-white/70 truncate">
-            Hydraulic System Basics
-          </span>
-          <span className="text-[11px] font-mono text-white/40 shrink-0 ml-2">
-            {totalCompletedLessons}/{totalLessons}
-          </span>
+          {isPageLoading ? (
+            <>
+              <div className="h-3.5 w-32 bg-white/10 rounded animate-pulse" />
+              <div className="h-3 w-8 bg-white/10 rounded animate-pulse" />
+            </>
+          ) : (
+            <>
+              <span className="text-[12px] font-medium text-white/70 truncate">
+                Hydraulic System Basics
+              </span>
+              <span className="text-[11px] font-mono text-white/40 shrink-0 ml-2">
+                {totalCompletedLessons}/{totalLessons}
+              </span>
+            </>
+          )}
         </div>
 
         {/* Scrollable Modules & Connected Lessons List */}
         <div className="flex-1 overflow-y-auto custom-scrollbar px-2 pb-4 space-y-1">
-          {sections.map((section, sIdx) => {
-            const isExpanded = expandedSections[section.sectionId] ?? true;
-            const completedCount = section.lessons.filter((l) => l.isCompleted).length;
-            const isModuleCompleted =
-              section.lessons.length > 0 && completedCount === section.lessons.length;
-
-            return (
-              <div key={section.sectionId} className="w-full">
-                {/* Module Header Button: directly module name, folder icon, chevron */}
-                <button
-                  type="button"
-                  onClick={() => toggleSection(section.sectionId)}
-                  className="w-full text-left px-3 py-2 text-xs sm:text-[13px] font-semibold transition-colors cursor-pointer select-none hover:bg-white/5 text-white/90 hover:text-white flex items-center justify-between gap-2 rounded-md"
-                  aria-expanded={isExpanded}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                    {isExpanded ? (
-                      <FolderOpen className="w-4 h-4 text-white/90 shrink-0" />
-                    ) : (
-                      <Folder className="w-4 h-4 text-white/60 shrink-0" />
-                    )}
-                    <span className="leading-tight font-medium whitespace-normal break-words">
-                      {section.title.replace(/^Module\s*\d+\s*[-:–]?\s*/i, '')}
-                    </span>
+          {isPageLoading ? (
+            <div className="space-y-4 px-2 pt-2 animate-pulse">
+              {[1, 2, 3].map((m) => (
+                <div key={m} className="space-y-2">
+                  <div className="flex items-center gap-2.5 px-3 py-2">
+                    <div className="w-4 h-4 bg-white/10 rounded shrink-0" />
+                    <div className="h-3.5 bg-white/10 rounded w-3/5" />
                   </div>
-                  <div className="flex items-center gap-2 shrink-0 text-white/60">
-                    {isModuleCompleted && (
-                      <div
-                        className="w-4 h-4 rounded-none bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0"
-                        title="Module Completed"
-                      >
-                        <Check className="w-2.5 h-2.5 stroke-[3]" />
-                      </div>
-                    )}
-                    <ChevronDown
-                      className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                        isExpanded ? 'rotate-180 text-white/80' : 'text-white/40'
-                      }`}
-                    />
+                  <div className="pl-6 space-y-1.5">
+                    <div className="h-9 bg-white/5 rounded-xl border border-white/5" />
+                    <div className="h-9 bg-white/5 rounded-xl border border-white/5 opacity-60" />
+                    <div className="h-9 bg-white/5 rounded-xl border border-white/5 opacity-40" />
                   </div>
-                </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            sections.map((section, sIdx) => {
+              const isExpanded = expandedSections[section.sectionId] ?? true;
+              const completedCount = section.lessons.filter((l) => l.isCompleted).length;
+              const isModuleCompleted =
+                section.lessons.length > 0 && completedCount === section.lessons.length;
 
-                {/* Tree connecting lines bending to each lesson title */}
-                {isExpanded && (
-                  <div className="w-full pl-3.5 pr-1 py-1">
-                    {(() => {
-                      const activeLessonIdx = section.lessons.findIndex(
-                        (l) => l.lessonId === selectedLessonId,
-                      );
+              return (
+                <div key={section.sectionId} className="w-full">
+                  {/* Module Header Button: directly module name, folder icon, chevron */}
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(section.sectionId)}
+                    className="w-full text-left px-3 py-2 text-xs sm:text-[13px] font-semibold transition-colors cursor-pointer select-none hover:bg-white/5 text-white/90 hover:text-white flex items-center justify-between gap-2 rounded-md"
+                    aria-expanded={isExpanded}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      {isExpanded ? (
+                        <FolderOpen className="w-4 h-4 text-white/90 shrink-0" />
+                      ) : (
+                        <Folder className="w-4 h-4 text-white/60 shrink-0" />
+                      )}
+                      <span className="leading-tight font-medium whitespace-normal break-words">
+                        {section.title.replace(/^Module\s*\d+\s*[-:–]?\s*/i, '')}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0 text-white/60">
+                      {isModuleCompleted && (
+                        <div
+                          className="w-4 h-4 rounded-none bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0"
+                          title="Module Completed"
+                        >
+                          <Check className="w-2.5 h-2.5 stroke-[3]" />
+                        </div>
+                      )}
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                          isExpanded ? 'rotate-180 text-white/80' : 'text-white/40'
+                        }`}
+                      />
+                    </div>
+                  </button>
 
-                      return section.lessons.map((lesson, lIdx) => {
-                        const isLast = lIdx === section.lessons.length - 1;
-                        const isCurrent = lesson.lessonId === selectedLessonId;
-                        const isAboveActive = activeLessonIdx !== -1 && lIdx < activeLessonIdx;
+                  {/* Tree connecting lines bending to each lesson title */}
+                  {isExpanded && (
+                    <div className="w-full pl-3.5 pr-1 py-1">
+                      {(() => {
+                        const activeLessonIdx = section.lessons.findIndex(
+                          (l) => l.lessonId === selectedLessonId,
+                        );
 
-                        return (
-                          <div key={lesson.lessonId} className="relative flex items-center py-1">
-                            {/* Tree branch line: Single continuous non-overlapping stem */}
-                            <div className="absolute left-[7px] top-0 bottom-0 w-3.5 pointer-events-none">
-                              {/* Top vertical entry + curved L-bend into lesson title */}
-                              <div
-                                className={`absolute left-0 ${
-                                  lIdx === 0 ? '-top-2 h-[27px]' : 'top-0 h-[19px]'
-                                } w-3.5 border-b border-l rounded-bl-[6px] ${
-                                  isCurrent
-                                    ? 'border-l-white border-b-white'
-                                    : isAboveActive
-                                      ? 'border-l-white border-b-white/15'
-                                      : 'border-l-white/15 border-b-white/15'
-                                } transition-colors`}
-                              />
+                        return section.lessons.map((lesson, lIdx) => {
+                          const isLast = lIdx === section.lessons.length - 1;
+                          const isCurrent = lesson.lessonId === selectedLessonId;
+                          const isAboveActive = activeLessonIdx !== -1 && lIdx < activeLessonIdx;
 
-                              {/* Bottom continuing vertical stem */}
-                              {!isLast && (
+                          return (
+                            <div key={lesson.lessonId} className="relative flex items-center py-1">
+                              {/* Tree branch line: Single continuous non-overlapping stem */}
+                              <div className="absolute left-[7px] top-0 bottom-0 w-3.5 pointer-events-none">
+                                {/* Top vertical entry + curved L-bend into lesson title */}
                                 <div
-                                  className={`absolute left-0 top-[19px] bottom-0 w-px ${
-                                    isAboveActive ? 'bg-white' : 'bg-white/15'
+                                  className={`absolute left-0 ${
+                                    lIdx === 0 ? '-top-2 h-[27px]' : 'top-0 h-[19px]'
+                                  } w-3.5 border-b border-l rounded-bl-[6px] ${
+                                    isCurrent
+                                      ? 'border-l-white border-b-white'
+                                      : isAboveActive
+                                        ? 'border-l-white border-b-white/15'
+                                        : 'border-l-white/15 border-b-white/15'
                                   } transition-colors`}
                                 />
-                              )}
-                            </div>
 
-                            {/* Lesson Button: Faded grey tab when clicked */}
-                            <button
-                              type="button"
-                              onClick={() => handleSelectLesson(lesson.lessonId)}
-                              className={`ml-5 w-full text-left px-3 py-2 flex flex-col justify-center transition-all cursor-pointer select-none rounded-xl group ${
-                                isCurrent
-                                  ? 'bg-white/10 text-white shadow-xs'
-                                  : 'bg-transparent hover:bg-white/5 text-white/70 hover:text-white'
-                              }`}
-                            >
-                              <div className="flex items-start justify-between gap-2 w-full">
-                                <span
-                                  className={`text-[12px] sm:text-[13px] leading-snug whitespace-normal break-words ${
-                                    isCurrent
-                                      ? 'font-semibold text-white'
-                                      : 'font-normal text-white/80 group-hover:text-white'
-                                  }`}
-                                >
-                                  {lesson.title}
-                                </span>
-                                {lesson.isCompleted && (
-                                  <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 stroke-[2.5] mt-0.5" />
+                                {/* Bottom continuing vertical stem */}
+                                {!isLast && (
+                                  <div
+                                    className={`absolute left-0 top-[19px] bottom-0 w-px ${
+                                      isAboveActive ? 'bg-white' : 'bg-white/15'
+                                    } transition-colors`}
+                                  />
                                 )}
                               </div>
-                              {lesson.durationSeconds > 0 && (
-                                <div className="flex items-center gap-1.5 text-[10px] font-mono text-white/40 mt-1">
-                                  <Play className="w-2.5 h-2.5 fill-none stroke-[2] text-white/40 shrink-0" />
-                                  <span>{Math.round(lesson.durationSeconds / 60)} min</span>
-                                </div>
-                              )}
-                            </button>
-                          </div>
-                        );
-                      });
-                    })()}
-                  </div>
-                )}
 
-                {/* Separation line after each module */}
-                {sIdx < sections.length - 1 && (
-                  <div className="border-b border-white/10 mt-2.5 mb-1.5 mx-1" />
-                )}
-              </div>
-            );
-          })}
+                              {/* Lesson Button: Faded grey tab when clicked */}
+                              <button
+                                type="button"
+                                onClick={() => handleSelectLesson(lesson.lessonId)}
+                                className={`ml-5 w-full text-left px-3 py-2 flex flex-col justify-center transition-all cursor-pointer select-none rounded-xl group ${
+                                  isCurrent
+                                    ? 'bg-white/10 text-white shadow-xs'
+                                    : 'bg-transparent hover:bg-white/5 text-white/70 hover:text-white'
+                                }`}
+                              >
+                                <div className="flex items-start justify-between gap-2 w-full">
+                                  <span
+                                    className={`text-[12px] sm:text-[13px] leading-snug whitespace-normal break-words ${
+                                      isCurrent
+                                        ? 'font-semibold text-white'
+                                        : 'font-normal text-white/80 group-hover:text-white'
+                                    }`}
+                                  >
+                                    {lesson.title}
+                                  </span>
+                                  {lesson.isCompleted && (
+                                    <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 stroke-[2.5] mt-0.5" />
+                                  )}
+                                </div>
+                                {lesson.durationSeconds > 0 && (
+                                  <div className="flex items-center gap-1.5 text-[10px] font-mono text-white/40 mt-1">
+                                    <Play className="w-2.5 h-2.5 fill-none stroke-[2] text-white/40 shrink-0" />
+                                    <span>{Math.round(lesson.durationSeconds / 60)} min</span>
+                                  </div>
+                                )}
+                              </button>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+                  )}
+
+                  {/* Separation line after each module */}
+                  {sIdx < sections.length - 1 && (
+                    <div className="border-b border-white/10 mt-2.5 mb-1.5 mx-1" />
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
       </aside>
 
@@ -1263,12 +1280,16 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       <main className="w-full h-auto shrink-0 md:flex-1 md:h-full md:min-w-0 bg-[#131316] rounded-xl flex flex-col overflow-hidden relative order-1 md:order-2">
         {/* Top Header Bar: Clean Lesson Title */}
         <div className="h-12 px-5 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#131316]">
-          <h1 className="text-sm sm:text-[15px] font-bold text-white truncate">
-            {currentLessonTitle}
-          </h1>
+          {isPageLoading ? (
+            <div className="h-4 w-44 bg-white/10 rounded animate-pulse" />
+          ) : (
+            <h1 className="text-sm sm:text-[15px] font-bold text-white truncate">
+              {currentLessonTitle}
+            </h1>
+          )}
 
           <div className="flex items-center gap-2 shrink-0">
-            {playbackData?.embedUrl && (
+            {!isPageLoading && playbackData?.embedUrl && (
               <button
                 type="button"
                 onClick={() => setUseEmbed((prev) => !prev)}
@@ -1324,7 +1345,13 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                   : 'w-full aspect-video max-h-[46vh] sm:max-h-[56vh] md:max-h-[74vh] lg:max-h-[78vh] mx-auto rounded-none shadow-2xl overflow-hidden'
               }`}
             >
-              {!hasStartedWatching ? (
+              {isPageLoading ? (
+                <div className="relative w-full h-full flex flex-col items-center justify-center bg-neutral-950 overflow-hidden">
+                  <div className="w-13 h-13 sm:w-15 sm:h-15 md:w-16 md:h-16 bg-white/5 rounded-full flex items-center justify-center animate-pulse">
+                    <Loader2 className="w-6 h-6 animate-spin text-white/40" />
+                  </div>
+                </div>
+              ) : !hasStartedWatching ? (
                 <div
                   className="relative w-full h-full flex items-center justify-center bg-neutral-950 overflow-hidden cursor-pointer group"
                   onClick={handleStartWatching}
@@ -1797,7 +1824,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         {/* Bottom Bar below video: Full-width matching top strip */}
         <div className="h-12 px-5 border-t border-white/10 flex items-center justify-between shrink-0 bg-[#131316]">
           <div className="flex items-center gap-2 text-xs text-white/50 font-mono">
-            {currentLesson?.durationSeconds ? (
+            {isPageLoading ? (
+              <div className="h-3 w-10 bg-white/10 rounded animate-pulse" />
+            ) : currentLesson?.durationSeconds ? (
               <span>{formatTime(currentLesson.durationSeconds)}</span>
             ) : null}
           </div>
@@ -1806,7 +1835,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             <button
               type="button"
               onClick={handlePrevLesson}
-              disabled={!hasPrevLesson}
+              disabled={isPageLoading || !hasPrevLesson}
               className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-20 disabled:pointer-events-none transition-colors cursor-pointer"
               title="Previous Lesson"
             >
@@ -1815,7 +1844,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             <button
               type="button"
               onClick={handleNextLesson}
-              disabled={!hasNextLesson}
+              disabled={isPageLoading || !hasNextLesson}
               className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-20 disabled:pointer-events-none transition-colors cursor-pointer"
               title="Next Lesson"
             >
