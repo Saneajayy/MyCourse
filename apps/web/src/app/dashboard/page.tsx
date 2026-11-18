@@ -31,6 +31,7 @@ import {
   Scroll,
   IndianRupee,
   Settings,
+  Search,
 } from 'lucide-react';
 import { HydraulicCalculator } from '../../components/calculator/HydraulicCalculator';
 
@@ -105,14 +106,14 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
 
   return (
     <div
-      className="w-full flex items-center h-5 select-none mb-3 overflow-hidden"
+      className="w-full flex items-center h-4 select-none mb-2.5 overflow-hidden"
       aria-label={`Course progress: ${clamped}%`}
       role="progressbar"
       aria-valuenow={clamped}
       aria-valuemin={0}
       aria-valuemax={100}
     >
-      {/* Completed portion with dense black vertical bars */}
+      {/* Completed portion with dense white vertical bars */}
       {clamped > 0 && (
         <div
           className="h-full shrink-0"
@@ -120,14 +121,14 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
             width: clamped >= 100 ? '100%' : `calc(${clamped}% - 14px)`,
             minWidth: clamped > 0 && clamped < 100 ? '8px' : undefined,
             backgroundImage:
-              'repeating-linear-gradient(to right, #000000 0px, #000000 1.5px, transparent 1.5px, transparent 3.5px)',
+              'repeating-linear-gradient(to right, #ffffff 0px, #ffffff 1.5px, transparent 1.5px, transparent 3.5px)',
           }}
         />
       )}
 
       {/* Percentage Label */}
       <span
-        className={`text-black font-semibold text-xs sm:text-[13px] leading-none shrink-0 select-none ${
+        className={`text-white font-medium text-xs leading-none shrink-0 select-none font-mono ${
           clamped === 0 ? 'pr-2' : clamped === 100 ? 'pl-2' : 'px-2'
         }`}
       >
@@ -140,7 +141,7 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
           className="flex-1 h-full"
           style={{
             backgroundImage:
-              'repeating-linear-gradient(to right, #D4D4D4 0px, #D4D4D4 1.5px, transparent 1.5px, transparent 3.5px)',
+              'repeating-linear-gradient(to right, rgba(255, 255, 255, 0.15) 0px, rgba(255, 255, 255, 0.15) 1.5px, transparent 1.5px, transparent 3.5px)',
           }}
         />
       )}
@@ -660,21 +661,25 @@ function StudentDashboardContent() {
                   <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">{greeting.subtitle}</p>
                 </div>
 
-                {/* Minimal Search Bar directly below Title */}
+                {/* Minimal Search Bar matching TUF Dark Theme */}
                 {courses.length > 0 && (
                   <div className="relative w-full max-w-md">
+                    <Search
+                      strokeWidth={1}
+                      className="w-4 h-4 text-[#c2c4cc]/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none stroke-1"
+                    />
                     <input
                       type="text"
-                      placeholder="Search courses"
+                      placeholder="Search courses..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full h-10 px-3.5 bg-white border border-neutral-300 rounded-none text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:outline-none transition-all shadow-none"
+                      className="w-full h-10 pl-10 pr-9 bg-[#151619] border border-white/[0.08] rounded-xl text-xs sm:text-sm text-white placeholder:text-[#c2c4cc]/50 focus:border-white/20 focus:outline-none transition-all shadow-none"
                     />
                     {searchQuery && (
                       <button
                         type="button"
                         onClick={() => setSearchQuery('')}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#c2c4cc]/60 hover:text-white p-1 cursor-pointer"
                         aria-label="Clear search"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -685,8 +690,8 @@ function StudentDashboardContent() {
 
                 {/* Error Notice */}
                 {coursesError && (
-                  <div className="p-4 rounded-none bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-semibold flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs sm:text-sm font-medium flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" strokeWidth={1} />
                     <span>{coursesError}</span>
                   </div>
                 )}
@@ -694,7 +699,7 @@ function StudentDashboardContent() {
                 {/* Courses Loading Skeleton */}
                 {(coursesLoading || authLoading) && courses.length === 0 ? (
                   <div className="w-full max-w-4xl bg-white/5 border border-white/[0.08] rounded-xl p-5 flex flex-col md:flex-row gap-5 animate-pulse select-none">
-                    <div className="w-full md:w-[320px] lg:w-[360px] aspect-[16/10] bg-white/10 rounded-lg shrink-0" />
+                    <div className="w-full md:w-[280px] lg:w-[320px] aspect-[16/10] bg-white/10 rounded-lg shrink-0" />
                     <div className="flex-1 flex flex-col justify-between py-1 space-y-3">
                       <div className="space-y-2.5">
                         <div className="h-6 w-3/5 bg-white/10 rounded" />
@@ -706,12 +711,12 @@ function StudentDashboardContent() {
                     </div>
                   </div>
                 ) : courses.length === 0 && !coursesError ? (
-                  <div className="bg-white border border-neutral-200 rounded-none p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
+                  <div className="bg-[#151619] border border-white/[0.08] rounded-xl p-8 sm:p-10 text-left space-y-4 max-w-md select-none">
                     <div className="space-y-1">
-                      <h2 className="text-lg font-bold text-neutral-900 uppercase">
-                        NO ACTIVE COURSES.
+                      <h2 className="text-base font-semibold text-white uppercase tracking-wider">
+                        NO ACTIVE COURSES
                       </h2>
-                      <p className="text-xs text-neutral-500 leading-relaxed">
+                      <p className="text-xs text-[#c2c4cc] leading-relaxed">
                         You are not currently enrolled in any courses. Explore our masterclass to
                         start learning.
                       </p>
@@ -719,7 +724,7 @@ function StudentDashboardContent() {
                     <div>
                       <Link
                         href="/#pricing"
-                        className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors shadow-none"
+                        className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs rounded-lg transition-colors"
                       >
                         <Sparkles className="w-3.5 h-3.5" />
                         <span>Explore Masterclass</span>
@@ -730,14 +735,14 @@ function StudentDashboardContent() {
 
                 {/* Empty Search Filter State */}
                 {courses.length > 0 && filteredCourses.length === 0 && (
-                  <div className="bg-white border border-neutral-200 rounded-none p-6 text-left space-y-2 shadow-none max-w-md">
-                    <p className="text-sm font-bold text-neutral-800">
+                  <div className="bg-[#151619] border border-white/[0.08] rounded-xl p-6 text-left space-y-2 max-w-md select-none">
+                    <p className="text-sm font-medium text-white">
                       No courses match &ldquo;{searchQuery}&rdquo;
                     </p>
                     <button
                       type="button"
                       onClick={() => setSearchQuery('')}
-                      className="text-xs font-bold text-black hover:underline cursor-pointer"
+                      className="text-xs font-medium text-[#c2c4cc] hover:text-white underline cursor-pointer"
                     >
                       Clear Search
                     </button>
@@ -746,7 +751,7 @@ function StudentDashboardContent() {
 
                 {/* Courses List: Wide Horizontal Course Cards matching design */}
                 {filteredCourses.length > 0 && (
-                  <div className="w-full flex flex-col gap-6 items-start text-left">
+                  <div className="w-full flex flex-col gap-5 items-start text-left">
                     {filteredCourses.map((c) => {
                       const percent = Math.min(
                         100,
@@ -760,10 +765,10 @@ function StudentDashboardContent() {
                       return (
                         <div
                           key={c.product.id}
-                          className="w-full max-w-4xl bg-white border border-neutral-300 rounded-none p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 shadow-none select-none"
+                          className="w-full max-w-4xl bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 transition-all duration-200 select-none"
                         >
-                          {/* Course Thumbnail Image: Desaturated Halftone Dot Effect */}
-                          <div className="relative w-full md:w-[320px] lg:w-[360px] shrink-0 aspect-[16/10] rounded-none overflow-hidden bg-black border border-neutral-200">
+                          {/* Course Thumbnail Image */}
+                          <div className="relative w-full md:w-[280px] lg:w-[320px] shrink-0 aspect-[16/10] rounded-lg overflow-hidden bg-black/60 border border-white/[0.08]">
                             <img
                               src={
                                 c.product.thumbnailUrl &&
@@ -784,70 +789,88 @@ function StudentDashboardContent() {
                             <div>
                               {/* Course Title + Active Status Badge */}
                               <div className="flex items-start justify-between gap-3">
-                                <h2 className="text-xl sm:text-[22px] font-bold text-neutral-900 tracking-tight leading-snug">
+                                <h2 className="text-lg sm:text-[20px] font-medium text-white tracking-tight leading-snug">
                                   <Link
                                     href={`/learn/${c.product.slug}`}
-                                    className="underline underline-offset-4 decoration-neutral-900 hover:text-neutral-700 transition-colors"
+                                    className="hover:text-white/80 transition-colors"
                                   >
                                     {c.product.title}
                                   </Link>
                                 </h2>
-                                <span className="px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase text-white bg-[#0e5c2f] rounded-none shrink-0 select-none">
+                                <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md shrink-0 select-none">
                                   {c.entitlement?.status || 'ACTIVE'}
                                 </span>
                               </div>
 
-                              {/* Dynamic Course Description */}
-                              <p className="text-xs sm:text-[13px] text-neutral-700 leading-relaxed mt-2 sm:mt-2.5 text-justify">
-                                {c.product.description ||
-                                  'Learn the fundamentals of hydraulic systems from scratch. This course introduces you to the working principles of hydraulics, essential components, and hydraulic circuit basics through easy-to-understand video lessons.'}
-                              </p>
+                              {/* Next lesson or description */}
+                              {c.nextLesson ? (
+                                <p className="text-xs sm:text-[13px] text-[#c2c4cc] flex items-center gap-1.5 mt-2">
+                                  <span className="text-white/40 font-mono text-[11px] uppercase tracking-wider shrink-0">
+                                    Next:
+                                  </span>
+                                  <span className="truncate">{c.nextLesson.title}</span>
+                                </p>
+                              ) : (
+                                <p className="text-xs sm:text-[13px] text-[#8e909a] leading-relaxed mt-2 line-clamp-2">
+                                  {c.product.description ||
+                                    'Learn the fundamentals of hydraulic systems from scratch through easy-to-understand video lessons.'}
+                                </p>
+                              )}
                             </div>
 
-                            {/* 2. Course Metadata: Total Videos & Total Hours of Content (Centered evenly between Description and Progress Bar) */}
-                            <div className="flex items-center gap-2.5 text-xs text-neutral-500 font-medium select-none py-3 sm:py-3.5">
+                            {/* 2. Course Metadata: Total Videos & Total Hours of Content */}
+                            <div className="flex items-center gap-2.5 text-xs text-[#8e909a] font-normal select-none py-2.5 sm:py-3">
                               <span className="inline-flex items-center gap-1.5">
-                                <Video className="w-3.5 h-3.5 text-neutral-400" />
+                                <Video className="w-3.5 h-3.5 text-neutral-400" strokeWidth={1} />
                                 <span>{totalVideos} Videos</span>
                               </span>
-                              <span className="text-neutral-300">•</span>
+                              <span className="text-white/20">•</span>
                               <span className="inline-flex items-center gap-1.5">
-                                <Clock className="w-3.5 h-3.5 text-neutral-400" />
+                                <Clock className="w-3.5 h-3.5 text-neutral-400" strokeWidth={1} />
                                 <span>{durationText}</span>
                               </span>
                             </div>
 
-                            {/* 3. Progress Bar, Certificate Unlock Notice & Action Buttons */}
+                            {/* 3. Progress Bar, Credential Unlock Notice & Action Buttons */}
                             <div>
                               {/* Barcode / Hatch Progress Bar with dynamic percentage */}
                               <CloseBarsProgressBar percent={percent} />
 
-                              {/* Dynamic Certificate Unlock Notice */}
-                              <p className="font-bold text-neutral-900 text-xs sm:text-[13px] select-none mt-2">
-                                {percent >= 90
-                                  ? 'Course completed. Certificate unlocked!'
-                                  : 'Complete course to unlock certificate.'}
-                              </p>
+                              {/* Dynamic Credential Unlock Notice */}
+                              {percent >= 90 ? (
+                                <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-medium select-none mt-2">
+                                  <CheckCircle2
+                                    className="w-3.5 h-3.5 text-emerald-400 shrink-0"
+                                    strokeWidth={1.5}
+                                  />
+                                  <span>Course completed. Credential unlocked!</span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-1.5 text-xs text-[#8e909a] select-none mt-2">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
+                                  <span>Complete course to unlock credential.</span>
+                                </div>
+                              )}
 
                               {/* Action Buttons */}
-                              <div className="flex flex-wrap items-center gap-3 mt-3.5 sm:mt-4">
+                              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mt-3.5 sm:mt-4">
                                 <Link
                                   href={`/learn/${c.product.slug}`}
-                                  aria-label={percent > 0 ? 'Continue Learning' : 'Start Learning'}
-                                  className="h-10 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-medium text-xs sm:text-sm rounded-none flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
+                                  aria-label={percent > 0 ? 'Resume Learning' : 'Start Learning'}
+                                  className="h-9 sm:h-10 px-4 sm:px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg flex items-center justify-center gap-1.5 transition-colors select-none shadow-sm"
                                 >
                                   <span>
                                     {percent > 0
                                       ? percent >= 90
                                         ? 'Review Course'
-                                        : 'Continue Learning'
+                                        : 'Resume Learning'
                                       : 'Start Learning'}{' '}
                                     &rarr;
                                   </span>
                                 </Link>
                                 <Link
                                   href={`/learn/${c.product.slug}`}
-                                  className="h-10 px-6 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-900 font-medium text-xs sm:text-sm rounded-none flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
+                                  className="h-9 sm:h-10 px-4 sm:px-5 bg-[#1f2023] hover:bg-white/[0.08] active:bg-white/[0.12] text-[#c2c4cc] hover:text-white border border-white/[0.08] font-medium text-xs sm:text-[13px] rounded-lg flex items-center justify-center gap-1.5 transition-colors select-none"
                                 >
                                   <span>View Syllabus &rarr;</span>
                                 </Link>
