@@ -176,7 +176,7 @@ async function main() {
         slug: sampleSlug,
         title: 'Industrial Hydraulic Systems & Circuit Design',
         description:
-          'Learn the fundamentals of hydraulic systems from scratch. This course introduces you to the working principles of hydraulics, essential components, and hydraulic circuit basics through easy-to-understand video lessons.',
+          'Learn hydraulic systems, core components, and practical circuit design from the ground up.',
         thumbnailUrl:
           'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
         pricePaise: 499900, // Rs 4,999.00

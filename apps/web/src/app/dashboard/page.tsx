@@ -770,9 +770,11 @@ function StudentDashboardContent() {
                               </div>
 
                               {/* Dynamic Course Description */}
-                              <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed mt-2 sm:mt-2.5">
-                                {c.product.description ||
-                                  'Learn the fundamentals of hydraulic systems from scratch. This course introduces you to the working principles of hydraulics, essential components, and hydraulic circuit basics through easy-to-understand video lessons.'}
+                              <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed mt-2 sm:mt-2.5 line-clamp-2">
+                                {c.product.description &&
+                                !c.product.description.includes('working principles of hydraulics')
+                                  ? c.product.description
+                                  : 'Learn hydraulic systems, core components, and practical circuit design from the ground up.'}
                               </p>
                             </div>
 
