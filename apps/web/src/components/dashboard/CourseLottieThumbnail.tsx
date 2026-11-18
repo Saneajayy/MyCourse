@@ -28,7 +28,7 @@ export function CourseLottieThumbnail({
           renderer: 'svg',
           loop: true,
           autoplay: true,
-          path: '/coursecarddd.json?v=2',
+          path: '/coursecarddd.json?v=3',
         });
       })
       .catch((err) => {
