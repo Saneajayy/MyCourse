@@ -734,8 +734,8 @@ function StudentDashboardContent() {
                           key={c.product.id}
                           className="relative w-full max-w-[720px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 transition-all duration-200 select-none"
                         >
-                          {/* Active Status Badge: Top right-most corner of the course card */}
-                          <span className="absolute top-4 right-4 sm:top-5 sm:right-5 px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md shrink-0 select-none z-10">
+                          {/* Desktop Active Status Badge: Top right-most corner of the course card */}
+                          <span className="hidden md:inline-flex absolute top-5 right-5 px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md shrink-0 select-none z-10">
                             {c.entitlement?.status || 'ACTIVE'}
                           </span>
 
@@ -754,8 +754,8 @@ function StudentDashboardContent() {
                           {/* Course Content Details */}
                           <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
                             <div>
-                              {/* Course Title with right padding for top-right active badge */}
-                              <div className="pr-16 sm:pr-20">
+                              {/* Course Title with mobile status badge and desktop right padding */}
+                              <div className="flex items-start justify-between gap-3 md:pr-20">
                                 <h2 className="text-lg sm:text-[20px] font-medium text-white tracking-tight leading-snug">
                                   <Link
                                     href={`/learn/${c.product.slug}`}
@@ -764,6 +764,9 @@ function StudentDashboardContent() {
                                     {c.product.title}
                                   </Link>
                                 </h2>
+                                <span className="md:hidden px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md shrink-0 select-none">
+                                  {c.entitlement?.status || 'ACTIVE'}
+                                </span>
                               </div>
 
                               {/* Dynamic Course Description */}
