@@ -393,8 +393,8 @@ function StudentDashboardContent() {
     label: string;
     icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
   }[] = [
-    { id: 'courses', label: 'My Courses', icon: Layers },
-    { id: 'certificates', label: 'My Certificates', icon: Scroll },
+    { id: 'courses', label: 'Courses', icon: Layers },
+    { id: 'certificates', label: 'Credentials', icon: Scroll },
     { id: 'calculator', label: 'Calculator', icon: Sigma },
     { id: 'profile', label: 'Profile', icon: UserIcon },
     { id: 'orders', label: 'Payment Orders', icon: IndianRupee },
@@ -409,7 +409,7 @@ function StudentDashboardContent() {
       {/* ============================================================== */}
       {/* 1. LEFT CARD: NAVIGATION TABS                                  */}
       {/* ============================================================== */}
-      <aside className="w-full shrink-0 md:flex-none md:w-72 lg:w-80 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
+      <aside className="w-full shrink-0 md:flex-none md:w-56 lg:w-60 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
         {/* Top Header: Brand Logo HYDRO BASICS + Back / Home Link + Mobile Sandwich Button */}
         <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
           <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
@@ -648,7 +648,7 @@ function StudentDashboardContent() {
                 {/* Header Title & Subtitle */}
                 <div className="text-left">
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                    My Courses
+                    Courses
                   </h1>
                   <p className="text-xs sm:text-sm text-neutral-400 mt-1">
                     Continue learning and master industrial hydraulic systems.
@@ -857,15 +857,15 @@ function StudentDashboardContent() {
               </div>
             )}
 
-            {/* TAB 2: MY CERTIFICATES */}
+            {/* TAB 2: CREDENTIALS */}
             {activeTab === 'certificates' && (
               <div className="space-y-6 text-left">
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                    My Certificates
+                    Credentials
                   </h1>
                   <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-                    Official certificates of completion signed by instructor{' '}
+                    Official verified credentials of completion signed by instructor{' '}
                     {siteConfig.instructor.name}.
                   </p>
                 </div>
@@ -874,7 +874,7 @@ function StudentDashboardContent() {
                   <div className="bg-white border border-neutral-200 rounded-none p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
                     <div className="space-y-1">
                       <h2 className="text-lg font-bold text-neutral-900 uppercase">
-                        NO CERTIFICATES EARNED YET.
+                        NO CREDENTIALS EARNED YET.
                       </h2>
                       <p className="text-xs text-neutral-500 leading-relaxed">
                         Complete all lesson modules and practical evaluations in your enrolled
@@ -1331,7 +1331,7 @@ function DashboardShellSkeleton() {
   return (
     <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit select-none z-10 flex flex-col md:flex-row gap-2.5 sm:gap-3">
       {/* Left Card Skeleton */}
-      <aside className="w-full shrink-0 md:flex-none md:w-72 lg:w-80 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
+      <aside className="w-full shrink-0 md:flex-none md:w-56 lg:w-60 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
         <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
           <div className="flex flex-col select-none">
             <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase">
