@@ -643,7 +643,8 @@ function StudentDashboardContent() {
                       placeholder="Search courses..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full h-10 pl-10 pr-9 bg-[#151619] border border-white/[0.08] rounded-xl text-xs sm:text-sm text-white placeholder:text-[#c2c4cc]/50 focus:border-white/20 focus:outline-none transition-all shadow-none"
+                      style={{ outline: 'none', boxShadow: 'none' }}
+                      className="w-full h-10 pl-10 pr-9 bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/[0.18] rounded-xl text-xs sm:text-sm text-white placeholder:text-[#c2c4cc]/50 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 transition-colors duration-150 shadow-none"
                     />
                     {searchQuery && (
                       <button
