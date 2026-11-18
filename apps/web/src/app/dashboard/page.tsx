@@ -668,7 +668,7 @@ function StudentDashboardContent() {
                 {/* Courses Loading Skeleton */}
                 {(coursesLoading || authLoading) && courses.length === 0 ? (
                   <div className="w-full max-w-[850px] bg-white/5 border border-white/[0.08] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 animate-pulse select-none">
-                    <div className="w-full md:w-[170px] aspect-square bg-white/10 rounded-lg shrink-0" />
+                    <div className="w-full md:w-auto md:self-stretch aspect-square bg-white/10 rounded-lg shrink-0" />
                     <div className="flex-1 flex flex-col justify-between py-1 space-y-3">
                       <div className="space-y-2.5">
                         <div className="h-6 w-3/5 bg-white/10 rounded" />
@@ -733,7 +733,7 @@ function StudentDashboardContent() {
                           className="w-full max-w-[850px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 transition-all duration-200 select-none"
                         >
                           {/* Course Thumbnail Image */}
-                          <div className="relative w-full md:w-[170px] aspect-square shrink-0 rounded-lg overflow-hidden bg-black/60 border border-white/[0.08]">
+                          <div className="relative w-full md:w-auto md:self-stretch aspect-square shrink-0 rounded-lg overflow-hidden bg-black/60 border border-white/[0.08]">
                             <img
                               src={
                                 c.product.thumbnailUrl &&
@@ -745,7 +745,7 @@ function StudentDashboardContent() {
                               onError={(e) => {
                                 (e.currentTarget as HTMLImageElement).src = '/course.jpg';
                               }}
-                              className="w-full h-full object-cover select-none"
+                              className="absolute inset-0 w-full h-full object-cover select-none"
                             />
                           </div>
 
