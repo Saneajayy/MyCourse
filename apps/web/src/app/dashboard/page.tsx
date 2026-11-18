@@ -25,7 +25,7 @@ import {
   Video,
   Clock,
   ArrowLeft,
-  Award,
+  Sigma,
   LogOut,
   Layers,
   Scroll,
@@ -394,8 +394,8 @@ function StudentDashboardContent() {
     icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
   }[] = [
     { id: 'courses', label: 'My Courses', icon: Layers },
-    { id: 'certificates', label: 'My Certificates', icon: Award },
-    { id: 'calculator', label: 'Calculator', icon: Scroll },
+    { id: 'certificates', label: 'My Certificates', icon: Scroll },
+    { id: 'calculator', label: 'Calculator', icon: Sigma },
     { id: 'profile', label: 'Profile', icon: UserIcon },
     { id: 'orders', label: 'Payment Orders', icon: FileText },
   ];
