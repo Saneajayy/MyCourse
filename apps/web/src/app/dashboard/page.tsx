@@ -802,20 +802,11 @@ function StudentDashboardContent() {
                                 </span>
                               </div>
 
-                              {/* Next lesson or description */}
-                              {c.nextLesson ? (
-                                <p className="text-xs sm:text-[13px] text-[#c2c4cc] flex items-center gap-1.5 mt-2">
-                                  <span className="text-white/40 font-mono text-[11px] uppercase tracking-wider shrink-0">
-                                    Next:
-                                  </span>
-                                  <span className="truncate">{c.nextLesson.title}</span>
-                                </p>
-                              ) : (
-                                <p className="text-xs sm:text-[13px] text-[#8e909a] leading-relaxed mt-2 line-clamp-2">
-                                  {c.product.description ||
-                                    'Learn the fundamentals of hydraulic systems from scratch through easy-to-understand video lessons.'}
-                                </p>
-                              )}
+                              {/* Dynamic Course Description */}
+                              <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed mt-2 sm:mt-2.5">
+                                {c.product.description ||
+                                  'Learn the fundamentals of hydraulic systems from scratch. This course introduces you to the working principles of hydraulics, essential components, and hydraulic circuit basics through easy-to-understand video lessons.'}
+                              </p>
                             </div>
 
                             {/* 2. Course Metadata: Total Videos & Total Hours of Content */}
