@@ -27,7 +27,7 @@ import {
   ArrowLeft,
   Award,
   LogOut,
-  Calculator as CalculatorIcon,
+  Sigma,
 } from 'lucide-react';
 import { HydraulicCalculator } from '../../components/calculator/HydraulicCalculator';
 
@@ -393,7 +393,7 @@ function StudentDashboardContent() {
   }[] = [
     { id: 'courses', label: 'My Courses', icon: BookOpen },
     { id: 'certificates', label: 'My Certificates', icon: Award },
-    { id: 'calculator', label: 'Calculator', icon: CalculatorIcon },
+    { id: 'calculator', label: 'Calculator', icon: Sigma },
     { id: 'profile', label: 'Profile', icon: UserIcon },
     { id: 'orders', label: 'Payment Orders', icon: Clock },
   ];
