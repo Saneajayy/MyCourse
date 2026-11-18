@@ -30,6 +30,7 @@ import {
   Layers,
   Scroll,
   IndianRupee,
+  Settings,
 } from 'lucide-react';
 import { HydraulicCalculator } from '../../components/calculator/HydraulicCalculator';
 
@@ -396,7 +397,7 @@ function StudentDashboardContent() {
     { id: 'courses', label: 'Courses', icon: Layers },
     { id: 'certificates', label: 'Credentials', icon: Scroll },
     { id: 'calculator', label: 'Calculator', icon: Sigma },
-    { id: 'profile', label: 'Profile', icon: UserIcon },
+    { id: 'profile', label: 'Settings', icon: Settings },
     { id: 'orders', label: 'Payment Orders', icon: IndianRupee },
   ];
 
@@ -409,7 +410,7 @@ function StudentDashboardContent() {
       {/* ============================================================== */}
       {/* 1. LEFT CARD: NAVIGATION TABS                                  */}
       {/* ============================================================== */}
-      <aside className="w-full shrink-0 md:flex-none md:w-56 lg:w-60 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
+      <aside className="w-full shrink-0 md:flex-none md:w-64 lg:w-72 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
         {/* Top Header: Brand Logo HYDRO BASICS + Back / Home Link + Mobile Sandwich Button */}
         <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
           <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
@@ -941,12 +942,12 @@ function StudentDashboardContent() {
             {/* TAB 3: HYDRAULIC SYSTEM CALCULATOR */}
             {activeTab === 'calculator' && <HydraulicCalculator />}
 
-            {/* TAB 4: PROFILE */}
+            {/* TAB 4: SETTINGS */}
             {activeTab === 'profile' && (
               <div className="space-y-6 text-left">
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                    Profile &amp; Account
+                    Settings &amp; Account
                   </h1>
                   <p className="text-xs sm:text-sm text-neutral-400 mt-1">
                     Manage your personal details, email verification, and security credentials.
@@ -1331,7 +1332,7 @@ function DashboardShellSkeleton() {
   return (
     <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit select-none z-10 flex flex-col md:flex-row gap-2.5 sm:gap-3">
       {/* Left Card Skeleton */}
-      <aside className="w-full shrink-0 md:flex-none md:w-56 lg:w-60 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
+      <aside className="w-full shrink-0 md:flex-none md:w-64 lg:w-72 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
         <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
           <div className="flex flex-col select-none">
             <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase">
