@@ -398,7 +398,7 @@ function StudentDashboardContent() {
     { id: 'certificates', label: 'Credentials', icon: Scroll },
     { id: 'calculator', label: 'Calculator', icon: Sigma },
     { id: 'profile', label: 'Settings', icon: Settings },
-    { id: 'orders', label: 'Payment Orders', icon: IndianRupee },
+    { id: 'orders', label: 'Payments', icon: IndianRupee },
   ];
 
   const activeTabConfig = navTabs.find((t) => t.id === activeTab) ?? navTabs[0]!;
@@ -1187,12 +1187,12 @@ function StudentDashboardContent() {
               </div>
             )}
 
-            {/* TAB 4: PAYMENT ORDERS */}
+            {/* TAB 4: PAYMENTS */}
             {activeTab === 'orders' && (
               <div className="space-y-6 text-left">
                 <div>
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                    Payment Orders &amp; Invoices
+                    Payments &amp; Invoices
                   </h1>
                   <p className="text-xs sm:text-sm text-neutral-400 mt-1">
                     Download official GST tax invoices in PDF format for company or personal
