@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/auth-context';
@@ -11,6 +11,7 @@ import { useToast } from '../../components/ui';
 import {
   BookOpen,
   User as UserIcon,
+  Menu,
   X,
   CheckCircle2,
   AlertCircle,
@@ -156,13 +157,44 @@ function StudentDashboardContent() {
       ? tabParam
       : 'courses',
   );
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const tabRefs = useRef<{ [key in DashboardTab]?: HTMLButtonElement | null }>({});
+  const [indicatorStyle, setIndicatorStyle] = useState<{
+    top: number;
+    height: number;
+    opacity: number;
+  }>({
+    top: 0,
+    height: 0,
+    opacity: 0,
+  });
+
   // Sync tab with URL query parameter
   const handleTabChange = (newTab: DashboardTab) => {
     setActiveTab(newTab);
+    setIsMobileMenuOpen(false);
     const url = new URL(window.location.href);
     url.searchParams.set('tab', newTab);
     window.history.replaceState({}, '', url.toString());
   };
+
+  // Smoothly move highlight pill to active tab
+  useEffect(() => {
+    const updateIndicator = () => {
+      const activeEl = tabRefs.current[activeTab];
+      if (activeEl) {
+        setIndicatorStyle({
+          top: activeEl.offsetTop,
+          height: activeEl.offsetHeight,
+          opacity: 1,
+        });
+      }
+    };
+    updateIndicator();
+    // Also re-measure on window resize to ensure exact positioning
+    window.addEventListener('resize', updateIndicator);
+    return () => window.removeEventListener('resize', updateIndicator);
+  }, [activeTab]);
 
   // Courses state
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
@@ -381,7 +413,7 @@ function StudentDashboardContent() {
       {/* 1. LEFT CARD: NAVIGATION TABS                                  */}
       {/* ============================================================== */}
       <aside className="w-full shrink-0 md:flex-none md:w-72 lg:w-80 md:h-full md:shrink-0 bg-[#131316] rounded-xl flex flex-col overflow-hidden">
-        {/* Top Header: Brand Logo HYDRO BASICS + Back / Home Link */}
+        {/* Top Header: Brand Logo HYDRO BASICS + Back / Home Link + Mobile Sandwich Button */}
         <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
           <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
             <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
@@ -391,7 +423,7 @@ function StudentDashboardContent() {
               BASICS
             </span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <Link
               href="/"
               className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-white/50 hover:text-white transition-colors"
@@ -400,28 +432,127 @@ function StudentDashboardContent() {
               <ArrowLeft className="w-3 h-3" />
               <span>Home</span>
             </Link>
+
+            {/* Sandwich Toggle Button on right of Home (Mobile only) */}
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+              aria-label={isMobileMenuOpen ? 'Close Menu' : 'Open Menu'}
+              aria-expanded={isMobileMenuOpen}
+              className="md:hidden w-8 h-8 relative flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer select-none"
+            >
+              <Menu
+                className={`w-4 h-4 stroke-[2.2] absolute transition-all duration-200 ${
+                  isMobileMenuOpen
+                    ? 'opacity-0 rotate-90 scale-75'
+                    : 'opacity-100 rotate-0 scale-100'
+                }`}
+              />
+              <X
+                className={`w-4 h-4 stroke-[2.2] absolute transition-all duration-200 ${
+                  isMobileMenuOpen
+                    ? 'opacity-100 rotate-0 scale-100'
+                    : 'opacity-0 -rotate-90 scale-75'
+                }`}
+              />
+            </button>
           </div>
         </div>
 
         {/* Thin Stroke Separation Line */}
         <div className="border-b border-white/10 w-full shrink-0" />
 
-        {/* Desktop Vertical Tabs Stack */}
-        <nav
-          aria-label="Student Navigation"
-          className="hidden md:flex flex-1 flex-col overflow-y-auto custom-scrollbar px-2.5 py-3 space-y-1"
+        {/* Mobile Expandable Tabs Stack (Sandwich Dropdown) */}
+        <div
+          className={`md:hidden grid transition-[grid-template-rows,opacity] duration-250 ease-out ${
+            isMobileMenuOpen
+              ? 'grid-rows-[1fr] opacity-100'
+              : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+          }`}
         >
+          <div className="overflow-hidden">
+            <nav
+              aria-label="Student Navigation Mobile"
+              className="flex flex-col px-3 py-2 space-y-1"
+            >
+              {navTabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => handleTabChange(tab.id)}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
+                      isActive
+                        ? 'bg-white/10 text-white font-semibold'
+                        : 'text-white/70 hover:text-white hover:bg-white/5 font-normal'
+                    }`}
+                  >
+                    <Icon
+                      className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-white/50'}`}
+                    />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+
+              {user?.role === 'ADMIN' && (
+                <Link
+                  href="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-emerald-400 hover:bg-emerald-500/10 font-normal transition-colors cursor-pointer select-none"
+                >
+                  <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <span>Admin Console</span>
+                </Link>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  logout();
+                }}
+                className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-white/70 hover:text-rose-400 hover:bg-white/5 font-normal transition-colors cursor-pointer select-none text-left"
+              >
+                <LogOut className="w-4 h-4 shrink-0 text-white/50" />
+                <span>Log Out</span>
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        {/* Desktop Vertical Tabs Stack with Smooth Sliding Highlight Pill */}
+        <nav
+          aria-label="Student Navigation Desktop"
+          className="relative hidden md:flex flex-1 flex-col overflow-y-auto custom-scrollbar px-2.5 py-3 space-y-1"
+        >
+          {/* Smooth Sliding Highlight Pill */}
+          {indicatorStyle.opacity > 0 && (
+            <div
+              className="absolute left-2.5 right-2.5 rounded-xl bg-white/10 pointer-events-none transition-[top,height,opacity] duration-200 ease-out z-0"
+              style={{
+                top: indicatorStyle.top,
+                height: indicatorStyle.height,
+              }}
+            />
+          )}
+
           {navTabs.map((tab) => {
             const isActive = activeTab === tab.id;
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
+                ref={(el) => {
+                  tabRefs.current[tab.id] = el;
+                }}
                 type="button"
                 onClick={() => handleTabChange(tab.id)}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-all text-left cursor-pointer select-none group ${
+                className={`relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
                   isActive
-                    ? 'bg-white/10 text-white font-semibold'
+                    ? 'text-white font-semibold'
                     : 'text-white/70 hover:text-white hover:bg-white/5 font-normal'
                 }`}
               >
@@ -438,7 +569,7 @@ function StudentDashboardContent() {
           {user?.role === 'ADMIN' && (
             <Link
               href="/admin"
-              className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-all text-left font-normal text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 cursor-pointer select-none group"
+              className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 cursor-pointer select-none group"
             >
               <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400 transition-colors" />
               <span className="truncate">Admin Console</span>
@@ -449,57 +580,10 @@ function StudentDashboardContent() {
           <button
             type="button"
             onClick={() => logout()}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-all text-left font-normal text-white/70 hover:text-rose-400 hover:bg-white/5 cursor-pointer select-none group"
+            className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-white/70 hover:text-rose-400 hover:bg-white/5 cursor-pointer select-none group"
           >
             <LogOut className="w-4 h-4 shrink-0 text-white/50 group-hover:text-rose-400 transition-colors" />
             <span className="truncate">Log Out</span>
-          </button>
-        </nav>
-
-        {/* Mobile Horizontal Tabs */}
-        <nav
-          aria-label="Student Navigation Mobile"
-          className="flex md:hidden overflow-x-auto custom-scrollbar px-3 py-2 gap-1.5 shrink-0"
-        >
-          {navTabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center gap-2 px-3 py-2 text-xs rounded-xl whitespace-nowrap transition-all cursor-pointer select-none shrink-0 ${
-                  isActive
-                    ? 'bg-white/10 text-white font-semibold'
-                    : 'text-white/70 hover:text-white hover:bg-white/5 font-normal'
-                }`}
-              >
-                <Icon
-                  className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-white/50'}`}
-                />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-
-          {user?.role === 'ADMIN' && (
-            <Link
-              href="/admin"
-              className="flex items-center gap-1.5 px-3 py-2 text-xs rounded-xl whitespace-nowrap text-emerald-400 hover:bg-emerald-500/10 font-normal transition-all shrink-0"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
-              <span>Admin Console</span>
-            </Link>
-          )}
-
-          <button
-            type="button"
-            onClick={() => logout()}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs rounded-xl whitespace-nowrap text-white/70 hover:text-rose-400 hover:bg-white/5 font-normal transition-all cursor-pointer select-none shrink-0"
-          >
-            <LogOut className="w-3.5 h-3.5 shrink-0 text-white/50" />
-            <span>Log Out</span>
           </button>
         </nav>
       </aside>
