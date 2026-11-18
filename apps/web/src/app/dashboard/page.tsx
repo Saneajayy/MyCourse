@@ -22,8 +22,6 @@ import {
   Eye,
   EyeOff,
   Lock,
-  Video,
-  Clock,
   ArrowLeft,
   Sigma,
   LogOut,
@@ -65,15 +63,6 @@ interface EnrolledCourse {
     lessonId: string;
     title: string;
   } | null;
-}
-
-function formatCourseDuration(seconds?: number): string {
-  if (!seconds || seconds <= 0) return '5 Hours of Content';
-  const hrs = seconds / 3600;
-  const rounded = hrs >= 10 ? Math.round(hrs) : Math.round(hrs * 10) / 10;
-  const isWhole = rounded % 1 === 0;
-  const numStr = isWhole ? rounded.toFixed(0) : rounded.toFixed(1);
-  return `${numStr} ${rounded === 1 ? 'Hour' : 'Hours'} of Content`;
 }
 
 interface OrderHistoryItem {
@@ -737,10 +726,6 @@ function StudentDashboardContent() {
                         100,
                         Math.max(0, Math.round(c.progress?.percentComplete ?? 0)),
                       );
-                      const totalVideos = c.product.totalVideos ?? c.progress?.totalLessons ?? 16;
-                      const durationSeconds =
-                        c.product.totalDurationSeconds ?? c.progress?.totalDurationSeconds ?? 17830;
-                      const durationText = formatCourseDuration(durationSeconds);
 
                       return (
                         <div
@@ -765,7 +750,7 @@ function StudentDashboardContent() {
                           </div>
 
                           {/* Course Content Details */}
-                          <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
+                          <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5 gap-4">
                             <div>
                               {/* Course Title + Active Status Badge */}
                               <div className="flex items-start justify-between gap-3">
@@ -789,20 +774,7 @@ function StudentDashboardContent() {
                               </p>
                             </div>
 
-                            {/* 2. Course Metadata: Total Videos & Total Hours of Content */}
-                            <div className="flex items-center gap-2.5 text-xs text-[#8e909a] font-normal select-none py-2.5 sm:py-3">
-                              <span className="inline-flex items-center gap-1.5">
-                                <Video className="w-3.5 h-3.5 text-neutral-400" strokeWidth={1} />
-                                <span>{totalVideos} Videos</span>
-                              </span>
-                              <span className="text-white/20">•</span>
-                              <span className="inline-flex items-center gap-1.5">
-                                <Clock className="w-3.5 h-3.5 text-neutral-400" strokeWidth={1} />
-                                <span>{durationText}</span>
-                              </span>
-                            </div>
-
-                            {/* 3. Progress Bar, Credential Unlock Notice & Action Buttons */}
+                            {/* Progress Bar, Credential Unlock Notice & Action Buttons */}
                             <div>
                               {/* Barcode / Hatch Progress Bar with dynamic percentage */}
                               <CloseBarsProgressBar percent={percent} />
