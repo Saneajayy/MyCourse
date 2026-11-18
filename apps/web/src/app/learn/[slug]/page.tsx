@@ -1346,11 +1346,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
               }`}
             >
               {isPageLoading ? (
-                <div className="relative w-full h-full flex flex-col items-center justify-center bg-neutral-950 overflow-hidden">
-                  <div className="w-13 h-13 sm:w-15 sm:h-15 md:w-16 md:h-16 bg-white/5 rounded-full flex items-center justify-center animate-pulse">
-                    <Loader2 className="w-6 h-6 animate-spin text-white/40" />
-                  </div>
-                </div>
+                <div className="relative w-full h-full bg-neutral-950 overflow-hidden" />
               ) : !hasStartedWatching ? (
                 <div
                   className="relative w-full h-full flex items-center justify-center bg-neutral-950 overflow-hidden cursor-pointer group"
