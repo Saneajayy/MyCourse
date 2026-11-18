@@ -389,7 +389,7 @@ function StudentDashboardContent() {
   const navTabs: {
     id: DashboardTab;
     label: string;
-    icon: React.ComponentType<{ className?: string }>;
+    icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
   }[] = [
     { id: 'courses', label: 'My Courses', icon: BookOpen },
     { id: 'certificates', label: 'My Certificates', icon: Award },
@@ -485,7 +485,8 @@ function StudentDashboardContent() {
                     }`}
                   >
                     <Icon
-                      className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-[#c2c4cc]/70'}`}
+                      strokeWidth={1}
+                      className={`w-4 h-4 shrink-0 stroke-1 ${isActive ? 'text-white' : 'text-[#c2c4cc]/70'}`}
                     />
                     <span>{tab.label}</span>
                   </button>
@@ -498,7 +499,10 @@ function StudentDashboardContent() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-emerald-400 hover:bg-emerald-500/10 font-normal transition-colors cursor-pointer select-none"
                 >
-                  <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <ShieldCheck
+                    strokeWidth={1}
+                    className="w-4 h-4 shrink-0 stroke-1 text-emerald-400"
+                  />
                   <span>Admin Console</span>
                 </Link>
               )}
@@ -511,7 +515,7 @@ function StudentDashboardContent() {
                 }}
                 className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] font-normal transition-colors cursor-pointer select-none text-left"
               >
-                <LogOut className="w-4 h-4 shrink-0 text-[#c2c4cc]/70" />
+                <LogOut strokeWidth={1} className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc]/70" />
                 <span>Log Out</span>
               </button>
             </nav>
@@ -561,7 +565,8 @@ function StudentDashboardContent() {
                 }`}
               >
                 <Icon
-                  className={`w-4 h-4 shrink-0 transition-colors ${
+                  strokeWidth={1}
+                  className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
                     isActive ? 'text-white' : 'text-[#c2c4cc]/60 group-hover:text-white'
                   }`}
                 />
@@ -575,7 +580,10 @@ function StudentDashboardContent() {
               href="/admin"
               className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 cursor-pointer select-none group"
             >
-              <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400 transition-colors" />
+              <ShieldCheck
+                strokeWidth={1}
+                className="w-4 h-4 shrink-0 stroke-1 text-emerald-400 transition-colors"
+              />
               <span className="truncate">Admin Console</span>
             </Link>
           )}
@@ -586,7 +594,10 @@ function StudentDashboardContent() {
             onClick={() => logout()}
             className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] cursor-pointer select-none group"
           >
-            <LogOut className="w-4 h-4 shrink-0 text-[#c2c4cc]/60 group-hover:text-rose-400 transition-colors" />
+            <LogOut
+              strokeWidth={1}
+              className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc]/60 group-hover:text-rose-400 transition-colors"
+            />
             <span className="truncate">Log Out</span>
           </button>
         </nav>
@@ -599,7 +610,7 @@ function StudentDashboardContent() {
         {/* Top Header Bar: Active Tab Title & User Status */}
         <div className="h-12 px-5 sm:px-6 border-b border-white/[0.08] flex items-center justify-between shrink-0 bg-[#101012]">
           <div className="flex items-center gap-2.5 min-w-0">
-            <ActiveIcon className="w-4 h-4 text-white/60 shrink-0" />
+            <ActiveIcon strokeWidth={1} className="w-4 h-4 stroke-1 text-white/60 shrink-0" />
             <h1 className="text-sm sm:text-[15px] font-bold text-white truncate">
               {activeTabLabel}
             </h1>
