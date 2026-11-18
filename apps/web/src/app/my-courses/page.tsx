@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useCallback, useMemo, Suspense } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/auth-context';
 import { apiClient, ApiError } from '../../lib/api-client';
@@ -12,7 +11,6 @@ import { useToast } from '../../components/ui';
 import {
   BookOpen,
   User as UserIcon,
-  Menu,
   X,
   CheckCircle2,
   AlertCircle,
@@ -25,6 +23,10 @@ import {
   Lock,
   Video,
   Clock,
+  ArrowLeft,
+  Award,
+  LogOut,
+  Calculator as CalculatorIcon,
 } from 'lucide-react';
 import { HydraulicCalculator } from '../../components/calculator/HydraulicCalculator';
 
@@ -154,12 +156,9 @@ function StudentDashboardContent() {
       ? tabParam
       : 'courses',
   );
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   // Sync tab with URL query parameter
   const handleTabChange = (newTab: DashboardTab) => {
     setActiveTab(newTab);
-    setIsMobileMenuOpen(false);
     const url = new URL(window.location.href);
     url.searchParams.set('tab', newTab);
     window.history.replaceState({}, '', url.toString());
@@ -360,890 +359,852 @@ function StudentDashboardContent() {
     );
   }
 
-  const navTabs: { id: DashboardTab; label: string }[] = [
-    { id: 'courses', label: 'My Courses' },
-    { id: 'certificates', label: 'My Certificates' },
-    { id: 'calculator', label: 'Calculator' },
-    { id: 'profile', label: 'Profile' },
-    { id: 'orders', label: 'Payment Orders' },
+  const navTabs: {
+    id: DashboardTab;
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+  }[] = [
+    { id: 'courses', label: 'My Courses', icon: BookOpen },
+    { id: 'certificates', label: 'My Certificates', icon: Award },
+    { id: 'calculator', label: 'Calculator', icon: CalculatorIcon },
+    { id: 'profile', label: 'Profile', icon: UserIcon },
+    { id: 'orders', label: 'Payment Orders', icon: Clock },
   ];
 
-  return (
-    <div className="min-h-screen w-full bg-white font-reddit selection:bg-black selection:text-white flex flex-col md:flex-row">
-      {/* ============================================================== */}
-      {/* 1. LEFT BLUE COLUMN (Solid #000000, embedded image, clean tabs) */}
-      {/* ============================================================== */}
+  const activeTabConfig = navTabs.find((t) => t.id === activeTab) ?? navTabs[0]!;
+  const ActiveIcon = activeTabConfig.icon;
+  const activeTabLabel = activeTabConfig.label;
 
-      {/* Mobile Top Header: Fixed on top of screen, expands & collapses smoothly without affecting content */}
-      <header className="md:hidden fixed top-0 inset-x-0 w-full bg-black border-b border-white/50 select-none z-50 shrink-0 shadow-none">
-        {/* Mobile Header Bar */}
-        <div className="w-full h-16 sm:h-20 px-5 sm:px-6 flex items-center justify-between relative z-50 bg-black">
-          <Link
-            href="/"
-            className="flex flex-col -space-y-0.5 leading-[0.92] text-white hover:opacity-90 select-none"
-            aria-label="HYDRO BASICS Home - Back to Course"
-          >
-            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+  return (
+    <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit select-none z-10 flex flex-col md:flex-row gap-2.5 sm:gap-3">
+      {/* ============================================================== */}
+      {/* 1. LEFT CARD: NAVIGATION TABS                                  */}
+      {/* ============================================================== */}
+      <aside className="w-full shrink-0 md:flex-none md:w-72 lg:w-80 md:h-full md:shrink-0 bg-[#131316] rounded-xl flex flex-col overflow-hidden">
+        {/* Top Header: Brand Logo HYDRO BASICS + Back / Home Link */}
+        <div className="px-4 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between shrink-0">
+          <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
               HYDRO
             </span>
-            <span className="font-extrabold text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
               BASICS
             </span>
           </Link>
-
-          {/* Three bars toggle button in top right corner with smooth icon rotation */}
-          <button
-            type="button"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label={isMobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
-            aria-expanded={isMobileMenuOpen}
-            className="h-10 w-10 relative flex items-center justify-center text-white hover:bg-white/10 rounded-none transition-colors focus:outline-none cursor-pointer"
-          >
-            <Menu
-              className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${
-                isMobileMenuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
-              }`}
-            />
-            <X
-              className={`w-6 h-6 stroke-[2.5] absolute transition-all duration-300 ease-in-out ${
-                isMobileMenuOpen
-                  ? 'opacity-100 rotate-0 scale-100'
-                  : 'opacity-0 -rotate-90 scale-75'
-              }`}
-            />
-          </button>
-        </div>
-
-        {/* Dropping Column when opened: Expands on top of screen and collapses smoothly without affecting content */}
-        <div
-          className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
-            isMobileMenuOpen
-              ? 'grid-rows-[1fr] opacity-100 pointer-events-auto visible'
-              : 'grid-rows-[0fr] opacity-0 pointer-events-none invisible'
-          }`}
-        >
-          <div className="overflow-hidden relative bg-black border-t border-white/50">
-            {/* Background halftone image shifted to the right, full-bleed with no left cut-off */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden select-none opacity-15">
-              <Image
-                src="/login-pixelated.png"
-                alt=""
-                fill
-                sizes="100vw"
-                style={{ objectPosition: '35% center' }}
-                className="object-cover mix-blend-screen select-none"
-              />
-            </div>
-
-            {/* Column of Full-Width Tabs with Thin White Dividing Borders */}
-            <nav
-              aria-label="Student Mobile Navigation Column"
-              className="relative z-10 flex flex-col w-full max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5rem)] overflow-y-auto"
-            >
-              {navTabs.map((tab) => {
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => {
-                      handleTabChange(tab.id);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-6 py-4 text-[15px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
-                      isActive
-                        ? 'bg-white text-black font-extrabold'
-                        : 'bg-transparent text-white hover:bg-white/10'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-
-              {/* Log Out Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  logout();
-                }}
-                className="w-full text-left px-6 py-4 text-[15px] font-bold text-white border-b border-white/50 hover:bg-white/10 active:bg-rose-500/20 transition-colors cursor-pointer select-none"
+          <div className="flex items-center gap-2">
+            {user?.role === 'ADMIN' && (
+              <Link
+                href="/admin"
+                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md hover:bg-emerald-500/20 transition-colors"
+                title="Admin Console"
               >
-                Log Out
-              </button>
-
-              {/* Admin Switch Link (if admin) */}
-              {user?.role === 'ADMIN' && (
-                <Link
-                  href="/admin"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full text-left px-6 py-3.5 text-xs font-bold uppercase tracking-wider text-emerald-200 border-b border-white/50 hover:bg-white/10 flex items-center gap-2"
-                >
-                  <ShieldCheck className="w-4 h-4 text-emerald-300" />
-                  <span>Admin Console</span>
-                </Link>
-              )}
-            </nav>
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Admin</span>
+              </Link>
+            )}
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-white/50 hover:text-white transition-colors"
+              title="Back to Home"
+            >
+              <ArrowLeft className="w-3 h-3" />
+              <span>Home</span>
+            </Link>
           </div>
         </div>
-      </header>
 
-      {/* Dimming Backdrop Overlay: Fixed over the screen behind the header (No blur, pure neutral opacity dimming) */}
-      <div
-        className={`md:hidden fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 ease-in-out ${
-          isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={() => setIsMobileMenuOpen(false)}
-        aria-hidden="true"
-      />
+        {/* Thin Stroke Separation Line */}
+        <div className="border-b border-white/10 w-full shrink-0" />
 
-      {/* Desktop Sidebar: Solid Blue Column with Embedded Image & Contrasting Tabs */}
-      <aside className="hidden md:flex md:fixed md:top-0 md:bottom-0 md:left-0 md:w-64 lg:w-72 bg-black text-white flex-col shrink-0 z-30 select-none border-r border-white/50 overflow-y-auto relative shadow-none">
-        {/* Previous Image Embedded on Column Back (Shifted to the Right, Full-Bleed with No Left Cut-Off) */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-          <Image
-            src="/login-pixelated.png"
-            alt="Hydraulic System Graphic"
-            fill
-            sizes="300px"
-            priority
-            style={{ objectPosition: '35% center' }}
-            className="object-cover mix-blend-screen opacity-15 select-none"
-          />
+        {/* Student Profile Info (Desktop) */}
+        <div className="hidden md:flex px-5 pt-3.5 pb-2.5 items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-7 h-7 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-xs font-bold text-white shrink-0">
+              {user?.name ? user.name.charAt(0).toUpperCase() : 'S'}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[12px] font-semibold text-white/90 truncate leading-tight">
+                {user?.name || 'Student'}
+              </p>
+              <p className="text-[10px] text-white/40 truncate font-mono">{user?.email || ''}</p>
+            </div>
+          </div>
         </div>
 
-        {/* Top: Brand Logo with Bottom Dividing Line */}
-        <div className="relative z-10 w-full px-6 sm:px-7 py-6 sm:py-7 border-b border-white/50">
-          <Link
-            href="/"
-            className="flex flex-col -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity select-none"
-            aria-label="HYDRO BASICS Home - Back to Course"
-          >
-            <span className="font-extrabold text-[22px] sm:text-[24px] tracking-[0.02em] uppercase leading-[0.92]">
-              HYDRO
-            </span>
-            <span className="font-extrabold text-[22px] sm:text-[24px] tracking-[0.02em] uppercase leading-[0.92]">
-              BASICS
-            </span>
-          </Link>
-        </div>
-
-        {/* Navigation Tabs with Thin White Dividing Borders & Contrasting Active Tab */}
+        {/* Desktop Vertical Tabs */}
         <nav
-          aria-label="Student Dashboard Navigation"
-          className="relative z-10 flex flex-col w-full"
+          aria-label="Student Navigation"
+          className="hidden md:flex flex-1 flex-col overflow-y-auto custom-scrollbar px-2.5 py-2 space-y-1"
         >
           {navTabs.map((tab) => {
             const isActive = activeTab === tab.id;
+            const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => handleTabChange(tab.id)}
-                className={`w-full text-left px-6 sm:px-7 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold border-b border-white/50 transition-colors cursor-pointer select-none ${
+                className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs sm:text-[13px] font-medium rounded-lg transition-all text-left cursor-pointer select-none ${
                   isActive
-                    ? 'bg-white text-black font-extrabold'
-                    : 'bg-transparent text-white hover:bg-white/10'
+                    ? 'bg-white/10 text-white font-semibold border border-white/15'
+                    : 'text-white/60 hover:text-white hover:bg-white/5'
                 }`}
               >
-                {tab.label}
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-white/40'}`} />
+                <span className="truncate">{tab.label}</span>
               </button>
             );
           })}
+        </nav>
 
-          {/* Log Out Tab Button */}
-          <button
-            type="button"
-            onClick={() => logout()}
-            className="w-full text-left px-6 sm:px-7 py-4.5 sm:py-5 text-[15px] sm:text-[16px] font-bold text-white border-b border-white/50 hover:bg-white/10 active:bg-rose-500/20 transition-colors cursor-pointer select-none"
-          >
-            Log Out
-          </button>
+        {/* Mobile Horizontal Tabs */}
+        <nav
+          aria-label="Student Navigation Mobile"
+          className="flex md:hidden overflow-x-auto custom-scrollbar px-3 py-2 gap-1.5 shrink-0"
+        >
+          {navTabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => handleTabChange(tab.id)}
+                className={`flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap transition-all cursor-pointer select-none shrink-0 ${
+                  isActive
+                    ? 'bg-white/10 text-white font-semibold border border-white/15'
+                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                }`}
+              >
+                <Icon
+                  className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-white/40'}`}
+                />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </nav>
 
-          {/* Admin Switch Link (visible only for admins) */}
+        {/* Desktop Bottom Section: Admin Switch + Logout */}
+        <div className="hidden md:flex flex-col border-t border-white/10 p-2.5 space-y-1 shrink-0">
           {user?.role === 'ADMIN' && (
             <Link
               href="/admin"
-              className="w-full text-left px-6 sm:px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-emerald-200 border-b border-white/50 hover:bg-white/10 flex items-center gap-2"
+              className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-colors"
             >
-              <ShieldCheck className="w-4 h-4 text-emerald-300" />
+              <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
               <span>Admin Console</span>
             </Link>
           )}
-        </nav>
-
-        {/* Empty Solid Blue Column Continuing Down */}
-        <div className="flex-1 w-full" />
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-white/60 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer text-left"
+          >
+            <LogOut className="w-4 h-4 shrink-0 text-white/40" />
+            <span>Log Out</span>
+          </button>
+        </div>
       </aside>
 
       {/* ============================================================== */}
-      {/* 2. RIGHT WHITE WORKSPACE (Left-aligned, Zero Shadows)          */}
+      {/* 2. RIGHT CARD: WORKSPACE CONTENT                              */}
       {/* ============================================================== */}
-      <main className="flex-1 md:pl-64 lg:pl-72 w-full min-h-screen bg-white flex flex-col pt-16 sm:pt-20 md:pt-0">
-        <div className="w-full max-w-4xl xl:max-w-5xl p-6 sm:p-8 lg:p-10 space-y-6 text-left">
-          {/* TAB 1: MY COURSES */}
-          {activeTab === 'courses' && (
-            <div className="space-y-6 text-left">
-              {/* Header Title & Subtitle */}
-              <div className="text-left">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
-                  My Courses
-                </h1>
-                <p className="text-xs sm:text-sm text-neutral-500 mt-1">
-                  Continue learning and master industrial hydraulic systems.
-                </p>
-              </div>
+      <main className="w-full flex-1 min-h-0 md:h-full md:min-w-0 bg-[#131316] rounded-xl flex flex-col overflow-hidden relative">
+        {/* Top Header Bar: Active Tab Title & User Status */}
+        <div className="h-12 px-5 sm:px-6 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#131316]">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <ActiveIcon className="w-4 h-4 text-white/60 shrink-0" />
+            <h1 className="text-sm sm:text-[15px] font-bold text-white truncate">
+              {activeTabLabel}
+            </h1>
+          </div>
 
-              {/* Minimal Search Bar directly below Title */}
-              {courses.length > 0 && (
-                <div className="relative w-full max-w-md">
-                  <input
-                    type="text"
-                    placeholder="Search courses"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-10 px-3.5 bg-white border border-neutral-300 rounded-none text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:outline-none transition-all shadow-none"
-                  />
-                  {searchQuery && (
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              type="button"
+              onClick={() => logout()}
+              className="md:hidden inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-mono text-white/50 hover:text-rose-400 transition-colors cursor-pointer"
+              title="Log Out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Logout</span>
+            </button>
+            <span className="hidden sm:inline-block text-[11px] font-mono text-white/40">
+              Student Dashboard
+            </span>
+          </div>
+        </div>
+
+        {/* Scrollable Tab Content Workspace */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-7 md:p-8">
+          <div className="w-full max-w-5xl space-y-6 text-left">
+            {/* TAB 1: MY COURSES */}
+            {activeTab === 'courses' && (
+              <div className="space-y-6 text-left">
+                {/* Header Title & Subtitle */}
+                <div className="text-left">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                    My Courses
+                  </h1>
+                  <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+                    Continue learning and master industrial hydraulic systems.
+                  </p>
+                </div>
+
+                {/* Minimal Search Bar directly below Title */}
+                {courses.length > 0 && (
+                  <div className="relative w-full max-w-md">
+                    <input
+                      type="text"
+                      placeholder="Search courses"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full h-10 px-3.5 bg-white border border-neutral-300 rounded-none text-xs sm:text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:outline-none transition-all shadow-none"
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
+                        aria-label="Clear search"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Error Notice */}
+                {coursesError && (
+                  <div className="p-4 rounded-none bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-semibold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                    <span>{coursesError}</span>
+                  </div>
+                )}
+
+                {/* Empty State: No Courses Enrolled */}
+                {courses.length === 0 && !coursesError && (
+                  <div className="bg-white border border-neutral-200 rounded-none p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
+                    <div className="space-y-1">
+                      <h2 className="text-lg font-bold text-neutral-900 uppercase">
+                        NO ACTIVE COURSES.
+                      </h2>
+                      <p className="text-xs text-neutral-500 leading-relaxed">
+                        You are not currently enrolled in any courses. Explore our masterclass to
+                        start learning.
+                      </p>
+                    </div>
+                    <div>
+                      <Link
+                        href="/#pricing"
+                        className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors shadow-none"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Explore Masterclass</span>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
+                {/* Empty Search Filter State */}
+                {courses.length > 0 && filteredCourses.length === 0 && (
+                  <div className="bg-white border border-neutral-200 rounded-none p-6 text-left space-y-2 shadow-none max-w-md">
+                    <p className="text-sm font-bold text-neutral-800">
+                      No courses match &ldquo;{searchQuery}&rdquo;
+                    </p>
                     <button
                       type="button"
                       onClick={() => setSearchQuery('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
-                      aria-label="Clear search"
+                      className="text-xs font-bold text-black hover:underline cursor-pointer"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      Clear Search
                     </button>
-                  )}
-                </div>
-              )}
-
-              {/* Error Notice */}
-              {coursesError && (
-                <div className="p-4 rounded-none bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm font-semibold flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-                  <span>{coursesError}</span>
-                </div>
-              )}
-
-              {/* Empty State: No Courses Enrolled */}
-              {courses.length === 0 && !coursesError && (
-                <div className="bg-white border border-neutral-200 rounded-none p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
-                  <div className="space-y-1">
-                    <h2 className="text-lg font-bold text-neutral-900 uppercase">
-                      NO ACTIVE COURSES.
-                    </h2>
-                    <p className="text-xs text-neutral-500 leading-relaxed">
-                      You are not currently enrolled in any courses. Explore our masterclass to
-                      start learning.
-                    </p>
                   </div>
-                  <div>
-                    <Link
-                      href="/#pricing"
-                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors shadow-none"
-                    >
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Explore Masterclass</span>
-                    </Link>
-                  </div>
-                </div>
-              )}
+                )}
 
-              {/* Empty Search Filter State */}
-              {courses.length > 0 && filteredCourses.length === 0 && (
-                <div className="bg-white border border-neutral-200 rounded-none p-6 text-left space-y-2 shadow-none max-w-md">
-                  <p className="text-sm font-bold text-neutral-800">
-                    No courses match &ldquo;{searchQuery}&rdquo;
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="text-xs font-bold text-black hover:underline cursor-pointer"
-                  >
-                    Clear Search
-                  </button>
-                </div>
-              )}
+                {/* Courses List: Wide Horizontal Course Cards matching design */}
+                {filteredCourses.length > 0 && (
+                  <div className="w-full flex flex-col gap-6 items-start text-left">
+                    {filteredCourses.map((c) => {
+                      const percent = Math.min(
+                        100,
+                        Math.max(0, Math.round(c.progress?.percentComplete ?? 0)),
+                      );
+                      const totalVideos = c.product.totalVideos ?? c.progress?.totalLessons ?? 16;
+                      const durationSeconds =
+                        c.product.totalDurationSeconds ?? c.progress?.totalDurationSeconds ?? 17830;
+                      const durationText = formatCourseDuration(durationSeconds);
 
-              {/* Courses List: Wide Horizontal Course Cards matching design */}
-              {filteredCourses.length > 0 && (
-                <div className="w-full flex flex-col gap-6 items-start text-left">
-                  {filteredCourses.map((c) => {
-                    const percent = Math.min(
-                      100,
-                      Math.max(0, Math.round(c.progress?.percentComplete ?? 0)),
-                    );
-                    const totalVideos = c.product.totalVideos ?? c.progress?.totalLessons ?? 16;
-                    const durationSeconds =
-                      c.product.totalDurationSeconds ?? c.progress?.totalDurationSeconds ?? 17830;
-                    const durationText = formatCourseDuration(durationSeconds);
+                      return (
+                        <div
+                          key={c.product.id}
+                          className="w-full max-w-4xl bg-white border border-neutral-300 rounded-none p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 shadow-none select-none"
+                        >
+                          {/* Course Thumbnail Image: Desaturated Halftone Dot Effect */}
+                          <div className="relative w-full md:w-[320px] lg:w-[360px] shrink-0 aspect-[16/10] rounded-none overflow-hidden bg-black border border-neutral-200">
+                            <img
+                              src={
+                                c.product.thumbnailUrl &&
+                                !c.product.thumbnailUrl.includes('unsplash')
+                                  ? c.product.thumbnailUrl
+                                  : '/course-halftone.jpg'
+                              }
+                              alt={c.product.title}
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).src = '/course.jpg';
+                              }}
+                              className="w-full h-full object-cover select-none"
+                            />
+                          </div>
 
-                    return (
-                      <div
-                        key={c.product.id}
-                        className="w-full max-w-4xl bg-white border border-neutral-300 rounded-none p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 shadow-none select-none"
-                      >
-                        {/* Course Thumbnail Image: Desaturated Halftone Dot Effect */}
-                        <div className="relative w-full md:w-[320px] lg:w-[360px] shrink-0 aspect-[16/10] rounded-none overflow-hidden bg-black border border-neutral-200">
-                          <img
-                            src={
-                              c.product.thumbnailUrl && !c.product.thumbnailUrl.includes('unsplash')
-                                ? c.product.thumbnailUrl
-                                : '/course-halftone.jpg'
-                            }
-                            alt={c.product.title}
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).src = '/course.jpg';
-                            }}
-                            className="w-full h-full object-cover select-none"
-                          />
-                        </div>
+                          {/* Course Content Details */}
+                          <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
+                            <div>
+                              {/* Course Title + Active Status Badge */}
+                              <div className="flex items-start justify-between gap-3">
+                                <h2 className="text-xl sm:text-[22px] font-bold text-neutral-900 tracking-tight leading-snug">
+                                  <Link
+                                    href={`/learn/${c.product.slug}`}
+                                    className="underline underline-offset-4 decoration-neutral-900 hover:text-neutral-700 transition-colors"
+                                  >
+                                    {c.product.title}
+                                  </Link>
+                                </h2>
+                                <span className="px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase text-white bg-[#0e5c2f] rounded-none shrink-0 select-none">
+                                  {c.entitlement?.status || 'ACTIVE'}
+                                </span>
+                              </div>
 
-                        {/* Course Content Details */}
-                        <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
-                          <div>
-                            {/* Course Title + Active Status Badge */}
-                            <div className="flex items-start justify-between gap-3">
-                              <h2 className="text-xl sm:text-[22px] font-bold text-neutral-900 tracking-tight leading-snug">
-                                <Link
-                                  href={`/learn/${c.product.slug}`}
-                                  className="underline underline-offset-4 decoration-neutral-900 hover:text-neutral-700 transition-colors"
-                                >
-                                  {c.product.title}
-                                </Link>
-                              </h2>
-                              <span className="px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase text-white bg-[#0e5c2f] rounded-none shrink-0 select-none">
-                                {c.entitlement?.status || 'ACTIVE'}
+                              {/* Dynamic Course Description */}
+                              <p className="text-xs sm:text-[13px] text-neutral-700 leading-relaxed mt-2 sm:mt-2.5 text-justify">
+                                {c.product.description ||
+                                  'Learn the fundamentals of hydraulic systems from scratch. This course introduces you to the working principles of hydraulics, essential components, and hydraulic circuit basics through easy-to-understand video lessons.'}
+                              </p>
+                            </div>
+
+                            {/* 2. Course Metadata: Total Videos & Total Hours of Content (Centered evenly between Description and Progress Bar) */}
+                            <div className="flex items-center gap-2.5 text-xs text-neutral-500 font-medium select-none py-3 sm:py-3.5">
+                              <span className="inline-flex items-center gap-1.5">
+                                <Video className="w-3.5 h-3.5 text-neutral-400" />
+                                <span>{totalVideos} Videos</span>
+                              </span>
+                              <span className="text-neutral-300">•</span>
+                              <span className="inline-flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5 text-neutral-400" />
+                                <span>{durationText}</span>
                               </span>
                             </div>
 
-                            {/* Dynamic Course Description */}
-                            <p className="text-xs sm:text-[13px] text-neutral-700 leading-relaxed mt-2 sm:mt-2.5 text-justify">
-                              {c.product.description ||
-                                'Learn the fundamentals of hydraulic systems from scratch. This course introduces you to the working principles of hydraulics, essential components, and hydraulic circuit basics through easy-to-understand video lessons.'}
-                            </p>
+                            {/* 3. Progress Bar, Certificate Unlock Notice & Action Buttons */}
+                            <div>
+                              {/* Barcode / Hatch Progress Bar with dynamic percentage */}
+                              <CloseBarsProgressBar percent={percent} />
+
+                              {/* Dynamic Certificate Unlock Notice */}
+                              <p className="font-bold text-neutral-900 text-xs sm:text-[13px] select-none mt-2">
+                                {percent >= 90
+                                  ? 'Course completed. Certificate unlocked!'
+                                  : 'Complete course to unlock certificate.'}
+                              </p>
+
+                              {/* Action Buttons */}
+                              <div className="flex flex-wrap items-center gap-3 mt-3.5 sm:mt-4">
+                                <Link
+                                  href={`/learn/${c.product.slug}`}
+                                  aria-label={percent > 0 ? 'Continue Learning' : 'Start Learning'}
+                                  className="h-10 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-medium text-xs sm:text-sm rounded-none flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
+                                >
+                                  <span>
+                                    {percent > 0
+                                      ? percent >= 90
+                                        ? 'Review Course'
+                                        : 'Continue Learning'
+                                      : 'Start Learning'}{' '}
+                                    &rarr;
+                                  </span>
+                                </Link>
+                                <Link
+                                  href={`/learn/${c.product.slug}`}
+                                  className="h-10 px-6 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-900 font-medium text-xs sm:text-sm rounded-none flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
+                                >
+                                  <span>View Syllabus &rarr;</span>
+                                </Link>
+                              </div>
+                            </div>
                           </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
-                          {/* 2. Course Metadata: Total Videos & Total Hours of Content (Centered evenly between Description and Progress Bar) */}
-                          <div className="flex items-center gap-2.5 text-xs text-neutral-500 font-medium select-none py-3 sm:py-3.5">
-                            <span className="inline-flex items-center gap-1.5">
-                              <Video className="w-3.5 h-3.5 text-neutral-400" />
-                              <span>{totalVideos} Videos</span>
-                            </span>
-                            <span className="text-neutral-300">•</span>
-                            <span className="inline-flex items-center gap-1.5">
-                              <Clock className="w-3.5 h-3.5 text-neutral-400" />
-                              <span>{durationText}</span>
-                            </span>
+            {/* TAB 2: MY CERTIFICATES */}
+            {activeTab === 'certificates' && (
+              <div className="space-y-6 text-left">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                    My Certificates
+                  </h1>
+                  <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+                    Official certificates of completion signed by instructor{' '}
+                    {siteConfig.instructor.name}.
+                  </p>
+                </div>
+
+                {completedCourses.length === 0 ? (
+                  <div className="bg-white border border-neutral-200 rounded-none p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
+                    <div className="space-y-1">
+                      <h2 className="text-lg font-bold text-neutral-900 uppercase">
+                        NO CERTIFICATES EARNED YET.
+                      </h2>
+                      <p className="text-xs text-neutral-500 leading-relaxed">
+                        Complete all lesson modules and practical evaluations in your enrolled
+                        courses to automatically unlock your verified certificate.
+                      </p>
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => handleTabChange('courses')}
+                        className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors shadow-none cursor-pointer"
+                      >
+                        <BookOpen className="w-3.5 h-3.5" />
+                        <span>Go to My Courses</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                    {completedCourses.map((c) => (
+                      <div
+                        key={c.product.id}
+                        className="bg-white border border-neutral-200 rounded-none p-6 shadow-none space-y-4 text-left"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-none bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200">
+                            <CheckCircle2 className="w-5 h-5" />
                           </div>
+                          <div className="min-w-0 flex-1">
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 block">
+                              Course Completed
+                            </span>
+                            <h2 className="text-base font-bold text-neutral-900 truncate">
+                              {c.product.title}
+                            </h2>
+                          </div>
+                        </div>
 
-                          {/* 3. Progress Bar, Certificate Unlock Notice & Action Buttons */}
-                          <div>
-                            {/* Barcode / Hatch Progress Bar with dynamic percentage */}
-                            <CloseBarsProgressBar percent={percent} />
+                        <div className="p-3.5 rounded-none bg-neutral-50 border border-neutral-200 text-xs text-neutral-600 space-y-1">
+                          <p>
+                            <strong className="text-neutral-900">Credential:</strong> Verified
+                            Certificate of Completion
+                          </p>
+                          <p>
+                            <strong className="text-neutral-900">Instructor:</strong>{' '}
+                            {siteConfig.instructor.name}
+                          </p>
+                        </div>
 
-                            {/* Dynamic Certificate Unlock Notice */}
-                            <p className="font-bold text-neutral-900 text-xs sm:text-[13px] select-none mt-2">
-                              {percent >= 90
-                                ? 'Course completed. Certificate unlocked!'
-                                : 'Complete course to unlock certificate.'}
-                            </p>
+                        <Link
+                          href={`/learn/${c.product.slug}`}
+                          className="w-full h-10 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none flex items-center justify-center gap-2 shadow-none"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Download Certificate</span>
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
-                            {/* Action Buttons */}
-                            <div className="flex flex-wrap items-center gap-3 mt-3.5 sm:mt-4">
+            {/* TAB 3: HYDRAULIC SYSTEM CALCULATOR */}
+            {activeTab === 'calculator' && <HydraulicCalculator />}
+
+            {/* TAB 4: PROFILE */}
+            {activeTab === 'profile' && (
+              <div className="space-y-6 text-left">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                    Profile &amp; Account
+                  </h1>
+                  <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+                    Manage your personal details, email verification, and security credentials.
+                  </p>
+                </div>
+
+                {/* 2-Column Responsive Grid: Profile on Left, Password on Right (Compact horizontal width on desktop) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 items-start w-full max-w-md lg:max-w-[720px]">
+                  {/* Personal Details Card (Left) */}
+                  <div className="bg-white border border-neutral-200/80 rounded-none overflow-hidden shadow-none text-left w-full lg:max-w-[345px]">
+                    {/* Header with border joining outer outline */}
+                    <div className="px-5 sm:px-7 py-4 sm:py-4.5 border-b border-neutral-200 flex items-center gap-2.5">
+                      <UserIcon className="w-4 h-4 text-neutral-900" />
+                      <h2 className="text-base sm:text-[17px] font-bold text-neutral-900">
+                        Personal Information
+                      </h2>
+                    </div>
+
+                    <div className="p-5 sm:p-7">
+                      <form onSubmit={handleSaveProfile} className="space-y-4 sm:space-y-4.5">
+                        {/* Name Input */}
+                        <div className="space-y-1.5 text-left">
+                          <label
+                            htmlFor="profile-name"
+                            className="text-sm font-bold text-neutral-900 block"
+                          >
+                            Full Name
+                          </label>
+                          <input
+                            id="profile-name"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Your name"
+                            className="w-full h-11 px-3.5 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
+                          />
+                        </div>
+
+                        {/* Email Address */}
+                        <div className="space-y-1.5 text-left">
+                          <label
+                            htmlFor="profile-email"
+                            className="text-sm font-bold text-neutral-900 block"
+                          >
+                            Email Address
+                          </label>
+                          <input
+                            id="profile-email"
+                            type="email"
+                            disabled
+                            value={user?.email || ''}
+                            className="w-full h-11 px-3.5 bg-neutral-100 border border-neutral-200 rounded-none text-sm text-neutral-600 cursor-not-allowed select-none shadow-none disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
+                          />
+                          {!user?.emailVerifiedAt && (
+                            <div className="flex items-center gap-3 pt-1">
                               <Link
-                                href={`/learn/${c.product.slug}`}
-                                aria-label={percent > 0 ? 'Continue Learning' : 'Start Learning'}
-                                className="h-10 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-medium text-xs sm:text-sm rounded-none flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
+                                href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
+                                className="text-xs font-semibold text-black hover:underline"
                               >
-                                <span>
-                                  {percent > 0
-                                    ? percent >= 90
-                                      ? 'Review Course'
-                                      : 'Continue Learning'
-                                    : 'Start Learning'}{' '}
-                                  &rarr;
-                                </span>
+                                Enter 6-digit OTP &rarr;
                               </Link>
-                              <Link
-                                href={`/learn/${c.product.slug}`}
-                                className="h-10 px-6 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-900 font-medium text-xs sm:text-sm rounded-none flex items-center justify-center gap-1.5 transition-colors select-none shadow-none"
+                              <button
+                                type="button"
+                                onClick={handleResendVerification}
+                                disabled={resendingVerification}
+                                className="text-xs font-semibold text-neutral-600 hover:text-black underline cursor-pointer disabled:opacity-50"
                               >
-                                <span>View Syllabus &rarr;</span>
+                                {resendingVerification ? 'Sending...' : 'Resend OTP'}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Phone Input */}
+                        <div className="space-y-1.5 text-left">
+                          <label
+                            htmlFor="profile-phone"
+                            className="text-sm font-bold text-neutral-900 block"
+                          >
+                            Phone Number
+                          </label>
+                          <input
+                            id="profile-phone"
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="+91 98765 43210"
+                            className="w-full h-11 px-3.5 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none font-mono"
+                          />
+                        </div>
+
+                        <div className="pt-1.5">
+                          <button
+                            type="submit"
+                            disabled={profileSaving}
+                            className="w-full h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-none transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                          >
+                            {profileSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                            <span>{profileSaving ? 'Saving...' : 'Save Profile'}</span>
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+
+                  {/* Change Password Card (Right) */}
+                  <div className="bg-white border border-neutral-200/80 rounded-none overflow-hidden shadow-none text-left w-full lg:max-w-[345px]">
+                    {/* Header with border joining outer outline */}
+                    <div className="px-5 sm:px-7 py-4 sm:py-4.5 border-b border-neutral-200 flex items-center gap-2.5">
+                      <Lock className="w-4 h-4 text-neutral-900" />
+                      <h2 className="text-base sm:text-[17px] font-bold text-neutral-900">
+                        Security &amp; Password
+                      </h2>
+                    </div>
+
+                    <div className="p-5 sm:p-7">
+                      <form onSubmit={handleChangePassword} className="space-y-4 sm:space-y-4.5">
+                        {passwordError && (
+                          <div className="p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium">
+                            {passwordError}
+                          </div>
+                        )}
+
+                        {/* Current Password */}
+                        <div className="space-y-1.5 text-left">
+                          <label
+                            htmlFor="profile-current-password"
+                            className="text-sm font-bold text-neutral-900 block"
+                          >
+                            Current Password
+                          </label>
+                          <div className="relative">
+                            <input
+                              id="profile-current-password"
+                              type={showCurrentPassword ? 'text' : 'password'}
+                              value={currentPassword}
+                              onChange={(e) => setCurrentPassword(e.target.value)}
+                              required
+                              placeholder="Your current password"
+                              className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
+                              aria-label={showCurrentPassword ? 'Hide password' : 'Show password'}
+                            >
+                              {showCurrentPassword ? (
+                                <Eye className="w-4 h-4" />
+                              ) : (
+                                <EyeOff className="w-4 h-4" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* New Password */}
+                        <div className="space-y-1.5 text-left">
+                          <label
+                            htmlFor="profile-new-password"
+                            className="text-sm font-bold text-neutral-900 block"
+                          >
+                            New Password
+                          </label>
+                          <div className="relative">
+                            <input
+                              id="profile-new-password"
+                              type={showNewPassword ? 'text' : 'password'}
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              required
+                              placeholder="At least 8 characters"
+                              className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowNewPassword(!showNewPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
+                              aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                            >
+                              {showNewPassword ? (
+                                <Eye className="w-4 h-4" />
+                              ) : (
+                                <EyeOff className="w-4 h-4" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Confirm Password */}
+                        <div className="space-y-1.5 text-left">
+                          <label
+                            htmlFor="profile-confirm-password"
+                            className="text-sm font-bold text-neutral-900 block"
+                          >
+                            Confirm New Password
+                          </label>
+                          <div className="relative">
+                            <input
+                              id="profile-confirm-password"
+                              type={showConfirmPassword ? 'text' : 'password'}
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              required
+                              placeholder="Repeat new password"
+                              className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
+                              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                            >
+                              {showConfirmPassword ? (
+                                <Eye className="w-4 h-4" />
+                              ) : (
+                                <EyeOff className="w-4 h-4" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="pt-1.5">
+                          <button
+                            type="submit"
+                            disabled={passwordSaving}
+                            className="w-full h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-none transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                          >
+                            {passwordSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                            <span>{passwordSaving ? 'Updating...' : 'Update Password'}</span>
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 4: PAYMENT ORDERS */}
+            {activeTab === 'orders' && (
+              <div className="space-y-6 text-left">
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                    Payment Orders &amp; Invoices
+                  </h1>
+                  <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+                    Download official GST tax invoices in PDF format for company or personal
+                    reimbursement.
+                  </p>
+                </div>
+
+                {ordersLoading ? (
+                  <div className="bg-white border border-neutral-200/80 rounded-none p-10 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-none w-full max-w-lg lg:max-w-[480px]">
+                    <Loader2 className="w-5 h-5 animate-spin text-black" />
+                    <span>Loading payment orders...</span>
+                  </div>
+                ) : orders.length === 0 ? (
+                  <div className="bg-white border border-neutral-200/80 rounded-none p-7 sm:p-9 text-left space-y-4 w-full max-w-lg lg:max-w-[480px] shadow-none">
+                    <div className="space-y-1.5">
+                      <h2 className="text-lg font-bold text-neutral-900">No payment history yet</h2>
+                      <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
+                        Once you enroll in a course, your official GST tax invoices and payment
+                        receipts will appear here.
+                      </p>
+                    </div>
+                    <div>
+                      <Link
+                        href="/#pricing"
+                        className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-none transition-colors shadow-none"
+                      >
+                        <Sparkles className="w-4 h-4" />
+                        <span>View Courses</span>
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4 w-full max-w-lg lg:max-w-[480px] text-left">
+                    {orders.map((ord) => {
+                      const amountFormatted = (
+                        (ord.totalPaise ??
+                          ord.amountPaise ??
+                          ord.invoice?.totalPaise ??
+                          ord.payments?.[0]?.amountPaise ??
+                          0) / 100
+                      ).toLocaleString('en-IN');
+
+                      return (
+                        <div
+                          key={ord.id}
+                          className="bg-white border border-neutral-200/80 rounded-none overflow-hidden select-none shadow-none text-left"
+                        >
+                          {/* 1. Header Bar: Order reference, date, status, and total amount */}
+                          <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-neutral-200 flex items-center justify-between gap-3 bg-neutral-50/50">
+                            {/* Order ID & Date */}
+                            <div className="flex items-center gap-2 sm:gap-2.5 text-xs sm:text-[13px] min-w-0">
+                              <span className="font-mono font-bold text-neutral-900 tracking-tight">
+                                {formatDisplayOrderId(ord.orderNumber || ord.id)}
+                              </span>
+                              <span className="text-neutral-300">•</span>
+                              <span className="text-neutral-500 font-medium whitespace-nowrap">
+                                {new Date(ord.createdAt).toLocaleDateString('en-IN', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  year: 'numeric',
+                                })}
+                              </span>
+                            </div>
+
+                            {/* Status Badge + Amount */}
+                            <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+                              <span
+                                className={`px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase rounded-none shrink-0 select-none ${
+                                  ord.status === 'PAID'
+                                    ? 'text-white bg-[#0e5c2f]'
+                                    : ord.status === 'FAILED'
+                                      ? 'text-white bg-rose-700'
+                                      : 'text-neutral-700 bg-neutral-200'
+                                }`}
+                              >
+                                {ord.status === 'PAID' ? 'PAID' : ord.status}
+                              </span>
+                              <span className="font-mono font-bold text-sm sm:text-base text-neutral-900 whitespace-nowrap">
+                                ₹{amountFormatted}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* 2. Card Body: Course information and direct action buttons */}
+                          <div className="p-5 sm:p-6 space-y-4">
+                            <div className="space-y-1 min-w-0">
+                              <h2 className="text-base sm:text-[17px] font-bold text-neutral-900 leading-snug">
+                                {ord.product.title}
+                              </h2>
+                              <p className="text-xs text-neutral-500 font-medium">
+                                12 Months Access
+                              </p>
+                            </div>
+
+                            {/* Actions: Download Invoice & Access Course equally spread on bottom */}
+                            <div className="grid grid-cols-2 gap-3 pt-1 w-full">
+                              {ord.invoice ? (
+                                <a
+                                  href={`${siteConfig.urls.api}/api/v1/invoices/${ord.invoice.id}/download`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="h-10 px-3 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-300 hover:border-neutral-400 font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center justify-center gap-2 shadow-none cursor-pointer w-full text-center select-none"
+                                >
+                                  <Download className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
+                                  <span className="truncate">Download Invoice</span>
+                                </a>
+                              ) : (
+                                <div className="h-10 px-3 bg-neutral-50 text-neutral-400 border border-neutral-200 font-medium text-xs rounded-none inline-flex items-center justify-center text-center w-full select-none">
+                                  <span className="truncate">Generating Invoice...</span>
+                                </div>
+                              )}
+
+                              <Link
+                                href={`/learn/${ord.product.slug}`}
+                                className="h-10 px-3 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center justify-center gap-1.5 shadow-none w-full text-center select-none"
+                              >
+                                <span className="truncate">Go to Course</span>
+                                <span className="shrink-0">&rarr;</span>
                               </Link>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* TAB 2: MY CERTIFICATES */}
-          {activeTab === 'certificates' && (
-            <div className="space-y-6 text-left">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
-                  My Certificates
-                </h1>
-                <p className="text-xs sm:text-sm text-neutral-500 mt-1">
-                  Official certificates of completion signed by instructor{' '}
-                  {siteConfig.instructor.name}.
-                </p>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-
-              {completedCourses.length === 0 ? (
-                <div className="bg-white border border-neutral-200 rounded-none p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
-                  <div className="space-y-1">
-                    <h2 className="text-lg font-bold text-neutral-900 uppercase">
-                      NO CERTIFICATES EARNED YET.
-                    </h2>
-                    <p className="text-xs text-neutral-500 leading-relaxed">
-                      Complete all lesson modules and practical evaluations in your enrolled courses
-                      to automatically unlock your verified certificate.
-                    </p>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => handleTabChange('courses')}
-                      className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors shadow-none cursor-pointer"
-                    >
-                      <BookOpen className="w-3.5 h-3.5" />
-                      <span>Go to My Courses</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-                  {completedCourses.map((c) => (
-                    <div
-                      key={c.product.id}
-                      className="bg-white border border-neutral-200 rounded-none p-6 shadow-none space-y-4 text-left"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-none bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200">
-                          <CheckCircle2 className="w-5 h-5" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 block">
-                            Course Completed
-                          </span>
-                          <h2 className="text-base font-bold text-neutral-900 truncate">
-                            {c.product.title}
-                          </h2>
-                        </div>
-                      </div>
-
-                      <div className="p-3.5 rounded-none bg-neutral-50 border border-neutral-200 text-xs text-neutral-600 space-y-1">
-                        <p>
-                          <strong className="text-neutral-900">Credential:</strong> Verified
-                          Certificate of Completion
-                        </p>
-                        <p>
-                          <strong className="text-neutral-900">Instructor:</strong>{' '}
-                          {siteConfig.instructor.name}
-                        </p>
-                      </div>
-
-                      <Link
-                        href={`/learn/${c.product.slug}`}
-                        className="w-full h-10 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none flex items-center justify-center gap-2 shadow-none"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>Download Certificate</span>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* TAB 3: HYDRAULIC SYSTEM CALCULATOR */}
-          {activeTab === 'calculator' && <HydraulicCalculator />}
-
-          {/* TAB 4: PROFILE */}
-          {activeTab === 'profile' && (
-            <div className="space-y-6 text-left">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
-                  Profile &amp; Account
-                </h1>
-                <p className="text-xs sm:text-sm text-neutral-500 mt-1">
-                  Manage your personal details, email verification, and security credentials.
-                </p>
-              </div>
-
-              {/* 2-Column Responsive Grid: Profile on Left, Password on Right (Compact horizontal width on desktop) */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 items-start w-full max-w-md lg:max-w-[720px]">
-                {/* Personal Details Card (Left) */}
-                <div className="bg-white border border-neutral-200/80 rounded-none overflow-hidden shadow-none text-left w-full lg:max-w-[345px]">
-                  {/* Header with border joining outer outline */}
-                  <div className="px-5 sm:px-7 py-4 sm:py-4.5 border-b border-neutral-200 flex items-center gap-2.5">
-                    <UserIcon className="w-4 h-4 text-neutral-900" />
-                    <h2 className="text-base sm:text-[17px] font-bold text-neutral-900">
-                      Personal Information
-                    </h2>
-                  </div>
-
-                  <div className="p-5 sm:p-7">
-                    <form onSubmit={handleSaveProfile} className="space-y-4 sm:space-y-4.5">
-                      {/* Name Input */}
-                      <div className="space-y-1.5 text-left">
-                        <label
-                          htmlFor="profile-name"
-                          className="text-sm font-bold text-neutral-900 block"
-                        >
-                          Full Name
-                        </label>
-                        <input
-                          id="profile-name"
-                          type="text"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          placeholder="Your name"
-                          className="w-full h-11 px-3.5 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
-                        />
-                      </div>
-
-                      {/* Email Address */}
-                      <div className="space-y-1.5 text-left">
-                        <label
-                          htmlFor="profile-email"
-                          className="text-sm font-bold text-neutral-900 block"
-                        >
-                          Email Address
-                        </label>
-                        <input
-                          id="profile-email"
-                          type="email"
-                          disabled
-                          value={user?.email || ''}
-                          className="w-full h-11 px-3.5 bg-neutral-100 border border-neutral-200 rounded-none text-sm text-neutral-600 cursor-not-allowed select-none shadow-none disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
-                        />
-                        {!user?.emailVerifiedAt && (
-                          <div className="flex items-center gap-3 pt-1">
-                            <Link
-                              href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
-                              className="text-xs font-semibold text-black hover:underline"
-                            >
-                              Enter 6-digit OTP &rarr;
-                            </Link>
-                            <button
-                              type="button"
-                              onClick={handleResendVerification}
-                              disabled={resendingVerification}
-                              className="text-xs font-semibold text-neutral-600 hover:text-black underline cursor-pointer disabled:opacity-50"
-                            >
-                              {resendingVerification ? 'Sending...' : 'Resend OTP'}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Phone Input */}
-                      <div className="space-y-1.5 text-left">
-                        <label
-                          htmlFor="profile-phone"
-                          className="text-sm font-bold text-neutral-900 block"
-                        >
-                          Phone Number
-                        </label>
-                        <input
-                          id="profile-phone"
-                          type="tel"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="+91 98765 43210"
-                          className="w-full h-11 px-3.5 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none font-mono"
-                        />
-                      </div>
-
-                      <div className="pt-1.5">
-                        <button
-                          type="submit"
-                          disabled={profileSaving}
-                          className="w-full h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-none transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-                        >
-                          {profileSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                          <span>{profileSaving ? 'Saving...' : 'Save Profile'}</span>
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-
-                {/* Change Password Card (Right) */}
-                <div className="bg-white border border-neutral-200/80 rounded-none overflow-hidden shadow-none text-left w-full lg:max-w-[345px]">
-                  {/* Header with border joining outer outline */}
-                  <div className="px-5 sm:px-7 py-4 sm:py-4.5 border-b border-neutral-200 flex items-center gap-2.5">
-                    <Lock className="w-4 h-4 text-neutral-900" />
-                    <h2 className="text-base sm:text-[17px] font-bold text-neutral-900">
-                      Security &amp; Password
-                    </h2>
-                  </div>
-
-                  <div className="p-5 sm:p-7">
-                    <form onSubmit={handleChangePassword} className="space-y-4 sm:space-y-4.5">
-                      {passwordError && (
-                        <div className="p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium">
-                          {passwordError}
-                        </div>
-                      )}
-
-                      {/* Current Password */}
-                      <div className="space-y-1.5 text-left">
-                        <label
-                          htmlFor="profile-current-password"
-                          className="text-sm font-bold text-neutral-900 block"
-                        >
-                          Current Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            id="profile-current-password"
-                            type={showCurrentPassword ? 'text' : 'password'}
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            required
-                            placeholder="Your current password"
-                            className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
-                            aria-label={showCurrentPassword ? 'Hide password' : 'Show password'}
-                          >
-                            {showCurrentPassword ? (
-                              <Eye className="w-4 h-4" />
-                            ) : (
-                              <EyeOff className="w-4 h-4" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* New Password */}
-                      <div className="space-y-1.5 text-left">
-                        <label
-                          htmlFor="profile-new-password"
-                          className="text-sm font-bold text-neutral-900 block"
-                        >
-                          New Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            id="profile-new-password"
-                            type={showNewPassword ? 'text' : 'password'}
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            required
-                            placeholder="At least 8 characters"
-                            className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowNewPassword(!showNewPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
-                            aria-label={showNewPassword ? 'Hide password' : 'Show password'}
-                          >
-                            {showNewPassword ? (
-                              <Eye className="w-4 h-4" />
-                            ) : (
-                              <EyeOff className="w-4 h-4" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Confirm Password */}
-                      <div className="space-y-1.5 text-left">
-                        <label
-                          htmlFor="profile-confirm-password"
-                          className="text-sm font-bold text-neutral-900 block"
-                        >
-                          Confirm New Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            id="profile-confirm-password"
-                            type={showConfirmPassword ? 'text' : 'password'}
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                            placeholder="Repeat new password"
-                            className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
-                            aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                          >
-                            {showConfirmPassword ? (
-                              <Eye className="w-4 h-4" />
-                            ) : (
-                              <EyeOff className="w-4 h-4" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="pt-1.5">
-                        <button
-                          type="submit"
-                          disabled={passwordSaving}
-                          className="w-full h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-none transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-                        >
-                          {passwordSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                          <span>{passwordSaving ? 'Updating...' : 'Update Password'}</span>
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 4: PAYMENT ORDERS */}
-          {activeTab === 'orders' && (
-            <div className="space-y-6 text-left">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
-                  Payment Orders &amp; Invoices
-                </h1>
-                <p className="text-xs sm:text-sm text-neutral-500 mt-1">
-                  Download official GST tax invoices in PDF format for company or personal
-                  reimbursement.
-                </p>
-              </div>
-
-              {ordersLoading ? (
-                <div className="bg-white border border-neutral-200/80 rounded-none p-10 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-none w-full max-w-lg lg:max-w-[480px]">
-                  <Loader2 className="w-5 h-5 animate-spin text-black" />
-                  <span>Loading payment orders...</span>
-                </div>
-              ) : orders.length === 0 ? (
-                <div className="bg-white border border-neutral-200/80 rounded-none p-7 sm:p-9 text-left space-y-4 w-full max-w-lg lg:max-w-[480px] shadow-none">
-                  <div className="space-y-1.5">
-                    <h2 className="text-lg font-bold text-neutral-900">No payment history yet</h2>
-                    <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
-                      Once you enroll in a course, your official GST tax invoices and payment
-                      receipts will appear here.
-                    </p>
-                  </div>
-                  <div>
-                    <Link
-                      href="/#pricing"
-                      className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-none transition-colors shadow-none"
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      <span>View Courses</span>
-                    </Link>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4 w-full max-w-lg lg:max-w-[480px] text-left">
-                  {orders.map((ord) => {
-                    const amountFormatted = (
-                      (ord.totalPaise ??
-                        ord.amountPaise ??
-                        ord.invoice?.totalPaise ??
-                        ord.payments?.[0]?.amountPaise ??
-                        0) / 100
-                    ).toLocaleString('en-IN');
-
-                    return (
-                      <div
-                        key={ord.id}
-                        className="bg-white border border-neutral-200/80 rounded-none overflow-hidden select-none shadow-none text-left"
-                      >
-                        {/* 1. Header Bar: Order reference, date, status, and total amount */}
-                        <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-neutral-200 flex items-center justify-between gap-3 bg-neutral-50/50">
-                          {/* Order ID & Date */}
-                          <div className="flex items-center gap-2 sm:gap-2.5 text-xs sm:text-[13px] min-w-0">
-                            <span className="font-mono font-bold text-neutral-900 tracking-tight">
-                              {formatDisplayOrderId(ord.orderNumber || ord.id)}
-                            </span>
-                            <span className="text-neutral-300">•</span>
-                            <span className="text-neutral-500 font-medium whitespace-nowrap">
-                              {new Date(ord.createdAt).toLocaleDateString('en-IN', {
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric',
-                              })}
-                            </span>
-                          </div>
-
-                          {/* Status Badge + Amount */}
-                          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-                            <span
-                              className={`px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase rounded-none shrink-0 select-none ${
-                                ord.status === 'PAID'
-                                  ? 'text-white bg-[#0e5c2f]'
-                                  : ord.status === 'FAILED'
-                                    ? 'text-white bg-rose-700'
-                                    : 'text-neutral-700 bg-neutral-200'
-                              }`}
-                            >
-                              {ord.status === 'PAID' ? 'PAID' : ord.status}
-                            </span>
-                            <span className="font-mono font-bold text-sm sm:text-base text-neutral-900 whitespace-nowrap">
-                              ₹{amountFormatted}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* 2. Card Body: Course information and direct action buttons */}
-                        <div className="p-5 sm:p-6 space-y-4">
-                          <div className="space-y-1 min-w-0">
-                            <h2 className="text-base sm:text-[17px] font-bold text-neutral-900 leading-snug">
-                              {ord.product.title}
-                            </h2>
-                            <p className="text-xs text-neutral-500 font-medium">12 Months Access</p>
-                          </div>
-
-                          {/* Actions: Download Invoice & Access Course equally spread on bottom */}
-                          <div className="grid grid-cols-2 gap-3 pt-1 w-full">
-                            {ord.invoice ? (
-                              <a
-                                href={`${siteConfig.urls.api}/api/v1/invoices/${ord.invoice.id}/download`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="h-10 px-3 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-300 hover:border-neutral-400 font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center justify-center gap-2 shadow-none cursor-pointer w-full text-center select-none"
-                              >
-                                <Download className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
-                                <span className="truncate">Download Invoice</span>
-                              </a>
-                            ) : (
-                              <div className="h-10 px-3 bg-neutral-50 text-neutral-400 border border-neutral-200 font-medium text-xs rounded-none inline-flex items-center justify-center text-center w-full select-none">
-                                <span className="truncate">Generating Invoice...</span>
-                              </div>
-                            )}
-
-                            <Link
-                              href={`/learn/${ord.product.slug}`}
-                              className="h-10 px-3 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center justify-center gap-1.5 shadow-none w-full text-center select-none"
-                            >
-                              <span className="truncate">Go to Course</span>
-                              <span className="shrink-0">&rarr;</span>
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </main>
     </div>
@@ -1252,8 +1213,8 @@ function StudentDashboardContent() {
 
 export default function MyCoursesPage() {
   useEffect(() => {
-    document.documentElement.style.backgroundColor = '#FFFFFF';
-    document.body.style.backgroundColor = '#FFFFFF';
+    document.documentElement.style.backgroundColor = '#000000';
+    document.body.style.backgroundColor = '#000000';
     return () => {
       document.documentElement.style.backgroundColor = '';
       document.body.style.backgroundColor = '';
