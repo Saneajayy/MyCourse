@@ -654,10 +654,10 @@ function StudentDashboardContent() {
               <div className="space-y-6 text-left">
                 {/* TUF-Style Welcome Header */}
                 <div className="text-left">
-                  <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal">
                     {greeting.title}
                   </h1>
-                  <p className="text-xs sm:text-sm text-[#c2c4cc] mt-1">{greeting.subtitle}</p>
+                  <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">{greeting.subtitle}</p>
                 </div>
 
                 {/* Minimal Search Bar directly below Title */}
