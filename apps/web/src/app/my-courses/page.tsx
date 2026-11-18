@@ -169,6 +169,12 @@ function StudentDashboardContent() {
     opacity: 0,
   });
 
+  // Courses state
+  const [courses, setCourses] = useState<EnrolledCourse[]>([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [coursesError, setCoursesError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Sync tab with URL query parameter
   const handleTabChange = (newTab: DashboardTab) => {
     setActiveTab(newTab);
@@ -179,28 +185,28 @@ function StudentDashboardContent() {
   };
 
   // Smoothly move highlight pill to active tab
-  useEffect(() => {
-    const updateIndicator = () => {
-      const activeEl = tabRefs.current[activeTab];
-      if (activeEl) {
-        setIndicatorStyle({
-          top: activeEl.offsetTop,
-          height: activeEl.offsetHeight,
-          opacity: 1,
-        });
-      }
-    };
-    updateIndicator();
-    // Also re-measure on window resize to ensure exact positioning
-    window.addEventListener('resize', updateIndicator);
-    return () => window.removeEventListener('resize', updateIndicator);
+  const updateIndicator = useCallback(() => {
+    const activeEl = tabRefs.current[activeTab];
+    if (activeEl) {
+      setIndicatorStyle({
+        top: activeEl.offsetTop,
+        height: activeEl.offsetHeight,
+        opacity: 1,
+      });
+    }
   }, [activeTab]);
 
-  // Courses state
-  const [courses, setCourses] = useState<EnrolledCourse[]>([]);
-  const [coursesLoading, setCoursesLoading] = useState(true);
-  const [coursesError, setCoursesError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  useEffect(() => {
+    updateIndicator();
+    const rafId = requestAnimationFrame(updateIndicator);
+    const timer = setTimeout(updateIndicator, 50);
+    window.addEventListener('resize', updateIndicator);
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateIndicator);
+    };
+  }, [updateIndicator, coursesLoading, authLoading]);
 
   // Profile state
   const [name, setName] = useState('');
@@ -380,17 +386,6 @@ function StudentDashboardContent() {
     return courses.filter((c) => (c.progress?.percentComplete ?? 0) >= 90);
   }, [courses]);
 
-  if (authLoading || (coursesLoading && courses.length === 0)) {
-    return (
-      <div className="fixed inset-0 w-full h-full bg-black text-white font-reddit flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-10 h-10 animate-spin text-white" />
-        <p className="text-sm font-bold tracking-wider uppercase text-neutral-400">
-          Loading Student Portal...
-        </p>
-      </div>
-    );
-  }
-
   const navTabs: {
     id: DashboardTab;
     label: string;
@@ -547,12 +542,21 @@ function StudentDashboardContent() {
                 key={tab.id}
                 ref={(el) => {
                   tabRefs.current[tab.id] = el;
+                  if (el && tab.id === activeTab && indicatorStyle.opacity === 0) {
+                    setIndicatorStyle({
+                      top: el.offsetTop,
+                      height: el.offsetHeight,
+                      opacity: 1,
+                    });
+                  }
                 }}
                 type="button"
                 onClick={() => handleTabChange(tab.id)}
                 className={`relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
                   isActive
-                    ? 'text-white font-semibold'
+                    ? indicatorStyle.opacity > 0
+                      ? 'text-white font-semibold'
+                      : 'bg-[#1f2023] text-white font-semibold'
                     : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
                 }`}
               >
@@ -655,8 +659,21 @@ function StudentDashboardContent() {
                   </div>
                 )}
 
-                {/* Empty State: No Courses Enrolled */}
-                {courses.length === 0 && !coursesError && (
+                {/* Courses Loading Skeleton */}
+                {(coursesLoading || authLoading) && courses.length === 0 ? (
+                  <div className="w-full max-w-4xl bg-white/5 border border-white/[0.08] rounded-xl p-5 flex flex-col md:flex-row gap-5 animate-pulse select-none">
+                    <div className="w-full md:w-[320px] lg:w-[360px] aspect-[16/10] bg-white/10 rounded-lg shrink-0" />
+                    <div className="flex-1 flex flex-col justify-between py-1 space-y-3">
+                      <div className="space-y-2.5">
+                        <div className="h-6 w-3/5 bg-white/10 rounded" />
+                        <div className="h-4 w-full bg-white/5 rounded" />
+                        <div className="h-4 w-4/5 bg-white/5 rounded" />
+                      </div>
+                      <div className="h-4 w-44 bg-white/5 rounded" />
+                      <div className="h-10 w-48 bg-white/10 rounded" />
+                    </div>
+                  </div>
+                ) : courses.length === 0 && !coursesError ? (
                   <div className="bg-white border border-neutral-200 rounded-none p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
                     <div className="space-y-1">
                       <h2 className="text-lg font-bold text-neutral-900 uppercase">
@@ -677,7 +694,7 @@ function StudentDashboardContent() {
                       </Link>
                     </div>
                   </div>
-                )}
+                ) : null}
 
                 {/* Empty Search Filter State */}
                 {courses.length > 0 && filteredCourses.length === 0 && (
@@ -1283,6 +1300,76 @@ function StudentDashboardContent() {
   );
 }
 
+function DashboardShellSkeleton() {
+  return (
+    <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit select-none z-10 flex flex-col md:flex-row gap-2.5 sm:gap-3">
+      {/* Left Card Skeleton */}
+      <aside className="w-full shrink-0 md:flex-none md:w-72 lg:w-80 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
+        <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
+          <div className="flex flex-col select-none">
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase">
+              BASICS
+            </span>
+          </div>
+          <span className="text-[11px] font-mono tracking-wider text-[#c2c4cc]/70">Home</span>
+        </div>
+        <div className="border-b border-white/[0.08] w-full shrink-0" />
+        <div className="p-2.5 space-y-1">
+          <div className="h-10 w-full bg-[#1f2023] rounded-xl flex items-center px-3.5 gap-3">
+            <div className="w-4 h-4 bg-white/20 rounded" />
+            <div className="h-4 w-24 bg-white/20 rounded" />
+          </div>
+          <div className="h-10 w-full bg-transparent rounded-xl flex items-center px-3.5 gap-3">
+            <div className="w-4 h-4 bg-white/10 rounded" />
+            <div className="h-4 w-28 bg-white/10 rounded" />
+          </div>
+          <div className="h-10 w-full bg-transparent rounded-xl flex items-center px-3.5 gap-3">
+            <div className="w-4 h-4 bg-white/10 rounded" />
+            <div className="h-4 w-20 bg-white/10 rounded" />
+          </div>
+          <div className="h-10 w-full bg-transparent rounded-xl flex items-center px-3.5 gap-3">
+            <div className="w-4 h-4 bg-white/10 rounded" />
+            <div className="h-4 w-16 bg-white/10 rounded" />
+          </div>
+          <div className="h-10 w-full bg-transparent rounded-xl flex items-center px-3.5 gap-3">
+            <div className="w-4 h-4 bg-white/10 rounded" />
+            <div className="h-4 w-32 bg-white/10 rounded" />
+          </div>
+        </div>
+      </aside>
+
+      {/* Right Card Skeleton */}
+      <main className="w-full flex-1 min-h-0 md:h-full md:min-w-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden relative">
+        <div className="h-12 px-5 sm:px-6 border-b border-white/[0.08] flex items-center justify-between shrink-0 bg-[#101012]">
+          <div className="h-4 w-28 bg-white/10 rounded animate-pulse" />
+          <div className="h-3 w-28 bg-white/5 rounded animate-pulse" />
+        </div>
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-7 md:p-8 space-y-6">
+          <div className="space-y-2 animate-pulse">
+            <div className="h-7 w-40 bg-white/10 rounded-md" />
+            <div className="h-4 w-64 bg-white/5 rounded-md" />
+          </div>
+          <div className="w-full max-w-4xl bg-white/5 border border-white/[0.08] rounded-xl p-5 flex flex-col md:flex-row gap-5 animate-pulse">
+            <div className="w-full md:w-[320px] lg:w-[360px] aspect-[16/10] bg-white/10 rounded-lg shrink-0" />
+            <div className="flex-1 flex flex-col justify-between py-1 space-y-3">
+              <div className="space-y-2.5">
+                <div className="h-6 w-3/5 bg-white/10 rounded" />
+                <div className="h-4 w-full bg-white/5 rounded" />
+                <div className="h-4 w-4/5 bg-white/5 rounded" />
+              </div>
+              <div className="h-4 w-44 bg-white/5 rounded" />
+              <div className="h-10 w-48 bg-white/10 rounded" />
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
 export default function MyCoursesPage() {
   useEffect(() => {
     document.documentElement.style.backgroundColor = '#000000';
@@ -1294,16 +1381,7 @@ export default function MyCoursesPage() {
   }, []);
 
   return (
-    <Suspense
-      fallback={
-        <div className="fixed inset-0 w-full h-full bg-black text-white font-reddit flex flex-col items-center justify-center space-y-4">
-          <Loader2 className="w-10 h-10 animate-spin text-white" />
-          <p className="text-sm font-bold tracking-wider uppercase text-neutral-400">
-            Loading Student Portal...
-          </p>
-        </div>
-      }
-    >
+    <Suspense fallback={<DashboardShellSkeleton />}>
       <StudentDashboardContent />
     </Suspense>
   );
