@@ -27,7 +27,9 @@ import {
   ArrowLeft,
   Award,
   LogOut,
-  Sigma,
+  Layers,
+  Scroll,
+  FileText,
 } from 'lucide-react';
 import { HydraulicCalculator } from '../../components/calculator/HydraulicCalculator';
 
@@ -391,11 +393,11 @@ function StudentDashboardContent() {
     label: string;
     icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
   }[] = [
-    { id: 'courses', label: 'My Courses', icon: BookOpen },
+    { id: 'courses', label: 'My Courses', icon: Layers },
     { id: 'certificates', label: 'My Certificates', icon: Award },
-    { id: 'calculator', label: 'Calculator', icon: Sigma },
+    { id: 'calculator', label: 'Calculator', icon: Scroll },
     { id: 'profile', label: 'Profile', icon: UserIcon },
-    { id: 'orders', label: 'Payment Orders', icon: Clock },
+    { id: 'orders', label: 'Payment Orders', icon: FileText },
   ];
 
   const activeTabConfig = navTabs.find((t) => t.id === activeTab) ?? navTabs[0]!;
