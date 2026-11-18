@@ -401,9 +401,31 @@ function StudentDashboardContent() {
     { id: 'orders', label: 'Payments', icon: IndianRupee },
   ];
 
-  const activeTabConfig = navTabs.find((t) => t.id === activeTab) ?? navTabs[0]!;
-  const ActiveIcon = activeTabConfig.icon;
-  const activeTabLabel = activeTabConfig.label;
+  const studentFirstName = useMemo(() => {
+    if (!user?.name) return 'ENGINEER';
+    const first = user.name.trim().split(' ')[0] ?? '';
+    return first ? first.toUpperCase() : 'ENGINEER';
+  }, [user?.name]);
+
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour >= 17 || hour < 4) {
+      return {
+        title: `Long day, ${studentFirstName}?`,
+        subtitle: 'One last push before calling it a day.',
+      };
+    }
+    if (hour >= 4 && hour < 12) {
+      return {
+        title: `Good morning, ${studentFirstName}!`,
+        subtitle: 'Ready to master industrial hydraulic systems today?',
+      };
+    }
+    return {
+      title: `Welcome back, ${studentFirstName}!`,
+      subtitle: 'Keep up the momentum in your hydraulic engineering training.',
+    };
+  }, [studentFirstName]);
 
   return (
     <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit select-none z-10 flex flex-col md:flex-row gap-2.5 sm:gap-3">
@@ -624,36 +646,18 @@ function StudentDashboardContent() {
       {/* 2. RIGHT CARD: WORKSPACE CONTENT                              */}
       {/* ============================================================== */}
       <main className="w-full flex-1 min-h-0 md:h-full md:min-w-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden relative">
-        {/* Top Header Bar: Active Tab Title & User Status */}
-        <div className="h-12 px-5 sm:px-6 border-b border-white/[0.08] flex items-center justify-between shrink-0 bg-[#101012]">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <ActiveIcon strokeWidth={1} className="w-4 h-4 stroke-1 text-white/60 shrink-0" />
-            <h1 className="text-sm sm:text-[15px] font-bold text-white truncate">
-              {activeTabLabel}
-            </h1>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0">
-            <span className="hidden sm:inline-block text-[11px] font-mono text-[#c2c4cc]/50">
-              Student Dashboard
-            </span>
-          </div>
-        </div>
-
         {/* Scrollable Tab Content Workspace */}
         <div className="flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-7 md:p-8">
           <div className="w-full max-w-5xl space-y-6 text-left">
-            {/* TAB 1: MY COURSES */}
+            {/* TAB 1: COURSES */}
             {activeTab === 'courses' && (
               <div className="space-y-6 text-left">
-                {/* Header Title & Subtitle */}
+                {/* TUF-Style Welcome Header */}
                 <div className="text-left">
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                    Courses
+                  <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                    {greeting.title}
                   </h1>
-                  <p className="text-xs sm:text-sm text-neutral-400 mt-1">
-                    Continue learning and master industrial hydraulic systems.
-                  </p>
+                  <p className="text-xs sm:text-sm text-[#c2c4cc] mt-1">{greeting.subtitle}</p>
                 </div>
 
                 {/* Minimal Search Bar directly below Title */}
@@ -1371,10 +1375,6 @@ function DashboardShellSkeleton() {
 
       {/* Right Card Skeleton */}
       <main className="w-full flex-1 min-h-0 md:h-full md:min-w-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden relative">
-        <div className="h-12 px-5 sm:px-6 border-b border-white/[0.08] flex items-center justify-between shrink-0 bg-[#101012]">
-          <div className="h-4 w-28 bg-white/10 rounded animate-pulse" />
-          <div className="h-3 w-28 bg-white/5 rounded animate-pulse" />
-        </div>
         <div className="flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-7 md:p-8 space-y-6">
           <div className="space-y-2 animate-pulse">
             <div className="h-7 w-40 bg-white/10 rounded-md" />
