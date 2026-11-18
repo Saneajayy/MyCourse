@@ -96,7 +96,7 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
 
   return (
     <div
-      className="w-full flex items-center gap-2 select-none mb-2"
+      className="w-full flex items-center gap-2 select-none"
       aria-label={`Course progress: ${clamped}%`}
       role="progressbar"
       aria-valuenow={clamped}
@@ -731,8 +731,13 @@ function StudentDashboardContent() {
                       return (
                         <div
                           key={c.product.id}
-                          className="w-full max-w-[720px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 transition-all duration-200 select-none"
+                          className="relative w-full max-w-[720px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 transition-all duration-200 select-none"
                         >
+                          {/* Active Status Badge: Top right-most corner of the course card */}
+                          <span className="absolute top-4 right-4 sm:top-5 sm:right-5 px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md shrink-0 select-none z-10">
+                            {c.entitlement?.status || 'ACTIVE'}
+                          </span>
+
                           {/* Course Thumbnail: Animated Lottie from coursecarddd.json */}
                           <div className="relative w-full aspect-square md:w-[180px] md:h-[180px] shrink-0 self-center rounded-lg overflow-hidden bg-black/60 border border-white/[0.08] flex items-center justify-center">
                             <CourseLottieThumbnail
@@ -746,10 +751,10 @@ function StudentDashboardContent() {
                           </div>
 
                           {/* Course Content Details */}
-                          <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5 gap-4">
+                          <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
                             <div>
-                              {/* Course Title + Active Status Badge */}
-                              <div className="flex items-start justify-between gap-3">
+                              {/* Course Title with right padding for top-right active badge */}
+                              <div className="pr-16 sm:pr-20">
                                 <h2 className="text-lg sm:text-[20px] font-medium text-white tracking-tight leading-snug">
                                   <Link
                                     href={`/learn/${c.product.slug}`}
@@ -758,9 +763,6 @@ function StudentDashboardContent() {
                                     {c.product.title}
                                   </Link>
                                 </h2>
-                                <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md shrink-0 select-none">
-                                  {c.entitlement?.status || 'ACTIVE'}
-                                </span>
                               </div>
 
                               {/* Dynamic Course Description */}
@@ -770,13 +772,15 @@ function StudentDashboardContent() {
                               </p>
                             </div>
 
-                            {/* Progress Bar & Action Buttons */}
-                            <div>
-                              {/* Sleek Progress Bar */}
-                              <CloseBarsProgressBar percent={percent} />
+                            {/* Progress Bar & Action Buttons with identical spacing top and bottom */}
+                            <div className="flex flex-col">
+                              {/* Sleek Progress Bar: Equal spacing above (my-3.5 sm:my-4) and below */}
+                              <div className="my-3.5 sm:my-4">
+                                <CloseBarsProgressBar percent={percent} />
+                              </div>
 
                               {/* Action Buttons */}
-                              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mt-3.5">
+                              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                                 <Link
                                   href={`/learn/${c.product.slug}`}
                                   aria-label={percent > 0 ? 'Resume Learning' : 'Start Learning'}
