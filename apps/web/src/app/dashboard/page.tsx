@@ -774,29 +774,13 @@ function StudentDashboardContent() {
                               </p>
                             </div>
 
-                            {/* Progress Bar, Credential Unlock Notice & Action Buttons */}
+                            {/* Progress Bar & Action Buttons */}
                             <div>
-                              {/* Barcode / Hatch Progress Bar with dynamic percentage */}
+                              {/* Sleek Progress Bar */}
                               <CloseBarsProgressBar percent={percent} />
 
-                              {/* Dynamic Credential Unlock Notice */}
-                              {percent >= 90 ? (
-                                <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-medium select-none mt-2">
-                                  <CheckCircle2
-                                    className="w-3.5 h-3.5 text-emerald-400 shrink-0"
-                                    strokeWidth={1.5}
-                                  />
-                                  <span>Course completed. Credential unlocked!</span>
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-1.5 text-xs text-[#8e909a] select-none mt-2">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-white/20 shrink-0" />
-                                  <span>Complete course to unlock credential.</span>
-                                </div>
-                              )}
-
                               {/* Action Buttons */}
-                              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mt-3.5 sm:mt-4">
+                              <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mt-3.5">
                                 <Link
                                   href={`/learn/${c.product.slug}`}
                                   aria-label={percent > 0 ? 'Resume Learning' : 'Start Learning'}
