@@ -1114,10 +1114,10 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             </>
           ) : (
             <>
-              <span className="text-[12px] font-medium text-white/70 truncate">
+              <span className="text-[12px] font-medium text-[#c2c4cc] truncate">
                 Hydraulic System Basics
               </span>
-              <span className="text-[11px] font-mono text-white/40 shrink-0 ml-2">
+              <span className="text-[11px] font-mono text-[#c2c4cc]/50 shrink-0 ml-2">
                 {totalCompletedLessons}/{totalLessons}
               </span>
             </>
@@ -1155,20 +1155,20 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                   <button
                     type="button"
                     onClick={() => toggleSection(section.sectionId)}
-                    className="w-full text-left px-3 py-2 text-xs sm:text-[13px] font-semibold transition-colors cursor-pointer select-none hover:bg-white/5 text-white/90 hover:text-white flex items-center justify-between gap-2 rounded-md"
+                    className="w-full text-left px-3 py-2 text-xs sm:text-[13px] font-semibold transition-colors cursor-pointer select-none hover:bg-white/[0.04] text-[#c2c4cc] hover:text-white flex items-center justify-between gap-2 rounded-md"
                     aria-expanded={isExpanded}
                   >
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
                       {isExpanded ? (
                         <FolderOpen className="w-4 h-4 text-white/90 shrink-0" />
                       ) : (
-                        <Folder className="w-4 h-4 text-white/60 shrink-0" />
+                        <Folder className="w-4 h-4 text-[#c2c4cc]/70 shrink-0" />
                       )}
                       <span className="leading-tight font-medium whitespace-normal break-words">
                         {section.title.replace(/^Module\s*\d+\s*[-:–]?\s*/i, '')}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0 text-white/60">
+                    <div className="flex items-center gap-2 shrink-0 text-[#c2c4cc]/60">
                       {isModuleCompleted && (
                         <div
                           className="w-4 h-4 rounded-none bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center shrink-0"
@@ -1179,7 +1179,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                       )}
                       <ChevronDown
                         className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                          isExpanded ? 'rotate-180 text-white/80' : 'text-white/40'
+                          isExpanded ? 'rotate-180 text-white/80' : 'text-[#c2c4cc]/40'
                         }`}
                       />
                     </div>
@@ -1240,7 +1240,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                                     className={`text-[12px] sm:text-[13px] leading-snug whitespace-normal break-words ${
                                       isCurrent
                                         ? 'font-semibold text-white'
-                                        : 'font-normal text-white/80 group-hover:text-white'
+                                        : 'font-normal text-[#c2c4cc] group-hover:text-white'
                                     }`}
                                   >
                                     {lesson.title}
@@ -1250,8 +1250,8 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                                   )}
                                 </div>
                                 {lesson.durationSeconds > 0 && (
-                                  <div className="flex items-center gap-1.5 text-[10px] font-mono text-white/40 mt-1">
-                                    <Play className="w-2.5 h-2.5 fill-none stroke-[2] text-white/40 shrink-0" />
+                                  <div className="flex items-center gap-1.5 text-[10px] font-mono text-[#c2c4cc]/50 mt-1">
+                                    <Play className="w-2.5 h-2.5 fill-none stroke-[2] text-[#c2c4cc]/50 shrink-0" />
                                     <span>{Math.round(lesson.durationSeconds / 60)} min</span>
                                   </div>
                                 )}
@@ -1265,7 +1265,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
                   {/* Separation line after each module */}
                   {sIdx < sections.length - 1 && (
-                    <div className="border-b border-white/10 mt-2.5 mb-1.5 mx-1" />
+                    <div className="border-b border-white/[0.08] mt-2.5 mb-1.5 mx-1" />
                   )}
                 </div>
               );
@@ -1675,7 +1675,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                               {showSettingsMenu && (
                                 <div
                                   onClick={(e) => e.stopPropagation()}
-                                  className="absolute right-0 bottom-10 sm:bottom-11 w-52 sm:w-56 bg-[#18181b]/95 backdrop-blur-xl border border-white/10 p-2 sm:p-2.5 z-30 shadow-2xl rounded-2xl text-xs text-white select-none animate-in fade-in zoom-in-95 duration-150"
+                                  className="absolute right-0 bottom-10 sm:bottom-11 w-52 sm:w-56 bg-[#101012]/95 backdrop-blur-xl border border-white/[0.08] p-2 sm:p-2.5 z-30 shadow-2xl rounded-2xl text-xs text-white select-none animate-in fade-in zoom-in-95 duration-150"
                                 >
                                   {/* Main Menu: Quality & Speed */}
                                   {settingsView === 'main' && (
