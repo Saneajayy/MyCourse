@@ -106,7 +106,7 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
 
   return (
     <div
-      className="w-full flex items-center gap-3 select-none mb-2.5"
+      className="w-full flex items-center gap-2 select-none mb-2"
       aria-label={`Course progress: ${clamped}%`}
       role="progressbar"
       aria-valuenow={clamped}
@@ -114,12 +114,12 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
       aria-valuemax={100}
     >
       {/* Percentage on Left Side Only */}
-      <span className="text-white font-medium text-xs font-mono shrink-0 select-none min-w-[28px]">
+      <span className="text-white font-medium text-xs font-mono leading-none shrink-0 select-none">
         {clamped}%
       </span>
 
       {/* Sleek Progress Bar Track with solid white fill */}
-      <div className="flex-1 h-1.5 bg-white/[0.1] rounded-full overflow-hidden">
+      <div className="flex-1 h-1 sm:h-1.5 bg-white/[0.1] rounded-full overflow-hidden">
         <div
           className="h-full bg-white rounded-full transition-all duration-300"
           style={{ width: `${clamped}%` }}
