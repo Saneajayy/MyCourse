@@ -382,7 +382,7 @@ function StudentDashboardContent() {
       {/* ============================================================== */}
       <aside className="w-full shrink-0 md:flex-none md:w-72 lg:w-80 md:h-full md:shrink-0 bg-[#131316] rounded-xl flex flex-col overflow-hidden">
         {/* Top Header: Brand Logo HYDRO BASICS + Back / Home Link */}
-        <div className="px-4 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between shrink-0">
+        <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
           <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
             <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
               HYDRO
@@ -392,16 +392,6 @@ function StudentDashboardContent() {
             </span>
           </Link>
           <div className="flex items-center gap-2">
-            {user?.role === 'ADMIN' && (
-              <Link
-                href="/admin"
-                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md hover:bg-emerald-500/20 transition-colors"
-                title="Admin Console"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Admin</span>
-              </Link>
-            )}
             <Link
               href="/"
               className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-white/50 hover:text-white transition-colors"
@@ -416,25 +406,10 @@ function StudentDashboardContent() {
         {/* Thin Stroke Separation Line */}
         <div className="border-b border-white/10 w-full shrink-0" />
 
-        {/* Student Profile Info (Desktop) */}
-        <div className="hidden md:flex px-5 pt-3.5 pb-2.5 items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-7 h-7 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-xs font-bold text-white shrink-0">
-              {user?.name ? user.name.charAt(0).toUpperCase() : 'S'}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[12px] font-semibold text-white/90 truncate leading-tight">
-                {user?.name || 'Student'}
-              </p>
-              <p className="text-[10px] text-white/40 truncate font-mono">{user?.email || ''}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop Vertical Tabs */}
+        {/* Desktop Vertical Tabs Stack */}
         <nav
           aria-label="Student Navigation"
-          className="hidden md:flex flex-1 flex-col overflow-y-auto custom-scrollbar px-2.5 py-2 space-y-1"
+          className="hidden md:flex flex-1 flex-col overflow-y-auto custom-scrollbar px-2.5 py-3 space-y-1"
         >
           {navTabs.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -444,17 +419,41 @@ function StudentDashboardContent() {
                 key={tab.id}
                 type="button"
                 onClick={() => handleTabChange(tab.id)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-xs sm:text-[13px] font-medium rounded-lg transition-all text-left cursor-pointer select-none ${
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-all text-left cursor-pointer select-none group ${
                   isActive
-                    ? 'bg-white/10 text-white font-semibold border border-white/15'
-                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                    ? 'bg-white/10 text-white font-semibold'
+                    : 'text-white/70 hover:text-white hover:bg-white/5 font-normal'
                 }`}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-white/40'}`} />
+                <Icon
+                  className={`w-4 h-4 shrink-0 transition-colors ${
+                    isActive ? 'text-white' : 'text-white/50 group-hover:text-white/80'
+                  }`}
+                />
                 <span className="truncate">{tab.label}</span>
               </button>
             );
           })}
+
+          {user?.role === 'ADMIN' && (
+            <Link
+              href="/admin"
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-all text-left font-normal text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 cursor-pointer select-none group"
+            >
+              <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400 transition-colors" />
+              <span className="truncate">Admin Console</span>
+            </Link>
+          )}
+
+          {/* Log Out Button: Last in the stack */}
+          <button
+            type="button"
+            onClick={() => logout()}
+            className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-all text-left font-normal text-white/70 hover:text-rose-400 hover:bg-white/5 cursor-pointer select-none group"
+          >
+            <LogOut className="w-4 h-4 shrink-0 text-white/50 group-hover:text-rose-400 transition-colors" />
+            <span className="truncate">Log Out</span>
+          </button>
         </nav>
 
         {/* Mobile Horizontal Tabs */}
@@ -470,41 +469,39 @@ function StudentDashboardContent() {
                 key={tab.id}
                 type="button"
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg whitespace-nowrap transition-all cursor-pointer select-none shrink-0 ${
+                className={`flex items-center gap-2 px-3 py-2 text-xs rounded-xl whitespace-nowrap transition-all cursor-pointer select-none shrink-0 ${
                   isActive
-                    ? 'bg-white/10 text-white font-semibold border border-white/15'
-                    : 'text-white/60 hover:text-white hover:bg-white/5'
+                    ? 'bg-white/10 text-white font-semibold'
+                    : 'text-white/70 hover:text-white hover:bg-white/5 font-normal'
                 }`}
               >
                 <Icon
-                  className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-white/40'}`}
+                  className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-white/50'}`}
                 />
                 <span>{tab.label}</span>
               </button>
             );
           })}
-        </nav>
 
-        {/* Desktop Bottom Section: Admin Switch + Logout */}
-        <div className="hidden md:flex flex-col border-t border-white/10 p-2.5 space-y-1 shrink-0">
           {user?.role === 'ADMIN' && (
             <Link
               href="/admin"
-              className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs rounded-xl whitespace-nowrap text-emerald-400 hover:bg-emerald-500/10 font-normal transition-all shrink-0"
             >
-              <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
+              <ShieldCheck className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
               <span>Admin Console</span>
             </Link>
           )}
+
           <button
             type="button"
             onClick={() => logout()}
-            className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-white/60 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer text-left"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs rounded-xl whitespace-nowrap text-white/70 hover:text-rose-400 hover:bg-white/5 font-normal transition-all cursor-pointer select-none shrink-0"
           >
-            <LogOut className="w-4 h-4 shrink-0 text-white/40" />
+            <LogOut className="w-3.5 h-3.5 shrink-0 text-white/50" />
             <span>Log Out</span>
           </button>
-        </div>
+        </nav>
       </aside>
 
       {/* ============================================================== */}
@@ -521,15 +518,6 @@ function StudentDashboardContent() {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <button
-              type="button"
-              onClick={() => logout()}
-              className="md:hidden inline-flex items-center gap-1.5 px-2 py-1 text-[11px] font-mono text-white/50 hover:text-rose-400 transition-colors cursor-pointer"
-              title="Log Out"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Logout</span>
-            </button>
             <span className="hidden sm:inline-block text-[11px] font-mono text-white/40">
               Student Dashboard
             </span>
