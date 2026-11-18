@@ -32,6 +32,7 @@ import {
   Search,
 } from 'lucide-react';
 import { HydraulicCalculator } from '../../components/calculator/HydraulicCalculator';
+import { CourseLottieThumbnail } from '../../components/dashboard/CourseLottieThumbnail';
 
 export type DashboardTab = 'courses' | 'certificates' | 'calculator' | 'profile' | 'orders';
 
@@ -732,20 +733,15 @@ function StudentDashboardContent() {
                           key={c.product.id}
                           className="w-full max-w-[720px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 transition-all duration-200 select-none"
                         >
-                          {/* Course Thumbnail Image */}
-                          <div className="relative w-full aspect-square md:w-[180px] md:h-[180px] shrink-0 self-center rounded-lg overflow-hidden bg-black/60 border border-white/[0.08]">
-                            <img
-                              src={
+                          {/* Course Thumbnail: Animated Lottie from coursecarddd.json */}
+                          <div className="relative w-full aspect-square md:w-[180px] md:h-[180px] shrink-0 self-center rounded-lg overflow-hidden bg-black/60 border border-white/[0.08] flex items-center justify-center">
+                            <CourseLottieThumbnail
+                              fallbackSrc={
                                 c.product.thumbnailUrl &&
                                 !c.product.thumbnailUrl.includes('unsplash')
                                   ? c.product.thumbnailUrl
                                   : '/course-halftone.jpg'
                               }
-                              alt={c.product.title}
-                              onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).src = '/course.jpg';
-                              }}
-                              className="w-full h-full object-cover select-none"
                             />
                           </div>
 
