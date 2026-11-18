@@ -412,7 +412,7 @@ function StudentDashboardContent() {
       {/* ============================================================== */}
       {/* 1. LEFT CARD: NAVIGATION TABS                                  */}
       {/* ============================================================== */}
-      <aside className="w-full shrink-0 md:flex-none md:w-72 lg:w-80 md:h-full md:shrink-0 bg-[#131316] rounded-xl flex flex-col overflow-hidden">
+      <aside className="w-full shrink-0 md:flex-none md:w-72 lg:w-80 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
         {/* Top Header: Brand Logo HYDRO BASICS + Back / Home Link + Mobile Sandwich Button */}
         <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
           <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
@@ -426,7 +426,7 @@ function StudentDashboardContent() {
           <div className="flex items-center gap-2.5 sm:gap-3">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-white/50 hover:text-white transition-colors"
+              className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-[#c2c4cc]/70 hover:text-white transition-colors"
               title="Back to Home"
             >
               <ArrowLeft className="w-3 h-3" />
@@ -439,7 +439,7 @@ function StudentDashboardContent() {
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
               aria-label={isMobileMenuOpen ? 'Close Menu' : 'Open Menu'}
               aria-expanded={isMobileMenuOpen}
-              className="md:hidden w-8 h-8 relative flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer select-none"
+              className="md:hidden w-8 h-8 relative flex items-center justify-center text-[#c2c4cc] hover:text-white hover:bg-white/[0.06] rounded-lg transition-colors cursor-pointer select-none"
             >
               <Menu
                 className={`w-4 h-4 stroke-[2.2] absolute transition-all duration-200 ${
@@ -460,7 +460,7 @@ function StudentDashboardContent() {
         </div>
 
         {/* Thin Stroke Separation Line */}
-        <div className="border-b border-white/10 w-full shrink-0" />
+        <div className="border-b border-white/[0.08] w-full shrink-0" />
 
         {/* Mobile Expandable Tabs Stack (Sandwich Dropdown) */}
         <div
@@ -485,12 +485,12 @@ function StudentDashboardContent() {
                     onClick={() => handleTabChange(tab.id)}
                     className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
                       isActive
-                        ? 'bg-white/10 text-white font-semibold'
-                        : 'text-white/70 hover:text-white hover:bg-white/5 font-normal'
+                        ? 'bg-[#1f2023] text-white font-semibold'
+                        : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
                     }`}
                   >
                     <Icon
-                      className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-white/50'}`}
+                      className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-[#c2c4cc]/70'}`}
                     />
                     <span>{tab.label}</span>
                   </button>
@@ -514,9 +514,9 @@ function StudentDashboardContent() {
                   setIsMobileMenuOpen(false);
                   logout();
                 }}
-                className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-white/70 hover:text-rose-400 hover:bg-white/5 font-normal transition-colors cursor-pointer select-none text-left"
+                className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] font-normal transition-colors cursor-pointer select-none text-left"
               >
-                <LogOut className="w-4 h-4 shrink-0 text-white/50" />
+                <LogOut className="w-4 h-4 shrink-0 text-[#c2c4cc]/70" />
                 <span>Log Out</span>
               </button>
             </nav>
@@ -528,10 +528,10 @@ function StudentDashboardContent() {
           aria-label="Student Navigation Desktop"
           className="relative hidden md:flex flex-1 flex-col overflow-y-auto custom-scrollbar px-2.5 py-3 space-y-1"
         >
-          {/* Smooth Sliding Highlight Pill */}
+          {/* Smooth Sliding Highlight Pill (TUF #1f2023) */}
           {indicatorStyle.opacity > 0 && (
             <div
-              className="absolute left-2.5 right-2.5 rounded-xl bg-white/10 pointer-events-none transition-[top,height,opacity] duration-200 ease-out z-0"
+              className="absolute left-2.5 right-2.5 rounded-xl bg-[#1f2023] pointer-events-none transition-[top,height,opacity] duration-200 ease-out z-0"
               style={{
                 top: indicatorStyle.top,
                 height: indicatorStyle.height,
@@ -553,12 +553,12 @@ function StudentDashboardContent() {
                 className={`relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
                   isActive
                     ? 'text-white font-semibold'
-                    : 'text-white/70 hover:text-white hover:bg-white/5 font-normal'
+                    : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
                 }`}
               >
                 <Icon
                   className={`w-4 h-4 shrink-0 transition-colors ${
-                    isActive ? 'text-white' : 'text-white/50 group-hover:text-white/80'
+                    isActive ? 'text-white' : 'text-[#c2c4cc]/60 group-hover:text-white'
                   }`}
                 />
                 <span className="truncate">{tab.label}</span>
@@ -580,9 +580,9 @@ function StudentDashboardContent() {
           <button
             type="button"
             onClick={() => logout()}
-            className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-white/70 hover:text-rose-400 hover:bg-white/5 cursor-pointer select-none group"
+            className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] cursor-pointer select-none group"
           >
-            <LogOut className="w-4 h-4 shrink-0 text-white/50 group-hover:text-rose-400 transition-colors" />
+            <LogOut className="w-4 h-4 shrink-0 text-[#c2c4cc]/60 group-hover:text-rose-400 transition-colors" />
             <span className="truncate">Log Out</span>
           </button>
         </nav>
@@ -591,9 +591,9 @@ function StudentDashboardContent() {
       {/* ============================================================== */}
       {/* 2. RIGHT CARD: WORKSPACE CONTENT                              */}
       {/* ============================================================== */}
-      <main className="w-full flex-1 min-h-0 md:h-full md:min-w-0 bg-[#131316] rounded-xl flex flex-col overflow-hidden relative">
+      <main className="w-full flex-1 min-h-0 md:h-full md:min-w-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden relative">
         {/* Top Header Bar: Active Tab Title & User Status */}
-        <div className="h-12 px-5 sm:px-6 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#131316]">
+        <div className="h-12 px-5 sm:px-6 border-b border-white/[0.08] flex items-center justify-between shrink-0 bg-[#101012]">
           <div className="flex items-center gap-2.5 min-w-0">
             <ActiveIcon className="w-4 h-4 text-white/60 shrink-0" />
             <h1 className="text-sm sm:text-[15px] font-bold text-white truncate">
@@ -602,7 +602,7 @@ function StudentDashboardContent() {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <span className="hidden sm:inline-block text-[11px] font-mono text-white/40">
+            <span className="hidden sm:inline-block text-[11px] font-mono text-[#c2c4cc]/50">
               Student Dashboard
             </span>
           </div>

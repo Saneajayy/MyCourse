@@ -1077,7 +1077,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       {/* ============================================================== */}
       {/* 1. LEFT CARD: SYLLABUS                                        */}
       {/* ============================================================== */}
-      <aside className="w-full flex-1 min-h-0 md:flex-none md:w-72 lg:w-80 md:h-full md:shrink-0 bg-[#131316] rounded-xl flex flex-col overflow-hidden order-2 md:order-1">
+      <aside className="w-full flex-1 min-h-0 md:flex-none md:w-72 lg:w-80 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden order-2 md:order-1">
         {/* Brand Logo: Top Left Corner HYDRO BASICS */}
         <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
           <Link
@@ -1094,7 +1094,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
           </Link>
           <Link
             href="/my-courses"
-            className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-white/50 hover:text-white transition-colors"
+            className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-[#c2c4cc]/70 hover:text-white transition-colors"
             title="Back to My Courses"
           >
             <ArrowLeft className="w-3 h-3" />
@@ -1103,7 +1103,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         </div>
 
         {/* Thin Stroke Separation Line */}
-        <div className="border-b border-white/10 w-full shrink-0" />
+        <div className="border-b border-white/[0.08] w-full shrink-0" />
 
         {/* Small Name of Course (without separation line below it) */}
         <div className="px-5 pt-3.5 pb-2 flex items-center justify-between shrink-0">
@@ -1231,8 +1231,8 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                                 onClick={() => handleSelectLesson(lesson.lessonId)}
                                 className={`ml-5 w-full text-left px-3 py-2 flex flex-col justify-center transition-all cursor-pointer select-none rounded-xl group ${
                                   isCurrent
-                                    ? 'bg-white/10 text-white shadow-xs'
-                                    : 'bg-transparent hover:bg-white/5 text-white/70 hover:text-white'
+                                    ? 'bg-[#1f2023] text-white shadow-xs'
+                                    : 'bg-transparent hover:bg-white/[0.04] text-[#c2c4cc] hover:text-white'
                                 }`}
                               >
                                 <div className="flex items-start justify-between gap-2 w-full">
@@ -1277,9 +1277,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       {/* ============================================================== */}
       {/* 2. RIGHT CARD: VIDEO PLAYER & BOTTOM CONTROLS                 */}
       {/* ============================================================== */}
-      <main className="w-full h-auto shrink-0 md:flex-1 md:h-full md:min-w-0 bg-[#131316] rounded-xl flex flex-col overflow-hidden relative order-1 md:order-2">
+      <main className="w-full h-auto shrink-0 md:flex-1 md:h-full md:min-w-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden relative order-1 md:order-2">
         {/* Top Header Bar: Clean Lesson Title */}
-        <div className="h-12 px-5 border-b border-white/10 flex items-center justify-between shrink-0 bg-[#131316]">
+        <div className="h-12 px-5 border-b border-white/[0.08] flex items-center justify-between shrink-0 bg-[#101012]">
           {isPageLoading ? (
             <div className="h-4 w-44 bg-white/10 rounded animate-pulse" />
           ) : (
@@ -1818,7 +1818,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         </div>
 
         {/* Bottom Bar below video: Full-width matching top strip */}
-        <div className="h-12 px-5 border-t border-white/10 flex items-center justify-between shrink-0 bg-[#131316]">
+        <div className="h-12 px-5 border-t border-white/[0.08] flex items-center justify-between shrink-0 bg-[#101012]">
           <div className="flex items-center gap-2 text-xs text-white/50 font-mono">
             {isPageLoading ? (
               <div className="h-3 w-10 bg-white/10 rounded animate-pulse" />
