@@ -106,45 +106,25 @@ function CloseBarsProgressBar({ percent = 0 }: { percent: number }) {
 
   return (
     <div
-      className="w-full flex items-center h-4 select-none mb-2.5 overflow-hidden"
+      className="w-full flex items-center gap-3 select-none mb-2.5"
       aria-label={`Course progress: ${clamped}%`}
       role="progressbar"
       aria-valuenow={clamped}
       aria-valuemin={0}
       aria-valuemax={100}
     >
-      {/* Completed portion with dense white vertical bars */}
-      {clamped > 0 && (
-        <div
-          className="h-full shrink-0"
-          style={{
-            width: clamped >= 100 ? '100%' : `calc(${clamped}% - 14px)`,
-            minWidth: clamped > 0 && clamped < 100 ? '8px' : undefined,
-            backgroundImage:
-              'repeating-linear-gradient(to right, #ffffff 0px, #ffffff 1.5px, transparent 1.5px, transparent 3.5px)',
-          }}
-        />
-      )}
-
-      {/* Percentage Label */}
-      <span
-        className={`text-white font-medium text-xs leading-none shrink-0 select-none font-mono ${
-          clamped === 0 ? 'pr-2' : clamped === 100 ? 'pl-2' : 'px-2'
-        }`}
-      >
+      {/* Percentage on Left Side Only */}
+      <span className="text-white font-medium text-xs font-mono shrink-0 select-none min-w-[28px]">
         {clamped}%
       </span>
 
-      {/* Uncompleted portion with faint light-gray vertical bars */}
-      {clamped < 100 && (
+      {/* Sleek Progress Bar Track with solid white fill */}
+      <div className="flex-1 h-1.5 bg-white/[0.1] rounded-full overflow-hidden">
         <div
-          className="flex-1 h-full"
-          style={{
-            backgroundImage:
-              'repeating-linear-gradient(to right, rgba(255, 255, 255, 0.15) 0px, rgba(255, 255, 255, 0.15) 1.5px, transparent 1.5px, transparent 3.5px)',
-          }}
+          className="h-full bg-white rounded-full transition-all duration-300"
+          style={{ width: `${clamped}%` }}
         />
-      )}
+      </div>
     </div>
   );
 }
