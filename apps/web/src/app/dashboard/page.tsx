@@ -486,9 +486,13 @@ function StudentDashboardContent() {
                   >
                     <Icon
                       strokeWidth={1}
-                      className={`w-4 h-4 shrink-0 stroke-1 ${isActive ? 'text-white' : 'text-[#c2c4cc]/70'}`}
+                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${isActive ? 'text-white' : 'text-[#c2c4cc]'}`}
                     />
-                    <span>{tab.label}</span>
+                    <span
+                      className={`transition-colors ${isActive ? 'text-white font-semibold' : 'text-[#c2c4cc] font-normal'}`}
+                    >
+                      {tab.label}
+                    </span>
                   </button>
                 );
               })}
@@ -515,8 +519,8 @@ function StudentDashboardContent() {
                 }}
                 className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] font-normal transition-colors cursor-pointer select-none text-left"
               >
-                <LogOut strokeWidth={1} className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc]/70" />
-                <span>Log Out</span>
+                <LogOut strokeWidth={1} className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc]" />
+                <span className="text-[#c2c4cc]">Log Out</span>
               </button>
             </nav>
           </div>
@@ -567,10 +571,18 @@ function StudentDashboardContent() {
                 <Icon
                   strokeWidth={1}
                   className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
-                    isActive ? 'text-white' : 'text-[#c2c4cc]/60 group-hover:text-white'
+                    isActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
                   }`}
                 />
-                <span className="truncate">{tab.label}</span>
+                <span
+                  className={`truncate transition-colors ${
+                    isActive
+                      ? 'text-white font-semibold'
+                      : 'text-[#c2c4cc] font-normal group-hover:text-white'
+                  }`}
+                >
+                  {tab.label}
+                </span>
               </button>
             );
           })}
@@ -596,9 +608,11 @@ function StudentDashboardContent() {
           >
             <LogOut
               strokeWidth={1}
-              className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc]/60 group-hover:text-rose-400 transition-colors"
+              className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc] group-hover:text-rose-400 transition-colors"
             />
-            <span className="truncate">Log Out</span>
+            <span className="truncate transition-colors text-[#c2c4cc] group-hover:text-rose-400">
+              Log Out
+            </span>
           </button>
         </nav>
       </aside>

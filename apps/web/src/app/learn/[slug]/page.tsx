@@ -1162,7 +1162,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                       {isExpanded ? (
                         <FolderOpen className="w-4 h-4 text-white/90 shrink-0" />
                       ) : (
-                        <Folder className="w-4 h-4 text-[#c2c4cc]/70 shrink-0" />
+                        <Folder className="w-4 h-4 text-[#c2c4cc] shrink-0" />
                       )}
                       <span className="leading-tight font-medium whitespace-normal break-words">
                         {section.title.replace(/^Module\s*\d+\s*[-:–]?\s*/i, '')}
