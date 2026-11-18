@@ -29,7 +29,7 @@ import {
   LogOut,
   Layers,
   Scroll,
-  FileText,
+  IndianRupee,
 } from 'lucide-react';
 import { HydraulicCalculator } from '../../components/calculator/HydraulicCalculator';
 
@@ -397,7 +397,7 @@ function StudentDashboardContent() {
     { id: 'certificates', label: 'My Certificates', icon: Scroll },
     { id: 'calculator', label: 'Calculator', icon: Sigma },
     { id: 'profile', label: 'Profile', icon: UserIcon },
-    { id: 'orders', label: 'Payment Orders', icon: FileText },
+    { id: 'orders', label: 'Payment Orders', icon: IndianRupee },
   ];
 
   const activeTabConfig = navTabs.find((t) => t.id === activeTab) ?? navTabs[0]!;
