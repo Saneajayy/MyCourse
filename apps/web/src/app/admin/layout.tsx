@@ -172,7 +172,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </p>
             <div className="pt-2">
               <Link
-                href="/my-courses"
+                href="/dashboard"
                 className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-900 hover:bg-black text-white text-xs font-semibold tracking-wide transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />

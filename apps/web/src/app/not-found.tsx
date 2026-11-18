@@ -96,7 +96,7 @@ export default function NotFound() {
                   <strong className="font-bold text-neutral-950 mr-1">Enrolled Students:</strong>
                   Access your course lessons and certificate progress directly in your{' '}
                   <Link
-                    href="/my-courses"
+                    href="/dashboard"
                     className="font-semibold underline text-black hover:opacity-80"
                   >
                     Student Dashboard
@@ -131,7 +131,7 @@ export default function NotFound() {
                 <span>Return to Home &rarr;</span>
               </Link>
               <Link
-                href="/my-courses"
+                href="/dashboard"
                 className="w-full sm:w-auto h-10 px-4 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-semibold text-xs rounded-none transition-colors flex items-center justify-center gap-1.5 cursor-pointer select-none"
               >
                 <BookOpen className="w-3.5 h-3.5" />

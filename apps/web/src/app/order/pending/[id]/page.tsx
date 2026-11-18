@@ -129,7 +129,7 @@ export default function OrderPendingPage() {
         <header className="absolute top-0 inset-x-0 w-full flex items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 z-20 pointer-events-none">
           <div className="pointer-events-auto">
             <Link
-              href="/my-courses"
+              href="/dashboard"
               className="text-xs sm:text-sm font-bold text-neutral-600 hover:text-black flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <BookOpen className="w-4 h-4 text-black" />
@@ -156,7 +156,7 @@ export default function OrderPendingPage() {
           <div className="my-auto w-full max-w-[460px] relative">
             {/* Pop-up close X button in top right corner of card */}
             <Link
-              href="/my-courses"
+              href="/dashboard"
               aria-label="Close"
               className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-9 h-9 sm:w-10 sm:h-10 rounded-none bg-white border border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100 flex items-center justify-center shadow-md transition-all cursor-pointer z-20"
             >

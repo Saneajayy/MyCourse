@@ -364,7 +364,7 @@ export class AuthService {
       },
     });
 
-    const defaultRedirect = activeEntitlementsCount > 0 ? '/my-courses' : '/checkout';
+    const defaultRedirect = activeEntitlementsCount > 0 ? '/dashboard' : '/checkout';
 
     return {
       success: true,

@@ -7,7 +7,7 @@ export default function AccountPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/my-courses?tab=profile');
+    router.replace('/dashboard?tab=profile');
   }, [router]);
 
   return (

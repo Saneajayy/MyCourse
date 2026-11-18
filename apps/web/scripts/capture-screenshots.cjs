@@ -2,7 +2,8 @@ const { chromium } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
 
-const OUT_DIR = '/Users/ajaykumar/.gemini/antigravity-ide/brain/86635171-46e8-489e-97e6-47b0ebde7e11';
+const OUT_DIR =
+  '/Users/ajaykumar/.gemini/antigravity-ide/brain/86635171-46e8-489e-97e6-47b0ebde7e11';
 
 async function main() {
   if (!fs.existsSync(OUT_DIR)) {
@@ -86,7 +87,9 @@ async function main() {
   await setupPage.getByPlaceholder('engineer@plant.com').fill(testEmail);
   await setupPage.getByPlaceholder('••••••••••••').fill(password);
   await setupPage.getByRole('button', { name: /Sign In/i }).click();
-  await setupPage.waitForURL('**/my-courses');
+  await setupPage.waitForURL(
+    (url) => url.pathname.includes('/dashboard') || url.pathname.includes('/my-courses'),
+  );
 
   // Checkout with 100% coupon
   await setupPage.goto('http://localhost:3000/checkout');
@@ -96,8 +99,8 @@ async function main() {
   await setupPage.getByRole('button', { name: /Pay ₹0 With Razorpay/i }).click();
   await setupPage.waitForURL('**/order/success/**');
 
-  // 5. My Courses
-  await setupPage.goto('http://localhost:3000/my-courses');
+  // 5. Dashboard
+  await setupPage.goto('http://localhost:3000/dashboard');
   await setupPage.waitForLoadState('networkidle');
   await setupPage.setViewportSize({ width: 1280, height: 800 });
   await setupPage.screenshot({ path: path.join(OUT_DIR, 'mycourses_1280px.png') });

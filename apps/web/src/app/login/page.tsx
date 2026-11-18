@@ -12,7 +12,7 @@ import { AlertCircle, Check, Eye, EyeOff, Loader2 } from 'lucide-react';
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get('redirect') || '/my-courses';
+  const redirectUrl = searchParams.get('redirect') || '/dashboard';
 
   const { login } = useAuth();
   const { error: toastError, success: toastSuccess } = useToast();
@@ -56,7 +56,7 @@ function LoginForm() {
         router.push(explicitRedirect);
       } else {
         toastSuccess('Welcome back!', 'Successfully logged in to your account.');
-        router.push('/my-courses');
+        router.push('/dashboard');
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Invalid email or password';

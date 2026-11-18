@@ -144,7 +144,7 @@ export default function OrderSuccessPage() {
           </div>
           <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
             <Link
-              href="/my-courses"
+              href="/dashboard"
               className="flex-1 inline-flex items-center justify-center h-11 px-5 bg-black text-white font-bold text-xs uppercase tracking-wider rounded-none hover:bg-neutral-800 transition-colors"
             >
               Go to My Courses
@@ -225,7 +225,7 @@ export default function OrderSuccessPage() {
         <header className="hidden lg:flex absolute top-0 inset-x-0 w-full items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 z-20 pointer-events-none">
           <div className="pointer-events-auto">
             <Link
-              href="/my-courses"
+              href="/dashboard"
               className="text-xs sm:text-sm font-bold text-neutral-600 hover:text-black flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <BookOpen className="w-4 h-4 text-black" />
@@ -264,7 +264,7 @@ export default function OrderSuccessPage() {
 
           <div className="relative z-10 w-full flex items-center justify-between">
             <Link
-              href="/my-courses"
+              href="/dashboard"
               className="text-xs text-neutral-300 font-semibold flex items-center gap-1 hover:text-white"
             >
               <BookOpen className="w-3.5 h-3.5" />

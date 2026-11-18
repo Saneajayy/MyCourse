@@ -142,7 +142,7 @@ export function PaymentPendingCard({
         )}
 
         <Link
-          href="/my-courses"
+          href="/dashboard"
           className="w-full h-12 border border-black bg-white hover:bg-neutral-100 text-black font-bold text-sm sm:text-[15px] rounded-none transition-all cursor-pointer flex items-center justify-center text-center gap-2"
         >
           <BookOpen className="w-4 h-4" />

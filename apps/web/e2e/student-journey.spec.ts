@@ -50,7 +50,9 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
       .fill(testStudent.email);
     await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill(testStudent.password);
     await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
-    await page.waitForURL('**/my-courses');
+    await page.waitForURL(
+      (url) => url.pathname.includes('/dashboard') || url.pathname.includes('/my-courses'),
+    );
 
     // 6. Navigate to Checkout
     await page.goto('/checkout');
@@ -74,7 +76,7 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
     await expect(page.locator('text=Download Tax Invoice')).toBeVisible();
 
     // 9. Open My Courses
-    await page.goto('/my-courses');
+    await page.goto('/dashboard');
     await expect(page.locator('h1')).toContainText(/Enrolled Courses/i);
     await expect(page.locator('text=Hydraulic System Basics')).toBeVisible();
     await expect(page.locator('text=Active • 365 Days Left')).toBeVisible();
@@ -108,7 +110,12 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
       .fill(testStudent.email);
     await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill(testStudent.password);
     await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
-    await page.waitForURL((url) => url.pathname === '/my-courses' || url.pathname === '/account');
+    await page.waitForURL(
+      (url) =>
+        url.pathname === '/dashboard' ||
+        url.pathname === '/my-courses' ||
+        url.pathname === '/account',
+    );
 
     await page.goto('/learn/hydraulic-engineering-mastery');
     await expect(page.locator('video')).toBeVisible();
@@ -132,7 +139,9 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
       .fill(unverifiedEmail);
     await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill('RobustHydraulics#2026!Key');
     await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
-    await page.waitForURL('**/my-courses');
+    await page.waitForURL(
+      (url) => url.pathname.includes('/dashboard') || url.pathname.includes('/my-courses'),
+    );
 
     // Go to checkout
     await page.goto('/checkout');

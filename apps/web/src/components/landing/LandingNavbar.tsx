@@ -67,7 +67,7 @@ export function LandingNavbar() {
           <div className="figma-glass-divider border-r border-white/20 h-full flex items-stretch">
             {isAuthenticated ? (
               <Link
-                href="/my-courses"
+                href="/dashboard"
                 className="h-full flex items-center justify-center px-6 sm:px-8 lg:px-10 text-white font-semibold text-[15px] sm:text-[16px] xl:text-[17px] tracking-normal hover:bg-white/10 active:bg-white/15 transition-all"
               >
                 My Courses
@@ -146,7 +146,7 @@ export function LandingNavbar() {
                 </Link>
                 {isAuthenticated ? (
                   <Link
-                    href="/my-courses"
+                    href="/dashboard"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="w-full py-2.5 text-center font-semibold text-white bg-white/10 hover:bg-white/20 rounded-md border border-white/15 transition-all text-sm"
                   >

@@ -22,6 +22,7 @@ export function Header() {
       '/reset-password',
       '/verify-email',
       '/checkout',
+      '/dashboard',
       '/my-courses',
       '/account',
       '/contact',
@@ -71,7 +72,7 @@ export function Header() {
 
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
-              <Link href="/my-courses" className="btn-outline text-xs flex items-center gap-1.5">
+              <Link href="/dashboard" className="btn-outline text-xs flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5" />
                 My Courses
               </Link>
@@ -145,7 +146,7 @@ export function Header() {
             {isAuthenticated ? (
               <>
                 <Link
-                  href="/my-courses"
+                  href="/dashboard"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="btn-outline text-center text-xs"
                 >

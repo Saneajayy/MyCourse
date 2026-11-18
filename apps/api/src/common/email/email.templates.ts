@@ -132,7 +132,7 @@ export function buildEmailHtml(options: EmailLayoutOptions): string {
                   <td>
                     <!-- Quick Navigation Links -->
                     <div style="margin-bottom: 10px; font-size: 12px; font-weight: 700;">
-                      <a href="${env.APP_URL}/my-courses" style="color: #000000; text-decoration: none; margin-right: 14px;">My Courses &rarr;</a>
+                      <a href="${env.APP_URL}/dashboard" style="color: #000000; text-decoration: none; margin-right: 14px;">My Courses &rarr;</a>
                       <a href="${env.APP_URL}/terms" style="color: #737373; text-decoration: none; margin-right: 14px;">Terms</a>
                       <a href="${env.APP_URL}/privacy" style="color: #737373; text-decoration: none; margin-right: 14px;">Privacy</a>
                       <a href="${env.APP_URL}/refunds" style="color: #737373; text-decoration: none; margin-right: 14px;">Refunds</a>
@@ -359,7 +359,7 @@ export function getOrderReceiptTemplate(data: {
 }): { subject: string; html: string; text: string } {
   const brandName = data.brandName || 'Hydro Basics';
   const amountRupees = (data.amountPaise / 100).toFixed(2);
-  const myCoursesUrl = `${env.APP_URL}/my-courses`;
+  const myCoursesUrl = `${env.APP_URL}/dashboard`;
   const invoiceDownloadUrl = `${env.APP_URL}/api/v1/orders/${data.orderId}/invoice`;
   const expiryText = data.expiresAt
     ? `Access Valid Until: ${data.expiresAt.toLocaleDateString('en-IN')}`
@@ -547,7 +547,7 @@ Support: ${data.supportEmail || 'support@hydrobasics.com'}`;
   `;
 
   const footerHtml = `
-    <p style="margin: 0;">You can also access this course anytime by logging into your student dashboard at <a href="${env.APP_URL}/my-courses" style="color: #000000; font-weight: 700; text-decoration: underline;">${env.APP_URL}/my-courses</a>.</p>
+    <p style="margin: 0;">You can also access this course anytime by logging into your student dashboard at <a href="${env.APP_URL}/dashboard" style="color: #000000; font-weight: 700; text-decoration: underline;">${env.APP_URL}/dashboard</a>.</p>
   `;
 
   const html = buildEmailHtml({

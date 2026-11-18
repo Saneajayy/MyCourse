@@ -1081,9 +1081,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         {/* Brand Logo: Top Left Corner HYDRO BASICS */}
         <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
           <Link
-            href="/my-courses"
+            href="/dashboard"
             className="flex flex-col select-none group"
-            title="Back to My Courses"
+            title="Back to Dashboard"
           >
             <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
               HYDRO
@@ -1093,9 +1093,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             </span>
           </Link>
           <Link
-            href="/my-courses"
+            href="/dashboard"
             className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-[#c2c4cc]/70 hover:text-white transition-colors"
-            title="Back to My Courses"
+            title="Back to Dashboard"
           >
             <ArrowLeft className="w-3 h-3" />
             <span>Courses</span>

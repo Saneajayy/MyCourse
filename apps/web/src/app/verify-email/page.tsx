@@ -163,8 +163,8 @@ function VerifyEmailForm() {
       setStatus('success');
       toastSuccess('Welcome to HydroBasics!', 'Account verified and signed in.');
 
-      // Determine redirect target: URL parameter > backend recommendation > /my-courses
-      const targetDestination = redirectParam || defaultRedirect || '/my-courses';
+      // Determine redirect target: URL parameter > backend recommendation > /dashboard
+      const targetDestination = redirectParam || defaultRedirect || '/dashboard';
 
       setTimeout(() => {
         router.push(targetDestination);

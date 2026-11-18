@@ -18,6 +18,7 @@ export function Footer() {
       '/reset-password',
       '/verify-email',
       '/checkout',
+      '/dashboard',
       '/my-courses',
       '/account',
       '/contact',
@@ -99,7 +100,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/my-courses"
+                  href="/dashboard"
                   className="hover:text-course-orange min-h-[32px] inline-flex items-center"
                 >
                   Student Portal

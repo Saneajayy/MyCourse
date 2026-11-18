@@ -183,7 +183,9 @@ test.describe('Admin Panel End-to-End Lifecycle (Phase 7)', () => {
       .fill(student1Email);
     await page.getByPlaceholder(/Password|••••••••|\*{4,}/i).fill('StudentPass#2026!');
     await page.getByRole('button', { name: /^(SIGN IN|LOG IN)$/i }).click();
-    await page.waitForURL('**/my-courses');
+    await page.waitForURL(
+      (url) => url.pathname.includes('/dashboard') || url.pathname.includes('/my-courses'),
+    );
 
     // Go to checkout for this published course
     await page.goto(`/checkout?course=${courseSlug}`);
