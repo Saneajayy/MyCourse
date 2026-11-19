@@ -11,7 +11,6 @@ import { useToast } from '../../components/ui';
 import {
   Tag,
   AlertTriangle,
-  Lock,
   MailCheck,
   RefreshCw,
   Loader2,
@@ -1269,12 +1268,8 @@ function CheckoutContent() {
                   >
                     {isSubmitting || quoteLoading ? (
                       <Loader2 className="w-4 h-4 animate-spin text-black" />
-                    ) : (
-                      <Lock className="w-4 h-4 text-black stroke-[2.5]" />
-                    )}
-                    <span>
-                      Pay ₹{(finalPricePaise / 100).toLocaleString('en-IN')} with Razorpay
-                    </span>
+                    ) : null}
+                    <span>Proceed to Pay &rarr;</span>
                   </button>
                 )}
               </div>
