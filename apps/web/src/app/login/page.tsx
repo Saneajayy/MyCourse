@@ -308,7 +308,7 @@ export default function LoginPage() {
         <div className="border-b border-white/[0.08] w-full shrink-0" />
 
         {/* Form Container */}
-        <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col items-center justify-center">
+        <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar px-4 py-8 sm:px-6 sm:py-10 lg:p-8 flex flex-col items-center">
           <div className="w-full max-w-[420px] sm:max-w-[440px] space-y-4 my-auto">
             <Suspense
               fallback={
