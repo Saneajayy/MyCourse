@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   Input,
@@ -25,6 +25,16 @@ export default function StyleguidePage() {
   const [previewModal, setPreviewModal] = useState<'success' | 'failed' | 'pending' | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [progressVal, setProgressVal] = useState(65);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const m = params.get('modal');
+      if (m === 'success' || m === 'failed' || m === 'pending') {
+        setPreviewModal(m);
+      }
+    }
+  }, []);
 
   const tabItems = [
     { id: 'overview', label: 'Overview', count: 12 },

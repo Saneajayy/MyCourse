@@ -288,6 +288,36 @@ function CheckoutContent() {
     }
   };
 
+  // Quick preview query parameter support (?modal=success or ?modal=verifying)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const modalParam = params.get('modal');
+      if (modalParam === 'success') {
+        setPaymentSuccessData({
+          orderId: 'ord_demo_1092',
+          orderNumber: 'HB-2026-9021',
+          transactionId: 'pay_demo_success',
+          invoiceId: 'INV-2026-0089',
+          invoiceDbId: 'inv_demo_db_id',
+          courseTitle: 'Hydraulic System Basics',
+          courseSlug: 'hydraulic-system-basics',
+          validityDays: 365,
+          amountPaise: 499900,
+          studentName: 'Ramesh Kumar',
+          studentEmail: 'student@example.com',
+          paymentMethod: 'UPI (Google Pay)',
+          paymentTime: new Date().toISOString(),
+        });
+        setPaymentModalStatus('success');
+        setPaymentModalOpen(true);
+      } else if (modalParam === 'verifying') {
+        setPaymentModalStatus('verifying');
+        setPaymentModalOpen(true);
+      }
+    }
+  }, []);
+
   // Load Razorpay Checkout Script
   useEffect(() => {
     if (typeof window === 'undefined') return;
