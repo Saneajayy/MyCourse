@@ -682,7 +682,7 @@ function StudentDashboardContent() {
                     </div>
                   </div>
                 ) : courses.length === 0 && !coursesError ? (
-                  <div className="bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-4 max-w-[350px] transition-all select-none">
+                  <div className="relative w-full max-w-[380px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-4 transition-all select-none">
                     <div className="space-y-1.5">
                       <h2 className="text-sm sm:text-[15px] font-semibold text-white uppercase tracking-wider">
                         NO ACTIVE COURSES
@@ -706,7 +706,7 @@ function StudentDashboardContent() {
 
                 {/* Empty Search Filter State */}
                 {courses.length > 0 && filteredCourses.length === 0 && (
-                  <div className="bg-[#151619] border border-white/[0.08] rounded-xl p-5 sm:p-6 text-left space-y-2 max-w-[350px] select-none">
+                  <div className="relative w-full max-w-[380px] bg-[#151619] border border-white/[0.08] rounded-xl p-5 sm:p-6 text-left space-y-2 select-none">
                     <p className="text-sm font-medium text-white">
                       No courses match &ldquo;{searchQuery}&rdquo;
                     </p>
