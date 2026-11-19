@@ -12,6 +12,7 @@ import {
   User as UserIcon,
   Menu,
   X,
+  Check,
   CheckCircle2,
   AlertCircle,
   ShieldCheck,
@@ -1024,14 +1025,14 @@ function StudentDashboardContent() {
                               readOnly
                               tabIndex={-1}
                               value={user?.email || ''}
-                              className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white cursor-not-allowed select-none focus:outline-none"
+                              className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-neutral-500 cursor-not-allowed select-none focus:outline-none"
                             />
                             {user?.emailVerifiedAt && (
                               <div
                                 className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-emerald-400 select-none pointer-events-none"
                                 title="Verified"
                               >
-                                <CheckCircle2 className="w-4 h-4" />
+                                <Check className="w-4 h-4 stroke-[2.5]" />
                               </div>
                             )}
                           </div>
