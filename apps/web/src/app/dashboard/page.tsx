@@ -451,7 +451,7 @@ function StudentDashboardContent() {
         </div>
 
         {/* Thin Stroke Separation Line */}
-        <div className="border-b border-white/[0.08] w-full shrink-0" />
+        <div className="border-b border-white/[0.08] w-full shrink-0 mt-[1px]" />
 
         {/* Mobile Expandable Tabs Stack (Sandwich Dropdown) */}
         <div
