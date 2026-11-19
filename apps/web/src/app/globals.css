@@ -330,22 +330,6 @@ body {
   -webkit-backface-visibility: hidden;
 }
 
-/* Ambient Caustic Breathing for Fractal Glass Graphic */
-@keyframes ambient-glass-breathe {
-  0%, 100% {
-    filter: brightness(0.97) contrast(1);
-    transform: scale(1);
-  }
-  50% {
-    filter: brightness(1.09) contrast(1.04);
-    transform: scale(1.02);
-  }
-}
-
-.animate-glass-breathe {
-  animation: ambient-glass-breathe 8s ease-in-out infinite;
-  will-change: filter, transform;
-}
 
 
 

@@ -251,14 +251,14 @@ export default function LoginPage() {
       {/* LEFT CARD (Desktop Only): Signature Fractal Glass Graphic     */}
       {/* ============================================================== */}
       <div className="hidden lg:relative lg:flex lg:flex-col lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
-        {/* Full-Bleed Fractal Glass Graphic with Ambient Breathing */}
+        {/* Full-Bleed Fractal Glass Graphic */}
         <Image
           src="/fractal-glass-5.jpg"
           alt="HydroBasics Industrial Hydraulic Engineer"
           fill
           priority
           sizes="50vw"
-          className="object-cover object-center select-none animate-glass-breathe"
+          className="object-cover object-center select-none"
         />
 
         {/* Top Vignette Gradient Overlay */}
