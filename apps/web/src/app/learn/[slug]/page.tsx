@@ -1462,10 +1462,10 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md text-white p-3 sm:p-6 z-30 text-center select-none font-reddit">
                       <div className="max-w-md w-full space-y-2 sm:space-y-3 flex flex-col items-center justify-center">
                         <div className="space-y-1 sm:space-y-1.5 flex flex-col items-center justify-center">
-                          <h3 className="text-sm sm:text-base md:text-lg font-bold text-white tracking-tight">
+                          <h3 className="text-base sm:text-lg md:text-xl font-bold text-white tracking-tight">
                             Session Active on Another Device
                           </h3>
-                          <p className="text-[11px] sm:text-xs text-[#c2c4cc] leading-normal sm:leading-relaxed max-w-[240px] sm:max-w-[300px] mx-auto text-center">
+                          <p className="text-[11px] sm:text-xs text-[#c2c4cc] leading-normal sm:leading-relaxed max-w-[270px] sm:max-w-[340px] mx-auto text-center">
                             Your stream was paused because playback was started on another browser or device.
                           </p>
                         </div>
