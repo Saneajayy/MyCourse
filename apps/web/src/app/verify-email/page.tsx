@@ -447,8 +447,8 @@ export default function VerifyEmailPage() {
         <div className="border-b border-white/[0.08] w-full shrink-0" />
 
         {/* Form Container */}
-        <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col items-center lg:justify-center">
-          <div className="w-full max-w-[420px] sm:max-w-[440px] space-y-4 py-2 pb-8 lg:py-0 lg:my-auto">
+        <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col items-center justify-center">
+          <div className="w-full max-w-[420px] sm:max-w-[440px] space-y-4 my-auto">
             <Suspense
               fallback={
                 <div className="p-8 text-center text-xs font-mono text-[#c2c4cc]">
