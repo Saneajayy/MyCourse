@@ -91,51 +91,11 @@ export default function TermsPage() {
 
         {/* Scrollable Document Body */}
         <div className="flex-1 overflow-y-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8 space-y-7 scroll-smooth text-left">
-          {/* Document Title & Preamble */}
-          <div className="space-y-3">
+          {/* Document Title */}
+          <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
               Terms of Service
             </h1>
-
-            <p className="text-xs sm:text-sm text-[#c2c4cc] leading-relaxed">
-              These Terms of Service (
-              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
-                Agreement
-              </code>
-              ,{' '}
-              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
-                Terms
-              </code>
-              ) constitute a legally binding agreement between you (
-              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
-                Student
-              </code>
-              ,{' '}
-              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
-                User
-              </code>
-              , or{' '}
-              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
-                Licensee
-              </code>
-              ) and <strong>{siteConfig.brandName}</strong> (
-              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
-                Company
-              </code>
-              ,{' '}
-              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
-                we
-              </code>
-              ,{' '}
-              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
-                our
-              </code>
-              , or{' '}
-              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
-                us
-              </code>
-              ). By accessing our website, purchasing an enrollment, or streaming instructional lecture content, you acknowledge that you have read, understood, and agreed to be bound by all provisions set forth below.
-            </p>
           </div>
 
           {/* Divider line touching outer ends */}
