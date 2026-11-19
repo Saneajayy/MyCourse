@@ -236,6 +236,16 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
     };
   }, []);
 
+  // Quick preview support for testing eviction UI (?test_evicted=true)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('test_evicted') === 'true') {
+        setIsEvicted(true);
+      }
+    }
+  }, []);
+
   // 1. Auth Guard
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -1359,7 +1369,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
             >
               {isPageLoading ? (
                 <div className="relative w-full h-full bg-neutral-950 overflow-hidden" />
-              ) : !hasStartedWatching ? (
+              ) : !hasStartedWatching && !isEvicted ? (
                 <div
                   className="relative w-full h-full flex items-center justify-center bg-neutral-950 overflow-hidden cursor-pointer group"
                   onClick={handleStartWatching}
@@ -1445,25 +1455,37 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
                   {/* Session Eviction Overlay */}
                   {isEvicted && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 backdrop-blur-md text-white p-6 z-30 text-center space-y-4">
-                      <div className="w-12 h-12 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center shrink-0">
-                        <AlertTriangle className="w-6 h-6 stroke-[2]" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md text-white p-6 z-30 text-center select-none font-reddit">
+                      <div className="max-w-md w-full space-y-4">
+                        <div className="w-12 h-12 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center mx-auto">
+                          <AlertTriangle className="w-5 h-5 stroke-[2.2]" />
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                            Session Active on Another Device
+                          </h3>
+                          <p className="text-xs sm:text-sm text-[#c2c4cc] leading-relaxed">
+                            Your stream was paused because playback was started on another browser or device.
+                          </p>
+                        </div>
+
+                        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
+                            className="w-full sm:w-auto h-10 px-5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                          >
+                            <span>Resume Watching Here &rarr;</span>
+                          </button>
+                          <Link
+                            href="/dashboard"
+                            className="w-full sm:w-auto h-10 px-4 rounded-lg border border-white/[0.08] hover:border-white/[0.14] bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white text-xs font-medium flex items-center justify-center transition-colors"
+                          >
+                            Return to Dashboard
+                          </Link>
+                        </div>
                       </div>
-                      <div className="max-w-md space-y-1">
-                        <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                          Session Active on Another Device
-                        </h3>
-                        <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-                          Your stream was paused because playback was initiated on another browser or device.
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
-                        className="h-10 px-5 bg-white hover:bg-neutral-200 text-black font-semibold text-xs sm:text-[13px] rounded-lg transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
-                      >
-                        Resume Watching Here
-                      </button>
                     </div>
                   )}
 
