@@ -70,8 +70,7 @@ function ResetPasswordForm() {
         'Password Updated',
         'Your password was successfully updated. Sign in with your new password.',
       );
-      const emailQuery = initialEmail ? `&email=${encodeURIComponent(initialEmail.trim().toLowerCase())}` : '';
-      router.push(`/login?reset=success${emailQuery}`);
+      router.push('/login');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Invalid or expired reset token';
       setErrorMsg(msg);

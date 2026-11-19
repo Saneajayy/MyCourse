@@ -13,32 +13,15 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get('redirect') || '/dashboard';
-  const queryEmail = searchParams.get('email') || '';
-  const isResetSuccess =
-    searchParams.get('reset') === 'success' ||
-    searchParams.get('message') === 'password-changed';
 
   const { login } = useAuth();
   const { error: toastError, success: toastSuccess } = useToast();
 
-  const [email, setEmail] = useState(queryEmail);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  const passwordInputRef = React.useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (queryEmail) {
-      setEmail(queryEmail);
-      if (isResetSuccess) {
-        setTimeout(() => {
-          passwordInputRef.current?.focus();
-        }, 100);
-      }
-    }
-  }, [queryEmail, isResetSuccess]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,11 +105,11 @@ function LoginForm() {
       </a>
 
       {/* Success Notification Alert */}
-      {isResetSuccess && !errorMsg && (
+      {searchParams.get('message') === 'password-changed' && !errorMsg && (
         <div className="p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 text-xs">
           <div className="flex items-center gap-2 font-medium">
             <Check className="w-4 h-4 text-emerald-400 shrink-0 stroke-[2.5]" />
-            <span>Password updated successfully. Enter your new password to sign in.</span>
+            <span>Password updated successfully. Please sign in with your new password.</span>
           </div>
         </div>
       )}
@@ -182,7 +165,6 @@ function LoginForm() {
           <div className="relative">
             <input
               id="login-password"
-              ref={passwordInputRef}
               type={showPassword ? 'text' : 'password'}
               required
               autoComplete="current-password"
