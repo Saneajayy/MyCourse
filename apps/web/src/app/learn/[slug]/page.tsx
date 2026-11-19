@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import type Hls from 'hls.js';
 import { useAuth } from '../../../context/auth-context';
 import { apiClient, ApiError } from '../../../lib/api-client';
-import { Button } from '../../../components/ui';
 import {
   Play,
   Pause,
@@ -1049,20 +1048,33 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
   if (curriculumError) {
     return (
-      <div className="bg-black min-h-screen text-white font-reddit relative selection:bg-white selection:text-black overflow-hidden flex flex-col justify-center items-center p-4">
-        <div className="noise-texture" aria-hidden="true" />
-        <div className="max-w-md w-full bg-white p-8 rounded-none border border-neutral-300 shadow-none text-neutral-900 space-y-4 text-center">
-          <div className="w-12 h-12 bg-rose-50 text-rose-600 inline-flex items-center justify-center border border-rose-200 mx-auto rounded-none">
-            <Lock className="w-6 h-6 text-rose-600" />
+      <div className="fixed inset-0 w-full h-[100dvh] bg-black text-white flex flex-col items-center justify-center p-6 text-center select-none font-reddit z-50">
+        <div className="max-w-md w-full space-y-4">
+          <div className="w-12 h-12 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center mx-auto">
+            <Lock className="w-5 h-5 stroke-[2.2]" />
           </div>
-          <h1 className="text-2xl font-black text-black">Access Restricted</h1>
-          <p className="text-xs text-neutral-600 leading-relaxed">{curriculumError}</p>
-          <div className="pt-2">
+
+          <div className="space-y-1.5">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Access Restricted
+            </h1>
+            <p className="text-xs sm:text-sm text-[#c2c4cc] leading-relaxed">
+              {curriculumError || 'You do not have an active enrollment for this course.'}
+            </p>
+          </div>
+
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5">
             <Link
               href="/#pricing"
-              className="inline-flex items-center justify-center h-11 px-6 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none transition-all"
+              className="w-full sm:w-auto h-10 px-5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
             >
-              Enroll to Unlock Access
+              <span>Enroll Now &rarr;</span>
+            </Link>
+            <Link
+              href="/dashboard"
+              className="w-full sm:w-auto h-10 px-4 rounded-lg border border-white/[0.08] hover:border-white/[0.14] bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white text-xs font-medium flex items-center justify-center transition-colors"
+            >
+              Return to Dashboard
             </Link>
           </div>
         </div>
@@ -1408,44 +1420,50 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
                   {/* Error Overlay */}
                   {streamError && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 text-white p-6 z-20 text-center space-y-3">
-                      <AlertTriangle className="w-10 h-10 text-rose-500" />
-                      <p className="text-sm font-bold text-rose-200">{streamError}</p>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="bg-white text-black rounded-none border border-black"
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md text-white p-6 z-20 text-center space-y-4">
+                      <div className="w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center shrink-0">
+                        <AlertTriangle className="w-6 h-6 stroke-[2]" />
+                      </div>
+                      <div className="max-w-md space-y-1">
+                        <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                          Playback Error
+                        </h3>
+                        <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+                          {streamError}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
                         onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
+                        className="h-9 px-4 bg-white hover:bg-neutral-200 text-black font-semibold text-xs rounded-lg transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
                       >
-                        <RotateCcw className="w-4 h-4 mr-1.5" />
-                        Retry Playback
-                      </Button>
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>Retry Playback</span>
+                      </button>
                     </div>
                   )}
 
                   {/* Session Eviction Overlay */}
                   {isEvicted && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 text-white p-6 z-30 text-center space-y-4">
-                      <div className="w-12 h-12 bg-amber-500/20 text-amber-400 inline-flex items-center justify-center border border-amber-500 rounded-none">
-                        <AlertTriangle className="w-6 h-6 text-amber-400" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 backdrop-blur-md text-white p-6 z-30 text-center space-y-4">
+                      <div className="w-12 h-12 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center shrink-0">
+                        <AlertTriangle className="w-6 h-6 stroke-[2]" />
                       </div>
                       <div className="max-w-md space-y-1">
-                        <h3 className="text-lg font-black text-amber-300">
-                          You started watching on another device
+                        <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                          Session Active on Another Device
                         </h3>
-                        <p className="text-xs text-gray-300 leading-relaxed">
-                          Your streaming session was paused because playback was initiated on
-                          another browser or device.
+                        <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+                          Your stream was paused because playback was initiated on another browser or device.
                         </p>
                       </div>
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        className="bg-black hover:bg-[#262626] text-white rounded-none"
+                      <button
+                        type="button"
                         onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
+                        className="h-10 px-5 bg-white hover:bg-neutral-200 text-black font-semibold text-xs sm:text-[13px] rounded-lg transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
                       >
                         Resume Watching Here
-                      </Button>
+                      </button>
                     </div>
                   )}
 
