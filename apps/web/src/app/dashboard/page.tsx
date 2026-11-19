@@ -682,7 +682,7 @@ function StudentDashboardContent() {
                     </div>
                   </div>
                 ) : courses.length === 0 && !coursesError ? (
-                  <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-4 transition-all select-none">
+                  <div className="relative w-fit max-w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-4 transition-all select-none">
                     <div className="space-y-1.5">
                       <h2 className="text-sm sm:text-[15px] font-semibold text-white uppercase tracking-wider">
                         NO ACTIVE COURSES
@@ -706,7 +706,7 @@ function StudentDashboardContent() {
 
                 {/* Empty Search Filter State */}
                 {courses.length > 0 && filteredCourses.length === 0 && (
-                  <div className="relative w-full bg-[#151619] border border-white/[0.08] rounded-xl p-5 sm:p-6 text-left space-y-2 select-none">
+                  <div className="relative w-fit max-w-full bg-[#151619] border border-white/[0.08] rounded-xl p-5 sm:p-6 text-left space-y-2 select-none">
                     <p className="text-sm font-medium text-white">
                       No courses match &ldquo;{searchQuery}&rdquo;
                     </p>
@@ -833,8 +833,8 @@ function StudentDashboardContent() {
 
                 {completedCourses.length === 0 ? (
                   <div className="w-full flex flex-col gap-5 items-start text-left">
-                    {/* Clean No-Credentials Card: Full horizontal width wrapping per screen size */}
-                    <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-4 select-none">
+                    {/* Clean No-Credentials Card: Hugs text length snugly with w-fit */}
+                    <div className="relative w-fit max-w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-4 select-none">
                       <div className="space-y-1.5">
                         <h2 className="text-sm sm:text-[15px] font-semibold text-white uppercase tracking-wider">
                           No Credentials Earned Yet
