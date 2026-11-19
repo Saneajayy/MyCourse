@@ -9,7 +9,6 @@ import { formatDisplayOrderId } from '../../lib/order';
 import { siteConfig } from '../../config/site';
 import { useToast } from '../../components/ui';
 import {
-  BookOpen,
   User as UserIcon,
   Menu,
   X,
@@ -359,11 +358,6 @@ function StudentDashboardContent() {
   // Completed courses eligible for certificate (unlocks at >= 90%)
   const completedCourses = useMemo(() => {
     return courses.filter((c) => (c.progress?.percentComplete ?? 0) >= 90);
-  }, [courses]);
-
-  // In-progress courses working towards unlocking certificate (< 90%)
-  const inProgressCourses = useMemo(() => {
-    return courses.filter((c) => (c.progress?.percentComplete ?? 0) < 90);
   }, [courses]);
 
   const navTabs: {
@@ -838,70 +832,27 @@ function StudentDashboardContent() {
                 </div>
 
                 {completedCourses.length === 0 ? (
-                  <div className="w-full max-w-[650px] space-y-5">
+                  <div className="w-full max-w-[650px]">
                     {/* Clean No-Credentials Card */}
-                    <div className="bg-[#151619] border border-white/[0.08] rounded-xl p-5 sm:p-6 text-left space-y-4 select-none">
-                      <div className="flex items-start gap-3.5">
-                        <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 text-emerald-400">
-                          <Award className="w-5 h-5" />
-                        </div>
-                        <div className="space-y-1">
-                          <h2 className="text-base sm:text-[17px] font-medium text-white tracking-tight">
-                            No Credentials Earned Yet
-                          </h2>
-                          <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-                            Complete at least 90% of your course lessons and practical evaluations
-                            to automatically unlock your verified certificate signed by instructor{' '}
-                            {siteConfig.instructor.name}.
-                          </p>
-                        </div>
+                    <div className="bg-[#151619] border border-white/[0.08] rounded-xl p-6 sm:p-8 text-left space-y-4 select-none">
+                      <div className="space-y-1.5">
+                        <h2 className="text-base sm:text-[17px] font-medium text-white tracking-tight">
+                          No Credentials Earned Yet
+                        </h2>
+                        <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+                          Complete all lesson modules and practical evaluations in your enrolled
+                          courses to automatically unlock your verified certificate signed by
+                          instructor {siteConfig.instructor.name}.
+                        </p>
                       </div>
-
-                      {/* If student has courses in progress, show unlock progress */}
-                      {inProgressCourses.length > 0 ? (
-                        <div className="pt-4 border-t border-white/[0.06] space-y-3">
-                          <span className="text-[11px] font-mono uppercase tracking-wider text-[#8a8c95] block">
-                            Unlock Progress
-                          </span>
-                          {inProgressCourses.map((c) => {
-                            const percent = Math.min(
-                              100,
-                              Math.max(0, Math.round(c.progress?.percentComplete ?? 0)),
-                            );
-                            return (
-                              <div
-                                key={c.product.id}
-                                className="p-3.5 rounded-lg bg-black/40 border border-white/[0.06] space-y-2.5"
-                              >
-                                <div className="flex items-center justify-between gap-3">
-                                  <h3 className="text-xs sm:text-sm font-medium text-white truncate">
-                                    {c.product.title}
-                                  </h3>
-                                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[#8a8c95] flex items-center gap-1 shrink-0">
-                                    <Lock className="w-3 h-3 text-white/50" />
-                                    {percent >= 90
-                                      ? 'Unlocked'
-                                      : `${Math.max(0, 90 - percent)}% needed`}
-                                  </span>
-                                </div>
-                                <CloseBarsProgressBar percent={percent} />
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : null}
 
                       <div className="pt-2">
                         <button
                           type="button"
                           onClick={() => handleTabChange('courses')}
-                          className="h-9 sm:h-10 px-4 sm:px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer select-none shadow-sm"
+                          className="h-9 sm:h-10 px-4 sm:px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg inline-flex items-center justify-center transition-colors cursor-pointer select-none shadow-sm"
                         >
-                          <BookOpen className="w-3.5 h-3.5" />
-                          <span>
-                            {inProgressCourses.length > 0 ? 'Continue Learning' : 'Explore Courses'}{' '}
-                            &rarr;
-                          </span>
+                          <span>Go to My Courses &rarr;</span>
                         </button>
                       </div>
                     </div>
@@ -992,18 +943,17 @@ function StudentDashboardContent() {
                             </div>
                           </div>
 
-                          {/* Action Buttons: Identical spacing and styling as Course Card */}
+                          {/* Action Buttons: Clean text without icon */}
                           <div className="mt-4 pt-3 border-t border-white/[0.06] flex flex-wrap items-center gap-2.5 sm:gap-3">
                             <Link
                               href={`/learn/${c.product.slug}`}
-                              className="h-9 sm:h-10 px-4 sm:px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg flex items-center justify-center gap-1.5 transition-colors select-none shadow-sm"
+                              className="h-9 sm:h-10 px-4 sm:px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg flex items-center justify-center transition-colors select-none shadow-sm"
                             >
-                              <Download className="w-3.5 h-3.5" />
                               <span>Download Certificate &rarr;</span>
                             </Link>
                             <Link
                               href={`/learn/${c.product.slug}`}
-                              className="h-9 sm:h-10 px-4 sm:px-5 bg-[#1f2023] hover:bg-white/[0.08] active:bg-white/[0.12] text-[#c2c4cc] hover:text-white border border-white/[0.08] font-medium text-xs sm:text-[13px] rounded-lg flex items-center justify-center gap-1.5 transition-colors select-none"
+                              className="h-9 sm:h-10 px-4 sm:px-5 bg-[#1f2023] hover:bg-white/[0.08] active:bg-white/[0.12] text-[#c2c4cc] hover:text-white border border-white/[0.08] font-medium text-xs sm:text-[13px] rounded-lg flex items-center justify-center transition-colors select-none"
                             >
                               <span>Review Lessons</span>
                             </Link>
@@ -1011,40 +961,6 @@ function StudentDashboardContent() {
                         </div>
                       </div>
                     ))}
-
-                    {/* In Progress Courses (if any courses remain to be completed) */}
-                    {inProgressCourses.length > 0 && (
-                      <div className="w-full max-w-[650px] pt-4 space-y-3">
-                        <h3 className="text-xs font-mono uppercase tracking-wider text-[#8a8c95]">
-                          In Progress to Unlock
-                        </h3>
-                        {inProgressCourses.map((c) => {
-                          const percent = Math.min(
-                            100,
-                            Math.max(0, Math.round(c.progress?.percentComplete ?? 0)),
-                          );
-                          return (
-                            <div
-                              key={c.product.id}
-                              className="p-3.5 rounded-xl bg-[#151619] border border-white/[0.08] flex flex-col gap-2.5 select-none"
-                            >
-                              <div className="flex items-center justify-between gap-3">
-                                <h4 className="text-xs sm:text-sm font-medium text-white truncate">
-                                  {c.product.title}
-                                </h4>
-                                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[#8a8c95] flex items-center gap-1 shrink-0">
-                                  <Lock className="w-3 h-3 text-white/50" />
-                                  {percent >= 90
-                                    ? 'Unlocked'
-                                    : `${Math.max(0, 90 - percent)}% needed`}
-                                </span>
-                              </div>
-                              <CloseBarsProgressBar percent={percent} />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
                   </div>
                 )}
               </div>
