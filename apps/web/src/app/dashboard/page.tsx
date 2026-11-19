@@ -30,6 +30,7 @@ import {
   IndianRupee,
   Settings,
   Search,
+  Award,
 } from 'lucide-react';
 import { HydraulicCalculator } from '../../components/calculator/HydraulicCalculator';
 import { CourseLottieThumbnail } from '../../components/dashboard/CourseLottieThumbnail';
@@ -358,6 +359,11 @@ function StudentDashboardContent() {
   // Completed courses eligible for certificate (unlocks at >= 90%)
   const completedCourses = useMemo(() => {
     return courses.filter((c) => (c.progress?.percentComplete ?? 0) >= 90);
+  }, [courses]);
+
+  // In-progress courses working towards unlocking certificate (< 90%)
+  const inProgressCourses = useMemo(() => {
+    return courses.filter((c) => (c.progress?.percentComplete ?? 0) < 90);
   }, [courses]);
 
   const navTabs: {
@@ -822,78 +828,223 @@ function StudentDashboardContent() {
             {activeTab === 'certificates' && (
               <div className="space-y-6 text-left">
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                  <h1 className="text-xl sm:text-2xl font-medium text-white tracking-tight">
                     Credentials
                   </h1>
-                  <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+                  <p className="text-xs sm:text-sm text-[#8a8c95] mt-1">
                     Official verified credentials of completion signed by instructor{' '}
                     {siteConfig.instructor.name}.
                   </p>
                 </div>
 
                 {completedCourses.length === 0 ? (
-                  <div className="bg-white border border-neutral-200 rounded-none p-8 sm:p-10 text-left space-y-4 max-w-md shadow-none">
-                    <div className="space-y-1">
-                      <h2 className="text-lg font-bold text-neutral-900 uppercase">
-                        NO CREDENTIALS EARNED YET.
-                      </h2>
-                      <p className="text-xs text-neutral-500 leading-relaxed">
-                        Complete all lesson modules and practical evaluations in your enrolled
-                        courses to automatically unlock your verified certificate.
-                      </p>
-                    </div>
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() => handleTabChange('courses')}
-                        className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors shadow-none cursor-pointer"
-                      >
-                        <BookOpen className="w-3.5 h-3.5" />
-                        <span>Go to My Courses</span>
-                      </button>
+                  <div className="w-full max-w-[650px] space-y-5">
+                    {/* Clean No-Credentials Card */}
+                    <div className="bg-[#151619] border border-white/[0.08] rounded-xl p-5 sm:p-6 text-left space-y-4 select-none">
+                      <div className="flex items-start gap-3.5">
+                        <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 text-emerald-400">
+                          <Award className="w-5 h-5" />
+                        </div>
+                        <div className="space-y-1">
+                          <h2 className="text-base sm:text-[17px] font-medium text-white tracking-tight">
+                            No Credentials Earned Yet
+                          </h2>
+                          <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+                            Complete at least 90% of your course lessons and practical evaluations
+                            to automatically unlock your verified certificate signed by instructor{' '}
+                            {siteConfig.instructor.name}.
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* If student has courses in progress, show unlock progress */}
+                      {inProgressCourses.length > 0 ? (
+                        <div className="pt-4 border-t border-white/[0.06] space-y-3">
+                          <span className="text-[11px] font-mono uppercase tracking-wider text-[#8a8c95] block">
+                            Unlock Progress
+                          </span>
+                          {inProgressCourses.map((c) => {
+                            const percent = Math.min(
+                              100,
+                              Math.max(0, Math.round(c.progress?.percentComplete ?? 0)),
+                            );
+                            return (
+                              <div
+                                key={c.product.id}
+                                className="p-3.5 rounded-lg bg-black/40 border border-white/[0.06] space-y-2.5"
+                              >
+                                <div className="flex items-center justify-between gap-3">
+                                  <h3 className="text-xs sm:text-sm font-medium text-white truncate">
+                                    {c.product.title}
+                                  </h3>
+                                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[#8a8c95] flex items-center gap-1 shrink-0">
+                                    <Lock className="w-3 h-3 text-white/50" />
+                                    {percent >= 90
+                                      ? 'Unlocked'
+                                      : `${Math.max(0, 90 - percent)}% needed`}
+                                  </span>
+                                </div>
+                                <CloseBarsProgressBar percent={percent} />
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={() => handleTabChange('courses')}
+                          className="h-9 sm:h-10 px-4 sm:px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg inline-flex items-center justify-center gap-1.5 transition-colors cursor-pointer select-none shadow-sm"
+                        >
+                          <BookOpen className="w-3.5 h-3.5" />
+                          <span>
+                            {inProgressCourses.length > 0 ? 'Continue Learning' : 'Explore Courses'}{' '}
+                            &rarr;
+                          </span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                  <div className="w-full flex flex-col gap-5 items-start text-left">
                     {completedCourses.map((c) => (
                       <div
                         key={c.product.id}
-                        className="bg-white border border-neutral-200 rounded-none p-6 shadow-none space-y-4 text-left"
+                        className="relative w-full max-w-[650px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 transition-all duration-200 select-none"
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-none bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200">
-                            <CheckCircle2 className="w-5 h-5" />
+                        {/* Desktop Active/Verified Badge: Top right-most corner */}
+                        <span className="hidden md:inline-flex absolute top-5 right-5 px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md shrink-0 select-none z-10">
+                          VERIFIED
+                        </span>
+
+                        {/* Certificate Miniature Preview Graphic */}
+                        <div className="relative w-full aspect-[4/3] md:w-[180px] md:h-[135px] shrink-0 self-center rounded-lg overflow-hidden bg-gradient-to-br from-[#1c1d22] via-[#121316] to-[#0a0b0d] border border-white/[0.1] flex flex-col justify-between p-3.5 shadow-inner">
+                          <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:8px_8px] pointer-events-none" />
+
+                          {/* Top Row: Mini Certificate Header */}
+                          <div className="relative z-10 flex items-center justify-between">
+                            <div className="flex items-center gap-1.5">
+                              <Award className="w-3.5 h-3.5 text-emerald-400" />
+                              <span className="text-[10px] font-mono font-semibold tracking-wider text-emerald-400 uppercase">
+                                OFFICIAL
+                              </span>
+                            </div>
+                            <ShieldCheck className="w-3.5 h-3.5 text-white/30" />
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600 block">
-                              Course Completed
-                            </span>
-                            <h2 className="text-base font-bold text-neutral-900 truncate">
+
+                          {/* Center: Certificate Title in Miniature */}
+                          <div className="relative z-10 text-center py-1">
+                            <p className="text-[9px] font-mono uppercase tracking-widest text-[#8a8c95]">
+                              CERTIFICATE OF COMPLETION
+                            </p>
+                            <p className="text-xs font-medium text-white truncate mt-0.5 px-1">
                               {c.product.title}
-                            </h2>
+                            </p>
+                          </div>
+
+                          {/* Bottom Row: Verification Code & Status */}
+                          <div className="relative z-10 flex items-center justify-between pt-1.5 border-t border-white/[0.06] text-[9px] font-mono text-[#8a8c95]">
+                            <span>ID: CERT-{c.product.slug.slice(0, 6).toUpperCase()}</span>
+                            <span className="text-emerald-400 font-medium">SIGNED</span>
                           </div>
                         </div>
 
-                        <div className="p-3.5 rounded-none bg-neutral-50 border border-neutral-200 text-xs text-neutral-600 space-y-1">
-                          <p>
-                            <strong className="text-neutral-900">Credential:</strong> Verified
-                            Certificate of Completion
-                          </p>
-                          <p>
-                            <strong className="text-neutral-900">Instructor:</strong>{' '}
-                            {siteConfig.instructor.name}
-                          </p>
-                        </div>
+                        {/* Credential Details & Actions */}
+                        <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
+                          <div>
+                            {/* Title with mobile status badge and desktop right padding */}
+                            <div className="flex items-start justify-between gap-3 md:pr-20">
+                              <h2 className="text-lg sm:text-[20px] font-medium text-white tracking-tight leading-snug">
+                                <Link
+                                  href={`/learn/${c.product.slug}`}
+                                  className="hover:text-white/80 transition-colors"
+                                >
+                                  {c.product.title}
+                                </Link>
+                              </h2>
+                              <span className="md:hidden px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md shrink-0 select-none">
+                                VERIFIED
+                              </span>
+                            </div>
 
-                        <Link
-                          href={`/learn/${c.product.slug}`}
-                          className="w-full h-10 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider rounded-none flex items-center justify-center gap-2 shadow-none"
-                        >
-                          <Download className="w-3.5 h-3.5" />
-                          <span>Download Certificate</span>
-                        </Link>
+                            {/* Credential Specifications */}
+                            <div className="mt-2.5 space-y-1.5 text-xs sm:text-[13px] text-[#c2c4cc]">
+                              <p className="flex items-center gap-2">
+                                <span className="text-[#8a8c95] w-20 shrink-0">Credential:</span>
+                                <span className="text-white font-medium truncate">
+                                  Verified Certificate of Completion
+                                </span>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                <span className="text-[#8a8c95] w-20 shrink-0">Instructor:</span>
+                                <span className="text-white font-medium">
+                                  {siteConfig.instructor.name}
+                                </span>
+                              </p>
+                              <p className="flex items-center gap-2">
+                                <span className="text-[#8a8c95] w-20 shrink-0">Status:</span>
+                                <span className="text-emerald-400 font-medium flex items-center gap-1">
+                                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                                  100% Curriculum Completed
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Action Buttons: Identical spacing and styling as Course Card */}
+                          <div className="mt-4 pt-3 border-t border-white/[0.06] flex flex-wrap items-center gap-2.5 sm:gap-3">
+                            <Link
+                              href={`/learn/${c.product.slug}`}
+                              className="h-9 sm:h-10 px-4 sm:px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg flex items-center justify-center gap-1.5 transition-colors select-none shadow-sm"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                              <span>Download Certificate &rarr;</span>
+                            </Link>
+                            <Link
+                              href={`/learn/${c.product.slug}`}
+                              className="h-9 sm:h-10 px-4 sm:px-5 bg-[#1f2023] hover:bg-white/[0.08] active:bg-white/[0.12] text-[#c2c4cc] hover:text-white border border-white/[0.08] font-medium text-xs sm:text-[13px] rounded-lg flex items-center justify-center gap-1.5 transition-colors select-none"
+                            >
+                              <span>Review Lessons</span>
+                            </Link>
+                          </div>
+                        </div>
                       </div>
                     ))}
+
+                    {/* In Progress Courses (if any courses remain to be completed) */}
+                    {inProgressCourses.length > 0 && (
+                      <div className="w-full max-w-[650px] pt-4 space-y-3">
+                        <h3 className="text-xs font-mono uppercase tracking-wider text-[#8a8c95]">
+                          In Progress to Unlock
+                        </h3>
+                        {inProgressCourses.map((c) => {
+                          const percent = Math.min(
+                            100,
+                            Math.max(0, Math.round(c.progress?.percentComplete ?? 0)),
+                          );
+                          return (
+                            <div
+                              key={c.product.id}
+                              className="p-3.5 rounded-xl bg-[#151619] border border-white/[0.08] flex flex-col gap-2.5 select-none"
+                            >
+                              <div className="flex items-center justify-between gap-3">
+                                <h4 className="text-xs sm:text-sm font-medium text-white truncate">
+                                  {c.product.title}
+                                </h4>
+                                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[#8a8c95] flex items-center gap-1 shrink-0">
+                                  <Lock className="w-3 h-3 text-white/50" />
+                                  {percent >= 90
+                                    ? 'Unlocked'
+                                    : `${Math.max(0, 90 - percent)}% needed`}
+                                </span>
+                              </div>
+                              <CloseBarsProgressBar percent={percent} />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
