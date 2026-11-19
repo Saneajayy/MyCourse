@@ -1460,16 +1460,12 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                   {/* Session Eviction Overlay */}
                   {isEvicted && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md text-white p-3 sm:p-6 z-30 text-center select-none font-reddit">
-                      <div className="max-w-md w-full space-y-1.5 sm:space-y-3.5 flex flex-col items-center justify-center">
-                        <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center shrink-0">
-                          <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2]" />
-                        </div>
-
-                        <div className="space-y-0.5 sm:space-y-1">
+                      <div className="max-w-md w-full space-y-2 sm:space-y-3 flex flex-col items-center justify-center">
+                        <div className="space-y-1 sm:space-y-1.5 flex flex-col items-center justify-center">
                           <h3 className="text-sm sm:text-base md:text-lg font-bold text-white tracking-tight">
                             Session Active on Another Device
                           </h3>
-                          <p className="text-[11px] sm:text-xs text-[#c2c4cc] leading-normal sm:leading-relaxed max-w-[280px] sm:max-w-md mx-auto">
+                          <p className="text-[11px] sm:text-xs text-[#c2c4cc] leading-normal sm:leading-relaxed max-w-[240px] sm:max-w-[300px] mx-auto text-center">
                             Your stream was paused because playback was started on another browser or device.
                           </p>
                         </div>
@@ -1480,7 +1476,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                             onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
                             className="h-8 sm:h-9 px-3.5 sm:px-5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-[11px] sm:text-xs rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-sm shrink-0"
                           >
-                            <span className="sm:hidden">Resume</span>
+                            <span className="sm:hidden">Resume Watching</span>
                             <span className="hidden sm:inline">Resume Watching Here &rarr;</span>
                           </button>
                           <Link
