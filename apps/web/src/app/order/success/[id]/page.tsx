@@ -48,8 +48,8 @@ export default function OrderSuccessPage() {
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
-    document.documentElement.style.backgroundColor = '#FFFFFF';
-    document.body.style.backgroundColor = '#FFFFFF';
+    document.documentElement.style.backgroundColor = '#000000';
+    document.body.style.backgroundColor = '#000000';
     return () => {
       document.documentElement.style.backgroundColor = '';
       document.body.style.backgroundColor = '';
@@ -119,9 +119,9 @@ export default function OrderSuccessPage() {
 
   if (loading) {
     return (
-      <div className="w-full h-screen h-[100dvh] flex flex-col items-center justify-center space-y-4 bg-white font-reddit">
-        <Loader2 className="w-10 h-10 animate-spin text-black" />
-        <p className="text-sm font-semibold tracking-wider uppercase text-neutral-600">
+      <div className="fixed inset-0 w-full h-[100dvh] flex flex-col items-center justify-center space-y-3 bg-black text-white font-reddit">
+        <Loader2 className="w-8 h-8 animate-spin text-white" />
+        <p className="text-xs font-mono tracking-wider uppercase text-[#c2c4cc]">
           Loading Order Receipt...
         </p>
       </div>
@@ -130,28 +130,27 @@ export default function OrderSuccessPage() {
 
   if (errorMsg || !order) {
     return (
-      <div className="w-full h-screen h-[100dvh] flex flex-col items-center justify-center p-4 bg-white font-reddit">
-        <div className="max-w-md w-full bg-white border border-neutral-200/80 rounded-none p-7 sm:p-8 text-neutral-900 space-y-4 text-center shadow-none">
-          <div className="w-12 h-12 rounded-none bg-neutral-100 text-neutral-800 flex items-center justify-center mx-auto">
-            <AlertCircle className="w-6 h-6" />
+      <div className="fixed inset-0 w-full h-[100dvh] flex flex-col items-center justify-center p-4 bg-black text-white font-reddit">
+        <div className="max-w-md w-full bg-[#151619] border border-white/[0.08] rounded-xl p-7 sm:p-8 space-y-4 text-center">
+          <div className="w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center mx-auto">
+            <AlertCircle className="w-6 h-6 stroke-[2]" />
           </div>
           <div className="space-y-1">
-            <h2 className="text-xl font-bold text-neutral-950">Order Not Found</h2>
-            <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
-              We couldn&apos;t retrieve the order details for this reference. Please check your
-              student portal or contact support.
+            <h2 className="text-xl font-bold text-white tracking-tight">Order Not Found</h2>
+            <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+              We couldn&apos;t retrieve the order details for this reference. Please check your student portal or contact support.
             </p>
           </div>
           <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
             <Link
               href="/dashboard"
-              className="flex-1 inline-flex items-center justify-center h-11 px-5 bg-black text-white font-bold text-xs uppercase tracking-wider rounded-none hover:bg-neutral-800 transition-colors"
+              className="flex-1 inline-flex items-center justify-center h-11 px-5 bg-white text-black font-semibold text-xs rounded-lg hover:bg-neutral-200 transition-colors"
             >
               Go to My Courses
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center h-11 px-5 border border-neutral-300 text-neutral-900 font-bold text-xs uppercase tracking-wider rounded-none hover:bg-neutral-50 transition-colors"
+              className="inline-flex items-center justify-center h-11 px-5 border border-white/[0.08] hover:border-white/[0.14] bg-[#1b1c20] text-white font-medium text-xs rounded-lg hover:bg-[#22242a] transition-colors"
             >
               Contact Support
             </Link>
@@ -177,39 +176,66 @@ export default function OrderSuccessPage() {
       : order.product.title || 'Hydraulic System Basics';
 
   return (
-    <div className="w-full h-screen h-[100dvh] overflow-hidden bg-white font-reddit selection:bg-black selection:text-white flex flex-col lg:flex-row">
+    <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit selection:bg-white selection:text-black z-10 flex flex-col lg:flex-row gap-2.5 sm:gap-3">
       {/* ============================================================== */}
-      {/* LEFT COLUMN (Desktop Only): Signature Halftone Graphic         */}
+      {/* LEFT CARD (Desktop Only): Signature Fractal Glass Graphic     */}
       {/* ============================================================== */}
-      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-end lg:w-1/2 h-full bg-black overflow-hidden select-none p-6 sm:p-8">
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-between lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
+        {/* Full-Bleed Fractal Glass Graphic */}
         <Image
-          src="/login-pixelated.png"
+          src="/fractal-glass-5.jpg"
           alt="HydroBasics Industrial Hydraulic Engineer"
           fill
           priority
           sizes="50vw"
-          className="object-cover object-center mix-blend-screen opacity-95 select-none"
+          className="object-cover object-center select-none"
         />
+        {/* Top Vignette Gradient Overlay */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000000]/95 via-[#000000]/45 to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
+        {/* Bottom Gradient for Text Legibility while keeping image vivid */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/35 to-transparent pointer-events-none"
           aria-hidden="true"
         />
 
-        {/* Confirmation Badge & Amount Paid Directly on Image */}
-        <div className="relative z-10 w-full mb-1 select-none">
-          <div className="flex items-end justify-between gap-4">
-            <div className="shrink-0">
-              <div className="h-11 flex items-center gap-2 px-4 rounded-none bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-sm font-mono font-bold tracking-wide shadow-md">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>PAYMENT CONFIRMED</span>
-              </div>
-            </div>
+        {/* Top Header Row over Image */}
+        <div className="relative z-10 w-full flex items-center justify-between">
+          <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
+              BASICS
+            </span>
+          </Link>
+        </div>
 
+        {/* Bottom Details over Image */}
+        <div className="relative z-10 w-full space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md inline-flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>PAYMENT CONFIRMED</span>
+            </span>
+          </div>
+
+          <div className="flex items-end justify-between gap-4">
+            <div className="space-y-1">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
+                {displayCourseTitle}
+              </h2>
+              <p className="text-xs sm:text-[13px] text-[#c2c4cc]">
+                12 Months Full Access Activated
+              </p>
+            </div>
             <div className="flex flex-col items-end shrink-0 text-right">
-              <span className="text-[11px] uppercase font-bold tracking-wider text-neutral-400 drop-shadow">
+              <span className="text-[10px] uppercase font-mono tracking-wider text-[#80828d]">
                 Amount Paid
               </span>
-              <span className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
+              <span className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white leading-none">
                 ₹{formattedAmount}
               </span>
             </div>
@@ -218,96 +244,35 @@ export default function OrderSuccessPage() {
       </div>
 
       {/* ============================================================== */}
-      {/* RIGHT COLUMN: Clean White Card & Navigation                    */}
+      {/* RIGHT CARD: Success Card & Navigation                          */}
       {/* ============================================================== */}
-      <div className="w-full lg:w-1/2 h-full bg-white text-neutral-900 flex flex-col relative overflow-hidden">
-        {/* Desktop Top Header Bar */}
-        <header className="hidden lg:flex absolute top-0 inset-x-0 w-full items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 z-20 pointer-events-none">
-          <div className="pointer-events-auto">
-            <Link
-              href="/dashboard"
-              className="text-xs sm:text-sm font-bold text-neutral-600 hover:text-black flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <BookOpen className="w-4 h-4 text-black" />
-              <span>My Courses &rarr;</span>
-            </Link>
-          </div>
-
-          <Link
-            href="/"
-            className="pointer-events-auto flex flex-col items-end -space-y-0.5 leading-[0.92] text-black hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
-            aria-label="HYDRO BASICS Home - Back to Course"
-          >
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative">
+        {/* Top Header Bar */}
+        <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
+          <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+            <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
               HYDRO
             </span>
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
               BASICS
             </span>
           </Link>
-        </header>
-
-        {/* Mobile Upper Part: Fixed Halftone Graphic */}
-        <div className="lg:hidden relative w-full h-[220px] sm:h-[250px] bg-black shrink-0 overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5">
-          <Image
-            src="/login-pixelated.png"
-            alt="HydroBasics Industrial Hydraulic Engineer"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center mix-blend-screen opacity-95 select-none"
-          />
-          <div
-            className="absolute inset-0 bg-gradient-to-t from-[#000000]/95 via-[#000000]/35 to-[#000000]/45 pointer-events-none"
-            aria-hidden="true"
-          />
-
-          <div className="relative z-10 w-full flex items-center justify-between">
-            <Link
-              href="/dashboard"
-              className="text-xs text-neutral-300 font-semibold flex items-center gap-1 hover:text-white"
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>My Courses &rarr;</span>
-            </Link>
-            <Link
-              href="/"
-              className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
-              aria-label="HYDRO BASICS Home"
-            >
-              <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-                HYDRO
-              </span>
-              <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-                BASICS
-              </span>
-            </Link>
-          </div>
-
-          <div className="relative z-10 w-full">
-            <div className="flex items-end justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="h-10 flex items-center gap-1.5 px-3 rounded-none bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs font-mono font-bold tracking-wide">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="truncate">PAYMENT CONFIRMED</span>
-                </div>
-              </div>
-
-              <div className="flex flex-col items-end shrink-0 text-right">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400 drop-shadow">
-                  Amount Paid
-                </span>
-                <span className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
-                  ₹{formattedAmount}
-                </span>
-              </div>
-            </div>
-          </div>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-[#c2c4cc]/70 hover:text-white transition-colors ml-auto"
+            title="Go to My Courses"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>My Courses &rarr;</span>
+          </Link>
         </div>
 
-        {/* Scrollable Center Section with Clean White Card (Reference Design) */}
-        <div className="flex-1 w-full min-h-0 overflow-y-auto relative flex flex-col justify-center items-center py-6 sm:py-8 px-4">
-          <div className="my-auto w-full max-w-[460px]">
+        {/* Thin Stroke Separation Line */}
+        <div className="border-b border-white/[0.08] w-full shrink-0" />
+
+        {/* Scrollable Center Section */}
+        <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col items-center lg:justify-center">
+          <div className="w-full max-w-[420px] sm:max-w-[440px] space-y-4 py-2 pb-8 lg:py-0 lg:my-auto">
             <PaymentSuccessCard
               data={{
                 orderId: order.id,

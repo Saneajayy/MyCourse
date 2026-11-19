@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '../../components/ui';
 import { apiClient } from '../../lib/api-client';
-import { Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Loader2, ArrowLeft, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -80,184 +80,186 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="relative w-full bg-white border border-neutral-200/80 rounded-none p-5 sm:p-8 select-none overflow-hidden">
-      {/* Card Content */}
-      <div className="w-full">
-        {isSuccess ? (
-          <div className="text-center py-4 space-y-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
-              Password Reset Successful
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
-              Your password has been securely updated. You can now log in with your new credentials.
-            </p>
-            <div className="pt-4 border-t border-neutral-200">
-              <button
-                type="button"
-                onClick={() => router.push('/login')}
-                className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] text-white font-bold text-base rounded-none transition-all flex items-center justify-center cursor-pointer"
-              >
-                Sign In Now
-              </button>
-            </div>
+    <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
+      {isSuccess ? (
+        <div className="text-center py-4 space-y-4">
+          <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center">
+            <CheckCircle2 className="w-6 h-6 stroke-[2]" />
           </div>
-        ) : isTokenInvalid ? (
-          <div className="text-center py-4 space-y-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900 tracking-tight">
-              Verification Code Required
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">
-              To reset your password, please start by requesting a 6-digit code for your email
-              address.
-            </p>
-            <div className="pt-4 border-t border-neutral-200">
-              <Link
-                href="/forgot-password"
-                className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] text-white font-bold text-base rounded-none transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Request Reset Code</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            Password Updated
+          </h2>
+          <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+            Your password has been securely updated. You can now log in with your new credentials.
+          </p>
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => router.push('/login')}
+              className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors flex items-center justify-center cursor-pointer shadow-sm"
+            >
+              Sign In Now &rarr;
+            </button>
           </div>
-        ) : (
-          <>
-            {/* Header & Title - Sizing & Placing identical to login, signup, and verify-email */}
-            <div className="text-center mb-6">
-              <h1 className="text-2xl sm:text-[28px] md:text-[30px] font-bold text-neutral-900 tracking-tight">
-                Create New Password
-              </h1>
-              <p className="text-xs sm:text-sm text-neutral-600 mt-1.5 leading-relaxed">
-                {initialEmail ? (
-                  <>Create a new password for your account.</>
-                ) : (
-                  'Choose a secure new password of at least 10 characters'
-                )}
-              </p>
+        </div>
+      ) : isTokenInvalid ? (
+        <div className="text-center py-4 space-y-4">
+          <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 mx-auto flex items-center justify-center">
+            <AlertCircle className="w-6 h-6 stroke-[2]" />
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            Reset Token Required
+          </h2>
+          <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+            To reset your password, please start by requesting a 6-digit code for your email address.
+          </p>
+          <div className="pt-2">
+            <Link
+              href="/forgot-password"
+              className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+            >
+              <span>Request Reset Code &rarr;</span>
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Header */}
+          <div className="space-y-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Create New Password
+            </h1>
+            <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+              {initialEmail ? (
+                <>Enter a new password for <span className="text-white font-medium">{initialEmail}</span>.</>
+              ) : (
+                'Choose a secure new password of at least 10 characters.'
+              )}
+            </p>
+          </div>
+
+          {/* Error Alert */}
+          {errorMsg && (
+            <div className="p-3 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-300 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+              <span>{errorMsg}</span>
             </div>
+          )}
 
-            {/* Error Banner */}
-            {errorMsg && (
-              <div className="mb-4 p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
-                <span>{errorMsg}</span>
-              </div>
-            )}
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-3.5">
-              {/* New Password */}
-              <div className="space-y-1.5 text-left">
-                <label htmlFor="reset-password" className="text-sm font-bold text-neutral-900">
-                  New Password
-                </label>
-                <div className="relative">
-                  <input
-                    id="reset-password"
-                    type={showNewPassword ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    placeholder="At least 10 characters"
-                    required
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full h-[44px] sm:h-[46px] rounded-none border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors p-1 rounded-none focus:outline-none cursor-pointer"
-                    aria-label={showNewPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showNewPassword ? (
-                      <Eye className="w-4 h-4" aria-hidden="true" />
-                    ) : (
-                      <EyeOff className="w-4 h-4" aria-hidden="true" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Confirm New Password */}
-              <div className="space-y-1.5 text-left">
-                <label
-                  htmlFor="reset-confirm-password"
-                  className="text-sm font-bold text-neutral-900"
-                >
-                  Confirm New Password
-                </label>
-                <div className="relative">
-                  <input
-                    id="reset-confirm-password"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    placeholder="Re-enter password"
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full h-[44px] sm:h-[46px] rounded-none border border-neutral-300 bg-white px-3.5 pr-10 text-sm text-neutral-900 focus:border-black focus:outline-none focus:ring-1 focus:ring-black transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800 transition-colors p-1 rounded-none focus:outline-none cursor-pointer"
-                    aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showConfirmPassword ? (
-                      <Eye className="w-4 h-4" aria-hidden="true" />
-                    ) : (
-                      <EyeOff className="w-4 h-4" aria-hidden="true" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="pt-2">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-3.5 pt-1">
+            {/* New Password */}
+            <div className="space-y-1.5 text-left">
+              <label htmlFor="reset-password" className="text-xs font-medium text-white block">
+                New Password
+              </label>
+              <div className="relative">
+                <input
+                  id="reset-password"
+                  type={showNewPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  placeholder="At least 10 characters"
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full h-10 px-3 pr-10 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-sm text-white placeholder:text-neutral-500 rounded-lg outline-none transition-colors"
+                />
                 <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-none transition-all disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
+                  type="button"
+                  onClick={() => setShowNewPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors p-1 focus:outline-none"
+                  aria-label={showNewPassword ? 'Hide password' : 'Show password'}
                 >
-                  {isLoading && (
-                    <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />
+                  {showNewPassword ? (
+                    <Eye className="w-4 h-4" aria-hidden="true" />
+                  ) : (
+                    <EyeOff className="w-4 h-4" aria-hidden="true" />
                   )}
-                  <span>{isLoading ? 'Updating Password...' : 'Save New Password'}</span>
                 </button>
               </div>
-            </form>
-
-            {/* Back to Login */}
-            <div className="mt-5 text-center text-sm text-neutral-600">
-              Remember your password?{' '}
-              <Link
-                href="/login"
-                className="font-bold text-black underline hover:text-[#262626] ml-1"
-              >
-                Sign in
-              </Link>
             </div>
 
-            {/* Horizontal Divider */}
-            <div className="-mx-5 sm:-mx-8 border-t border-neutral-200 my-6" />
+            {/* Confirm New Password */}
+            <div className="space-y-1.5 text-left">
+              <label
+                htmlFor="reset-confirm-password"
+                className="text-xs font-medium text-white block"
+              >
+                Confirm New Password
+              </label>
+              <div className="relative">
+                <input
+                  id="reset-confirm-password"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  placeholder="Re-enter password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full h-10 px-3 pr-10 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-sm text-white placeholder:text-neutral-500 rounded-lg outline-none transition-colors"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors p-1 focus:outline-none"
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? (
+                    <Eye className="w-4 h-4" aria-hidden="true" />
+                  ) : (
+                    <EyeOff className="w-4 h-4" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+            </div>
 
-            {/* Footer Disclaimer */}
-            <p className="text-center text-xs text-neutral-500 leading-normal">
-              Need assistance? Contact our{' '}
-              <Link href="/contact" className="underline hover:text-neutral-800">
-                support desk
-              </Link>
-              .
-            </p>
-          </>
-        )}
-      </div>
+            {/* Submit Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors disabled:opacity-60 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                {isLoading && (
+                  <Loader2 className="w-4 h-4 animate-spin text-black" aria-hidden="true" />
+                )}
+                <span>{isLoading ? 'Updating Password...' : 'Save New Password \u2192'}</span>
+              </button>
+            </div>
+          </form>
+
+          {/* Back to Login */}
+          <div className="pt-1 text-center text-xs text-[#c2c4cc]">
+            Remember your password?{' '}
+            <Link
+              href="/login"
+              className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1"
+            >
+              Sign in &rarr;
+            </Link>
+          </div>
+
+          {/* Horizontal Divider */}
+          <div className="-mx-5 sm:-mx-7 border-t border-white/[0.06] pt-4" />
+
+          {/* Footer Disclaimer */}
+          <p className="text-center text-[11px] text-[#80828d] leading-normal">
+            Need assistance? Contact our{' '}
+            <Link href="/contact" className="underline hover:text-white transition-colors">
+              support desk
+            </Link>
+            .
+          </p>
+        </>
+      )}
     </div>
   );
 }
 
 export default function ResetPasswordPage() {
   useEffect(() => {
-    document.documentElement.style.backgroundColor = '#FFFFFF';
-    document.body.style.backgroundColor = '#FFFFFF';
+    document.documentElement.style.backgroundColor = '#000000';
+    document.body.style.backgroundColor = '#000000';
     return () => {
       document.documentElement.style.backgroundColor = '';
       document.body.style.backgroundColor = '';
@@ -265,53 +267,99 @@ export default function ResetPasswordPage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-white font-reddit selection:bg-black selection:text-white flex flex-col lg:flex-row overflow-hidden">
-      {/* Left Column (Desktop Only): Signature Dot Halftone Graphic on Deep Cobalt Blue */}
-      <div className="hidden lg:relative lg:flex lg:w-1/2 h-full bg-black overflow-hidden select-none">
+    <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit selection:bg-white selection:text-black z-10 flex flex-col lg:flex-row gap-2.5 sm:gap-3">
+      {/* ============================================================== */}
+      {/* LEFT CARD (Desktop Only): Signature Fractal Glass Graphic     */}
+      {/* ============================================================== */}
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-between lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
+        {/* Full-Bleed Fractal Glass Graphic */}
         <Image
-          src="/login-pixelated.png"
+          src="/fractal-glass-5.jpg"
           alt="HydroBasics Industrial Hydraulic Engineer"
           fill
           priority
           sizes="50vw"
-          className="object-cover object-center mix-blend-screen opacity-95 select-none"
+          className="object-cover object-center select-none"
         />
-        {/* Soft overlay gradient for subtle depth */}
+        {/* Top Vignette Gradient Overlay */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000000]/80 via-transparent to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none"
           aria-hidden="true"
         />
-      </div>
+        {/* Bottom Gradient for Text Legibility while keeping image vivid */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/35 to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
 
-      {/* Right Column: Clean White Background on both Mobile & Desktop */}
-      <div className="w-full lg:w-1/2 h-full bg-white flex flex-col overflow-y-auto relative">
-        {/* Top Header Bar inside the right side area */}
-        <header className="w-full flex items-center justify-end px-5 pt-5 sm:px-8 sm:pt-8 shrink-0 z-20">
-          <Link
-            href="/"
-            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-black hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
-            aria-label="HYDRO BASICS Home - Back to Course"
-          >
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+        {/* Top Header Row over Image */}
+        <div className="relative z-10 w-full flex items-center justify-between">
+          <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
               HYDRO
             </span>
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
               BASICS
             </span>
           </Link>
-        </header>
+        </div>
 
-        {/* Perfectly Centered Card */}
-        <div className="m-auto w-full max-w-[420px] sm:max-w-[440px] px-4 py-6 sm:py-8 relative z-10">
-          <Suspense
-            fallback={
-              <div className="p-8 text-center text-sm font-mono text-neutral-500">
-                Loading reset form...
-              </div>
-            }
+        {/* Bottom Details over Image */}
+        <div className="relative z-10 w-full space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
+              CREDENTIAL SECURITY
+            </span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
+            Create New Password
+          </h2>
+          <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed max-w-lg">
+            Set a strong password for your HydroBasics account to protect your engineering coursework, calculators, and certificates.
+          </p>
+        </div>
+      </div>
+
+      {/* ============================================================== */}
+      {/* RIGHT CARD: Reset Password Form                                 */}
+      {/* ============================================================== */}
+      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative">
+        {/* Top Header Bar */}
+        <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
+          <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+            <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
+              BASICS
+            </span>
+          </Link>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-[#c2c4cc]/70 hover:text-white transition-colors ml-auto"
+            title="Back to Sign In"
           >
-            <ResetPasswordForm />
-          </Suspense>
+            <ArrowLeft className="w-3 h-3" />
+            <span>Sign In</span>
+          </Link>
+        </div>
+
+        {/* Thin Stroke Separation Line */}
+        <div className="border-b border-white/[0.08] w-full shrink-0" />
+
+        {/* Form Container */}
+        <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col items-center lg:justify-center">
+          <div className="w-full max-w-[420px] sm:max-w-[440px] space-y-4 py-2 pb-8 lg:py-0 lg:my-auto">
+            <Suspense
+              fallback={
+                <div className="p-8 text-center text-xs font-mono text-[#c2c4cc]">
+                  Loading reset form...
+                </div>
+              }
+            >
+              <ResetPasswordForm />
+            </Suspense>
+          </div>
         </div>
       </div>
     </div>

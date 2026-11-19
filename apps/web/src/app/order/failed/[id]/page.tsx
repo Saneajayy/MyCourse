@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { apiClient } from '../../../../lib/api-client';
-import { X } from 'lucide-react';
+import { X, ArrowLeft } from 'lucide-react';
 import { PaymentFailedCard } from '../../../../components/PaymentFailedCard';
 
 export default function OrderFailedPage() {
@@ -20,8 +20,8 @@ export default function OrderFailedPage() {
   } | null>(null);
 
   useEffect(() => {
-    document.documentElement.style.backgroundColor = '#FFFFFF';
-    document.body.style.backgroundColor = '#FFFFFF';
+    document.documentElement.style.backgroundColor = '#000000';
+    document.body.style.backgroundColor = '#000000';
     return () => {
       document.documentElement.style.backgroundColor = '';
       document.body.style.backgroundColor = '';
@@ -40,78 +40,96 @@ export default function OrderFailedPage() {
       .catch(() => {});
   }, [orderId]);
 
+  const displayCourse = order?.product?.title || 'Hydraulic System Basics';
+
   return (
-    <div className="w-full h-screen h-[100dvh] overflow-hidden bg-white font-reddit selection:bg-black selection:text-white flex flex-col lg:flex-row">
+    <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit selection:bg-white selection:text-black z-10 flex flex-col lg:flex-row gap-2.5 sm:gap-3">
       {/* ============================================================== */}
-      {/* LEFT COLUMN (Desktop Only): Signature Halftone Graphic         */}
+      {/* LEFT CARD (Desktop Only): Signature Fractal Glass Graphic     */}
       {/* ============================================================== */}
-      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-end lg:w-1/2 h-full bg-black overflow-hidden select-none p-6 sm:p-8">
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-between lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
+        {/* Full-Bleed Fractal Glass Graphic */}
         <Image
-          src="/login-pixelated.png"
+          src="/fractal-glass-5.jpg"
           alt="HydroBasics Industrial Hydraulic Engineer"
           fill
           priority
           sizes="50vw"
-          className="object-cover object-center mix-blend-screen opacity-95 select-none"
+          className="object-cover object-center select-none"
         />
+        {/* Top Vignette Gradient Overlay */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000000]/95 via-[#000000]/45 to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
+        {/* Bottom Gradient for Text Legibility while keeping image vivid */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/35 to-transparent pointer-events-none"
           aria-hidden="true"
         />
 
-        <div className="relative z-10 w-full mb-1 select-none">
-          <div className="flex items-end justify-between gap-4">
-            <div className="shrink-0">
-              <div className="h-11 flex items-center gap-2 px-4 rounded-none bg-rose-500/25 border border-rose-400/50 backdrop-blur-sm text-rose-200 text-sm font-mono font-bold tracking-wide shadow-md">
-                <X className="w-4 h-4 text-rose-400 shrink-0" />
-                <span>PAYMENT DECLINED</span>
-              </div>
-            </div>
+        {/* Top Header Row over Image */}
+        <div className="relative z-10 w-full flex items-center justify-between">
+          <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
+              BASICS
+            </span>
+          </Link>
+        </div>
+
+        {/* Bottom Details over Image */}
+        <div className="relative z-10 w-full space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-md inline-flex items-center gap-1.5">
+              <X className="w-3.5 h-3.5" />
+              <span>PAYMENT DECLINED</span>
+            </span>
+          </div>
+
+          <div className="space-y-1">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
+              {displayCourse}
+            </h2>
+            <p className="text-xs sm:text-[13px] text-[#c2c4cc]">
+              No charge was applied to your payment method. You can retry anytime.
+            </p>
           </div>
         </div>
       </div>
 
       {/* ============================================================== */}
-      {/* RIGHT COLUMN: Clean White Background with Centered Pop-up Card */}
+      {/* RIGHT CARD: Failed Card & Navigation                           */}
       {/* ============================================================== */}
-      <div className="w-full lg:w-1/2 h-full bg-white text-neutral-900 flex flex-col relative overflow-hidden">
+      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative">
         {/* Top Header Bar */}
-        <header className="absolute top-0 inset-x-0 w-full flex items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 z-20 pointer-events-none">
-          <div className="pointer-events-auto">
-            <Link
-              href="/checkout"
-              className="text-xs sm:text-sm font-bold text-neutral-600 hover:text-black flex items-center gap-1.5 transition-colors cursor-pointer"
-            >
-              <span>&larr; Back to Checkout</span>
-            </Link>
-          </div>
-
-          <Link
-            href="/"
-            className="pointer-events-auto flex flex-col items-end -space-y-0.5 leading-[0.92] text-black hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
-            aria-label="HYDRO BASICS Home - Back to Course"
-          >
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+        <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
+          <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+            <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
               HYDRO
             </span>
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
               BASICS
             </span>
           </Link>
-        </header>
+          <Link
+            href="/checkout"
+            className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-[#c2c4cc]/70 hover:text-white transition-colors ml-auto"
+            title="Back to Checkout"
+          >
+            <ArrowLeft className="w-3 h-3" />
+            <span>Back to Checkout</span>
+          </Link>
+        </div>
 
-        {/* Center Section: Pop-up Card */}
-        <div className="flex-1 w-full min-h-0 overflow-y-auto relative flex flex-col justify-center items-center py-6 sm:py-8 px-4">
-          <div className="my-auto w-full max-w-[460px] relative">
-            {/* Pop-up close X button in top right corner of card */}
-            <Link
-              href="/checkout"
-              aria-label="Close"
-              className="absolute -top-3 -right-3 sm:-top-4 sm:-right-4 w-9 h-9 sm:w-10 sm:h-10 rounded-none bg-white border border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100 flex items-center justify-center shadow-md transition-all cursor-pointer z-20"
-            >
-              <X className="w-4 h-4 sm:w-5 sm:h-5" />
-            </Link>
+        {/* Thin Stroke Separation Line */}
+        <div className="border-b border-white/[0.08] w-full shrink-0" />
 
+        {/* Scrollable Center Section */}
+        <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col items-center lg:justify-center">
+          <div className="w-full max-w-[420px] sm:max-w-[440px] space-y-4 py-2 pb-8 lg:py-0 lg:my-auto">
             <PaymentFailedCard
               orderId={orderId}
               courseTitle={order?.product?.title}

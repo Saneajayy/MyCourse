@@ -7,7 +7,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useToast } from '../../components/ui';
 import { useAuth, User } from '../../context/auth-context';
 import { apiClient } from '../../lib/api-client';
-import { Loader2, RotateCw, Check } from 'lucide-react';
+import { Loader2, RotateCw, Check, ArrowLeft, AlertCircle } from 'lucide-react';
 
 function VerifyEmailForm() {
   const router = useRouter();
@@ -215,164 +215,161 @@ function VerifyEmailForm() {
   const isComplete = digits.every((d) => d.length === 1);
 
   return (
-    <div className="relative w-full bg-white border border-neutral-200/80 rounded-none p-5 sm:p-8 select-none overflow-hidden">
-      <div className="w-full">
-        {/* Header & Title - Sizing & Placing identical to login, signup, and forgot pwd */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl sm:text-[28px] md:text-[30px] font-bold text-neutral-900 tracking-tight">
-            Please check your email
-          </h1>
-          <div className="text-neutral-600 text-[13px] sm:text-[14px] font-normal mt-1.5 space-y-0.5">
-            <p>Enter the 6 digit OTP we sent you to</p>
-            {isEditingEmail ? (
-              <div className="inline-flex items-center gap-2 mt-1.5">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  className="bg-neutral-50 border border-neutral-300 rounded-none px-2.5 py-1 text-xs sm:text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-1 focus:ring-black text-center font-normal"
-                  autoFocus
-                />
-                <button
-                  type="button"
-                  onClick={() => setIsEditingEmail(false)}
-                  className="text-xs font-bold text-white bg-black hover:bg-[#262626] px-2.5 py-1 rounded-none transition-colors cursor-pointer"
-                >
-                  Save
-                </button>
-              </div>
-            ) : (
-              <div>
-                <span
-                  onClick={() => setIsEditingEmail(true)}
-                  className="text-neutral-900 font-medium cursor-pointer break-all hover:text-black transition-colors inline-block"
-                  title="Click to edit email"
-                >
-                  {email || 'your email address'}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Info/Success message */}
-        {infoMessage && (
-          <div className="mb-4 p-3.5 rounded-none bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 text-xs sm:text-[13px] font-medium text-center">
-            <span>{infoMessage}</span>
-          </div>
-        )}
-
-        {/* Error message */}
-        {errorMessage && (
-          <div className="mb-4 p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium text-center">
-            <span>{errorMessage}</span>
-          </div>
-        )}
-
-        {/* 6 Digit OTP Inputs Form */}
-        <form onSubmit={handleManualSubmit} className="space-y-5">
-          <div
-            className="flex items-center justify-center gap-2 sm:gap-2.5 my-2"
-            onPaste={handlePaste}
-          >
-            {digits.map((digit, index) => (
+    <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
+      {/* Header */}
+      <div className="space-y-1">
+        <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+          Check Your Email
+        </h1>
+        <div className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+          <span>Enter the 6-digit code sent to </span>
+          {isEditingEmail ? (
+            <div className="inline-flex items-center gap-2 mt-2 w-full">
               <input
-                key={index}
-                ref={(el) => {
-                  inputRefs.current[index] = el;
-                }}
-                id={`otp-input-${index}`}
-                type="text"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                pattern="\d*"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleDigitChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                disabled={status === 'verifying' || status === 'success'}
-                className="w-[38px] h-[44px] sm:w-[42px] sm:h-[48px] text-center text-xl sm:text-2xl font-bold text-neutral-900 bg-white border border-neutral-300 focus:border-black focus:ring-1 focus:ring-black caret-black rounded-none focus:outline-none transition-all disabled:opacity-50 select-none"
-                aria-label={`Digit ${index + 1}`}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                className="flex-1 h-8 px-2.5 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-xs text-white placeholder:text-neutral-500 rounded-lg outline-none"
+                autoFocus
               />
-            ))}
-          </div>
-
-          {/* Verify & Continue Button */}
-          <div className="pt-2">
-            <button
-              type="submit"
-              disabled={!isComplete || status === 'verifying' || status === 'success'}
-              className="w-full h-[46px] sm:h-[48px] bg-black hover:bg-[#262626] active:bg-[#171717] active:scale-[0.99] text-white font-bold text-base rounded-none transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {status === 'verifying' ? (
-                <>
-                  <Loader2 className="w-4.5 h-4.5 animate-spin text-white" aria-hidden="true" />
-                  <span>Verifying Code...</span>
-                </>
-              ) : status === 'success' ? (
-                <>
-                  <Check className="w-4.5 h-4.5 stroke-[3] text-white" aria-hidden="true" />
-                  <span>Verified! Redirecting...</span>
-                </>
-              ) : (
-                <span>Verify &amp; Continue</span>
-              )}
-            </button>
-          </div>
-        </form>
-
-        {/* Resend Code Section */}
-        <div className="mt-5 flex flex-col items-center gap-1 text-[13px] text-neutral-600">
-          <div className="flex items-center gap-1.5 flex-wrap justify-center">
-            <span>Didn&apos;t receive the email?</span>
-            {resendCooldown > 0 ? (
-              <span className="text-neutral-400 font-normal">Resend in {resendCooldown}s</span>
-            ) : (
               <button
                 type="button"
-                onClick={handleResendOtp}
-                disabled={isResending}
-                className="font-semibold text-black hover:text-[#262626] underline underline-offset-2 inline-flex items-center gap-1 cursor-pointer disabled:opacity-50 transition-colors"
+                onClick={() => setIsEditingEmail(false)}
+                className="h-8 px-3 bg-white text-black text-xs font-semibold rounded-lg hover:bg-neutral-200 transition-colors"
               >
-                {isResending && <RotateCw className="w-3 h-3 animate-spin text-black" />}
-                <span>Resend Code</span>
+                Save
               </button>
-            )}
-          </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsEditingEmail(true)}
+              className="text-white font-medium underline underline-offset-2 hover:text-white/80 transition-colors cursor-pointer"
+              title="Click to edit email"
+            >
+              {email || 'your email address'}
+            </button>
+          )}
         </div>
-
-        {/* Wrong Account Link - Sized and styled identically to Create an account on login / Try another email on forgot-password */}
-        <div className="mt-5 text-center text-sm text-neutral-600">
-          Wrong account?{' '}
-          <Link
-            href="/register"
-            className="font-bold text-black underline hover:text-[#262626] ml-1 cursor-pointer"
-          >
-            Try another email
-          </Link>
-        </div>
-
-        {/* Horizontal Divider */}
-        <div className="-mx-5 sm:-mx-8 border-t border-neutral-200 my-6" />
-
-        {/* Footer Disclaimer */}
-        <p className="text-center text-xs text-neutral-500 leading-normal">
-          Need assistance? Contact our{' '}
-          <Link href="/contact" className="underline hover:text-neutral-800">
-            support desk
-          </Link>
-          .
-        </p>
       </div>
+
+      {/* Info message */}
+      {infoMessage && (
+        <div className="p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 text-xs flex items-center gap-2">
+          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span>{infoMessage}</span>
+        </div>
+      )}
+
+      {/* Error message */}
+      {errorMessage && (
+        <div className="p-3 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-300 text-xs flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+
+      {/* 6 Digit OTP Form */}
+      <form onSubmit={handleManualSubmit} className="space-y-4 pt-1">
+        <div
+          className="flex items-center justify-between gap-1.5 sm:gap-2 my-2"
+          onPaste={handlePaste}
+        >
+          {digits.map((digit, index) => (
+            <input
+              key={index}
+              ref={(el) => {
+                inputRefs.current[index] = el;
+              }}
+              id={`otp-input-${index}`}
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="\d*"
+              maxLength={1}
+              value={digit}
+              onChange={(e) => handleDigitChange(index, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(index, e)}
+              disabled={status === 'verifying' || status === 'success'}
+              className="w-[44px] h-[50px] sm:w-[48px] sm:h-[54px] text-center text-xl sm:text-2xl font-bold font-mono text-white bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 rounded-lg outline-none transition-colors disabled:opacity-50 select-none"
+              aria-label={`Digit ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Submit Button */}
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={!isComplete || status === 'verifying' || status === 'success'}
+            className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+          >
+            {status === 'verifying' ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-black" aria-hidden="true" />
+                <span>Verifying Code...</span>
+              </>
+            ) : status === 'success' ? (
+              <>
+                <Check className="w-4 h-4 stroke-[2.5] text-emerald-600" aria-hidden="true" />
+                <span>Verified! Redirecting...</span>
+              </>
+            ) : (
+              <span>Verify &amp; Continue &rarr;</span>
+            )}
+          </button>
+        </div>
+      </form>
+
+      {/* Resend Section */}
+      <div className="pt-1 text-center text-xs text-[#c2c4cc]">
+        Didn&apos;t receive the code?{' '}
+        {resendCooldown > 0 ? (
+          <span className="text-[#80828d] font-mono ml-1">Resend in {resendCooldown}s</span>
+        ) : (
+          <button
+            type="button"
+            onClick={handleResendOtp}
+            disabled={isResending}
+            className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1 inline-flex items-center gap-1 cursor-pointer"
+          >
+            {isResending && <RotateCw className="w-3 h-3 animate-spin text-white" />}
+            <span>Resend Code</span>
+          </button>
+        )}
+      </div>
+
+      {/* Wrong Account Link */}
+      <div className="text-center text-xs text-[#80828d]">
+        Wrong account?{' '}
+        <Link
+          href="/register"
+          className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1"
+        >
+          Try another email &rarr;
+        </Link>
+      </div>
+
+      {/* Horizontal Divider */}
+      <div className="-mx-5 sm:-mx-7 border-t border-white/[0.06] pt-4" />
+
+      {/* Footer Disclaimer */}
+      <p className="text-center text-[11px] text-[#80828d] leading-normal">
+        Need assistance? Contact our{' '}
+        <Link href="/contact" className="underline hover:text-white transition-colors">
+          support desk
+        </Link>
+        .
+      </p>
     </div>
   );
 }
 
 export default function VerifyEmailPage() {
   useEffect(() => {
-    document.documentElement.style.backgroundColor = '#FFFFFF';
-    document.body.style.backgroundColor = '#FFFFFF';
+    document.documentElement.style.backgroundColor = '#000000';
+    document.body.style.backgroundColor = '#000000';
     return () => {
       document.documentElement.style.backgroundColor = '';
       document.body.style.backgroundColor = '';
@@ -380,53 +377,99 @@ export default function VerifyEmailPage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-white font-reddit selection:bg-black selection:text-white flex flex-col lg:flex-row overflow-hidden">
-      {/* Left Column (Desktop Only): Signature Dot Halftone Graphic on Deep Cobalt Blue */}
-      <div className="hidden lg:relative lg:flex lg:w-1/2 h-full bg-black overflow-hidden select-none">
+    <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit selection:bg-white selection:text-black z-10 flex flex-col lg:flex-row gap-2.5 sm:gap-3">
+      {/* ============================================================== */}
+      {/* LEFT CARD (Desktop Only): Signature Fractal Glass Graphic     */}
+      {/* ============================================================== */}
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-between lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
+        {/* Full-Bleed Fractal Glass Graphic */}
         <Image
-          src="/login-pixelated.png"
+          src="/fractal-glass-5.jpg"
           alt="HydroBasics Industrial Hydraulic Engineer"
           fill
           priority
           sizes="50vw"
-          className="object-cover object-center mix-blend-screen opacity-95 select-none"
+          className="object-cover object-center select-none"
         />
-        {/* Soft overlay gradient for subtle depth */}
+        {/* Top Vignette Gradient Overlay */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000000]/80 via-transparent to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none"
           aria-hidden="true"
         />
-      </div>
+        {/* Bottom Gradient for Text Legibility while keeping image vivid */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/35 to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
 
-      {/* Right Column: Clean White Background on both Mobile & Desktop */}
-      <div className="w-full lg:w-1/2 h-full bg-white flex flex-col overflow-y-auto relative">
-        {/* Top Header Bar inside the right side area */}
-        <header className="w-full flex items-center justify-end px-5 pt-5 sm:px-8 sm:pt-8 shrink-0 z-20">
-          <Link
-            href="/"
-            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-black hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
-            aria-label="HYDRO BASICS Home - Back to Course"
-          >
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+        {/* Top Header Row over Image */}
+        <div className="relative z-10 w-full flex items-center justify-between">
+          <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
               HYDRO
             </span>
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
               BASICS
             </span>
           </Link>
-        </header>
+        </div>
 
-        {/* Centered OTP Verification Area */}
-        <div className="m-auto w-full max-w-[420px] sm:max-w-[440px] px-4 py-6 sm:py-8 relative z-10">
-          <Suspense
-            fallback={
-              <div className="p-8 text-center text-sm font-mono text-neutral-500">
-                Loading verification...
-              </div>
-            }
+        {/* Bottom Details over Image */}
+        <div className="relative z-10 w-full space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
+              ACCOUNT SECURITY
+            </span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
+            Email Verification
+          </h2>
+          <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed max-w-lg">
+            Verify your identity to ensure secure access to your course modules, engineering calculators, and certificates.
+          </p>
+        </div>
+      </div>
+
+      {/* ============================================================== */}
+      {/* RIGHT CARD: Verify Email Form                                   */}
+      {/* ============================================================== */}
+      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative">
+        {/* Top Header Bar */}
+        <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
+          <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+            <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
+              BASICS
+            </span>
+          </Link>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-[#c2c4cc]/70 hover:text-white transition-colors ml-auto"
+            title="Back to Sign In"
           >
-            <VerifyEmailForm />
-          </Suspense>
+            <ArrowLeft className="w-3 h-3" />
+            <span>Sign In</span>
+          </Link>
+        </div>
+
+        {/* Thin Stroke Separation Line */}
+        <div className="border-b border-white/[0.08] w-full shrink-0" />
+
+        {/* Form Container */}
+        <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col items-center lg:justify-center">
+          <div className="w-full max-w-[420px] sm:max-w-[440px] space-y-4 py-2 pb-8 lg:py-0 lg:my-auto">
+            <Suspense
+              fallback={
+                <div className="p-8 text-center text-xs font-mono text-[#c2c4cc]">
+                  Loading verification...
+                </div>
+              }
+            >
+              <VerifyEmailForm />
+            </Suspense>
+          </div>
         </div>
       </div>
     </div>
