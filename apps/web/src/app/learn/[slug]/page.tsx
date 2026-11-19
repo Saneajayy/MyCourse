@@ -1430,59 +1430,65 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
 
                   {/* Error Overlay */}
                   {streamError && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/85 backdrop-blur-md text-white p-6 z-20 text-center space-y-4">
-                      <div className="w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center shrink-0">
-                        <AlertTriangle className="w-6 h-6 stroke-[2]" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md text-white p-3 sm:p-6 z-20 text-center select-none font-reddit">
+                      <div className="max-w-md w-full space-y-1.5 sm:space-y-3.5 flex flex-col items-center justify-center">
+                        <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center justify-center shrink-0">
+                          <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2]" />
+                        </div>
+                        <div className="space-y-0.5 sm:space-y-1">
+                          <h3 className="text-sm sm:text-base md:text-lg font-bold text-white tracking-tight">
+                            Playback Error
+                          </h3>
+                          <p className="text-[11px] sm:text-xs text-[#c2c4cc] leading-normal sm:leading-relaxed max-w-[280px] sm:max-w-md mx-auto">
+                            {streamError}
+                          </p>
+                        </div>
+                        <div className="pt-1 sm:pt-2 flex flex-row items-center justify-center gap-2 sm:gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
+                            className="h-8 sm:h-9 px-3.5 sm:px-5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-[11px] sm:text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm shrink-0"
+                          >
+                            <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                            <span>Retry Playback</span>
+                          </button>
+                        </div>
                       </div>
-                      <div className="max-w-md space-y-1">
-                        <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                          Playback Error
-                        </h3>
-                        <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-                          {streamError}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
-                        className="h-9 px-4 bg-white hover:bg-neutral-200 text-black font-semibold text-xs rounded-lg transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
-                      >
-                        <RotateCcw className="w-3.5 h-3.5" />
-                        <span>Retry Playback</span>
-                      </button>
                     </div>
                   )}
 
                   {/* Session Eviction Overlay */}
                   {isEvicted && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md text-white p-6 z-30 text-center select-none font-reddit">
-                      <div className="max-w-md w-full space-y-4">
-                        <div className="w-12 h-12 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center mx-auto">
-                          <AlertTriangle className="w-5 h-5 stroke-[2.2]" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/95 backdrop-blur-md text-white p-3 sm:p-6 z-30 text-center select-none font-reddit">
+                      <div className="max-w-md w-full space-y-1.5 sm:space-y-3.5 flex flex-col items-center justify-center">
+                        <div className="w-8 h-8 sm:w-11 sm:h-11 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center shrink-0">
+                          <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2]" />
                         </div>
 
-                        <div className="space-y-1.5">
-                          <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                        <div className="space-y-0.5 sm:space-y-1">
+                          <h3 className="text-sm sm:text-base md:text-lg font-bold text-white tracking-tight">
                             Session Active on Another Device
                           </h3>
-                          <p className="text-xs sm:text-sm text-[#c2c4cc] leading-relaxed">
+                          <p className="text-[11px] sm:text-xs text-[#c2c4cc] leading-normal sm:leading-relaxed max-w-[280px] sm:max-w-md mx-auto">
                             Your stream was paused because playback was started on another browser or device.
                           </p>
                         </div>
 
-                        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5">
+                        <div className="pt-1 sm:pt-2 flex flex-row items-center justify-center gap-2 sm:gap-2.5">
                           <button
                             type="button"
                             onClick={() => selectedLessonId && loadLessonStream(selectedLessonId)}
-                            className="w-full sm:w-auto h-10 px-5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                            className="h-8 sm:h-9 px-3.5 sm:px-5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-[11px] sm:text-xs rounded-lg transition-colors flex items-center justify-center gap-1 cursor-pointer shadow-sm shrink-0"
                           >
-                            <span>Resume Watching Here &rarr;</span>
+                            <span className="sm:hidden">Resume</span>
+                            <span className="hidden sm:inline">Resume Watching Here &rarr;</span>
                           </button>
                           <Link
                             href="/dashboard"
-                            className="w-full sm:w-auto h-10 px-4 rounded-lg border border-white/[0.08] hover:border-white/[0.14] bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white text-xs font-medium flex items-center justify-center transition-colors"
+                            className="h-8 sm:h-9 px-3 sm:px-4 rounded-lg border border-white/[0.08] hover:border-white/[0.14] bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white text-[11px] sm:text-xs font-medium flex items-center justify-center transition-colors shrink-0"
                           >
-                            Return to Dashboard
+                            <span className="sm:hidden">Dashboard</span>
+                            <span className="hidden sm:inline">Return to Dashboard</span>
                           </Link>
                         </div>
                       </div>
