@@ -695,10 +695,9 @@ function StudentDashboardContent() {
                     <div>
                       <Link
                         href="/#pricing"
-                        className="inline-flex items-center justify-center gap-2 h-9 sm:h-10 px-4 sm:px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg transition-colors select-none shadow-sm"
+                        className="inline-flex items-center justify-center h-9 sm:h-10 px-4 sm:px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg transition-colors select-none shadow-sm"
                       >
-                        <Sparkles className="w-3.5 h-3.5" />
-                        <span>Explore Masterclass</span>
+                        <span>Explore Masterclass &rarr;</span>
                       </Link>
                     </div>
                   </div>
@@ -826,8 +825,7 @@ function StudentDashboardContent() {
                     Credentials
                   </h1>
                   <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">
-                    Official verified credentials of completion signed by instructor{' '}
-                    {siteConfig.instructor.name}.
+                    Official verified credentials of completion signed by instructor.
                   </p>
                 </div>
 
@@ -841,8 +839,7 @@ function StudentDashboardContent() {
                         </h2>
                         <p className="text-xs text-[#c2c4cc] leading-relaxed">
                           Complete all lesson modules and practical evaluations in your enrolled
-                          courses to automatically unlock your verified certificate signed by
-                          instructor {siteConfig.instructor.name}.
+                          courses to unlock your verified certificates.
                         </p>
                       </div>
 
