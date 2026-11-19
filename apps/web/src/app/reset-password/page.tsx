@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '../../components/ui';
 import { apiClient } from '../../lib/api-client';
-import { Eye, EyeOff, Loader2, ArrowLeft, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, ArrowLeft, AlertCircle } from 'lucide-react';
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -68,8 +68,10 @@ function ResetPasswordForm() {
       setIsSuccess(true);
       toastSuccess(
         'Password Updated',
-        'Your password was successfully updated. You may now log in.',
+        'Your password was successfully updated. Sign in with your new password.',
       );
+      const emailQuery = initialEmail ? `&email=${encodeURIComponent(initialEmail.trim().toLowerCase())}` : '';
+      router.push(`/login?reset=success${emailQuery}`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Invalid or expired reset token';
       setErrorMsg(msg);
@@ -82,25 +84,9 @@ function ResetPasswordForm() {
   return (
     <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
       {isSuccess ? (
-        <div className="text-center py-4 space-y-4">
-          <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center">
-            <CheckCircle2 className="w-6 h-6 stroke-[2]" />
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-            Password Updated
-          </h2>
-          <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-            Your password has been securely updated. You can now log in with your new credentials.
-          </p>
-          <div className="pt-2">
-            <button
-              type="button"
-              onClick={() => router.push('/login')}
-              className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors flex items-center justify-center cursor-pointer shadow-sm"
-            >
-              Sign In Now &rarr;
-            </button>
-          </div>
+        <div className="text-center py-8 space-y-3">
+          <Loader2 className="w-6 h-6 animate-spin text-white mx-auto" />
+          <p className="text-xs text-[#c2c4cc]">Password updated! Redirecting to sign in...</p>
         </div>
       ) : isTokenInvalid ? (
         <div className="text-center py-4 space-y-4">
