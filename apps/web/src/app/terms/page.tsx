@@ -171,10 +171,10 @@ export default function TermsPage() {
             <div className="p-3.5 rounded-lg bg-[#18191d] border border-white/[0.08] text-xs text-[#c2c4cc] leading-relaxed space-y-1.5">
               <p className="text-white font-medium">Mandatory Plant Safety Rules:</p>
               <ul className="list-disc list-inside space-y-1 pl-1">
-                <li>Demonstrations are strictly for educational analysis and conceptual understanding.</li>
-                <li>Never calibrate, modify, or dismantle live hydraulic machinery without OEM factory schematics and verified manufacturer service manuals.</li>
-                <li>Enforce rigorous Lockout/Tagout (LOTO) protocols and depressurize all accumulators and pilot lines before commencing physical maintenance.</li>
-                <li>Hydro Basics and the instructor explicitly disclaim any liability for equipment downtime, valve failure, personal injury, or financial loss incurred from applying course concepts in industrial plants.</li>
+                <li>Demonstrations are strictly for educational and conceptual understanding.</li>
+                <li>Never modify live machinery without OEM schematics and service manuals.</li>
+                <li>Always enforce LOTO protocols and depressurize lines before maintenance.</li>
+                <li>Hydro Basics disclaims liability for equipment damage or personal injury.</li>
               </ul>
             </div>
           </section>
