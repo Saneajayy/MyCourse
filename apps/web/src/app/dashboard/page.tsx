@@ -1021,7 +1021,8 @@ function StudentDashboardContent() {
                             <input
                               id="profile-email"
                               type="email"
-                              disabled
+                              readOnly
+                              tabIndex={-1}
                               value={user?.email || ''}
                               className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white cursor-not-allowed select-none focus:outline-none"
                             />
