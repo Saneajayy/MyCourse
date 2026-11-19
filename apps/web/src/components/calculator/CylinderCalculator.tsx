@@ -170,17 +170,17 @@ function UnitDropdown<T extends string>({ currentUnit, options, onSelect }: Unit
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="h-10 min-w-[76px] sm:min-w-[84px] px-2.5 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 font-mono text-xs font-bold border border-neutral-300 hover:border-neutral-400 transition-all flex items-center justify-between gap-1.5 cursor-pointer select-none rounded-none shadow-none"
+        className="h-10 min-w-[76px] sm:min-w-[84px] px-2.5 bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white font-mono text-xs font-medium border border-white/[0.08] hover:border-white/[0.14] transition-all flex items-center justify-between gap-1.5 cursor-pointer select-none rounded-lg shadow-none"
         title="Click to change unit"
       >
         <span className="whitespace-nowrap">{UNIT_DISPLAY[currentUnit] || currentUnit}</span>
-        <ChevronDown className="w-3 h-3 text-neutral-500 shrink-0" />
+        <ChevronDown className="w-3 h-3 text-[#80828d] shrink-0" />
       </button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
-          <div className="absolute right-0 top-full mt-1 w-full min-w-full bg-white border border-neutral-300 shadow-lg z-50 py-1 rounded-none">
+          <div className="absolute right-0 top-full mt-1 w-full min-w-full bg-[#18191c] border border-white/[0.1] shadow-2xl z-50 py-1 rounded-lg overflow-hidden">
             {options.map((opt) => (
               <button
                 key={opt}
@@ -191,13 +191,13 @@ function UnitDropdown<T extends string>({ currentUnit, options, onSelect }: Unit
                 }}
                 className={`w-full text-left px-2.5 py-1.5 text-xs font-mono transition-colors flex items-center justify-between gap-1.5 cursor-pointer ${
                   opt === currentUnit
-                    ? 'bg-neutral-100 font-bold text-neutral-950'
-                    : 'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950'
+                    ? 'bg-white/10 font-medium text-white'
+                    : 'text-[#c2c4cc] hover:bg-white/[0.06] hover:text-white'
                 }`}
               >
                 <span className="whitespace-nowrap">{UNIT_DISPLAY[opt] || opt}</span>
                 {opt === currentUnit && (
-                  <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[2.5] shrink-0" />
                 )}
               </button>
             ))}
@@ -474,31 +474,29 @@ export function CylinderCalculator() {
   };
 
   return (
-    <div className="w-full max-w-2xl bg-white border border-neutral-300 rounded-none shadow-none font-reddit select-none overflow-hidden">
-      {/* Top Header Strip with Sigma Formula Button (Left aligned matching subsection modules) */}
-      <div className="relative px-4 sm:px-6 py-2.5 sm:py-3 bg-white border-b border-neutral-300 flex items-center justify-start z-20">
+    <div className="w-full max-w-2xl bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl shadow-none font-reddit select-none overflow-hidden transition-all text-left">
+      {/* Top Header Strip with Sigma Formula Button */}
+      <div className="relative px-4 sm:px-6 py-2.5 sm:py-3 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-start z-20">
         <button
           type="button"
           onClick={() => setShowFormulaModal(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 font-mono text-xs sm:text-sm font-bold border border-neutral-300 hover:border-neutral-400 transition-colors cursor-pointer rounded-none"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1f2023] hover:bg-[#27282c] active:bg-[#2e3035] text-white font-mono text-xs sm:text-[13px] font-medium border border-white/[0.08] hover:border-white/[0.14] transition-colors cursor-pointer rounded-lg"
           title="View formulas breakdown"
         >
-          <Sigma className="w-3.5 h-3.5 text-neutral-700" />
+          <Sigma className="w-3.5 h-3.5 text-white/70" />
           <span>Formula Sheet</span>
         </button>
       </div>
 
       {/* ============================================================== */}
-      {/* 1. INPUTS SECTION (Every line touches box borders completely)  */}
+      {/* 1. INPUTS SECTION                                              */}
       {/* ============================================================== */}
       <div>
         {/* Piston/Bore Diameter */}
-        <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+        <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-            <CircleDot className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900">
-              Piston/Bore Diameter
-            </span>
+            <CircleDot className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white">Piston/Bore Diameter</span>
           </div>
           <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
             <input
@@ -507,7 +505,7 @@ export function CylinderCalculator() {
               placeholder="0"
               value={boreStr}
               onChange={(e) => setBoreStr(e.target.value)}
-              className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+              className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
             />
             <UnitDropdown
               currentUnit={boreUnit}
@@ -518,10 +516,10 @@ export function CylinderCalculator() {
         </div>
 
         {/* Rod Diameter */}
-        <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+        <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-            <Circle className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900">Rod Diameter</span>
+            <Circle className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white">Rod Diameter</span>
           </div>
           <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
             <input
@@ -530,17 +528,17 @@ export function CylinderCalculator() {
               placeholder="0"
               value={rodStr}
               onChange={(e) => setRodStr(e.target.value)}
-              className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+              className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
             />
             <UnitDropdown currentUnit={rodUnit} options={['mm', 'cm', 'm']} onSelect={setRodUnit} />
           </div>
         </div>
 
         {/* Stroke */}
-        <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+        <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-            <Ruler className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900">Stroke</span>
+            <Ruler className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white">Stroke</span>
           </div>
           <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
             <input
@@ -549,7 +547,7 @@ export function CylinderCalculator() {
               placeholder="0"
               value={strokeStr}
               onChange={(e) => setStrokeStr(e.target.value)}
-              className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+              className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
             />
             <UnitDropdown
               currentUnit={strokeUnit}
@@ -560,10 +558,10 @@ export function CylinderCalculator() {
         </div>
 
         {/* Pressure */}
-        <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+        <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-            <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900">Pressure</span>
+            <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white">Pressure</span>
           </div>
           <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
             <input
@@ -572,7 +570,7 @@ export function CylinderCalculator() {
               placeholder="0"
               value={pressureStr}
               onChange={(e) => setPressureStr(e.target.value)}
-              className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+              className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
             />
             <UnitDropdown
               currentUnit={pressureUnit}
@@ -583,10 +581,10 @@ export function CylinderCalculator() {
         </div>
 
         {/* Oil Flow */}
-        <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+        <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-            <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900">Oil Flow</span>
+            <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white">Oil Flow</span>
           </div>
           <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
             <input
@@ -595,7 +593,7 @@ export function CylinderCalculator() {
               placeholder="0"
               value={flowStr}
               onChange={(e) => setFlowStr(e.target.value)}
-              className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+              className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
             />
             <UnitDropdown
               currentUnit={flowUnit}
@@ -607,27 +605,27 @@ export function CylinderCalculator() {
       </div>
 
       {/* ============================================================== */}
-      {/* 2. DUAL COLUMN OUTPUTS (Clean separation line, plain text labels) */}
+      {/* 2. DUAL COLUMN OUTPUTS                                         */}
       {/* ============================================================== */}
       <div>
-        {/* Plain text column titles: Bore Side & Rod Side (No box, no background) */}
-        <div className="px-4 sm:px-6 pt-5 pb-2.5 grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3 text-xs sm:text-sm font-semibold text-neutral-600">
+        {/* Column titles: Bore Side & Rod Side */}
+        <div className="px-4 sm:px-6 pt-5 pb-2.5 grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3 text-xs sm:text-[13px] font-medium text-[#c2c4cc]">
           <div />
-          <div className="text-center font-semibold text-neutral-700">Bore Side</div>
-          <div className="text-center font-semibold text-neutral-700">Rod Side</div>
+          <div className="text-center font-medium text-[#c2c4cc]">Bore Side</div>
+          <div className="text-center font-medium text-[#c2c4cc]">Rod Side</div>
           <div />
         </div>
 
         {/* Row 1: Area */}
-        <div className="px-4 sm:px-6 py-2.5 border-b border-neutral-300 grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
+        <div className="px-4 sm:px-6 py-2.5 border-b border-white/[0.06] grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <Grid3X3 className="w-4 h-4 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">Area</span>
+            <Grid3X3 className="w-4 h-4 text-white/70 shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white truncate">Area</span>
           </div>
-          <div className="h-10 px-2 bg-neutral-100 border border-neutral-300 flex items-center justify-center font-mono text-xs sm:text-sm font-bold text-neutral-900">
+          <div className="h-10 px-2 bg-[#131417] border border-white/[0.05] flex items-center justify-center font-mono text-xs sm:text-sm font-medium text-white rounded-lg">
             {areaBoreFormatted}
           </div>
-          <div className="h-10 px-2 bg-neutral-100 border border-neutral-300 flex items-center justify-center font-mono text-xs sm:text-sm font-bold text-neutral-900">
+          <div className="h-10 px-2 bg-[#131417] border border-white/[0.05] flex items-center justify-center font-mono text-xs sm:text-sm font-medium text-white rounded-lg">
             {areaRodFormatted}
           </div>
           <UnitDropdown
@@ -638,15 +636,15 @@ export function CylinderCalculator() {
         </div>
 
         {/* Row 2: Volume */}
-        <div className="px-4 sm:px-6 py-2.5 border-b border-neutral-300 grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
+        <div className="px-4 sm:px-6 py-2.5 border-b border-white/[0.06] grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <FlaskConical className="w-4 h-4 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">Volume</span>
+            <FlaskConical className="w-4 h-4 text-white/70 shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white truncate">Volume</span>
           </div>
-          <div className="h-10 px-2 bg-neutral-100 border border-neutral-300 flex items-center justify-center font-mono text-xs sm:text-sm font-bold text-neutral-900">
+          <div className="h-10 px-2 bg-[#131417] border border-white/[0.05] flex items-center justify-center font-mono text-xs sm:text-sm font-medium text-white rounded-lg">
             {volBoreFormatted}
           </div>
-          <div className="h-10 px-2 bg-neutral-100 border border-neutral-300 flex items-center justify-center font-mono text-xs sm:text-sm font-bold text-neutral-900">
+          <div className="h-10 px-2 bg-[#131417] border border-white/[0.05] flex items-center justify-center font-mono text-xs sm:text-sm font-medium text-white rounded-lg">
             {volRodFormatted}
           </div>
           <UnitDropdown
@@ -657,10 +655,10 @@ export function CylinderCalculator() {
         </div>
 
         {/* Row 3: Force (Editable two-way input) */}
-        <div className="px-4 sm:px-6 py-2.5 border-b border-neutral-300 grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
+        <div className="px-4 sm:px-6 py-2.5 border-b border-white/[0.06] grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <ArrowRight className="w-4 h-4 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">Force</span>
+            <ArrowRight className="w-4 h-4 text-white/70 shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white truncate">Force</span>
           </div>
           <input
             type="number"
@@ -669,7 +667,7 @@ export function CylinderCalculator() {
             onFocus={() => handleFocusField('forceBore', forceBoreFormatted)}
             onBlur={() => setActiveField(null)}
             onChange={(e) => handleFieldChange('forceBore', e.target.value)}
-            className="w-full h-10 px-2 bg-white border border-neutral-300 text-center font-mono text-xs sm:text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+            className="w-full h-10 px-2 bg-[#1b1c20] border border-white/[0.08] text-center font-mono text-xs sm:text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
           />
           <input
             type="number"
@@ -678,7 +676,7 @@ export function CylinderCalculator() {
             onFocus={() => handleFocusField('forceRod', forceRodFormatted)}
             onBlur={() => setActiveField(null)}
             onChange={(e) => handleFieldChange('forceRod', e.target.value)}
-            className="w-full h-10 px-2 bg-white border border-neutral-300 text-center font-mono text-xs sm:text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+            className="w-full h-10 px-2 bg-[#1b1c20] border border-white/[0.08] text-center font-mono text-xs sm:text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
           />
           <UnitDropdown
             currentUnit={forceUnit}
@@ -688,10 +686,10 @@ export function CylinderCalculator() {
         </div>
 
         {/* Row 4: Time (Editable two-way input) */}
-        <div className="px-4 sm:px-6 py-2.5 border-b border-neutral-300 grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
+        <div className="px-4 sm:px-6 py-2.5 border-b border-white/[0.06] grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <Clock className="w-4 h-4 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">Time</span>
+            <Clock className="w-4 h-4 text-white/70 shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white truncate">Time</span>
           </div>
           <input
             type="number"
@@ -700,7 +698,7 @@ export function CylinderCalculator() {
             onFocus={() => handleFocusField('timeBore', timeBoreFormatted)}
             onBlur={() => setActiveField(null)}
             onChange={(e) => handleFieldChange('timeBore', e.target.value)}
-            className="w-full h-10 px-2 bg-white border border-neutral-300 text-center font-mono text-xs sm:text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+            className="w-full h-10 px-2 bg-[#1b1c20] border border-white/[0.08] text-center font-mono text-xs sm:text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
           />
           <input
             type="number"
@@ -709,7 +707,7 @@ export function CylinderCalculator() {
             onFocus={() => handleFocusField('timeRod', timeRodFormatted)}
             onBlur={() => setActiveField(null)}
             onChange={(e) => handleFieldChange('timeRod', e.target.value)}
-            className="w-full h-10 px-2 bg-white border border-neutral-300 text-center font-mono text-xs sm:text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+            className="w-full h-10 px-2 bg-[#1b1c20] border border-white/[0.08] text-center font-mono text-xs sm:text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
           />
           <UnitDropdown
             currentUnit={timeUnit}
@@ -719,10 +717,10 @@ export function CylinderCalculator() {
         </div>
 
         {/* Row 5: Velocity (Editable two-way input) */}
-        <div className="px-4 sm:px-6 py-2.5 border-b border-neutral-300 grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
+        <div className="px-4 sm:px-6 py-2.5 border-b border-white/[0.06] grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <Wind className="w-4 h-4 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">Velocity</span>
+            <Wind className="w-4 h-4 text-white/70 shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white truncate">Velocity</span>
           </div>
           <input
             type="number"
@@ -731,7 +729,7 @@ export function CylinderCalculator() {
             onFocus={() => handleFocusField('velBore', velBoreFormatted)}
             onBlur={() => setActiveField(null)}
             onChange={(e) => handleFieldChange('velBore', e.target.value)}
-            className="w-full h-10 px-2 bg-white border border-neutral-300 text-center font-mono text-xs sm:text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+            className="w-full h-10 px-2 bg-[#1b1c20] border border-white/[0.08] text-center font-mono text-xs sm:text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
           />
           <input
             type="number"
@@ -740,7 +738,7 @@ export function CylinderCalculator() {
             onFocus={() => handleFocusField('velRod', velRodFormatted)}
             onBlur={() => setActiveField(null)}
             onChange={(e) => handleFieldChange('velRod', e.target.value)}
-            className="w-full h-10 px-2 bg-white border border-neutral-300 text-center font-mono text-xs sm:text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+            className="w-full h-10 px-2 bg-[#1b1c20] border border-white/[0.08] text-center font-mono text-xs sm:text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
           />
           <UnitDropdown
             currentUnit={velocityUnit}
@@ -750,15 +748,15 @@ export function CylinderCalculator() {
         </div>
 
         {/* Row 6: Outflow */}
-        <div className="px-4 sm:px-6 py-2.5 border-b border-neutral-300 grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
+        <div className="px-4 sm:px-6 py-2.5 border-b border-white/[0.06] grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <GitFork className="w-4 h-4 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">Outflow</span>
+            <GitFork className="w-4 h-4 text-white/70 shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white truncate">Outflow</span>
           </div>
-          <div className="h-10 px-2 bg-neutral-100 border border-neutral-300 flex items-center justify-center font-mono text-xs sm:text-sm font-bold text-neutral-900">
+          <div className="h-10 px-2 bg-[#131417] border border-white/[0.05] flex items-center justify-center font-mono text-xs sm:text-sm font-medium text-white rounded-lg">
             {outflowBoreFormatted}
           </div>
-          <div className="h-10 px-2 bg-neutral-100 border border-neutral-300 flex items-center justify-center font-mono text-xs sm:text-sm font-bold text-neutral-900">
+          <div className="h-10 px-2 bg-[#131417] border border-white/[0.05] flex items-center justify-center font-mono text-xs sm:text-sm font-medium text-white rounded-lg">
             {outflowRodFormatted}
           </div>
           <UnitDropdown
@@ -769,12 +767,12 @@ export function CylinderCalculator() {
         </div>
 
         {/* Row 7: Ratio */}
-        <div className="px-4 sm:px-6 py-2.5 border-b border-neutral-300 grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
+        <div className="px-4 sm:px-6 py-2.5 border-b border-white/[0.06] grid grid-cols-[1fr_80px_80px_70px] sm:grid-cols-[180px_1fr_1fr_76px] items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 min-w-0">
-            <PieChart className="w-4 h-4 text-black shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-neutral-900 truncate">Ratio</span>
+            <PieChart className="w-4 h-4 text-white/70 shrink-0" />
+            <span className="text-xs sm:text-sm font-medium text-white truncate">Ratio</span>
           </div>
-          <div className="h-10 px-2 bg-neutral-100 border border-neutral-300 flex items-center justify-center font-mono text-xs sm:text-sm font-bold text-neutral-900">
+          <div className="h-10 px-2 bg-[#131417] border border-white/[0.05] flex items-center justify-center font-mono text-xs sm:text-sm font-medium text-white rounded-lg">
             {ratioFormatted}
           </div>
           {/* Rod Side has no ratio value, empty box placeholder */}
@@ -786,11 +784,11 @@ export function CylinderCalculator() {
       {/* ============================================================== */}
       {/* 3. BOTTOM ACTIONS (Copy, Reset)                                */}
       {/* ============================================================== */}
-      <div className="p-4 sm:px-6 sm:py-5 grid grid-cols-2 gap-3 bg-neutral-50">
+      <div className="p-4 sm:px-6 sm:py-5 grid grid-cols-2 gap-3 bg-white/[0.02] border-t border-white/[0.06]">
         <button
           type="button"
           onClick={handleCopy}
-          className="h-10 sm:h-11 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider border border-black transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-none shadow-none"
+          className="h-10 sm:h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-lg shadow-sm"
         >
           <Copy className="w-4 h-4" />
           <span>{copySuccess ? 'Copied!' : 'Copy'}</span>
@@ -799,28 +797,28 @@ export function CylinderCalculator() {
         <button
           type="button"
           onClick={handleReset}
-          className="h-10 sm:h-11 bg-white hover:bg-neutral-100 active:bg-neutral-200 text-neutral-800 font-bold text-xs uppercase tracking-wider border border-neutral-300 hover:border-neutral-400 transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-none shadow-none"
+          className="h-10 sm:h-11 bg-[#1f2023] hover:bg-[#27282c] active:bg-[#2e3035] text-white font-medium text-xs uppercase tracking-wider border border-white/[0.08] hover:border-white/[0.14] transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-lg shadow-none"
         >
-          <RotateCcw className="w-4 h-4 text-neutral-600" />
+          <RotateCcw className="w-4 h-4 text-white/70" />
           <span>Reset</span>
         </button>
       </div>
 
       {/* ============================================================== */}
-      {/* 4. FORMULA MODAL DIALOG (Pure Black & White Theme)             */}
+      {/* 4. FORMULA MODAL DIALOG                                        */}
       {/* ============================================================== */}
       {showFormulaModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 select-none">
-          <div className="w-full max-w-lg bg-white border border-black shadow-2xl rounded-none overflow-hidden max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm select-none">
+          <div className="w-full max-w-lg bg-[#151619] border border-white/[0.1] shadow-2xl rounded-xl overflow-hidden max-h-[90vh] flex flex-col text-white">
             {/* Modal Header */}
-            <div className="bg-black text-white px-5 py-4 flex items-center justify-between border-b border-black">
-              <h3 className="text-base sm:text-lg font-extrabold uppercase tracking-tight">
-                Cylinder Formula
+            <div className="bg-[#18191c] text-white px-5 py-4 flex items-center justify-between border-b border-white/[0.08]">
+              <h3 className="text-base sm:text-lg font-semibold tracking-tight text-white">
+                Cylinder Formula Sheet
               </h3>
               <button
                 type="button"
                 onClick={() => setShowFormulaModal(false)}
-                className="text-white hover:bg-white/20 p-1 rounded-none transition-colors cursor-pointer"
+                className="text-[#c2c4cc] hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-colors cursor-pointer"
                 aria-label="Close formula modal"
               >
                 <X className="w-5 h-5" />
@@ -828,123 +826,130 @@ export function CylinderCalculator() {
             </div>
 
             {/* Modal Table & Content */}
-            <div className="p-5 sm:p-6 overflow-y-auto space-y-4 text-neutral-900 text-xs sm:text-sm">
+            <div className="p-5 sm:p-6 overflow-y-auto space-y-4 text-white text-xs sm:text-sm">
               {/* Columns Header */}
-              <div className="grid grid-cols-[90px_1fr_1fr] pb-2 border-b border-black font-extrabold text-black uppercase tracking-wider text-[11px]">
+              <div className="grid grid-cols-[90px_1fr_1fr] pb-2 border-b border-white/[0.08] font-medium text-[#c2c4cc] uppercase tracking-wider text-[11px]">
                 <div>Metric</div>
                 <div className="text-center">Bore side</div>
                 <div className="text-center">Rod side</div>
               </div>
 
               {/* Area */}
-              <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2 border-b border-neutral-200">
-                <div className="flex items-center gap-1.5 font-bold text-black">
-                  <Grid3X3 className="w-4 h-4 text-black" />
+              <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2 border-b border-white/[0.06]">
+                <div className="flex items-center gap-1.5 font-medium text-white">
+                  <Grid3X3 className="w-4 h-4 text-white/70" />
                   <span>Area</span>
                 </div>
-                <div className="text-center font-mono font-bold text-sm">π × R²</div>
-                <div className="text-center font-mono font-bold text-sm">X − π × r²</div>
+                <div className="text-center font-mono font-medium text-sm text-white">π × R²</div>
+                <div className="text-center font-mono font-medium text-sm text-white">
+                  X − π × r²
+                </div>
               </div>
-              <p className="text-[11px] text-neutral-600 font-mono -mt-2">
-                <span className="font-extrabold text-black">R</span> = Radius of piston/Bore;&nbsp;
-                <span className="font-extrabold text-black">X</span> = Area on piston/Bore
+              <p className="text-[11px] text-[#80828d] font-mono -mt-2">
+                <span className="font-semibold text-[#c2c4cc]">R</span> = Radius of
+                piston/Bore;&nbsp;
+                <span className="font-semibold text-[#c2c4cc]">X</span> = Area on piston/Bore
                 side;&nbsp;
-                <span className="font-extrabold text-black">r</span> = Radius of rod
+                <span className="font-semibold text-[#c2c4cc]">r</span> = Radius of rod
               </p>
 
               {/* Volume */}
-              <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2 border-b border-neutral-200">
-                <div className="flex items-center gap-1.5 font-bold text-black">
-                  <FlaskConical className="w-4 h-4 text-black" />
+              <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2 border-b border-white/[0.06]">
+                <div className="flex items-center gap-1.5 font-medium text-white">
+                  <FlaskConical className="w-4 h-4 text-white/70" />
                   <span>Volume</span>
                 </div>
-                <div className="text-center font-mono font-bold text-sm">π × R² × L</div>
-                <div className="text-center font-mono font-bold text-sm">X − π × r² × L</div>
+                <div className="text-center font-mono font-medium text-sm text-white">
+                  π × R² × L
+                </div>
+                <div className="text-center font-mono font-medium text-sm text-white">
+                  X − π × r² × L
+                </div>
               </div>
-              <p className="text-[11px] text-neutral-600 font-mono -mt-2">
-                <span className="font-extrabold text-black">X</span> = Volume on piston/Bore
+              <p className="text-[11px] text-[#80828d] font-mono -mt-2">
+                <span className="font-semibold text-[#c2c4cc]">X</span> = Volume on piston/Bore
                 side;&nbsp;
-                <span className="font-extrabold text-black">L</span> = Stroke length
+                <span className="font-semibold text-[#c2c4cc]">L</span> = Stroke length
               </p>
 
               {/* Force */}
-              <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2 border-b border-neutral-200">
-                <div className="flex items-center gap-1.5 font-bold text-black">
-                  <ArrowRight className="w-4 h-4 text-black" />
+              <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2 border-b border-white/[0.06]">
+                <div className="flex items-center gap-1.5 font-medium text-white">
+                  <ArrowRight className="w-4 h-4 text-white/70" />
                   <span>Force</span>
                 </div>
-                <div className="text-center font-mono font-bold text-sm">P × A</div>
-                <div className="text-center font-mono font-bold text-sm">P × A</div>
+                <div className="text-center font-mono font-medium text-sm text-white">P × A</div>
+                <div className="text-center font-mono font-medium text-sm text-white">P × A</div>
               </div>
-              <p className="text-[11px] text-neutral-600 font-mono -mt-2">
-                <span className="font-extrabold text-black">P</span> = Pressure;&nbsp;
-                <span className="font-extrabold text-black">A</span> = Area
+              <p className="text-[11px] text-[#80828d] font-mono -mt-2">
+                <span className="font-semibold text-[#c2c4cc]">P</span> = Pressure;&nbsp;
+                <span className="font-semibold text-[#c2c4cc]">A</span> = Area
               </p>
 
               {/* Time */}
-              <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2 border-b border-neutral-200">
-                <div className="flex items-center gap-1.5 font-bold text-black">
-                  <Clock className="w-4 h-4 text-black" />
+              <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2 border-b border-white/[0.06]">
+                <div className="flex items-center gap-1.5 font-medium text-white">
+                  <Clock className="w-4 h-4 text-white/70" />
                   <span>Time</span>
                 </div>
-                <div className="text-center font-mono font-bold text-sm">V ÷ FR</div>
-                <div className="text-center font-mono font-bold text-sm">V ÷ FR</div>
+                <div className="text-center font-mono font-medium text-sm text-white">V ÷ FR</div>
+                <div className="text-center font-mono font-medium text-sm text-white">V ÷ FR</div>
               </div>
-              <p className="text-[11px] text-neutral-600 font-mono -mt-2">
-                <span className="font-extrabold text-black">V</span> = Volume;&nbsp;
-                <span className="font-extrabold text-black">FR</span> = Oil flow rate
+              <p className="text-[11px] text-[#80828d] font-mono -mt-2">
+                <span className="font-semibold text-[#c2c4cc]">V</span> = Volume;&nbsp;
+                <span className="font-semibold text-[#c2c4cc]">FR</span> = Oil flow rate
               </p>
 
               {/* Velocity */}
-              <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2 border-b border-neutral-200">
-                <div className="flex items-center gap-1.5 font-bold text-black">
-                  <Wind className="w-4 h-4 text-black" />
+              <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2 border-b border-white/[0.06]">
+                <div className="flex items-center gap-1.5 font-medium text-white">
+                  <Wind className="w-4 h-4 text-white/70" />
                   <span>Velocity</span>
                 </div>
-                <div className="text-center font-mono font-bold text-sm">L ÷ T</div>
-                <div className="text-center font-mono font-bold text-sm">L ÷ T</div>
+                <div className="text-center font-mono font-medium text-sm text-white">L ÷ T</div>
+                <div className="text-center font-mono font-medium text-sm text-white">L ÷ T</div>
               </div>
-              <p className="text-[11px] text-neutral-600 font-mono -mt-2">
-                <span className="font-extrabold text-black">L</span> = Stroke length;&nbsp;
-                <span className="font-extrabold text-black">T</span> = Time
+              <p className="text-[11px] text-[#80828d] font-mono -mt-2">
+                <span className="font-semibold text-[#c2c4cc]">L</span> = Stroke length;&nbsp;
+                <span className="font-semibold text-[#c2c4cc]">T</span> = Time
               </p>
 
               {/* Outflow */}
-              <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2 border-b border-neutral-200">
-                <div className="flex items-center gap-1.5 font-bold text-black">
-                  <GitFork className="w-4 h-4 text-black" />
+              <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2 border-b border-white/[0.06]">
+                <div className="flex items-center gap-1.5 font-medium text-white">
+                  <GitFork className="w-4 h-4 text-white/70" />
                   <span>Outflow</span>
                 </div>
-                <div className="text-center font-mono font-bold text-sm">FR ÷ Z</div>
-                <div className="text-center font-mono font-bold text-sm">FR × Z</div>
+                <div className="text-center font-mono font-medium text-sm text-white">FR ÷ Z</div>
+                <div className="text-center font-mono font-medium text-sm text-white">FR × Z</div>
               </div>
-              <p className="text-[11px] text-neutral-600 font-mono -mt-2">
-                <span className="font-extrabold text-black">FR</span> = Oil flow rate;&nbsp;
-                <span className="font-extrabold text-black">Z</span> = Ratio
+              <p className="text-[11px] text-[#80828d] font-mono -mt-2">
+                <span className="font-semibold text-[#c2c4cc]">FR</span> = Oil flow rate;&nbsp;
+                <span className="font-semibold text-[#c2c4cc]">Z</span> = Ratio
               </p>
 
               {/* Ratio */}
               <div className="grid grid-cols-[90px_1fr_1fr] items-center gap-2 py-2">
-                <div className="flex items-center gap-1.5 font-bold text-black">
-                  <PieChart className="w-4 h-4 text-black" />
+                <div className="flex items-center gap-1.5 font-medium text-white">
+                  <PieChart className="w-4 h-4 text-white/70" />
                   <span>Ratio</span>
                 </div>
-                <div className="col-span-2 text-center font-mono font-bold text-sm">
+                <div className="col-span-2 text-center font-mono font-medium text-sm text-white">
                   A(X) ÷ A(Y)
                 </div>
               </div>
-              <p className="text-[11px] text-neutral-600 font-mono -mt-2">
-                <span className="font-extrabold text-black">A(X)</span> = Area bore side;&nbsp;
-                <span className="font-extrabold text-black">A(Y)</span> = Area rod side
+              <p className="text-[11px] text-[#80828d] font-mono -mt-2">
+                <span className="font-semibold text-[#c2c4cc]">A(X)</span> = Area bore side;&nbsp;
+                <span className="font-semibold text-[#c2c4cc]">A(Y)</span> = Area rod side
               </p>
             </div>
 
             {/* Modal Footer */}
-            <div className="p-3 bg-neutral-100 border-t border-black text-right">
+            <div className="p-3 bg-[#18191c] border-t border-white/[0.08] text-right">
               <button
                 type="button"
                 onClick={() => setShowFormulaModal(false)}
-                className="px-5 py-2 bg-black hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider rounded-none cursor-pointer border border-black"
+                className="px-4 py-2 bg-white hover:bg-neutral-200 text-black font-semibold text-xs rounded-lg cursor-pointer transition-colors shadow-sm"
               >
                 Close
               </button>

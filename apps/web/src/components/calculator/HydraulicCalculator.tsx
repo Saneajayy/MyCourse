@@ -56,16 +56,16 @@ export function HydraulicCalculator() {
   return (
     <div className="space-y-6 text-left w-full max-w-4xl xl:max-w-5xl select-none font-reddit">
       {/* Header Title & Subtitle */}
-      <div className="text-left space-y-1">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
+      <div className="text-left">
+        <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal">
           Hydraulic System Calculator
         </h1>
-        <p className="text-xs sm:text-sm text-neutral-500">
+        <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">
           Industrial fluid power formulas, dimensioning &amp; component sizing calculations.
         </p>
       </div>
 
-      {/* 5 Sub-Section Navigation Tabs (Proper Rectangular Boxes) */}
+      {/* 5 Sub-Section Navigation Tabs */}
       <div className="flex flex-wrap gap-2 sm:gap-2.5">
         {CALCULATOR_TABS.map((tab) => {
           const Icon = tab.icon;
@@ -75,13 +75,13 @@ export function HydraulicCalculator() {
               key={tab.id}
               type="button"
               onClick={() => setActiveSection(tab.id)}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 sm:px-5 sm:py-3 text-xs sm:text-sm font-bold border transition-colors cursor-pointer rounded-none select-none ${
+              className={`inline-flex items-center gap-2 px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-[13px] font-medium transition-colors cursor-pointer rounded-lg select-none ${
                 isActive
-                  ? 'border-black bg-black text-white font-extrabold shadow-xs'
-                  : 'border-neutral-300 bg-white text-neutral-800 hover:border-black hover:bg-neutral-50'
+                  ? 'bg-white text-black shadow-sm font-semibold'
+                  : 'bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] text-[#c2c4cc] hover:text-white'
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-neutral-800'}`} />
+              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-black' : 'text-[#c2c4cc]'}`} />
               <span>{tab.label}</span>
             </button>
           );

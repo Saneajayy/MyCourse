@@ -202,17 +202,17 @@ function UnitDropdown<T extends string>({ currentUnit, options, onSelect }: Unit
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="h-10 min-w-[76px] sm:min-w-[84px] px-2.5 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 font-mono text-xs font-bold border border-neutral-300 hover:border-neutral-400 transition-all flex items-center justify-between gap-1.5 cursor-pointer select-none rounded-none shadow-none"
+        className="h-10 min-w-[76px] sm:min-w-[84px] px-2.5 bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white font-mono text-xs font-medium border border-white/[0.08] hover:border-white/[0.14] transition-all flex items-center justify-between gap-1.5 cursor-pointer select-none rounded-lg shadow-none"
         title="Click to change unit"
       >
         <span className="whitespace-nowrap">{UNIT_DISPLAY[currentUnit] || currentUnit}</span>
-        <ChevronDown className="w-3 h-3 text-neutral-500 shrink-0" />
+        <ChevronDown className="w-3 h-3 text-[#80828d] shrink-0" />
       </button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
-          <div className="absolute right-0 top-full mt-1 w-full min-w-full bg-white border border-neutral-300 shadow-lg z-50 py-1 rounded-none">
+          <div className="absolute right-0 top-full mt-1 w-full min-w-full bg-[#18191c] border border-white/[0.1] shadow-2xl z-50 py-1 rounded-lg overflow-hidden">
             {options.map((opt) => (
               <button
                 key={opt}
@@ -223,13 +223,13 @@ function UnitDropdown<T extends string>({ currentUnit, options, onSelect }: Unit
                 }}
                 className={`w-full text-left px-2.5 py-1.5 text-xs font-mono transition-colors flex items-center justify-between gap-1.5 cursor-pointer ${
                   opt === currentUnit
-                    ? 'bg-neutral-100 font-bold text-neutral-950'
-                    : 'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950'
+                    ? 'bg-white/10 font-medium text-white'
+                    : 'text-[#c2c4cc] hover:bg-white/[0.06] hover:text-white'
                 }`}
               >
                 <span className="whitespace-nowrap">{UNIT_DISPLAY[opt] || opt}</span>
                 {opt === currentUnit && (
-                  <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[2.5] shrink-0" />
                 )}
               </button>
             ))}
@@ -432,18 +432,18 @@ export function PipingCalculator() {
   const currentSubSectionObj = SUBSECTIONS.find((s) => s.id === activeSubSection);
 
   return (
-    <div className="w-full max-w-2xl bg-white border border-neutral-300 rounded-none shadow-none font-reddit select-none overflow-hidden">
+    <div className="w-full max-w-2xl bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl shadow-none font-reddit select-none overflow-hidden transition-all text-left">
       {/* ============================================================== */}
       {/* 1. TOP HEADER: Formula Sheet Button & SubSection Dropdown      */}
       {/* ============================================================== */}
-      <div className="relative px-4 sm:px-6 py-2.5 sm:py-3 border-b border-neutral-300 flex items-center justify-between bg-white z-20">
+      <div className="relative px-4 sm:px-6 py-2.5 sm:py-3 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between z-20">
         <button
           type="button"
           onClick={() => setShowFormulaModal(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 font-mono text-xs sm:text-sm font-bold border border-neutral-300 hover:border-neutral-400 transition-colors cursor-pointer rounded-none"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1f2023] hover:bg-[#27282c] active:bg-[#2e3035] text-white font-mono text-xs sm:text-[13px] font-medium border border-white/[0.08] hover:border-white/[0.14] transition-colors cursor-pointer rounded-lg"
           title="View formulas breakdown"
         >
-          <Sigma className="w-3.5 h-3.5 text-neutral-700" />
+          <Sigma className="w-3.5 h-3.5 text-white/70" />
           <span>Formula Sheet</span>
         </button>
 
@@ -451,11 +451,11 @@ export function PipingCalculator() {
           <button
             type="button"
             onClick={() => setIsSubSectionMenuOpen(!isSubSectionMenuOpen)}
-            className="inline-flex items-center gap-2 px-3 py-1.5 bg-white hover:bg-neutral-50 text-neutral-900 font-mono text-xs sm:text-sm font-bold border border-neutral-300 hover:border-neutral-400 transition-colors cursor-pointer rounded-none"
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white font-mono text-xs sm:text-[13px] font-medium border border-white/[0.08] hover:border-white/[0.14] transition-colors cursor-pointer rounded-lg"
           >
             <span>{currentSubSectionObj?.label || 'With kinematic viscosity'}</span>
             <ChevronDown
-              className={`w-4 h-4 text-neutral-600 transition-transform ${
+              className={`w-4 h-4 text-[#80828d] transition-transform ${
                 isSubSectionMenuOpen ? 'rotate-180' : ''
               }`}
             />
@@ -469,7 +469,7 @@ export function PipingCalculator() {
                 onClick={() => setIsSubSectionMenuOpen(false)}
                 aria-hidden="true"
               />
-              <div className="absolute right-0 top-full mt-1 w-64 bg-white border border-neutral-300 shadow-2xl z-40 py-1 rounded-none">
+              <div className="absolute right-0 top-full mt-1 w-64 bg-[#18191c] border border-white/[0.1] shadow-2xl z-40 py-1 rounded-lg overflow-hidden">
                 {SUBSECTIONS.map((sub) => (
                   <button
                     key={sub.id}
@@ -480,13 +480,13 @@ export function PipingCalculator() {
                     }}
                     className={`w-full text-left px-4 py-2.5 text-xs sm:text-sm font-bold transition-colors flex items-center justify-between cursor-pointer ${
                       sub.id === activeSubSection
-                        ? 'bg-neutral-100 text-neutral-950'
-                        : 'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950'
+                        ? 'bg-white/10 text-white font-medium'
+                        : 'text-[#c2c4cc] hover:bg-white/[0.06] hover:text-white'
                     }`}
                   >
                     <span>{sub.label}</span>
                     {sub.id === activeSubSection && (
-                      <Check className="w-4 h-4 text-neutral-900 stroke-[2.5]" />
+                      <Check className="w-4 h-4 text-emerald-400 stroke-[2.5]" />
                     )}
                   </button>
                 ))}
@@ -504,10 +504,10 @@ export function PipingCalculator() {
       {activeSubSection === 'using-kinematic' && (
         <div>
           {/* Input 1: Flow rate */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
+              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -516,7 +516,7 @@ export function PipingCalculator() {
                 placeholder="0"
                 value={kvFlowStr}
                 onChange={(e) => setKvFlowStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={kvFlowUnit}
@@ -527,10 +527,10 @@ export function PipingCalculator() {
           </div>
 
           {/* Input 2: Inside pipe diameter */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <DiameterIcon className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+              <DiameterIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">
                 Inside pipe diameter
               </span>
             </div>
@@ -541,7 +541,7 @@ export function PipingCalculator() {
                 placeholder="0"
                 value={kvDiameterStr}
                 onChange={(e) => setKvDiameterStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={kvDiameterUnit}
@@ -552,12 +552,10 @@ export function PipingCalculator() {
           </div>
 
           {/* Input 3: Kinematic viscosity */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <StreamlineIcon className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Kinematic viscosity
-              </span>
+              <StreamlineIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Kinematic viscosity</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -566,7 +564,7 @@ export function PipingCalculator() {
                 placeholder="0"
                 value={kvViscosityStr}
                 onChange={(e) => setKvViscosityStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={kvViscosityUnit}
@@ -582,10 +580,10 @@ export function PipingCalculator() {
       {activeSubSection === 'using-absolute' && (
         <div>
           {/* Input 1: Flow rate */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
+              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -594,7 +592,7 @@ export function PipingCalculator() {
                 placeholder="0"
                 value={avFlowStr}
                 onChange={(e) => setAvFlowStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={avFlowUnit}
@@ -605,12 +603,10 @@ export function PipingCalculator() {
           </div>
 
           {/* Input 2: Specific gravity */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Specific gravity
-              </span>
+              <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Specific gravity</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -619,16 +615,16 @@ export function PipingCalculator() {
                 placeholder="e.g. 0.87"
                 value={avSpecificGravityStr}
                 onChange={(e) => setAvSpecificGravityStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
             </div>
           </div>
 
           {/* Input 3: Inside pipe diameter */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <DiameterIcon className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+              <DiameterIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">
                 Inside pipe diameter
               </span>
             </div>
@@ -639,7 +635,7 @@ export function PipingCalculator() {
                 placeholder="0"
                 value={avDiameterStr}
                 onChange={(e) => setAvDiameterStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={avDiameterUnit}
@@ -650,12 +646,10 @@ export function PipingCalculator() {
           </div>
 
           {/* Input 4: Absolute viscosity */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <ViscosityPourIcon className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
-                Absolute viscosity
-              </span>
+              <ViscosityPourIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Absolute viscosity</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -664,7 +658,7 @@ export function PipingCalculator() {
                 placeholder="0"
                 value={avViscosityStr}
                 onChange={(e) => setAvViscosityStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={avViscosityUnit}
@@ -681,15 +675,13 @@ export function PipingCalculator() {
       {/* ============================================================== */}
 
       {/* Output 1: Cross-sectional area */}
-      <div className="px-4 sm:px-6 py-3.5 bg-neutral-50/50 border-b border-neutral-300 flex items-center justify-between gap-3">
+      <div className="px-4 sm:px-6 py-4 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-          <CylinderAreaIcon className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-          <span className="text-xs sm:text-sm font-bold text-neutral-900">
-            Cross-sectional area
-          </span>
+          <CylinderAreaIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+          <span className="text-xs sm:text-sm font-medium text-white">Cross-sectional area</span>
         </div>
         <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
-          <div className="w-full h-10 px-3 bg-neutral-100 border border-neutral-300 flex items-center justify-end font-mono text-sm font-bold text-neutral-900">
+          <div className="w-full h-10 px-3 bg-[#131417] border border-white/[0.05] flex items-center justify-end font-mono text-sm font-medium text-white rounded-lg">
             {areaFormatted}
           </div>
           <UnitDropdown
@@ -701,13 +693,13 @@ export function PipingCalculator() {
       </div>
 
       {/* Output 2: Velocity */}
-      <div className="px-4 sm:px-6 py-3.5 bg-neutral-50/50 border-b border-neutral-300 flex items-center justify-between gap-3">
+      <div className="px-4 sm:px-6 py-4 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-          <VelocityIcon className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-          <span className="text-xs sm:text-sm font-bold text-neutral-900">Velocity</span>
+          <VelocityIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+          <span className="text-xs sm:text-sm font-medium text-white">Velocity</span>
         </div>
         <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
-          <div className="w-full h-10 px-3 bg-neutral-100 border border-neutral-300 flex items-center justify-end font-mono text-sm font-bold text-neutral-900">
+          <div className="w-full h-10 px-3 bg-[#131417] border border-white/[0.05] flex items-center justify-end font-mono text-sm font-medium text-white rounded-lg">
             {velocityFormatted}
           </div>
           <UnitDropdown
@@ -719,15 +711,15 @@ export function PipingCalculator() {
       </div>
 
       {/* Output 3: Reynolds number (Dimensionless) */}
-      <div className="px-4 sm:px-6 py-3.5 bg-neutral-50/50 border-b border-neutral-300 flex items-center justify-between gap-3">
+      <div className="px-4 sm:px-6 py-4 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
           <div className="w-5 h-5 flex items-center justify-center shrink-0">
-            <ReynoldsIcon className="text-black" />
+            <ReynoldsIcon className="text-white/70" />
           </div>
-          <span className="text-xs sm:text-sm font-bold text-neutral-900">Reynolds number</span>
+          <span className="text-xs sm:text-sm font-medium text-white">Reynolds number</span>
         </div>
         <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
-          <div className="w-full h-10 px-3 bg-neutral-100 border border-neutral-300 flex items-center justify-end font-mono text-sm font-bold text-neutral-900">
+          <div className="w-full h-10 px-3 bg-[#131417] border border-white/[0.05] flex items-center justify-end font-mono text-sm font-medium text-white rounded-lg">
             {reynoldsFormatted}
           </div>
         </div>
@@ -736,11 +728,11 @@ export function PipingCalculator() {
       {/* ============================================================== */}
       {/* 4. BOTTOM ACTIONS (Copy, Reset)                                */}
       {/* ============================================================== */}
-      <div className="p-4 sm:px-6 sm:py-5 grid grid-cols-2 gap-3 bg-neutral-50">
+      <div className="p-4 sm:px-6 sm:py-5 grid grid-cols-2 gap-3 bg-white/[0.02] border-t border-white/[0.06]">
         <button
           type="button"
           onClick={handleCopy}
-          className="h-10 sm:h-11 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider border border-black transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-none shadow-none"
+          className="h-10 sm:h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-[13px] transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-lg shadow-sm select-none"
         >
           <Copy className="w-4 h-4" />
           <span>{copySuccess ? 'Copied!' : 'Copy'}</span>
@@ -749,9 +741,9 @@ export function PipingCalculator() {
         <button
           type="button"
           onClick={handleReset}
-          className="h-10 sm:h-11 bg-white hover:bg-neutral-100 active:bg-neutral-200 text-neutral-800 font-bold text-xs uppercase tracking-wider border border-neutral-300 hover:border-neutral-400 transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-none shadow-none"
+          className="h-10 sm:h-11 bg-[#1f2023] hover:bg-[#27282c] active:bg-[#2e3035] text-white font-medium text-xs sm:text-[13px] border border-white/[0.08] hover:border-white/[0.14] transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-lg shadow-none select-none"
         >
-          <RotateCcw className="w-4 h-4 text-neutral-600" />
+          <RotateCcw className="w-4 h-4 text-white/70" />
           <span>Reset</span>
         </button>
       </div>
@@ -760,11 +752,11 @@ export function PipingCalculator() {
       {/* 5. FORMULA MODAL DIALOG                                        */}
       {/* ============================================================== */}
       {showFormulaModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 select-none">
-          <div className="w-full max-w-lg bg-white border border-black shadow-2xl rounded-none overflow-hidden max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm select-none">
+          <div className="w-full max-w-lg bg-[#151619] border border-white/[0.1] shadow-2xl rounded-xl overflow-hidden max-h-[90vh] flex flex-col text-white">
             {/* Modal Header */}
-            <div className="bg-black text-white px-5 py-4 flex items-center justify-between border-b border-black">
-              <h3 className="text-base sm:text-lg font-extrabold uppercase tracking-tight">
+            <div className="bg-[#18191c] text-white px-5 py-4 flex items-center justify-between border-b border-white/[0.08]">
+              <h3 className="text-sm sm:text-base font-medium text-white">
                 {activeSubSection === 'using-kinematic'
                   ? 'Piping - With kinematic viscosity'
                   : 'Piping - With absolute viscosity'}
@@ -772,7 +764,7 @@ export function PipingCalculator() {
               <button
                 type="button"
                 onClick={() => setShowFormulaModal(false)}
-                className="text-white hover:bg-white/20 p-1 rounded-none transition-colors cursor-pointer"
+                className="text-[#c2c4cc] hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg transition-colors cursor-pointer"
                 aria-label="Close formula modal"
               >
                 <X className="w-5 h-5" />
@@ -787,11 +779,11 @@ export function PipingCalculator() {
                   {/* Formula 1: Area */}
                   <div className="flex items-center justify-center gap-6">
                     <CylinderAreaIcon className="w-9 h-9 stroke-[1.5]" />
-                    <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                    <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                       <span className="italic font-bold">A</span>
                       <span>=</span>
                       <div className="inline-flex flex-col items-center">
-                        <span className="border-b-2 border-black px-3 pb-0.5 italic">π d²</span>
+                        <span className="border-b-2 border-white/60 px-3 pb-0.5 italic">π d²</span>
                         <span className="pt-0.5 italic font-sans text-base sm:text-xl">4</span>
                       </div>
                     </div>
@@ -800,11 +792,11 @@ export function PipingCalculator() {
                   {/* Formula 2: Velocity */}
                   <div className="flex items-center justify-center gap-6 pt-2">
                     <VelocityIcon className="w-9 h-9 stroke-[1.5]" />
-                    <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                    <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                       <span className="italic font-bold">v</span>
                       <span>=</span>
                       <div className="inline-flex flex-col items-center">
-                        <span className="border-b-2 border-black px-3 pb-0.5 italic">Q</span>
+                        <span className="border-b-2 border-white/60 px-3 pb-0.5 italic">Q</span>
                         <span className="pt-0.5 italic">A</span>
                       </div>
                     </div>
@@ -813,11 +805,11 @@ export function PipingCalculator() {
                   {/* Formula 3: Reynolds Number */}
                   <div className="flex items-center justify-center gap-6 pt-2">
                     <ReynoldsIcon className="text-xl" />
-                    <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                    <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                       <span className="italic font-bold">Re</span>
                       <span>=</span>
                       <div className="inline-flex flex-col items-center">
-                        <span className="border-b-2 border-black px-3 pb-0.5 italic">
+                        <span className="border-b-2 border-white/60 px-3 pb-0.5 italic">
                           1000 × v × d
                         </span>
                         <span className="pt-0.5 italic">ν</span>
@@ -826,19 +818,18 @@ export function PipingCalculator() {
                   </div>
 
                   {/* Legend */}
-                  <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
+                  <div className="pt-6 border-t border-white/[0.08] text-xs sm:text-sm text-[#c2c4cc] space-y-1 text-center font-mono">
                     <p>
-                      <span className="font-extrabold text-black">A</span> = Cross-sectional
-                      area;&nbsp;
-                      <span className="font-extrabold text-black">d</span> = Inside pipe diameter;
+                      <span className="font-bold text-white">A</span> = Cross-sectional area;&nbsp;
+                      <span className="font-bold text-white">d</span> = Inside pipe diameter;
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">v</span> = Velocity;&nbsp;
-                      <span className="font-extrabold text-black">Q</span> = Flow rate;&nbsp;
-                      <span className="font-extrabold text-black">Re</span> = Reynolds number;
+                      <span className="font-bold text-white">v</span> = Velocity;&nbsp;
+                      <span className="font-bold text-white">Q</span> = Flow rate;&nbsp;
+                      <span className="font-bold text-white">Re</span> = Reynolds number;
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">ν</span> = Kinematic viscosity
+                      <span className="font-bold text-white">ν</span> = Kinematic viscosity
                     </p>
                   </div>
                 </div>
@@ -848,11 +839,11 @@ export function PipingCalculator() {
                   {/* Formula 1: Area */}
                   <div className="flex items-center justify-center gap-6">
                     <CylinderAreaIcon className="w-9 h-9 stroke-[1.5]" />
-                    <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                    <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                       <span className="italic font-bold">A</span>
                       <span>=</span>
                       <div className="inline-flex flex-col items-center">
-                        <span className="border-b-2 border-black px-3 pb-0.5 italic">π d²</span>
+                        <span className="border-b-2 border-white/60 px-3 pb-0.5 italic">π d²</span>
                         <span className="pt-0.5 italic font-sans text-base sm:text-xl">4</span>
                       </div>
                     </div>
@@ -861,11 +852,11 @@ export function PipingCalculator() {
                   {/* Formula 2: Velocity */}
                   <div className="flex items-center justify-center gap-6 pt-2">
                     <VelocityIcon className="w-9 h-9 stroke-[1.5]" />
-                    <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                    <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                       <span className="italic font-bold">v</span>
                       <span>=</span>
                       <div className="inline-flex flex-col items-center">
-                        <span className="border-b-2 border-black px-3 pb-0.5 italic">Q</span>
+                        <span className="border-b-2 border-white/60 px-3 pb-0.5 italic">Q</span>
                         <span className="pt-0.5 italic">A</span>
                       </div>
                     </div>
@@ -874,11 +865,11 @@ export function PipingCalculator() {
                   {/* Formula 3: Reynolds Number */}
                   <div className="flex items-center justify-center gap-6 pt-2">
                     <ReynoldsIcon className="text-xl" />
-                    <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                    <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                       <span className="italic font-bold">Re</span>
                       <span>=</span>
                       <div className="inline-flex flex-col items-center">
-                        <span className="border-b-2 border-black px-3 pb-0.5 italic">
+                        <span className="border-b-2 border-white/60 px-3 pb-0.5 italic">
                           1000 × v × d × S<sub>g</sub>
                         </span>
                         <span className="pt-0.5 italic">μ</span>
@@ -887,23 +878,22 @@ export function PipingCalculator() {
                   </div>
 
                   {/* Legend */}
-                  <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
+                  <div className="pt-6 border-t border-white/[0.08] text-xs sm:text-sm text-[#c2c4cc] space-y-1 text-center font-mono">
                     <p>
-                      <span className="font-extrabold text-black">A</span> = Cross-sectional
-                      area;&nbsp;
-                      <span className="font-extrabold text-black">d</span> = Inside pipe diameter;
+                      <span className="font-bold text-white">A</span> = Cross-sectional area;&nbsp;
+                      <span className="font-bold text-white">d</span> = Inside pipe diameter;
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">v</span> = Velocity;&nbsp;
-                      <span className="font-extrabold text-black">Q</span> = Flow rate;&nbsp;
-                      <span className="font-extrabold text-black">Re</span> = Reynolds number;
+                      <span className="font-bold text-white">v</span> = Velocity;&nbsp;
+                      <span className="font-bold text-white">Q</span> = Flow rate;&nbsp;
+                      <span className="font-bold text-white">Re</span> = Reynolds number;
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">
+                      <span className="font-bold text-white">
                         S<sub>g</sub>
                       </span>{' '}
                       = Specific gravity;&nbsp;
-                      <span className="font-extrabold text-black">μ</span> = Absolute viscosity
+                      <span className="font-bold text-white">μ</span> = Absolute viscosity
                     </p>
                   </div>
                 </div>
@@ -911,11 +901,11 @@ export function PipingCalculator() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-3 bg-neutral-100 border-t border-black text-right">
+            <div className="p-3 sm:px-5 sm:py-3 bg-[#18191c] border-t border-white/[0.08] flex justify-end">
               <button
                 type="button"
                 onClick={() => setShowFormulaModal(false)}
-                className="px-5 py-2 bg-black hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider rounded-none cursor-pointer border border-black"
+                className="px-4 py-1.5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors cursor-pointer shadow-sm"
               >
                 Close
               </button>

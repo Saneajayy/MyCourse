@@ -156,17 +156,17 @@ function UnitDropdown<T extends string>({ currentUnit, options, onSelect }: Unit
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="h-10 min-w-[76px] sm:min-w-[84px] px-2.5 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 font-mono text-xs font-bold border border-neutral-300 hover:border-neutral-400 transition-all flex items-center justify-between gap-1.5 cursor-pointer select-none rounded-none shadow-none"
+        className="h-10 min-w-[76px] sm:min-w-[84px] px-2.5 bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white font-mono text-xs font-medium border border-white/[0.08] hover:border-white/[0.14] transition-all flex items-center justify-between gap-1.5 cursor-pointer select-none rounded-lg shadow-none"
         title="Click to change unit"
       >
         <span className="whitespace-nowrap">{UNIT_DISPLAY[currentUnit] || currentUnit}</span>
-        <ChevronDown className="w-3 h-3 text-neutral-500 shrink-0" />
+        <ChevronDown className="w-3 h-3 text-[#80828d] shrink-0" />
       </button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} aria-hidden="true" />
-          <div className="absolute right-0 top-full mt-1 w-full min-w-full bg-white border border-neutral-300 shadow-lg z-50 py-1 rounded-none">
+          <div className="absolute right-0 top-full mt-1 w-full min-w-full bg-[#18191c] border border-white/[0.1] shadow-2xl z-50 py-1 rounded-lg overflow-hidden">
             {options.map((opt) => (
               <button
                 key={opt}
@@ -177,13 +177,13 @@ function UnitDropdown<T extends string>({ currentUnit, options, onSelect }: Unit
                 }}
                 className={`w-full text-left px-2.5 py-1.5 text-xs font-mono transition-colors flex items-center justify-between gap-1.5 cursor-pointer ${
                   opt === currentUnit
-                    ? 'bg-neutral-100 font-bold text-neutral-950'
-                    : 'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950'
+                    ? 'bg-white/10 font-medium text-white'
+                    : 'text-[#c2c4cc] hover:bg-white/[0.06] hover:text-white'
                 }`}
               >
                 <span className="whitespace-nowrap">{UNIT_DISPLAY[opt] || opt}</span>
                 {opt === currentUnit && (
-                  <Check className="w-3.5 h-3.5 text-neutral-900 stroke-[2.5] shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[2.5] shrink-0" />
                 )}
               </button>
             ))}
@@ -752,18 +752,18 @@ export function MotorCalculator() {
   const currentSubSectionObj = SUBSECTIONS.find((s) => s.id === activeSubSection);
 
   return (
-    <div className="w-full max-w-2xl bg-white border border-neutral-300 rounded-none shadow-none font-reddit select-none overflow-hidden">
+    <div className="w-full max-w-2xl bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl shadow-none font-reddit select-none overflow-hidden transition-all text-left">
       {/* ============================================================== */}
       {/* 1. TOP HEADER: Formula Sheet Button & SubSection Dropdown      */}
       {/* ============================================================== */}
-      <div className="relative px-4 sm:px-6 py-2.5 sm:py-3 border-b border-neutral-300 flex items-center justify-between bg-white z-20">
+      <div className="relative px-4 sm:px-6 py-2.5 sm:py-3 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between z-20">
         <button
           type="button"
           onClick={() => setShowFormulaModal(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 font-mono text-xs sm:text-sm font-bold border border-neutral-300 hover:border-neutral-400 transition-colors cursor-pointer rounded-none"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1f2023] hover:bg-[#27282c] active:bg-[#2e3035] text-white font-mono text-xs sm:text-[13px] font-medium border border-white/[0.08] hover:border-white/[0.14] transition-colors cursor-pointer rounded-lg"
           title="View formulas breakdown"
         >
-          <Sigma className="w-3.5 h-3.5 text-neutral-700" />
+          <Sigma className="w-3.5 h-3.5 text-white/70" />
           <span>Formula Sheet</span>
         </button>
 
@@ -771,11 +771,11 @@ export function MotorCalculator() {
           <button
             type="button"
             onClick={() => setIsSubSectionMenuOpen(!isSubSectionMenuOpen)}
-            className="inline-flex items-center gap-2 px-3 py-1.5 bg-white hover:bg-neutral-50 text-neutral-900 font-mono text-xs sm:text-sm font-bold border border-neutral-300 hover:border-neutral-400 transition-colors cursor-pointer rounded-none"
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white font-mono text-xs sm:text-[13px] font-medium border border-white/[0.08] hover:border-white/[0.14] transition-colors cursor-pointer rounded-lg"
           >
             <span>{currentSubSectionObj?.label || 'Flow rate'}</span>
             <ChevronDown
-              className={`w-4 h-4 text-neutral-600 transition-transform ${
+              className={`w-4 h-4 text-[#80828d] transition-transform ${
                 isSubSectionMenuOpen ? 'rotate-180' : ''
               }`}
             />
@@ -789,7 +789,7 @@ export function MotorCalculator() {
                 onClick={() => setIsSubSectionMenuOpen(false)}
                 aria-hidden="true"
               />
-              <div className="absolute right-0 top-full mt-1 w-48 sm:w-56 bg-white border border-neutral-300 shadow-2xl z-40 py-1 rounded-none">
+              <div className="absolute right-0 top-full mt-1 w-48 sm:w-56 bg-[#18191c] border border-white/[0.1] shadow-2xl z-40 py-1 rounded-lg overflow-hidden">
                 {SUBSECTIONS.map((sub) => (
                   <button
                     key={sub.id}
@@ -800,8 +800,8 @@ export function MotorCalculator() {
                     }}
                     className={`w-full text-left px-4 py-2.5 text-xs sm:text-sm font-bold transition-colors flex items-center justify-between cursor-pointer ${
                       sub.id === activeSubSection
-                        ? 'bg-neutral-100 text-neutral-950'
-                        : 'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950'
+                        ? 'bg-white/10 text-white font-medium'
+                        : 'text-[#c2c4cc] hover:bg-white/[0.06] hover:text-white'
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -810,8 +810,8 @@ export function MotorCalculator() {
                         <span
                           className={`text-[10px] px-1.5 py-0.5 border ${
                             sub.id === activeSubSection
-                              ? 'border-neutral-400 text-neutral-700'
-                              : 'border-neutral-300 text-neutral-500'
+                              ? 'border-white/20 text-[#c2c4cc] rounded'
+                              : 'border-white/10 text-neutral-500 rounded'
                           }`}
                         >
                           Next
@@ -819,7 +819,7 @@ export function MotorCalculator() {
                       )}
                     </div>
                     {sub.id === activeSubSection && (
-                      <Check className="w-4 h-4 text-neutral-900 stroke-[2.5]" />
+                      <Check className="w-4 h-4 text-emerald-400 stroke-[2.5]" />
                     )}
                   </button>
                 ))}
@@ -837,10 +837,10 @@ export function MotorCalculator() {
       {activeSubSection === 'flow-rate' && (
         <div>
           {/* Input 1: Displacement */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Displacement</span>
+              <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Displacement</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -849,7 +849,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={frDispStr}
                 onChange={(e) => setFrDispStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={frDispUnit}
@@ -860,10 +860,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 2: Speed */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Speed</span>
+              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Speed</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -872,7 +872,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={frSpeedStr}
                 onChange={(e) => setFrSpeedStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={frSpeedUnit}
@@ -883,10 +883,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 3: Volumetric efficiency */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+              <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">
                 Volumetric efficiency
               </span>
             </div>
@@ -897,19 +897,19 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={frVolEffStr}
                 onChange={(e) => setFrVolEffStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
-              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-neutral-100 text-neutral-700 font-mono text-xs font-bold border border-neutral-300 flex items-center justify-center rounded-none">
+              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-[#1b1c20] text-[#c2c4cc] font-mono text-xs font-medium border border-white/[0.08] flex items-center justify-center rounded-lg select-none">
                 %
               </div>
             </div>
           </div>
 
           {/* Input 4: Power */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Power</span>
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Power</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -918,7 +918,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={frPowerStr}
                 onChange={(e) => setFrPowerStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={frPowerUnit}
@@ -929,10 +929,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 5: Pressure */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Pressure</span>
+              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Pressure</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -941,7 +941,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={frPressureStr}
                 onChange={(e) => setFrPressureStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={frPressureUnit}
@@ -952,10 +952,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 6: Mechanical efficiency */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">
                 Mechanical efficiency
               </span>
             </div>
@@ -966,24 +966,22 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={frMechEffStr}
                 onChange={(e) => setFrMechEffStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
-              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-neutral-100 text-neutral-700 font-mono text-xs font-bold border border-neutral-300 flex items-center justify-center rounded-none">
+              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-[#1b1c20] text-[#c2c4cc] font-mono text-xs font-medium border border-white/[0.08] flex items-center justify-center rounded-lg select-none">
                 %
               </div>
             </div>
           </div>
 
           {/* Separator / Output Header */}
-          <div className="px-4 sm:px-6 py-4 bg-neutral-50/50 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-4 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-extrabold text-neutral-900 uppercase tracking-tight">
-                Flow rate
-              </span>
+              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
-              <div className="w-full h-10 px-3 bg-neutral-100 border border-neutral-300 flex items-center justify-end font-mono text-sm font-bold text-neutral-900">
+              <div className="w-full h-10 px-3 bg-[#131417] border border-white/[0.05] flex items-center justify-end font-mono text-sm font-medium text-white rounded-lg">
                 {flowRateFormatted}
               </div>
               <UnitDropdown
@@ -1000,10 +998,10 @@ export function MotorCalculator() {
       {activeSubSection === 'pressure' && (
         <div>
           {/* Input 1: Power */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Power</span>
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Power</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1012,7 +1010,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={prPowerStr}
                 onChange={(e) => setPrPowerStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={prPowerUnit}
@@ -1023,10 +1021,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 2: Flow rate */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
+              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1035,7 +1033,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={prFlowStr}
                 onChange={(e) => setPrFlowStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={prFlowUnit}
@@ -1046,10 +1044,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 3: Volumetric efficiency */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+              <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">
                 Volumetric efficiency
               </span>
             </div>
@@ -1060,19 +1058,19 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={prVolEffStr}
                 onChange={(e) => setPrVolEffStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
-              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-neutral-100 text-neutral-700 font-mono text-xs font-bold border border-neutral-300 flex items-center justify-center rounded-none">
+              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-[#1b1c20] text-[#c2c4cc] font-mono text-xs font-medium border border-white/[0.08] flex items-center justify-center rounded-lg select-none">
                 %
               </div>
             </div>
           </div>
 
           {/* Input 4: Mechanical efficiency */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">
                 Mechanical efficiency
               </span>
             </div>
@@ -1083,19 +1081,19 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={prMechEffStr}
                 onChange={(e) => setPrMechEffStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
-              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-neutral-100 text-neutral-700 font-mono text-xs font-bold border border-neutral-300 flex items-center justify-center rounded-none">
+              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-[#1b1c20] text-[#c2c4cc] font-mono text-xs font-medium border border-white/[0.08] flex items-center justify-center rounded-lg select-none">
                 %
               </div>
             </div>
           </div>
 
           {/* Input 5: Torque */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <RotateCw className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Torque</span>
+              <RotateCw className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Torque</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1104,7 +1102,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={prTorqueStr}
                 onChange={(e) => setPrTorqueStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={prTorqueUnit}
@@ -1115,10 +1113,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 6: Displacement */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Displacement</span>
+              <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Displacement</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1127,7 +1125,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={prDispStr}
                 onChange={(e) => setPrDispStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={prDispUnit}
@@ -1138,15 +1136,13 @@ export function MotorCalculator() {
           </div>
 
           {/* Separator / Output Header */}
-          <div className="px-4 sm:px-6 py-4 bg-neutral-50/50 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-4 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-extrabold text-neutral-900 uppercase tracking-tight">
-                Pressure
-              </span>
+              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Pressure</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
-              <div className="w-full h-10 px-3 bg-neutral-100 border border-neutral-300 flex items-center justify-end font-mono text-sm font-bold text-neutral-900">
+              <div className="w-full h-10 px-3 bg-[#131417] border border-white/[0.05] flex items-center justify-end font-mono text-sm font-medium text-white rounded-lg">
                 {pressureFormatted}
               </div>
               <UnitDropdown
@@ -1163,10 +1159,10 @@ export function MotorCalculator() {
       {activeSubSection === 'displacement' && (
         <div>
           {/* Input 1: Torque */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <RotateCw className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Torque</span>
+              <RotateCw className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Torque</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1175,7 +1171,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={dispTorqueStr}
                 onChange={(e) => setDispTorqueStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={dispTorqueUnit}
@@ -1186,10 +1182,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 2: Mechanical efficiency */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">
                 Mechanical efficiency
               </span>
             </div>
@@ -1200,19 +1196,19 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={dispMechEffStr}
                 onChange={(e) => setDispMechEffStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
-              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-neutral-100 text-neutral-700 font-mono text-xs font-bold border border-neutral-300 flex items-center justify-center rounded-none">
+              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-[#1b1c20] text-[#c2c4cc] font-mono text-xs font-medium border border-white/[0.08] flex items-center justify-center rounded-lg select-none">
                 %
               </div>
             </div>
           </div>
 
           {/* Input 3: Pressure */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Pressure</span>
+              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Pressure</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1221,7 +1217,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={dispPressureStr}
                 onChange={(e) => setDispPressureStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={dispPressureUnit}
@@ -1232,10 +1228,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 4: Flow rate */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
+              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1244,7 +1240,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={dispFlowStr}
                 onChange={(e) => setDispFlowStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={dispFlowUnit}
@@ -1255,10 +1251,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 5: Volumetric efficiency */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+              <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">
                 Volumetric efficiency
               </span>
             </div>
@@ -1269,19 +1265,19 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={dispVolEffStr}
                 onChange={(e) => setDispVolEffStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
-              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-neutral-100 text-neutral-700 font-mono text-xs font-bold border border-neutral-300 flex items-center justify-center rounded-none">
+              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-[#1b1c20] text-[#c2c4cc] font-mono text-xs font-medium border border-white/[0.08] flex items-center justify-center rounded-lg select-none">
                 %
               </div>
             </div>
           </div>
 
           {/* Input 6: Speed */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Speed</span>
+              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Speed</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1290,7 +1286,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={dispSpeedStr}
                 onChange={(e) => setDispSpeedStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={dispSpeedUnit}
@@ -1301,15 +1297,13 @@ export function MotorCalculator() {
           </div>
 
           {/* Separator / Output Header */}
-          <div className="px-4 sm:px-6 py-4 bg-neutral-50/50 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-4 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-extrabold text-neutral-900 uppercase tracking-tight">
-                Displacement
-              </span>
+              <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Displacement</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
-              <div className="w-full h-10 px-3 bg-neutral-100 border border-neutral-300 flex items-center justify-end font-mono text-sm font-bold text-neutral-900">
+              <div className="w-full h-10 px-3 bg-[#131417] border border-white/[0.05] flex items-center justify-end font-mono text-sm font-medium text-white rounded-lg">
                 {displacementFormatted}
               </div>
               <UnitDropdown
@@ -1326,10 +1320,10 @@ export function MotorCalculator() {
       {activeSubSection === 'speed' && (
         <div>
           {/* Input 1: Flow rate */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
+              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1338,7 +1332,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={spdFlowStr}
                 onChange={(e) => setSpdFlowStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={spdFlowUnit}
@@ -1349,10 +1343,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 2: Volumetric efficiency */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+              <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">
                 Volumetric efficiency
               </span>
             </div>
@@ -1363,19 +1357,19 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={spdVolEffStr}
                 onChange={(e) => setSpdVolEffStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
-              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-neutral-100 text-neutral-700 font-mono text-xs font-bold border border-neutral-300 flex items-center justify-center rounded-none">
+              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-[#1b1c20] text-[#c2c4cc] font-mono text-xs font-medium border border-white/[0.08] flex items-center justify-center rounded-lg select-none">
                 %
               </div>
             </div>
           </div>
 
           {/* Input 3: Displacement */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Displacement</span>
+              <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Displacement</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1384,7 +1378,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={spdDispStr}
                 onChange={(e) => setSpdDispStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={spdDispUnit}
@@ -1395,10 +1389,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 4: Power */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Power</span>
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Power</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1407,7 +1401,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={spdPowerStr}
                 onChange={(e) => setSpdPowerStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={spdPowerUnit}
@@ -1418,10 +1412,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 5: Torque */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <RotateCw className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Torque</span>
+              <RotateCw className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Torque</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1430,7 +1424,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={spdTorqueStr}
                 onChange={(e) => setSpdTorqueStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={spdTorqueUnit}
@@ -1441,15 +1435,13 @@ export function MotorCalculator() {
           </div>
 
           {/* Separator / Output Header */}
-          <div className="px-4 sm:px-6 py-4 bg-neutral-50/50 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-4 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-extrabold text-neutral-900 uppercase tracking-tight">
-                Speed
-              </span>
+              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Speed</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
-              <div className="w-full h-10 px-3 bg-neutral-100 border border-neutral-300 flex items-center justify-end font-mono text-sm font-bold text-neutral-900">
+              <div className="w-full h-10 px-3 bg-[#131417] border border-white/[0.05] flex items-center justify-end font-mono text-sm font-medium text-white rounded-lg">
                 {speedFormatted}
               </div>
               <UnitDropdown
@@ -1466,10 +1458,10 @@ export function MotorCalculator() {
       {activeSubSection === 'torque' && (
         <div>
           {/* Input 1: Mechanical efficiency */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">
                 Mechanical efficiency
               </span>
             </div>
@@ -1480,19 +1472,19 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={trqMechEffStr}
                 onChange={(e) => setTrqMechEffStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
-              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-neutral-100 text-neutral-700 font-mono text-xs font-bold border border-neutral-300 flex items-center justify-center rounded-none">
+              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-[#1b1c20] text-[#c2c4cc] font-mono text-xs font-medium border border-white/[0.08] flex items-center justify-center rounded-lg select-none">
                 %
               </div>
             </div>
           </div>
 
           {/* Input 2: Displacement */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Displacement</span>
+              <Disc className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Displacement</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1501,7 +1493,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={trqDispStr}
                 onChange={(e) => setTrqDispStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={trqDispUnit}
@@ -1512,10 +1504,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 3: Pressure */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Pressure</span>
+              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Pressure</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1524,7 +1516,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={trqPressureStr}
                 onChange={(e) => setTrqPressureStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={trqPressureUnit}
@@ -1535,10 +1527,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 4: Power */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Power</span>
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Power</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1547,7 +1539,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={trqPowerStr}
                 onChange={(e) => setTrqPowerStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={trqPowerUnit}
@@ -1558,10 +1550,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 5: Speed */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Speed</span>
+              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Speed</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1570,7 +1562,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={trqSpeedStr}
                 onChange={(e) => setTrqSpeedStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={trqSpeedUnit}
@@ -1581,15 +1573,13 @@ export function MotorCalculator() {
           </div>
 
           {/* Separator / Output Header */}
-          <div className="px-4 sm:px-6 py-4 bg-neutral-50/50 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-4 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-extrabold text-neutral-900 uppercase tracking-tight">
-                Torque
-              </span>
+              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Torque</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
-              <div className="w-full h-10 px-3 bg-neutral-100 border border-neutral-300 flex items-center justify-end font-mono text-sm font-bold text-neutral-900">
+              <div className="w-full h-10 px-3 bg-[#131417] border border-white/[0.05] flex items-center justify-end font-mono text-sm font-medium text-white rounded-lg">
                 {torqueFormatted}
               </div>
               <UnitDropdown
@@ -1606,10 +1596,10 @@ export function MotorCalculator() {
       {activeSubSection === 'power' && (
         <div>
           {/* Input 1: Torque */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Torque</span>
+              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Torque</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1618,7 +1608,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={pwrTorqueStr}
                 onChange={(e) => setPwrTorqueStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={pwrTorqueUnit}
@@ -1629,10 +1619,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 2: Speed */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Speed</span>
+              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Speed</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1641,7 +1631,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={pwrSpeedStr}
                 onChange={(e) => setPwrSpeedStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={pwrSpeedUnit}
@@ -1652,10 +1642,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 3: Flow rate */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Flow rate</span>
+              <Pipette className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Flow rate</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1664,7 +1654,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={pwrFlowStr}
                 onChange={(e) => setPwrFlowStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={pwrFlowUnit}
@@ -1675,10 +1665,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 4: Pressure */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">Pressure</span>
+              <Gauge className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Pressure</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
               <input
@@ -1687,7 +1677,7 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={pwrPressureStr}
                 onChange={(e) => setPwrPressureStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
               <UnitDropdown
                 currentUnit={pwrPressureUnit}
@@ -1698,10 +1688,10 @@ export function MotorCalculator() {
           </div>
 
           {/* Input 5: Volumetric efficiency */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+              <FlaskConical className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">
                 Volumetric efficiency
               </span>
             </div>
@@ -1712,19 +1702,19 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={pwrVolEffStr}
                 onChange={(e) => setPwrVolEffStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
-              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-neutral-100 text-neutral-700 font-mono text-xs font-bold border border-neutral-300 flex items-center justify-center rounded-none">
+              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-[#1b1c20] text-[#c2c4cc] font-mono text-xs font-medium border border-white/[0.08] flex items-center justify-center rounded-lg select-none">
                 %
               </div>
             </div>
           </div>
 
           {/* Input 6: Mechanical efficiency */}
-          <div className="px-4 sm:px-6 py-3 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-3 border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-neutral-900">
+              <Wrench className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">
                 Mechanical efficiency
               </span>
             </div>
@@ -1735,24 +1725,22 @@ export function MotorCalculator() {
                 placeholder="0"
                 value={pwrMechEffStr}
                 onChange={(e) => setPwrMechEffStr(e.target.value)}
-                className="w-full h-10 px-3 bg-white border border-neutral-300 text-right font-mono text-sm font-bold text-neutral-900 focus:border-black focus:outline-none transition-colors rounded-none shadow-none"
+                className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] text-right font-mono text-sm font-medium text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-colors rounded-lg shadow-none"
               />
-              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-neutral-100 text-neutral-700 font-mono text-xs font-bold border border-neutral-300 flex items-center justify-center rounded-none">
+              <div className="h-10 min-w-[70px] sm:min-w-[76px] px-2.5 bg-[#1b1c20] text-[#c2c4cc] font-mono text-xs font-medium border border-white/[0.08] flex items-center justify-center rounded-lg select-none">
                 %
               </div>
             </div>
           </div>
 
           {/* Separator / Output Header */}
-          <div className="px-4 sm:px-6 py-4 bg-neutral-50/50 border-b border-neutral-300 flex items-center justify-between gap-3">
+          <div className="px-4 sm:px-6 py-4 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-[140px] sm:min-w-[180px]">
-              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-black shrink-0" />
-              <span className="text-xs sm:text-sm font-extrabold text-neutral-900 uppercase tracking-tight">
-                Power
-              </span>
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-white">Power</span>
             </div>
             <div className="flex items-center gap-2 flex-1 justify-end max-w-xs sm:max-w-sm">
-              <div className="w-full h-10 px-3 bg-neutral-100 border border-neutral-300 flex items-center justify-end font-mono text-sm font-bold text-neutral-900">
+              <div className="w-full h-10 px-3 bg-[#131417] border border-white/[0.05] flex items-center justify-end font-mono text-sm font-medium text-white rounded-lg">
                 {powerFormatted}
               </div>
               <UnitDropdown
@@ -1768,11 +1756,11 @@ export function MotorCalculator() {
       {/* ============================================================== */}
       {/* 3. BOTTOM ACTIONS (Copy, Reset)                                */}
       {/* ============================================================== */}
-      <div className="p-4 sm:px-6 sm:py-5 grid grid-cols-2 gap-3 bg-neutral-50">
+      <div className="p-4 sm:px-6 sm:py-5 grid grid-cols-2 gap-3 bg-white/[0.02] border-t border-white/[0.06]">
         <button
           type="button"
           onClick={handleCopy}
-          className="h-10 sm:h-11 bg-black hover:bg-[#262626] text-white font-bold text-xs uppercase tracking-wider border border-black transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-none shadow-none"
+          className="h-10 sm:h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-[13px] transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-lg shadow-sm select-none"
         >
           <Copy className="w-4 h-4" />
           <span>{copySuccess ? 'Copied!' : 'Copy'}</span>
@@ -1781,9 +1769,9 @@ export function MotorCalculator() {
         <button
           type="button"
           onClick={handleReset}
-          className="h-10 sm:h-11 bg-white hover:bg-neutral-100 active:bg-neutral-200 text-neutral-800 font-bold text-xs uppercase tracking-wider border border-neutral-300 hover:border-neutral-400 transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-none shadow-none"
+          className="h-10 sm:h-11 bg-[#1f2023] hover:bg-[#27282c] active:bg-[#2e3035] text-white font-medium text-xs sm:text-[13px] border border-white/[0.08] hover:border-white/[0.14] transition-colors cursor-pointer flex items-center justify-center gap-1.5 rounded-lg shadow-none select-none"
         >
-          <RotateCcw className="w-4 h-4 text-neutral-600" />
+          <RotateCcw className="w-4 h-4 text-white/70" />
           <span>Reset</span>
         </button>
       </div>
@@ -1792,11 +1780,11 @@ export function MotorCalculator() {
       {/* 4. FORMULA MODAL DIALOG                                        */}
       {/* ============================================================== */}
       {showFormulaModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 select-none">
-          <div className="w-full max-w-lg bg-white border border-black shadow-2xl rounded-none overflow-hidden max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm select-none">
+          <div className="w-full max-w-lg bg-[#151619] border border-white/[0.1] shadow-2xl rounded-xl overflow-hidden max-h-[90vh] flex flex-col text-white">
             {/* Modal Header */}
-            <div className="bg-black text-white px-5 py-4 flex items-center justify-between border-b border-black">
-              <h3 className="text-base sm:text-lg font-extrabold uppercase tracking-tight">
+            <div className="bg-[#18191c] text-white px-5 py-4 flex items-center justify-between border-b border-white/[0.08]">
+              <h3 className="text-sm sm:text-base font-medium text-white">
                 {activeSubSection === 'power'
                   ? 'Motor - Power formula'
                   : activeSubSection === 'torque'
@@ -1812,7 +1800,7 @@ export function MotorCalculator() {
               <button
                 type="button"
                 onClick={() => setShowFormulaModal(false)}
-                className="text-white hover:bg-white/20 p-1 rounded-none transition-colors cursor-pointer"
+                className="text-[#c2c4cc] hover:text-white hover:bg-white/[0.06] p-1.5 rounded-lg transition-colors cursor-pointer"
                 aria-label="Close formula modal"
               >
                 <X className="w-5 h-5" />
@@ -1824,18 +1812,18 @@ export function MotorCalculator() {
               {activeSubSection === 'torque' ? (
                 /* TORQUE FORMULA BREAKDOWN (Image 1) */
                 <div className="text-center py-4 space-y-6">
-                  <div className="flex justify-center text-black">
+                  <div className="flex justify-center text-white/80">
                     <Wrench className="w-12 h-12 stroke-[1.5]" />
                   </div>
 
                   {/* Formula 1 */}
-                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                     <span className="italic font-bold">T</span>
                     <span>=</span>
                     <div className="inline-flex flex-col items-center">
-                      <div className="border-b-2 border-black px-4 pb-0.5 flex items-center gap-1 text-xs sm:text-sm font-sans font-medium">
+                      <div className="border-b-2 border-white/60 px-4 pb-0.5 flex items-center gap-1 text-xs sm:text-sm font-sans font-medium">
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">
+                          <span className="border-b border-white/60 px-1 pb-0.5 italic">
                             η<sub>m</sub>
                           </span>
                           <span>100</span>
@@ -1849,68 +1837,68 @@ export function MotorCalculator() {
                     </div>
                   </div>
 
-                  <div className="text-xs uppercase font-extrabold tracking-widest text-neutral-400">
+                  <div className="text-xs uppercase font-mono font-medium tracking-widest text-[#80828d]">
                     OR
                   </div>
 
                   {/* Formula 2 */}
-                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                     <span className="italic font-bold">T</span>
                     <span>=</span>
                     <div className="inline-flex flex-col items-center">
-                      <span className="border-b-2 border-black px-4 pb-0.5 italic">P</span>
+                      <span className="border-b-2 border-white/60 px-4 pb-0.5 italic">P</span>
                       <span className="pt-1 italic font-serif">N</span>
                     </div>
                   </div>
 
                   {/* Legend */}
-                  <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
+                  <div className="pt-6 border-t border-white/[0.08] text-xs sm:text-sm text-[#c2c4cc] space-y-1 text-center font-mono">
                     <p>
-                      <span className="font-extrabold text-black">
+                      <span className="font-bold text-white">
                         η<sub>m</sub>
                       </span>{' '}
                       = Mechanical efficiency;&nbsp;
-                      <span className="font-extrabold text-black">p</span> = Pressure;&nbsp;
-                      <span className="font-extrabold text-black">V</span> = Displacement
+                      <span className="font-bold text-white">p</span> = Pressure;&nbsp;
+                      <span className="font-bold text-white">V</span> = Displacement
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">P</span> = Power;&nbsp;
-                      <span className="font-extrabold text-black">N</span> = Speed
+                      <span className="font-bold text-white">P</span> = Power;&nbsp;
+                      <span className="font-bold text-white">N</span> = Speed
                     </p>
                   </div>
                 </div>
               ) : activeSubSection === 'power' ? (
                 /* POWER FORMULA BREAKDOWN (Image 4) */
                 <div className="text-center py-4 space-y-6">
-                  <div className="flex justify-center text-black">
+                  <div className="flex justify-center text-white/80">
                     <Zap className="w-12 h-12 stroke-[1.5]" />
                   </div>
 
                   {/* Formula 1 */}
-                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                     <span className="italic font-bold">P</span>
                     <span>=</span>
                     <span className="italic">T × N</span>
                   </div>
 
-                  <div className="text-xs uppercase font-extrabold tracking-widest text-neutral-400">
+                  <div className="text-xs uppercase font-mono font-medium tracking-widest text-[#80828d]">
                     OR
                   </div>
 
                   {/* Formula 2 */}
-                  <div className="inline-flex items-center gap-2 font-serif text-lg sm:text-2xl text-neutral-900">
+                  <div className="inline-flex items-center gap-2 font-serif text-lg sm:text-2xl text-white">
                     <span className="italic font-bold">P</span>
                     <span>=</span>
                     <span className="italic">Q × p × </span>
                     <div className="inline-flex flex-col items-center text-xs sm:text-sm font-sans font-medium">
-                      <span className="border-b border-black px-1 pb-0.5 italic">
+                      <span className="border-b border-white/60 px-1 pb-0.5 italic">
                         η<sub>v</sub>
                       </span>
                       <span>100</span>
                     </div>
                     <span>×</span>
                     <div className="inline-flex flex-col items-center text-xs sm:text-sm font-sans font-medium">
-                      <span className="border-b border-black px-1 pb-0.5 italic">
+                      <span className="border-b border-white/60 px-1 pb-0.5 italic">
                         η<sub>m</sub>
                       </span>
                       <span>100</span>
@@ -1918,19 +1906,19 @@ export function MotorCalculator() {
                   </div>
 
                   {/* Legend */}
-                  <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
+                  <div className="pt-6 border-t border-white/[0.08] text-xs sm:text-sm text-[#c2c4cc] space-y-1 text-center font-mono">
                     <p>
-                      <span className="font-extrabold text-black">T</span> = Torque;&nbsp;
-                      <span className="font-extrabold text-black">N</span> = Speed;&nbsp;
-                      <span className="font-extrabold text-black">Q</span> = Flow rate
+                      <span className="font-bold text-white">T</span> = Torque;&nbsp;
+                      <span className="font-bold text-white">N</span> = Speed;&nbsp;
+                      <span className="font-bold text-white">Q</span> = Flow rate
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">p</span> = Pressure;&nbsp;
-                      <span className="font-extrabold text-black">
+                      <span className="font-bold text-white">p</span> = Pressure;&nbsp;
+                      <span className="font-bold text-white">
                         η<sub>v</sub>
                       </span>{' '}
                       = Volumetric efficiency;&nbsp;
-                      <span className="font-extrabold text-black">
+                      <span className="font-bold text-white">
                         η<sub>m</sub>
                       </span>{' '}
                       = Mechanical efficiency
@@ -1940,19 +1928,19 @@ export function MotorCalculator() {
               ) : activeSubSection === 'displacement' ? (
                 /* DISPLACEMENT FORMULA BREAKDOWN (Image 3) */
                 <div className="text-center py-4 space-y-6">
-                  <div className="flex justify-center text-black">
+                  <div className="flex justify-center text-white/80">
                     <Disc className="w-12 h-12 stroke-[1.5]" />
                   </div>
 
                   {/* Formula 1 */}
-                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                     <span className="italic font-bold">V</span>
                     <span>=</span>
                     <div className="inline-flex flex-col items-center">
-                      <span className="border-b-2 border-black px-4 pb-0.5 italic">T × 2π</span>
+                      <span className="border-b-2 border-white/60 px-4 pb-0.5 italic">T × 2π</span>
                       <div className="flex items-center gap-1 pt-1 text-xs sm:text-sm font-sans font-medium">
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">
+                          <span className="border-b border-white/60 px-1 pb-0.5 italic">
                             η<sub>m</sub>
                           </span>
                           <span>100</span>
@@ -1963,20 +1951,20 @@ export function MotorCalculator() {
                     </div>
                   </div>
 
-                  <div className="text-xs uppercase font-extrabold tracking-widest text-neutral-400">
+                  <div className="text-xs uppercase font-mono font-medium tracking-widest text-[#80828d]">
                     OR
                   </div>
 
                   {/* Formula 2 */}
-                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                     <span className="italic font-bold">V</span>
                     <span>=</span>
                     <div className="inline-flex flex-col items-center">
-                      <div className="border-b-2 border-black px-4 pb-0.5 flex items-center gap-1">
+                      <div className="border-b-2 border-white/60 px-4 pb-0.5 flex items-center gap-1">
                         <span className="italic font-serif">Q</span>
                         <span>×</span>
                         <div className="flex flex-col items-center text-xs sm:text-sm font-sans font-medium">
-                          <span className="border-b border-black px-1 pb-0.5 italic">
+                          <span className="border-b border-white/60 px-1 pb-0.5 italic">
                             η<sub>v</sub>
                           </span>
                           <span>100</span>
@@ -1987,42 +1975,42 @@ export function MotorCalculator() {
                   </div>
 
                   {/* Legend */}
-                  <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
+                  <div className="pt-6 border-t border-white/[0.08] text-xs sm:text-sm text-[#c2c4cc] space-y-1 text-center font-mono">
                     <p>
-                      <span className="font-extrabold text-black">T</span> = Torque;&nbsp;
-                      <span className="font-extrabold text-black">
+                      <span className="font-bold text-white">T</span> = Torque;&nbsp;
+                      <span className="font-bold text-white">
                         η<sub>m</sub>
                       </span>{' '}
                       = Mechanical efficiency;&nbsp;
-                      <span className="font-extrabold text-black">p</span> = Pressure
+                      <span className="font-bold text-white">p</span> = Pressure
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">Q</span> = Flow rate;&nbsp;
-                      <span className="font-extrabold text-black">
+                      <span className="font-bold text-white">Q</span> = Flow rate;&nbsp;
+                      <span className="font-bold text-white">
                         η<sub>v</sub>
                       </span>{' '}
                       = Volumetric efficiency;&nbsp;
-                      <span className="font-extrabold text-black">N</span> = Speed
+                      <span className="font-bold text-white">N</span> = Speed
                     </p>
                   </div>
                 </div>
               ) : activeSubSection === 'speed' ? (
                 /* SPEED FORMULA BREAKDOWN (Image 1) */
                 <div className="text-center py-4 space-y-6">
-                  <div className="flex justify-center text-black">
+                  <div className="flex justify-center text-white/80">
                     <Gauge className="w-12 h-12 stroke-[1.5]" />
                   </div>
 
                   {/* Formula 1 */}
-                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                     <span className="italic font-bold">N</span>
                     <span>=</span>
                     <div className="inline-flex flex-col items-center">
-                      <div className="border-b-2 border-black px-4 pb-0.5 flex items-center gap-1">
+                      <div className="border-b-2 border-white/60 px-4 pb-0.5 flex items-center gap-1">
                         <span className="italic font-serif">Q</span>
                         <span>×</span>
                         <div className="flex flex-col items-center text-xs sm:text-sm font-sans font-medium">
-                          <span className="border-b border-black px-1 pb-0.5 italic">
+                          <span className="border-b border-white/60 px-1 pb-0.5 italic">
                             η<sub>v</sub>
                           </span>
                           <span>100</span>
@@ -2032,59 +2020,59 @@ export function MotorCalculator() {
                     </div>
                   </div>
 
-                  <div className="text-xs uppercase font-extrabold tracking-widest text-neutral-400">
+                  <div className="text-xs uppercase font-mono font-medium tracking-widest text-[#80828d]">
                     OR
                   </div>
 
                   {/* Formula 2 */}
-                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                     <span className="italic font-bold">N</span>
                     <span>=</span>
                     <div className="inline-flex flex-col items-center">
-                      <span className="border-b-2 border-black px-4 pb-0.5 italic">P</span>
+                      <span className="border-b-2 border-white/60 px-4 pb-0.5 italic">P</span>
                       <span className="pt-1 italic font-serif">T</span>
                     </div>
                   </div>
 
                   {/* Legend */}
-                  <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
+                  <div className="pt-6 border-t border-white/[0.08] text-xs sm:text-sm text-[#c2c4cc] space-y-1 text-center font-mono">
                     <p>
-                      <span className="font-extrabold text-black">Q</span> = Flow rate;&nbsp;
-                      <span className="font-extrabold text-black">
+                      <span className="font-bold text-white">Q</span> = Flow rate;&nbsp;
+                      <span className="font-bold text-white">
                         η<sub>v</sub>
                       </span>{' '}
                       = Volumetric efficiency;&nbsp;
-                      <span className="font-extrabold text-black">V</span> = Displacement
+                      <span className="font-bold text-white">V</span> = Displacement
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">P</span> = Power;&nbsp;
-                      <span className="font-extrabold text-black">T</span> = Torque
+                      <span className="font-bold text-white">P</span> = Power;&nbsp;
+                      <span className="font-bold text-white">T</span> = Torque
                     </p>
                   </div>
                 </div>
               ) : activeSubSection === 'pressure' ? (
                 /* PRESSURE FORMULA BREAKDOWN */
                 <div className="text-center py-4 space-y-6">
-                  <div className="flex justify-center text-black">
+                  <div className="flex justify-center text-white/80">
                     <Gauge className="w-12 h-12 stroke-[1.5]" />
                   </div>
 
                   {/* Formula 1 */}
-                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                     <span className="italic font-bold">p</span>
                     <span>=</span>
                     <div className="inline-flex flex-col items-center">
-                      <span className="border-b-2 border-black px-4 pb-0.5 italic">P</span>
+                      <span className="border-b-2 border-white/60 px-4 pb-0.5 italic">P</span>
                       <div className="flex items-center gap-1 pt-1 text-xs sm:text-sm font-sans font-medium">
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">
+                          <span className="border-b border-white/60 px-1 pb-0.5 italic">
                             η<sub>v</sub>
                           </span>
                           <span>100</span>
                         </div>
                         <span className="px-0.5">×</span>
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">
+                          <span className="border-b border-white/60 px-1 pb-0.5 italic">
                             η<sub>m</sub>
                           </span>
                           <span>100</span>
@@ -2095,19 +2083,19 @@ export function MotorCalculator() {
                     </div>
                   </div>
 
-                  <div className="text-xs uppercase font-extrabold tracking-widest text-neutral-400">
+                  <div className="text-xs uppercase font-mono font-medium tracking-widest text-[#80828d]">
                     OR
                   </div>
 
                   {/* Formula 2 */}
-                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                     <span className="italic font-bold">p</span>
                     <span>=</span>
                     <div className="inline-flex flex-col items-center">
-                      <span className="border-b-2 border-black px-4 pb-0.5 italic">T × 2π</span>
+                      <span className="border-b-2 border-white/60 px-4 pb-0.5 italic">T × 2π</span>
                       <div className="flex items-center gap-1 pt-1 text-xs sm:text-sm font-sans font-medium">
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">
+                          <span className="border-b border-white/60 px-1 pb-0.5 italic">
                             η<sub>m</sub>
                           </span>
                           <span>100</span>
@@ -2119,42 +2107,42 @@ export function MotorCalculator() {
                   </div>
 
                   {/* Legend */}
-                  <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
+                  <div className="pt-6 border-t border-white/[0.08] text-xs sm:text-sm text-[#c2c4cc] space-y-1 text-center font-mono">
                     <p>
-                      <span className="font-extrabold text-black">P</span> = Power;&nbsp;
-                      <span className="font-extrabold text-black">
+                      <span className="font-bold text-white">P</span> = Power;&nbsp;
+                      <span className="font-bold text-white">
                         η<sub>v</sub>
                       </span>{' '}
                       = Volumetric efficiency;
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">
+                      <span className="font-bold text-white">
                         η<sub>m</sub>
                       </span>{' '}
                       = Mechanical efficiency;&nbsp;
-                      <span className="font-extrabold text-black">Q</span> = Flow rate;
+                      <span className="font-bold text-white">Q</span> = Flow rate;
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">T</span> = Torque;&nbsp;
-                      <span className="font-extrabold text-black">V</span> = Displacement
+                      <span className="font-bold text-white">T</span> = Torque;&nbsp;
+                      <span className="font-bold text-white">V</span> = Displacement
                     </p>
                   </div>
                 </div>
               ) : (
                 /* FLOW RATE FORMULA BREAKDOWN */
                 <div className="text-center py-4 space-y-6">
-                  <div className="flex justify-center text-black">
+                  <div className="flex justify-center text-white/80">
                     <Pipette className="w-12 h-12 stroke-[1.5]" />
                   </div>
 
                   {/* Formula 1 */}
-                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                     <span className="italic font-bold">Q</span>
                     <span>=</span>
                     <div className="inline-flex flex-col items-center">
-                      <span className="border-b-2 border-black px-4 pb-0.5 italic">V × N</span>
+                      <span className="border-b-2 border-white/60 px-4 pb-0.5 italic">V × N</span>
                       <div className="flex flex-col items-center pt-1 text-xs sm:text-sm font-sans font-medium">
-                        <span className="border-b border-black px-1.5 pb-0.5 italic">
+                        <span className="border-b border-white/60 px-1.5 pb-0.5 italic">
                           η<sub>v</sub>
                         </span>
                         <span>100</span>
@@ -2162,26 +2150,26 @@ export function MotorCalculator() {
                     </div>
                   </div>
 
-                  <div className="text-xs uppercase font-extrabold tracking-widest text-neutral-400">
+                  <div className="text-xs uppercase font-mono font-medium tracking-widest text-[#80828d]">
                     OR
                   </div>
 
                   {/* Formula 2 */}
-                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-neutral-900">
+                  <div className="inline-flex items-center gap-3 font-serif text-lg sm:text-2xl text-white">
                     <span className="italic font-bold">Q</span>
                     <span>=</span>
                     <div className="inline-flex flex-col items-center">
-                      <span className="border-b-2 border-black px-4 pb-0.5 italic">P</span>
+                      <span className="border-b-2 border-white/60 px-4 pb-0.5 italic">P</span>
                       <div className="flex items-center gap-1 pt-1 text-xs sm:text-sm font-sans font-medium">
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">
+                          <span className="border-b border-white/60 px-1 pb-0.5 italic">
                             η<sub>v</sub>
                           </span>
                           <span>100</span>
                         </div>
                         <span className="px-0.5">×</span>
                         <div className="flex flex-col items-center">
-                          <span className="border-b border-black px-1 pb-0.5 italic">
+                          <span className="border-b border-white/60 px-1 pb-0.5 italic">
                             η<sub>m</sub>
                           </span>
                           <span>100</span>
@@ -2193,24 +2181,24 @@ export function MotorCalculator() {
                   </div>
 
                   {/* Legend */}
-                  <div className="pt-6 border-t border-neutral-200 text-xs sm:text-sm text-neutral-700 space-y-1 text-center font-mono">
+                  <div className="pt-6 border-t border-white/[0.08] text-xs sm:text-sm text-[#c2c4cc] space-y-1 text-center font-mono">
                     <p>
-                      <span className="font-extrabold text-black">V</span> = Displacement;&nbsp;
-                      <span className="font-extrabold text-black">N</span> = Speed;
+                      <span className="font-bold text-white">V</span> = Displacement;&nbsp;
+                      <span className="font-bold text-white">N</span> = Speed;
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">
+                      <span className="font-bold text-white">
                         η<sub>v</sub>
                       </span>{' '}
                       = Volumetric efficiency;&nbsp;
-                      <span className="font-extrabold text-black">P</span> = Power;
+                      <span className="font-bold text-white">P</span> = Power;
                     </p>
                     <p>
-                      <span className="font-extrabold text-black">
+                      <span className="font-bold text-white">
                         η<sub>m</sub>
                       </span>{' '}
                       = Mechanical efficiency;&nbsp;
-                      <span className="font-extrabold text-black">p</span> = Pressure
+                      <span className="font-bold text-white">p</span> = Pressure
                     </p>
                   </div>
                 </div>
@@ -2218,11 +2206,11 @@ export function MotorCalculator() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-3 bg-neutral-100 border-t border-black text-right">
+            <div className="p-3 sm:px-5 sm:py-3 bg-[#18191c] border-t border-white/[0.08] flex justify-end">
               <button
                 type="button"
                 onClick={() => setShowFormulaModal(false)}
-                className="px-5 py-2 bg-black hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider rounded-none cursor-pointer border border-black"
+                className="px-4 py-1.5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors cursor-pointer shadow-sm"
               >
                 Close
               </button>
