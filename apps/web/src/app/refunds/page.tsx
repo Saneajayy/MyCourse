@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { siteConfig } from '../../config/site';
-import { ArrowLeft, Shield, CheckCircle2, RotateCcw } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 export default function RefundPage() {
   useEffect(() => {
@@ -47,20 +47,6 @@ export default function RefundPage() {
               BASICS
             </span>
           </Link>
-          <span className="text-[11px] font-mono tracking-wider text-white/70 px-2.5 py-1 rounded bg-black/40 border border-white/10 backdrop-blur-md">
-            Refund &amp; Cancellation
-          </span>
-        </div>
-
-        {/* Bottom Highlights over Left Card Image */}
-        <div className="relative z-10 w-full space-y-2">
-          <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
-            <Shield className="w-3.5 h-3.5" />
-            <span>7-Day Full Satisfaction Guarantee</span>
-          </div>
-          <p className="text-xs text-[#c2c4cc]/80 leading-relaxed max-w-sm">
-            Fair progress eligibility criteria, 5–7 business days direct Razorpay settlement, and no recurring charges.
-          </p>
         </div>
       </div>
 
@@ -68,16 +54,22 @@ export default function RefundPage() {
       {/* RIGHT CARD: Full Scrollable Refund Policy (Starts Top-Left)   */}
       {/* ============================================================== */}
       <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative select-text">
-        {/* Top Header Bar: lines touch outer ends */}
+        {/* Top Header Bar: Heading on left, Back link on right, lines touch outer ends */}
         <div className="px-6 sm:px-8 lg:px-10 py-4 sm:py-5 border-b border-white/[0.08] flex items-center justify-between shrink-0 select-none bg-[#101012]">
-          <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
-            <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
-              HYDRO
-            </span>
-            <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
-              BASICS
-            </span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+              <span className="font-extrabold text-[14px] text-white leading-[1.05] tracking-wider uppercase">
+                HYDRO
+              </span>
+              <span className="font-extrabold text-[14px] text-white leading-[1.05] tracking-wider uppercase">
+                BASICS
+              </span>
+            </Link>
+            <span className="lg:hidden text-white/30 font-mono text-xs">/</span>
+            <h1 className="text-sm sm:text-base font-bold text-white tracking-tight">
+              Cancellation &amp; Refund Policy
+            </h1>
+          </div>
 
           <Link
             href="/"
@@ -89,22 +81,8 @@ export default function RefundPage() {
           </Link>
         </div>
 
-        {/* Scrollable Document Body */}
+        {/* Scrollable Document Body: Starts immediately from Section 01 */}
         <div className="flex-1 overflow-y-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8 space-y-7 scroll-smooth text-left">
-          {/* Document Title & Preamble */}
-          <div className="space-y-3">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
-              Cancellation &amp; Refund Policy
-            </h1>
-
-            <p className="text-xs sm:text-sm text-[#c2c4cc] leading-relaxed">
-              At <strong>{siteConfig.brandName}</strong>, we stand firmly behind the engineering depth and practical industrial utility of our curriculum. This Cancellation &amp; Refund Policy describes our 7-day money-back guarantee, student eligibility conditions, non-refundable elements, and payment gateway reversal protocols.
-            </p>
-          </div>
-
-          {/* Divider line touching outer ends */}
-          <div className="-mx-6 sm:-mx-8 lg:-mx-10 border-b border-white/[0.08]" />
-
           {/* Section 1 */}
           <section className="space-y-2">
             <div className="flex items-center gap-2">
@@ -182,9 +160,8 @@ export default function RefundPage() {
               Once your refund request is verified by our administration desk:
             </p>
             <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 leading-relaxed space-y-1">
-              <div className="font-semibold text-white flex items-center gap-1.5">
-                <RotateCcw className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Original Payment Method Reversal (5–7 Business Days)</span>
+              <div className="font-semibold text-white">
+                Original Payment Method Reversal (5–7 Business Days)
               </div>
               <p>
                 The reimbursement is transmitted via Razorpay directly back to the original source of payment (UPI VPA, Credit Card, Debit Card, or Net Banking account). Depending on your bank&apos;s clearing cycles, the credit will appear on your statement within 5 to 7 Indian banking days.
