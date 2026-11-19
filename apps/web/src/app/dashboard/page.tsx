@@ -980,225 +980,231 @@ function StudentDashboardContent() {
                 {/* 2-Column Responsive Grid: Profile on Left, Password on Right */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 items-start w-full max-w-md lg:max-w-[720px]">
                   {/* Personal Details Card (Left) */}
-                  <div className="relative w-full lg:max-w-[345px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-5 transition-all select-none">
-                    <div className="flex items-center gap-2.5 pb-3 border-b border-white/[0.06]">
+                  <div className="relative w-full lg:max-w-[345px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl overflow-hidden text-left transition-all select-none">
+                    {/* Header with border touching the ends of the box */}
+                    <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-white/[0.08] flex items-center gap-2.5 bg-white/[0.02]">
                       <UserIcon className="w-4 h-4 text-white/70" strokeWidth={1.8} />
-                      <h2 className="text-sm sm:text-[15px] font-semibold text-white uppercase tracking-wider">
+                      <h2 className="text-sm sm:text-[15px] font-semibold text-white">
                         Personal Information
                       </h2>
                     </div>
 
-                    <form onSubmit={handleSaveProfile} className="space-y-4">
-                      {/* Name Input */}
-                      <div className="space-y-1.5 text-left">
-                        <label
-                          htmlFor="profile-name"
-                          className="text-xs font-medium text-[#c2c4cc] block"
-                        >
-                          Full Name
-                        </label>
-                        <input
-                          id="profile-name"
-                          type="text"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          placeholder="Your name"
-                          className="w-full h-10 px-3.5 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
-                        />
-                      </div>
+                    <div className="p-5 sm:p-6">
+                      <form onSubmit={handleSaveProfile} className="space-y-4">
+                        {/* Name Input */}
+                        <div className="space-y-1.5 text-left">
+                          <label
+                            htmlFor="profile-name"
+                            className="text-xs font-medium text-[#c2c4cc] block"
+                          >
+                            Full Name
+                          </label>
+                          <input
+                            id="profile-name"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Your name"
+                            className="w-full h-10 px-3.5 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
+                          />
+                        </div>
 
-                      {/* Email Address */}
-                      <div className="space-y-1.5 text-left">
-                        <label
-                          htmlFor="profile-email"
-                          className="text-xs font-medium text-[#c2c4cc] block"
-                        >
-                          Email Address
-                        </label>
-                        <input
-                          id="profile-email"
-                          type="email"
-                          disabled
-                          value={user?.email || ''}
-                          className="w-full h-10 px-3.5 bg-[#131417] border border-white/[0.05] rounded-lg text-xs sm:text-[13px] text-[#80828d] cursor-not-allowed select-none"
-                        />
-                        {!user?.emailVerifiedAt && (
-                          <div className="flex items-center gap-3 pt-1">
-                            <Link
-                              href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
-                              className="text-xs font-medium text-amber-400 hover:text-amber-300 underline"
-                            >
-                              Enter 6-digit OTP &rarr;
-                            </Link>
-                            <button
-                              type="button"
-                              onClick={handleResendVerification}
-                              disabled={resendingVerification}
-                              className="text-xs font-medium text-[#c2c4cc] hover:text-white underline cursor-pointer disabled:opacity-50"
-                            >
-                              {resendingVerification ? 'Sending...' : 'Resend OTP'}
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                        {/* Email Address */}
+                        <div className="space-y-1.5 text-left">
+                          <label
+                            htmlFor="profile-email"
+                            className="text-xs font-medium text-[#c2c4cc] block"
+                          >
+                            Email Address
+                          </label>
+                          <input
+                            id="profile-email"
+                            type="email"
+                            disabled
+                            value={user?.email || ''}
+                            className="w-full h-10 px-3.5 bg-[#131417] border border-white/[0.05] rounded-lg text-xs sm:text-[13px] text-[#80828d] cursor-not-allowed select-none"
+                          />
+                          {!user?.emailVerifiedAt && (
+                            <div className="flex items-center gap-3 pt-1">
+                              <Link
+                                href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
+                                className="text-xs font-medium text-amber-400 hover:text-amber-300 underline"
+                              >
+                                Enter 6-digit OTP &rarr;
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={handleResendVerification}
+                                disabled={resendingVerification}
+                                className="text-xs font-medium text-[#c2c4cc] hover:text-white underline cursor-pointer disabled:opacity-50"
+                              >
+                                {resendingVerification ? 'Sending...' : 'Resend OTP'}
+                              </button>
+                            </div>
+                          )}
+                        </div>
 
-                      {/* Phone Input */}
-                      <div className="space-y-1.5 text-left">
-                        <label
-                          htmlFor="profile-phone"
-                          className="text-xs font-medium text-[#c2c4cc] block"
-                        >
-                          Phone Number
-                        </label>
-                        <input
-                          id="profile-phone"
-                          type="tel"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="+91 98765 43210"
-                          className="w-full h-10 px-3.5 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all font-mono"
-                        />
-                      </div>
+                        {/* Phone Input */}
+                        <div className="space-y-1.5 text-left">
+                          <label
+                            htmlFor="profile-phone"
+                            className="text-xs font-medium text-[#c2c4cc] block"
+                          >
+                            Phone Number
+                          </label>
+                          <input
+                            id="profile-phone"
+                            type="tel"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="+91 98765 43210"
+                            className="w-full h-10 px-3.5 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all font-mono"
+                          />
+                        </div>
 
-                      <div className="pt-2">
-                        <button
-                          type="submit"
-                          disabled={profileSaving}
-                          className="w-full h-9 sm:h-10 px-4 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-                        >
-                          {profileSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                          <span>{profileSaving ? 'Saving...' : 'Save Profile'}</span>
-                        </button>
-                      </div>
-                    </form>
+                        <div className="pt-2">
+                          <button
+                            type="submit"
+                            disabled={profileSaving}
+                            className="w-full h-9 sm:h-10 px-4 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                          >
+                            {profileSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                            <span>{profileSaving ? 'Saving...' : 'Save Profile'}</span>
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
 
                   {/* Change Password Card (Right) */}
-                  <div className="relative w-full lg:max-w-[345px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-5 transition-all select-none">
-                    <div className="flex items-center gap-2.5 pb-3 border-b border-white/[0.06]">
+                  <div className="relative w-full lg:max-w-[345px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl overflow-hidden text-left transition-all select-none">
+                    {/* Header with border touching the ends of the box */}
+                    <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-white/[0.08] flex items-center gap-2.5 bg-white/[0.02]">
                       <Lock className="w-4 h-4 text-white/70" strokeWidth={1.8} />
-                      <h2 className="text-sm sm:text-[15px] font-semibold text-white uppercase tracking-wider">
+                      <h2 className="text-sm sm:text-[15px] font-semibold text-white">
                         Security &amp; Password
                       </h2>
                     </div>
 
-                    <form onSubmit={handleChangePassword} className="space-y-4">
-                      {passwordError && (
-                        <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium">
-                          {passwordError}
-                        </div>
-                      )}
+                    <div className="p-5 sm:p-6">
+                      <form onSubmit={handleChangePassword} className="space-y-4">
+                        {passwordError && (
+                          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium">
+                            {passwordError}
+                          </div>
+                        )}
 
-                      {/* Current Password */}
-                      <div className="space-y-1.5 text-left">
-                        <label
-                          htmlFor="profile-current-password"
-                          className="text-xs font-medium text-[#c2c4cc] block"
-                        >
-                          Current Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            id="profile-current-password"
-                            type={showCurrentPassword ? 'text' : 'password'}
-                            value={currentPassword}
-                            onChange={(e) => setCurrentPassword(e.target.value)}
-                            required
-                            placeholder="Your current password"
-                            className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white p-1 cursor-pointer transition-colors"
-                            aria-label={showCurrentPassword ? 'Hide password' : 'Show password'}
+                        {/* Current Password */}
+                        <div className="space-y-1.5 text-left">
+                          <label
+                            htmlFor="profile-current-password"
+                            className="text-xs font-medium text-[#c2c4cc] block"
                           >
-                            {showCurrentPassword ? (
-                              <Eye className="w-3.5 h-3.5" />
-                            ) : (
-                              <EyeOff className="w-3.5 h-3.5" />
-                            )}
+                            Current Password
+                          </label>
+                          <div className="relative">
+                            <input
+                              id="profile-current-password"
+                              type={showCurrentPassword ? 'text' : 'password'}
+                              value={currentPassword}
+                              onChange={(e) => setCurrentPassword(e.target.value)}
+                              required
+                              placeholder="Your current password"
+                              className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white p-1 cursor-pointer transition-colors"
+                              aria-label={showCurrentPassword ? 'Hide password' : 'Show password'}
+                            >
+                              {showCurrentPassword ? (
+                                <Eye className="w-3.5 h-3.5" />
+                              ) : (
+                                <EyeOff className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* New Password */}
+                        <div className="space-y-1.5 text-left">
+                          <label
+                            htmlFor="profile-new-password"
+                            className="text-xs font-medium text-[#c2c4cc] block"
+                          >
+                            New Password
+                          </label>
+                          <div className="relative">
+                            <input
+                              id="profile-new-password"
+                              type={showNewPassword ? 'text' : 'password'}
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              required
+                              placeholder="At least 8 characters"
+                              className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowNewPassword(!showNewPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white p-1 cursor-pointer transition-colors"
+                              aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                            >
+                              {showNewPassword ? (
+                                <Eye className="w-3.5 h-3.5" />
+                              ) : (
+                                <EyeOff className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Confirm Password */}
+                        <div className="space-y-1.5 text-left">
+                          <label
+                            htmlFor="profile-confirm-password"
+                            className="text-xs font-medium text-[#c2c4cc] block"
+                          >
+                            Confirm New Password
+                          </label>
+                          <div className="relative">
+                            <input
+                              id="profile-confirm-password"
+                              type={showConfirmPassword ? 'text' : 'password'}
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              required
+                              placeholder="Repeat new password"
+                              className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white p-1 cursor-pointer transition-colors"
+                              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                            >
+                              {showConfirmPassword ? (
+                                <Eye className="w-3.5 h-3.5" />
+                              ) : (
+                                <EyeOff className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="pt-2">
+                          <button
+                            type="submit"
+                            disabled={passwordSaving}
+                            className="w-full h-9 sm:h-10 px-4 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                          >
+                            {passwordSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                            <span>{passwordSaving ? 'Updating...' : 'Update Password'}</span>
                           </button>
                         </div>
-                      </div>
-
-                      {/* New Password */}
-                      <div className="space-y-1.5 text-left">
-                        <label
-                          htmlFor="profile-new-password"
-                          className="text-xs font-medium text-[#c2c4cc] block"
-                        >
-                          New Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            id="profile-new-password"
-                            type={showNewPassword ? 'text' : 'password'}
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            required
-                            placeholder="At least 8 characters"
-                            className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowNewPassword(!showNewPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white p-1 cursor-pointer transition-colors"
-                            aria-label={showNewPassword ? 'Hide password' : 'Show password'}
-                          >
-                            {showNewPassword ? (
-                              <Eye className="w-3.5 h-3.5" />
-                            ) : (
-                              <EyeOff className="w-3.5 h-3.5" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Confirm Password */}
-                      <div className="space-y-1.5 text-left">
-                        <label
-                          htmlFor="profile-confirm-password"
-                          className="text-xs font-medium text-[#c2c4cc] block"
-                        >
-                          Confirm New Password
-                        </label>
-                        <div className="relative">
-                          <input
-                            id="profile-confirm-password"
-                            type={showConfirmPassword ? 'text' : 'password'}
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                            placeholder="Repeat new password"
-                            className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white p-1 cursor-pointer transition-colors"
-                            aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                          >
-                            {showConfirmPassword ? (
-                              <Eye className="w-3.5 h-3.5" />
-                            ) : (
-                              <EyeOff className="w-3.5 h-3.5" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="pt-2">
-                        <button
-                          type="submit"
-                          disabled={passwordSaving}
-                          className="w-full h-9 sm:h-10 px-4 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-                        >
-                          {passwordSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                          <span>{passwordSaving ? 'Updating...' : 'Update Password'}</span>
-                        </button>
-                      </div>
-                    </form>
+                      </form>
+                    </div>
                   </div>
                 </div>
               </div>
