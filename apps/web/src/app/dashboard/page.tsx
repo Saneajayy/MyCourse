@@ -1258,7 +1258,7 @@ function StudentDashboardContent() {
                       return (
                         <div
                           key={ord.id}
-                          className="relative w-full max-w-[650px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl overflow-hidden transition-all duration-200 select-none text-left"
+                          className="relative w-full max-w-[520px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl overflow-hidden transition-all duration-200 select-none text-left"
                         >
                           {/* Header Bar: Order reference, date, status, and total amount */}
                           <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-white/[0.06] flex items-center justify-between gap-3 bg-white/[0.02]">
