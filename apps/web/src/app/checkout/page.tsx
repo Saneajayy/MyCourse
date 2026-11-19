@@ -1296,7 +1296,7 @@ function CheckoutContent() {
                 <div className="flex items-center justify-center gap-6 sm:gap-7 pt-1 pb-0.5 flex-nowrap">
                   <div
                     title="Google Pay (GPay)"
-                    className="shrink-0 flex items-center justify-center"
+                    className="shrink-0 flex items-center justify-center translate-x-1.5"
                   >
                     <GPayLogo className="h-5 sm:h-[22px] w-auto" />
                   </div>
