@@ -260,6 +260,13 @@ export default function LoginPage() {
           sizes="50vw"
           className="object-cover object-center select-none"
         />
+
+        {/* Straight Vertical Glass Shine Beam */}
+        <div
+          className="absolute inset-y-0 left-0 w-1/3 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.03)_25%,rgba(255,255,255,0.18)_50%,rgba(255,255,255,0.03)_75%,transparent_100%)] pointer-events-none animate-glass-shine"
+          aria-hidden="true"
+        />
+
         {/* Top Vignette Gradient Overlay */}
         <div
           className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none"
