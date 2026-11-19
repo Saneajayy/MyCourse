@@ -65,20 +65,14 @@ export default function GlobalError({
       <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative select-text">
         {/* Top Header Bar: lines touch outer ends */}
         <div className="px-6 sm:px-8 lg:px-10 py-4 sm:py-5 border-b border-white/[0.08] flex items-center justify-between shrink-0 select-none bg-[#101012]">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
-              <span className="font-extrabold text-[14px] text-white leading-[1.05] tracking-wider uppercase">
-                HYDRO
-              </span>
-              <span className="font-extrabold text-[14px] text-white leading-[1.05] tracking-wider uppercase">
-                BASICS
-              </span>
-            </Link>
-            <span className="lg:hidden text-white/30 font-mono text-xs">/</span>
-            <h1 className="text-sm sm:text-base font-bold text-white tracking-tight">
-              500 &bull; Operation Interrupted
-            </h1>
-          </div>
+          <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+            <span className="font-extrabold text-[14px] text-white leading-[1.05] tracking-wider uppercase">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[14px] text-white leading-[1.05] tracking-wider uppercase">
+              BASICS
+            </span>
+          </Link>
 
           <Link
             href="/"
