@@ -682,9 +682,9 @@ function StudentDashboardContent() {
                     </div>
                   </div>
                 ) : courses.length === 0 && !coursesError ? (
-                  <div className="bg-[#151619] border border-white/[0.08] rounded-xl p-8 sm:p-10 text-left space-y-4 max-w-md select-none">
-                    <div className="space-y-1">
-                      <h2 className="text-base font-semibold text-white uppercase tracking-wider">
+                  <div className="bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-4 max-w-[350px] transition-all select-none">
+                    <div className="space-y-1.5">
+                      <h2 className="text-sm sm:text-[15px] font-semibold text-white uppercase tracking-wider">
                         NO ACTIVE COURSES
                       </h2>
                       <p className="text-xs text-[#c2c4cc] leading-relaxed">
@@ -695,7 +695,7 @@ function StudentDashboardContent() {
                     <div>
                       <Link
                         href="/#pricing"
-                        className="inline-flex items-center justify-center gap-2 h-10 px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs rounded-lg transition-colors"
+                        className="inline-flex items-center justify-center gap-2 h-9 sm:h-10 px-4 sm:px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg transition-colors select-none shadow-sm"
                       >
                         <Sparkles className="w-3.5 h-3.5" />
                         <span>Explore Masterclass</span>
@@ -706,7 +706,7 @@ function StudentDashboardContent() {
 
                 {/* Empty Search Filter State */}
                 {courses.length > 0 && filteredCourses.length === 0 && (
-                  <div className="bg-[#151619] border border-white/[0.08] rounded-xl p-6 text-left space-y-2 max-w-md select-none">
+                  <div className="bg-[#151619] border border-white/[0.08] rounded-xl p-5 sm:p-6 text-left space-y-2 max-w-[350px] select-none">
                     <p className="text-sm font-medium text-white">
                       No courses match &ldquo;{searchQuery}&rdquo;
                     </p>
@@ -833,13 +833,13 @@ function StudentDashboardContent() {
 
                 {completedCourses.length === 0 ? (
                   <div className="w-full flex flex-col gap-5 items-start text-left">
-                    {/* Clean No-Credentials Card: Exact same width & padding as course card */}
-                    <div className="relative w-full max-w-[650px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 text-left space-y-4 select-none">
+                    {/* Clean No-Credentials Card: Snug width & balanced padding */}
+                    <div className="relative w-full max-w-[380px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-4 select-none">
                       <div className="space-y-1.5">
-                        <h2 className="text-base sm:text-[18px] font-medium text-white tracking-tight leading-snug">
+                        <h2 className="text-sm sm:text-[15px] font-semibold text-white uppercase tracking-wider">
                           No Credentials Earned Yet
                         </h2>
-                        <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+                        <p className="text-xs text-[#c2c4cc] leading-relaxed">
                           Complete all lesson modules and practical evaluations in your enrolled
                           courses to automatically unlock your verified certificate signed by
                           instructor {siteConfig.instructor.name}.
