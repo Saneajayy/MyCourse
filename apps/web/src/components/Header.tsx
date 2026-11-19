@@ -29,6 +29,7 @@ export function Header() {
       '/terms',
       '/privacy',
       '/refunds',
+      '/404',
     ].includes(pathname) ||
     pathname.startsWith('/order') ||
     pathname.startsWith('/learn');
