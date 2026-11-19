@@ -97,7 +97,7 @@ function GPayLogo({ className = 'h-5 w-auto' }: { className?: string }) {
       <text
         x="19.5"
         y="14.5"
-        fill="#5F6368"
+        fill="#FFFFFF"
         fontSize="14"
         fontWeight="600"
         fontFamily="system-ui, -apple-system, 'Google Sans', Roboto, sans-serif"
@@ -120,7 +120,7 @@ function VisaLogo({ className = 'h-5 w-auto' }: { className?: string }) {
     >
       <path
         d="M19.4 16.5L21.8 1.5H25.6L23.2 16.5H19.4ZM35.8 1.8C35 1.5 33.7 1.2 32.1 1.2C28.4 1.2 25.8 3.2 25.8 6C25.8 8.1 27.6 9.3 28.9 10C30.2 10.7 30.7 11.1 30.7 11.8C30.7 12.9 29.5 13.4 28.3 13.4C26.8 13.4 25.9 13.1 24.6 12.4L24.1 12.1L23.4 15.3C24.4 15.8 26.2 16.2 28.1 16.2C32.1 16.2 34.7 14.2 34.7 11.4C34.7 9 32.7 7.7 31.1 6.9C29.9 6.3 29.4 5.9 29.4 5.2C29.4 4.5 30.1 3.9 31.5 3.9C32.7 3.9 33.7 4.2 34.6 4.6L35 4.8L35.8 1.8ZM43 1.5H40C39.1 1.5 38.3 1.8 38 2.6L32.4 16.5H36.4L37.2 14.1H42.1L42.6 16.5H46.3L43 1.5ZM38.3 11.1L40.3 5.3L41.5 11.1H38.3ZM16.2 1.5L12.5 11.8L12.1 9.9C11.4 7.5 10 5 8 3.7L11.5 16.5H15.5L20.2 1.5H16.2Z"
-        fill="#1A1F71"
+        fill="#FFFFFF"
       />
       <path
         d="M9.6 1.5H3.6L3.5 1.8C8.2 3 11.8 6.1 13.1 9.5L11.9 3.1C11.7 2 10.7 1.5 9.6 1.5Z"
@@ -161,7 +161,7 @@ function PaytmLogo({ className = 'h-5 w-auto' }: { className?: string }) {
       <text
         x="0"
         y="15.5"
-        fill="#002970"
+        fill="#FFFFFF"
         fontSize="17"
         fontWeight="900"
         fontFamily="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
@@ -799,18 +799,18 @@ function CheckoutContent() {
           sizes="50vw"
           className="object-cover object-center select-none"
         />
-        {/* Top Vignette Gradient Overlay */}
+        {/* Top Vignette Gradient Overlay (Subtle for maximum image vibrancy) */}
         <div
-          className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/20 to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none"
           aria-hidden="true"
         />
-        {/* Bottom Deep Gradient for High Contrast Typography */}
+        {/* Bottom Gradient for Text Legibility while keeping image vivid */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/75 to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/35 to-transparent pointer-events-none"
           aria-hidden="true"
         />
 
-        {/* Top Header Row over Image */}
+        {/* Top Header Row over Image (Only HYDRO BASICS brand logo) */}
         <div className="relative z-10 w-full flex items-center justify-between">
           <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
             <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
@@ -820,39 +820,31 @@ function CheckoutContent() {
               BASICS
             </span>
           </Link>
-          <Link
-            href="/#pricing"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#101012]/80 hover:bg-[#101012] backdrop-blur-md border border-white/[0.1] text-[11px] font-mono tracking-wider text-[#c2c4cc] hover:text-white transition-colors"
-            title="Back to Course Overview"
-          >
-            <ArrowLeft className="w-3 h-3" />
-            <span>Course</span>
-          </Link>
         </div>
 
         {/* Bottom Course Summary & Pricing Controls */}
-        <div className="relative z-10 w-full space-y-5">
-          {/* Course Details */}
+        <div className="relative z-10 w-full space-y-4">
+          {/* Course Title with 12 Months Access right in front + Natural flowing description */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
-                MASTERCLASS
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
+                {course?.title || 'Hydraulic System Basics'}
+              </h2>
+              <span className="text-xs font-mono font-medium text-[#c2c4cc] px-2.5 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.08] shrink-0 select-none">
+                12 Months Access
               </span>
-              <span className="text-xs font-mono text-[#c2c4cc]">12 Months Access</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
-              {course?.title || 'Hydraulic System Basics'}
-            </h2>
-            <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed max-w-lg line-clamp-2">
+            <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed w-full">
               {course?.description ||
                 'Learn hydraulic systems, core components, and practical circuit design from the ground up.'}
             </p>
           </div>
 
-          <div className="border-b border-white/[0.1] w-full" />
+          {/* Full-width separation line touching outer card borders completely */}
+          <div className="-mx-6 sm:-mx-8 border-b border-white/[0.08]" />
 
           {/* Coupon Entry & Final Price */}
-          <div className="flex items-end justify-between gap-4">
+          <div className="flex items-end justify-between gap-4 pt-1">
             {/* Coupon Code Entry */}
             <div className="flex-1 max-w-xs">
               {appliedCoupon ? (
@@ -925,7 +917,7 @@ function CheckoutContent() {
       {/* ============================================================== */}
       {/* 2. MOBILE TOP BANNER CARD (Fractal Glass)                     */}
       {/* ============================================================== */}
-      <div className="lg:hidden w-full shrink-0 h-[210px] sm:h-[230px] bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden relative select-none flex flex-col justify-between p-4 shadow-sm">
+      <div className="lg:hidden w-full shrink-0 h-[170px] sm:h-[190px] bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden relative select-none flex flex-col justify-between p-4 shadow-sm">
         {/* Full-Bleed Fractal Glass Graphic */}
         <Image
           src="/fractal-glass-5.jpg"
@@ -935,9 +927,9 @@ function CheckoutContent() {
           sizes="100vw"
           className="object-cover object-center select-none"
         />
-        {/* Dark Overlays */}
+        {/* Dark Overlays (Subtle for maximum image vibrancy) */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/60 to-black/50 pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/45 to-black/30 pointer-events-none"
           aria-hidden="true"
         />
 
@@ -951,13 +943,9 @@ function CheckoutContent() {
               BASICS
             </span>
           </Link>
-          <Link
-            href="/#pricing"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#101012]/80 backdrop-blur-md border border-white/[0.1] text-[11px] font-mono tracking-wider text-[#c2c4cc] hover:text-white transition-colors"
-          >
-            <ArrowLeft className="w-3 h-3" />
-            <span>Course</span>
-          </Link>
+          <span className="text-[11px] font-mono text-[#c2c4cc] px-2 py-0.5 rounded bg-black/40 border border-white/10">
+            12 Months Access
+          </span>
         </div>
 
         {/* Bottom Controls inside Mobile Banner */}
@@ -966,7 +954,7 @@ function CheckoutContent() {
             {/* Coupon Code Entry */}
             <div className="flex-1 min-w-0">
               {appliedCoupon ? (
-                <div className="h-10 flex items-center gap-1.5 px-3 rounded-lg bg-emerald-500/20 border border-emerald-400/30 backdrop-blur-md text-emerald-300 text-xs">
+                <div className="h-9 flex items-center gap-1.5 px-3 rounded-lg bg-emerald-500/20 border border-emerald-400/30 backdrop-blur-md text-emerald-300 text-xs">
                   <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span className="font-mono font-bold tracking-wide truncate">
                     {appliedCoupon.code}
@@ -988,7 +976,7 @@ function CheckoutContent() {
                     <button
                       type="submit"
                       disabled={couponLoading}
-                      className="h-10 px-3 sm:px-4 bg-white hover:bg-neutral-200 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
+                      className="h-9 px-3 bg-white hover:bg-neutral-200 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
                     >
                       {couponLoading ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin text-black" />
@@ -1001,7 +989,7 @@ function CheckoutContent() {
                       placeholder="COUPON CODE"
                       value={couponInput}
                       onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                      className="h-10 flex-1 min-w-0 rounded-lg border border-white/[0.14] bg-[#101012]/80 backdrop-blur-md px-3 text-xs font-mono uppercase text-white placeholder:text-neutral-500 focus:border-white/40 focus:outline-none transition-colors"
+                      className="h-9 flex-1 min-w-0 rounded-lg border border-white/[0.14] bg-[#101012]/80 backdrop-blur-md px-3 text-xs font-mono uppercase text-white placeholder:text-neutral-500 focus:border-white/40 focus:outline-none transition-colors"
                     />
                   </div>
                   {couponError && (
@@ -1075,9 +1063,9 @@ function CheckoutContent() {
         {/* Thin Stroke Separation Line */}
         <div className="border-b border-white/[0.08] w-full shrink-0" />
 
-        {/* Scrollable Billing Form Container */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col items-center justify-center">
-          <div className="w-full max-w-md space-y-4 my-auto">
+        {/* Scrollable Billing Form Container (Smooth scroll without overflow bugs) */}
+        <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col items-center lg:justify-center">
+          <div className="w-full max-w-md space-y-4 py-2 pb-10 lg:py-0 lg:my-auto">
             {/* Email Verification Warning Alert Gate */}
             {isAuthenticated && !user?.emailVerifiedAt && (
               <div className="w-full bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 sm:p-5 text-amber-200">
@@ -1292,7 +1280,7 @@ function CheckoutContent() {
               </div>
 
               {/* Payment Methods and Security Guarantee */}
-              <div className="-mx-5 sm:-mx-6 border-t border-white/[0.06] pt-4 px-5 sm:px-6 space-y-2 text-center">
+              <div className="-mx-5 sm:-mx-6 border-t border-white/[0.06] pt-4 px-5 sm:px-6 space-y-2.5 text-center">
                 {/* Secured by Razorpay in Center */}
                 <div className="flex items-center justify-center gap-1.5 text-[#c2c4cc] text-xs font-medium">
                   <span>Secured by</span>
@@ -1304,31 +1292,22 @@ function CheckoutContent() {
                   Accepted Payment Methods
                 </div>
 
-                {/* Brand Logos: GPay, Visa, Mastercard, Paytm */}
-                <div className="flex items-center justify-center gap-3 pt-1 pb-0.5">
+                {/* Independent Flowing Brand Logos (No White Boxes) */}
+                <div className="flex items-center justify-center gap-6 sm:gap-7 pt-1 pb-0.5 flex-nowrap">
                   <div
                     title="Google Pay (GPay)"
-                    className="h-7 px-2.5 bg-white rounded-md flex items-center justify-center shadow-sm"
+                    className="shrink-0 flex items-center justify-center"
                   >
-                    <GPayLogo className="h-4 w-auto" />
+                    <GPayLogo className="h-5 sm:h-[22px] w-auto" />
                   </div>
-                  <div
-                    title="Visa"
-                    className="h-7 px-2.5 bg-white rounded-md flex items-center justify-center shadow-sm"
-                  >
-                    <VisaLogo className="h-3.5 w-auto" />
+                  <div title="Visa" className="shrink-0 flex items-center justify-center">
+                    <VisaLogo className="h-4 sm:h-[18px] w-auto" />
                   </div>
-                  <div
-                    title="Mastercard"
-                    className="h-7 px-2.5 bg-white rounded-md flex items-center justify-center shadow-sm"
-                  >
-                    <MastercardLogo className="h-4 w-auto" />
+                  <div title="Mastercard" className="shrink-0 flex items-center justify-center">
+                    <MastercardLogo className="h-5 sm:h-[22px] w-auto" />
                   </div>
-                  <div
-                    title="Paytm"
-                    className="h-7 px-2.5 bg-white rounded-md flex items-center justify-center shadow-sm"
-                  >
-                    <PaytmLogo className="h-3.5 w-auto" />
+                  <div title="Paytm" className="shrink-0 flex items-center justify-center">
+                    <PaytmLogo className="h-4 sm:h-[18px] w-auto" />
                   </div>
                 </div>
               </div>
