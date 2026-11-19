@@ -1022,7 +1022,7 @@ function StudentDashboardContent() {
                             type="email"
                             disabled
                             value={user?.email || ''}
-                            className="w-full h-10 px-3.5 bg-[#131417] border border-white/[0.05] rounded-lg text-xs sm:text-[13px] text-[#80828d] cursor-not-allowed select-none"
+                            className="w-full h-10 px-3.5 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-[#80828d] cursor-not-allowed select-none focus:outline-none"
                           />
                           {!user?.emailVerifiedAt && (
                             <div className="flex items-center gap-3 pt-1">
