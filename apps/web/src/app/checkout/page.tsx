@@ -8,7 +8,17 @@ import { useAuth } from '../../context/auth-context';
 import { apiClient, getAccessToken } from '../../lib/api-client';
 import { siteConfig } from '../../config/site';
 import { useToast } from '../../components/ui';
-import { Tag, AlertTriangle, Lock, MailCheck, RefreshCw, Loader2, X } from 'lucide-react';
+import {
+  Tag,
+  AlertTriangle,
+  Lock,
+  MailCheck,
+  RefreshCw,
+  Loader2,
+  X,
+  ArrowLeft,
+  Check,
+} from 'lucide-react';
 import { computeOrderTotals, TaxConfig } from '../../lib/tax';
 import { PaymentSuccessModal, PaymentSuccessData } from '../../components/PaymentSuccessModal';
 
@@ -186,13 +196,13 @@ function RazorpayLogo({ className = 'h-3.5 w-auto' }: { className?: string }) {
       <g transform="translate(0, 1) scale(0.72)">
         <path
           d="M22.436 0l-11.91 7.773-1.174 4.276 6.625-4.297L11.65 24h4.391l6.395-24zM14.26 10.098L3.389 17.166 1.564 24h9.008l3.688-13.902Z"
-          fill="#000000"
+          fill="#00BAF2"
         />
       </g>
       <text
         x="19"
         y="14.5"
-        fill="#0C2340"
+        fill="#FFFFFF"
         fontSize="13.5"
         fontWeight="800"
         fontFamily="system-ui, -apple-system, sans-serif"
@@ -765,9 +775,9 @@ function CheckoutContent() {
 
   if (courseLoading || authLoading) {
     return (
-      <div className="w-full flex-1 flex flex-col items-center justify-center min-h-[60vh] space-y-4">
-        <Loader2 className="w-10 h-10 animate-spin text-black" />
-        <p className="text-sm font-semibold tracking-wider uppercase text-neutral-600">
+      <div className="fixed inset-0 w-full h-[100dvh] bg-black text-white flex flex-col items-center justify-center space-y-4 font-reddit select-none z-50">
+        <Loader2 className="w-8 h-8 animate-spin text-white/80" />
+        <p className="text-xs font-mono tracking-wider uppercase text-[#c2c4cc]">
           Securing Checkout Session...
         </p>
       </div>
@@ -775,44 +785,89 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="w-full h-screen h-[100dvh] overflow-hidden bg-white font-reddit selection:bg-black selection:text-white flex flex-col lg:flex-row">
+    <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit selection:bg-white selection:text-black z-10 flex flex-col lg:flex-row gap-2.5 sm:gap-3">
       {/* ============================================================== */}
-      {/* LEFT COLUMN (Desktop Only): Signature Halftone Graphic         */}
-      {/* (100% identical styling to Login & Register split view)       */}
+      {/* 1. LEFT CARD (Desktop): Fractal Glass Wallpaper + Order Info   */}
       {/* ============================================================== */}
-      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-end lg:w-1/2 h-full bg-black overflow-hidden select-none p-6 sm:p-8">
-        {/* Full-Bleed Signature Dot Halftone Graphic */}
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-between lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
+        {/* Full-Bleed Fractal Glass Graphic */}
         <Image
-          src="/login-pixelated.png"
+          src="/fractal-glass-5.jpg"
           alt="HydroBasics Industrial Hydraulic Engineer"
           fill
           priority
           sizes="50vw"
-          className="object-cover object-center mix-blend-screen opacity-95 select-none"
+          className="object-cover object-center select-none"
         />
-        {/* Soft overlay gradient for subtle depth */}
+        {/* Top Vignette Gradient Overlay */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#000000]/95 via-[#000000]/45 to-transparent pointer-events-none"
+          className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/20 to-transparent pointer-events-none"
           aria-hidden="true"
         />
-        {/* Price & Coupon Controls (Directly on Image, No Card) */}
-        <div className="relative z-10 w-full mb-1 select-none">
+        {/* Bottom Deep Gradient for High Contrast Typography */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/75 to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
+
+        {/* Top Header Row over Image */}
+        <div className="relative z-10 w-full flex items-center justify-between">
+          <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
+              BASICS
+            </span>
+          </Link>
+          <Link
+            href="/#pricing"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#101012]/80 hover:bg-[#101012] backdrop-blur-md border border-white/[0.1] text-[11px] font-mono tracking-wider text-[#c2c4cc] hover:text-white transition-colors"
+            title="Back to Course Overview"
+          >
+            <ArrowLeft className="w-3 h-3" />
+            <span>Course</span>
+          </Link>
+        </div>
+
+        {/* Bottom Course Summary & Pricing Controls */}
+        <div className="relative z-10 w-full space-y-5">
+          {/* Course Details */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
+                MASTERCLASS
+              </span>
+              <span className="text-xs font-mono text-[#c2c4cc]">12 Months Access</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
+              {course?.title || 'Hydraulic System Basics'}
+            </h2>
+            <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed max-w-lg line-clamp-2">
+              {course?.description ||
+                'Learn hydraulic systems, core components, and practical circuit design from the ground up.'}
+            </p>
+          </div>
+
+          <div className="border-b border-white/[0.1] w-full" />
+
+          {/* Coupon Entry & Final Price */}
           <div className="flex items-end justify-between gap-4">
-            {/* Coupon Code Entry: Apply button then input bar */}
-            <div className="shrink-0">
+            {/* Coupon Code Entry */}
+            <div className="flex-1 max-w-xs">
               {appliedCoupon ? (
-                <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-none bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-sm shadow-md">
-                  <div className="flex items-center gap-2 truncate">
-                    <Tag className="w-4 h-4 text-emerald-400 shrink-0" />
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-lg bg-emerald-500/15 border border-emerald-400/30 backdrop-blur-md text-emerald-300 text-xs shadow-md">
+                  <div className="flex items-center gap-2 truncate flex-1">
+                    <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span className="font-mono font-bold tracking-wide">{appliedCoupon.code}</span>
-                    <span className="text-emerald-300 font-semibold text-xs">
+                    <span className="text-emerald-400/80 font-mono text-[11px]">
                       (-₹{(discountPaise / 100).toLocaleString('en-IN')})
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={handleRemoveCoupon}
-                    className="text-white hover:text-rose-200 underline text-xs font-bold cursor-pointer shrink-0 ml-1.5"
+                    className="text-white/80 hover:text-white underline text-[11px] font-semibold cursor-pointer shrink-0 ml-1"
                   >
                     Remove
                   </button>
@@ -823,10 +878,10 @@ function CheckoutContent() {
                     <button
                       type="submit"
                       disabled={couponLoading}
-                      className="h-11 px-5 bg-white hover:bg-neutral-100 active:bg-neutral-200 text-black font-extrabold text-sm rounded-none transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-md"
+                      className="h-10 px-4 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-[13px] rounded-lg transition-colors flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
                     >
                       {couponLoading ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-black" />
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-black" />
                       ) : (
                         'Apply'
                       )}
@@ -836,12 +891,12 @@ function CheckoutContent() {
                       placeholder="COUPON CODE"
                       value={couponInput}
                       onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                      className="h-11 w-44 sm:w-56 md:w-64 rounded-none border border-white/45 bg-transparent px-3.5 text-sm font-mono uppercase text-white placeholder:text-neutral-400/60 focus:border-white focus:outline-none transition-all"
+                      className="h-10 w-full min-w-0 rounded-lg border border-white/[0.14] bg-[#101012]/80 backdrop-blur-md px-3 text-xs sm:text-sm font-mono uppercase text-white placeholder:text-neutral-500 focus:border-white/40 focus:outline-none transition-colors"
                     />
                   </div>
                   {couponError && (
-                    <p className="absolute -bottom-5 left-0 text-[11px] font-semibold text-rose-300 flex items-center gap-1 drop-shadow">
-                      <X className="w-3.5 h-3.5 stroke-[2.5]" />
+                    <p className="absolute -bottom-5 left-0 text-[11px] font-medium text-rose-300 flex items-center gap-1 drop-shadow">
+                      <X className="w-3 h-3 stroke-[2.5]" />
                       <span>{couponError}</span>
                     </p>
                   )}
@@ -849,12 +904,17 @@ function CheckoutContent() {
               )}
             </div>
 
-            {/* Final Price on the Right */}
+            {/* Final Price */}
             <div className="flex flex-col items-end shrink-0 text-right">
-              <span className="text-[11px] uppercase font-bold tracking-wider text-neutral-400/80 drop-shadow">
+              {discountPaise > 0 && (
+                <span className="text-xs font-mono line-through text-[#80828d]">
+                  ₹{(basePricePaise / 100).toLocaleString('en-IN')}
+                </span>
+              )}
+              <span className="text-[11px] uppercase font-mono font-medium tracking-wider text-[#c2c4cc]">
                 Final Price
               </span>
-              <span className="text-4xl sm:text-5xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-bold font-mono tracking-tight text-white leading-none">
                 ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
               </span>
             </div>
@@ -863,175 +923,178 @@ function CheckoutContent() {
       </div>
 
       {/* ============================================================== */}
-      {/* RIGHT COLUMN: Desktop Split / Mobile View                      */}
+      {/* 2. MOBILE TOP BANNER CARD (Fractal Glass)                     */}
       {/* ============================================================== */}
-      <div className="w-full lg:w-1/2 h-full bg-white text-neutral-900 flex flex-col relative overflow-hidden">
-        {/* Desktop Top Header Bar: Absolute in top corners so it doesn't offset vertical center */}
-        <header className="hidden lg:flex absolute top-0 inset-x-0 w-full items-center justify-between px-6 pt-5 sm:px-8 sm:pt-6 md:px-10 z-20 pointer-events-none">
-          {/* Top-Left Corner: Already Enrolled / Sign In (hidden when signed in) */}
-          <div className="pointer-events-auto">
-            {!isAuthenticated && (
-              <div className="text-xs sm:text-sm text-neutral-600">
+      <div className="lg:hidden w-full shrink-0 h-[210px] sm:h-[230px] bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden relative select-none flex flex-col justify-between p-4 shadow-sm">
+        {/* Full-Bleed Fractal Glass Graphic */}
+        <Image
+          src="/fractal-glass-5.jpg"
+          alt="HydroBasics Industrial Hydraulic Engineer"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center select-none"
+        />
+        {/* Dark Overlays */}
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/60 to-black/50 pointer-events-none"
+          aria-hidden="true"
+        />
+
+        {/* Top Header Row inside Mobile Banner */}
+        <div className="relative z-10 w-full flex items-center justify-between">
+          <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
+              HYDRO
+            </span>
+            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
+              BASICS
+            </span>
+          </Link>
+          <Link
+            href="/#pricing"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#101012]/80 backdrop-blur-md border border-white/[0.1] text-[11px] font-mono tracking-wider text-[#c2c4cc] hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-3 h-3" />
+            <span>Course</span>
+          </Link>
+        </div>
+
+        {/* Bottom Controls inside Mobile Banner */}
+        <div className="relative z-10 w-full">
+          <div className="flex items-end justify-between gap-3">
+            {/* Coupon Code Entry */}
+            <div className="flex-1 min-w-0">
+              {appliedCoupon ? (
+                <div className="h-10 flex items-center gap-1.5 px-3 rounded-lg bg-emerald-500/20 border border-emerald-400/30 backdrop-blur-md text-emerald-300 text-xs">
+                  <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="font-mono font-bold tracking-wide truncate">
+                    {appliedCoupon.code}
+                  </span>
+                  <span className="text-emerald-400/80 font-mono text-[11px] shrink-0">
+                    (-₹{(discountPaise / 100).toLocaleString('en-IN')})
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-white hover:text-rose-200 underline text-[11px] font-bold cursor-pointer shrink-0 ml-auto"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleApplyCoupon} className="relative w-full">
+                  <div className="flex items-center gap-2 w-full">
+                    <button
+                      type="submit"
+                      disabled={couponLoading}
+                      className="h-10 px-3 sm:px-4 bg-white hover:bg-neutral-200 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
+                    >
+                      {couponLoading ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-black" />
+                      ) : (
+                        'Apply'
+                      )}
+                    </button>
+                    <input
+                      type="text"
+                      placeholder="COUPON CODE"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                      className="h-10 flex-1 min-w-0 rounded-lg border border-white/[0.14] bg-[#101012]/80 backdrop-blur-md px-3 text-xs font-mono uppercase text-white placeholder:text-neutral-500 focus:border-white/40 focus:outline-none transition-colors"
+                    />
+                  </div>
+                  {couponError && (
+                    <p className="absolute -bottom-4 left-0 text-[10px] font-medium text-rose-300 flex items-center gap-0.5 drop-shadow truncate max-w-full">
+                      <X className="w-3 h-3 stroke-[2.5] shrink-0" />
+                      <span className="truncate">{couponError}</span>
+                    </p>
+                  )}
+                </form>
+              )}
+            </div>
+
+            {/* Final Price on Mobile */}
+            <div className="flex flex-col items-end shrink-0 text-right">
+              {discountPaise > 0 && (
+                <span className="text-[10px] font-mono line-through text-[#80828d]">
+                  ₹{(basePricePaise / 100).toLocaleString('en-IN')}
+                </span>
+              )}
+              <span className="text-[10px] uppercase font-mono font-medium tracking-wider text-[#c2c4cc]">
+                Final Price
+              </span>
+              <span className="text-2xl sm:text-3xl font-bold font-mono tracking-tight text-white leading-none">
+                ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ============================================================== */}
+      {/* 3. RIGHT CARD: Billing Information & Checkout Actions          */}
+      {/* ============================================================== */}
+      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative">
+        {/* Top Header Bar */}
+        <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
+          <div>
+            {!isAuthenticated ? (
+              <div className="text-xs text-[#c2c4cc]">
                 Already enrolled?{' '}
                 <Link
                   href="/login?redirect=/checkout"
-                  className="font-bold text-black hover:underline hover:text-[#262626] ml-0.5"
+                  className="font-medium text-white hover:underline transition-colors ml-0.5"
                 >
                   Sign In &rarr;
                 </Link>
               </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-[#c2c4cc]">Signed in as</span>
+                <span className="text-xs font-medium text-white truncate max-w-[150px] sm:max-w-[220px]">
+                  {user?.name || user?.email}
+                </span>
+                {user?.emailVerifiedAt && (
+                  <Check className="w-3.5 h-3.5 stroke-[2.5] text-emerald-400" />
+                )}
+              </div>
             )}
           </div>
 
-          {/* Top-Right Corner: Brand Logo deeply in corner */}
           <Link
-            href="/"
-            className="pointer-events-auto flex flex-col items-end -space-y-0.5 leading-[0.92] text-black hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
-            aria-label="HYDRO BASICS Home - Back to Course"
+            href={isAuthenticated ? '/dashboard' : '/'}
+            className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-[#c2c4cc]/70 hover:text-white transition-colors"
+            title={isAuthenticated ? 'Back to Dashboard' : 'Back to Home'}
           >
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
-              HYDRO
-            </span>
-            <span className="font-extrabold text-[20px] sm:text-[22px] tracking-[0.02em] uppercase leading-[0.92]">
-              BASICS
-            </span>
+            <ArrowLeft className="w-3 h-3" />
+            <span>{isAuthenticated ? 'Dashboard' : 'Home'}</span>
           </Link>
-        </header>
-
-        {/* Mobile Upper Part: Fixed full-bleed edge-to-edge halftone header */}
-        <div className="lg:hidden fixed top-0 inset-x-0 z-30 w-full h-[250px] sm:h-[280px] bg-black overflow-hidden select-none flex flex-col justify-between p-4 sm:p-5 shadow-sm touch-none">
-          {/* Full-Bleed Signature Dot Halftone Graphic */}
-          <Image
-            src="/login-pixelated.png"
-            alt="HydroBasics Industrial Hydraulic Engineer"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center mix-blend-screen opacity-95 select-none"
-          />
-          {/* Soft overlay gradient for subtle depth */}
-          <div
-            className="absolute inset-0 bg-gradient-to-t from-[#000000]/95 via-[#000000]/35 to-[#000000]/45 pointer-events-none"
-            aria-hidden="true"
-          />
-
-          {/* Top Bar inside Mobile Upper Part */}
-          <div className="relative z-10 w-full flex items-center justify-between pointer-events-auto touch-auto">
-            <div>
-              {!isAuthenticated && (
-                <div className="text-xs text-neutral-300 font-medium">
-                  Already enrolled?{' '}
-                  <Link
-                    href="/login?redirect=/checkout"
-                    className="font-bold text-white underline hover:text-cyan-200 ml-0.5"
-                  >
-                    Sign In &rarr;
-                  </Link>
-                </div>
-              )}
-            </div>
-            <Link
-              href="/"
-              className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
-              aria-label="HYDRO BASICS Home - Back to Course"
-            >
-              <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-                HYDRO
-              </span>
-              <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-                BASICS
-              </span>
-            </Link>
-          </div>
-
-          {/* Bottom Controls inside Mobile Upper Part */}
-          <div className="relative z-10 w-full pointer-events-auto touch-auto">
-            <div className="flex items-end justify-between gap-3">
-              {/* Coupon Code Entry: Apply button then input bar extending horizontally */}
-              <div className="flex-1 min-w-0">
-                {appliedCoupon ? (
-                  <div className="h-11 flex items-center gap-1.5 px-3 rounded-none bg-emerald-500/25 border border-emerald-400/50 backdrop-blur-sm text-emerald-200 text-xs">
-                    <Tag className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span className="font-mono font-bold tracking-wide truncate">
-                      {appliedCoupon.code}
-                    </span>
-                    <span className="text-emerald-300 font-semibold text-[11px] shrink-0">
-                      (-₹{(discountPaise / 100).toLocaleString('en-IN')})
-                    </span>
-                    <button
-                      type="button"
-                      onClick={handleRemoveCoupon}
-                      className="text-white hover:text-rose-200 underline text-[11px] font-bold cursor-pointer shrink-0 ml-auto"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleApplyCoupon} className="relative w-full">
-                    <div className="flex items-center gap-2 w-full">
-                      <button
-                        type="submit"
-                        disabled={couponLoading}
-                        className="h-11 px-4 bg-white hover:bg-neutral-100 active:bg-neutral-200 text-black font-extrabold text-xs sm:text-sm rounded-none transition-all flex items-center justify-center cursor-pointer disabled:opacity-60 shrink-0 shadow-sm"
-                      >
-                        {couponLoading ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin text-black" />
-                        ) : (
-                          'Apply'
-                        )}
-                      </button>
-                      <input
-                        type="text"
-                        placeholder="COUPON CODE"
-                        value={couponInput}
-                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                        className="h-11 flex-1 min-w-0 rounded-none border border-white/45 bg-transparent px-3 text-xs sm:text-sm font-mono uppercase text-white placeholder:text-neutral-400/60 focus:border-white focus:outline-none transition-all"
-                      />
-                    </div>
-                    {couponError && (
-                      <p className="absolute -bottom-5 left-0 text-[10px] font-semibold text-rose-300 flex items-center gap-0.5 drop-shadow truncate max-w-full">
-                        <X className="w-3 h-3 stroke-[2.5] shrink-0" />
-                        <span className="truncate">{couponError}</span>
-                      </p>
-                    )}
-                  </form>
-                )}
-              </div>
-
-              {/* Final Price on the Right */}
-              <div className="flex flex-col items-end shrink-0 text-right">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400/80 drop-shadow">
-                  Final Price
-                </span>
-                <span className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white drop-shadow-lg leading-none">
-                  ₹{(finalPricePaise / 100).toLocaleString('en-IN')}
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Scrollable Billing Section (Pinned below fixed header on mobile, perfectly centered on desktop) */}
-        <div className="flex-1 w-full h-full min-h-0 overflow-y-auto overscroll-contain relative flex flex-col items-center pt-[250px] sm:pt-[280px] pb-12 sm:pb-16 lg:pt-0 lg:pb-0 lg:justify-center">
-          {/* Centered Order & Billing Container */}
-          <div className="w-full max-w-lg px-4 sm:px-6 py-6 sm:py-8 relative z-10 space-y-4 lg:my-auto">
+        {/* Thin Stroke Separation Line */}
+        <div className="border-b border-white/[0.08] w-full shrink-0" />
+
+        {/* Scrollable Billing Form Container */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col items-center justify-center">
+          <div className="w-full max-w-md space-y-4 my-auto">
             {/* Email Verification Warning Alert Gate */}
             {isAuthenticated && !user?.emailVerifiedAt && (
-              <div className="w-full bg-[#FEF3C7] border border-amber-300 rounded-none p-5 text-amber-950">
+              <div className="w-full bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 sm:p-5 text-amber-200">
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 font-bold text-sm text-amber-900">
-                    <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0" />
+                  <div className="flex items-center gap-2 font-semibold text-sm text-amber-300">
+                    <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                     <span>Action Required: Email Verification</span>
                   </div>
-                  <p className="text-xs text-amber-900/90 leading-relaxed">
+                  <p className="text-xs text-amber-200/90 leading-relaxed">
                     Before purchasing, RBI/tax compliance requires a verified email address. We sent
                     a verification code to{' '}
-                    <strong className="font-semibold text-black">{user?.email}</strong>.
+                    <strong className="font-semibold text-white">{user?.email}</strong>.
                   </p>
-                  <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
                     <Link
                       href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
-                      className="h-9 px-3.5 bg-black hover:bg-[#262626] text-white font-bold text-xs rounded-none transition-all flex items-center justify-center cursor-pointer"
+                      className="h-8 sm:h-9 px-3.5 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center cursor-pointer shadow-sm"
                     >
                       Enter 6-Digit OTP
                     </Link>
@@ -1039,7 +1102,7 @@ function CheckoutContent() {
                       type="button"
                       onClick={handleResendVerification}
                       disabled={resendingVerification}
-                      className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-none transition-all flex items-center cursor-pointer disabled:opacity-60"
+                      className="h-8 sm:h-9 px-3 bg-[#1f2023] hover:bg-[#27282c] text-white border border-white/[0.08] font-medium text-xs rounded-lg transition-colors flex items-center cursor-pointer disabled:opacity-60"
                     >
                       {resendingVerification ? (
                         <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
@@ -1052,7 +1115,7 @@ function CheckoutContent() {
                       type="button"
                       onClick={handleCheckVerification}
                       disabled={checkingVerification}
-                      className="h-9 px-3 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-bold text-xs rounded-none transition-all flex items-center cursor-pointer disabled:opacity-60"
+                      className="h-8 sm:h-9 px-3 bg-[#1f2023] hover:bg-[#27282c] text-white border border-white/[0.08] font-medium text-xs rounded-lg transition-colors flex items-center cursor-pointer disabled:opacity-60"
                     >
                       {checkingVerification ? (
                         <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
@@ -1066,28 +1129,28 @@ function CheckoutContent() {
               </div>
             )}
 
-            {/* Billing Info Card Box - Identical styling to Login / Signup / Verify-Email cards */}
-            <div className="relative w-full bg-white border border-neutral-200/80 rounded-none p-5 sm:p-7 select-none overflow-hidden space-y-5">
-              {/* Simple Billing Information Headline */}
+            {/* Billing Info Card Box */}
+            <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 select-none overflow-hidden space-y-4 transition-all text-left">
+              {/* Billing Headline */}
               <div className="space-y-1">
-                <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
+                <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal">
                   Billing Information
                 </h1>
-                <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
+                <p className="text-xs text-[#c2c4cc] leading-relaxed">
                   Enter your student contact and tax invoice information.
                 </p>
               </div>
 
-              {/* Billing Form Fields */}
-              <div className="space-y-4 pt-0.5">
-                {/* First Name & Last Name in one single row */}
-                <div className="grid grid-cols-2 gap-3 sm:gap-3.5">
+              {/* Form Fields */}
+              <div className="space-y-3.5 pt-1">
+                {/* First Name & Last Name */}
+                <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5 text-left">
                     <label
                       htmlFor="checkout-first-name"
-                      className="text-sm font-bold text-neutral-900 block"
+                      className="text-xs font-medium text-white block"
                     >
-                      First Name <span className="text-rose-500">*</span>
+                      First Name <span className="text-rose-400">*</span>
                     </label>
                     <input
                       id="checkout-first-name"
@@ -1096,15 +1159,15 @@ function CheckoutContent() {
                       placeholder="Ramesh"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full h-11 rounded-none border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all"
+                      className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-sm text-white placeholder:text-neutral-500 rounded-lg outline-none transition-colors"
                     />
                   </div>
                   <div className="space-y-1.5 text-left">
                     <label
                       htmlFor="checkout-last-name"
-                      className="text-sm font-bold text-neutral-900 block"
+                      className="text-xs font-medium text-white block"
                     >
-                      Last Name <span className="text-rose-500">*</span>
+                      Last Name <span className="text-rose-400">*</span>
                     </label>
                     <input
                       id="checkout-last-name"
@@ -1113,38 +1176,44 @@ function CheckoutContent() {
                       placeholder="Kumar"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="w-full h-11 rounded-none border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all"
+                      className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-sm text-white placeholder:text-neutral-500 rounded-lg outline-none transition-colors"
                     />
                   </div>
                 </div>
 
                 {/* Email Address */}
                 <div className="space-y-1.5 text-left">
-                  <label
-                    htmlFor="checkout-email"
-                    className="text-sm font-bold text-neutral-900 block"
-                  >
-                    Email Address <span className="text-rose-500">*</span>
+                  <label htmlFor="checkout-email" className="text-xs font-medium text-white block">
+                    Email Address <span className="text-rose-400">*</span>
                   </label>
-                  <input
-                    id="checkout-email"
-                    type="email"
-                    required
-                    disabled={isAuthenticated}
-                    placeholder="engineer@plant.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full h-11 rounded-none border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
-                  />
+                  <div className="relative">
+                    <input
+                      id="checkout-email"
+                      type="email"
+                      required
+                      readOnly={isAuthenticated}
+                      tabIndex={isAuthenticated ? -1 : undefined}
+                      placeholder="engineer@plant.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className={`w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-sm rounded-lg outline-none transition-colors ${
+                        isAuthenticated
+                          ? 'text-neutral-400 cursor-not-allowed select-none pr-9'
+                          : 'text-white placeholder:text-neutral-500'
+                      }`}
+                    />
+                    {isAuthenticated && user?.emailVerifiedAt && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <Check className="w-4 h-4 stroke-[2.5] text-emerald-400" />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Phone Number */}
                 <div className="space-y-1.5 text-left">
-                  <label
-                    htmlFor="checkout-phone"
-                    className="text-sm font-bold text-neutral-900 block"
-                  >
-                    Phone Number <span className="text-rose-500">*</span>
+                  <label htmlFor="checkout-phone" className="text-xs font-medium text-white block">
+                    Phone Number <span className="text-rose-400">*</span>
                   </label>
                   <input
                     id="checkout-phone"
@@ -1153,32 +1222,35 @@ function CheckoutContent() {
                     placeholder="+91 98765 43210"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full h-11 rounded-none border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all font-mono"
+                    className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-sm font-mono text-white placeholder:text-neutral-500 rounded-lg outline-none transition-colors"
                   />
                 </div>
 
                 {/* Company GSTIN */}
                 <div className="space-y-1.5 text-left">
-                  <label
-                    htmlFor="checkout-gstin"
-                    className="text-sm font-bold text-neutral-900 block"
-                  >
-                    Company GSTIN
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label
+                      htmlFor="checkout-gstin"
+                      className="text-xs font-medium text-white block"
+                    >
+                      Company GSTIN
+                    </label>
+                    <span className="text-[11px] text-[#80828d]">Optional</span>
+                  </div>
                   <input
                     id="checkout-gstin"
                     type="text"
                     placeholder="22AAAAA0000A1Z5"
                     value={gstin}
                     onChange={(e) => setGstin(e.target.value.toUpperCase())}
-                    className="w-full h-11 rounded-none border border-neutral-300 bg-white px-3.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-2 focus:ring-black/15 focus:outline-none transition-all font-mono uppercase"
+                    className="w-full h-10 px-3 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-sm font-mono uppercase text-white placeholder:text-neutral-500 rounded-lg outline-none transition-colors"
                   />
                 </div>
               </div>
 
-              {/* Error Alert Banner: Translucent Red (matching Login/Register) */}
+              {/* Error Alert Banner */}
               {checkoutError && (
-                <div className="p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium flex items-center justify-center text-center animate-in fade-in">
+                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium flex items-center justify-center text-center animate-in fade-in">
                   <span>{checkoutError}</span>
                 </div>
               )}
@@ -1188,7 +1260,7 @@ function CheckoutContent() {
                 {!isAuthenticated ? (
                   <Link
                     href="/login?redirect=/checkout"
-                    className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-base sm:text-[17px] rounded-none transition-all flex items-center justify-center cursor-pointer text-center select-none"
+                    className="w-full h-11 sm:h-12 px-6 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-sm sm:text-[15px] rounded-lg transition-colors flex items-center justify-center cursor-pointer text-center select-none shadow-sm"
                   >
                     Sign In to Continue Checkout &rarr;
                   </Link>
@@ -1196,7 +1268,7 @@ function CheckoutContent() {
                   <button
                     type="button"
                     disabled
-                    className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-neutral-200 text-neutral-500 font-bold text-sm sm:text-base uppercase tracking-wider rounded-none opacity-75 cursor-not-allowed flex items-center justify-center text-center select-none"
+                    className="w-full h-11 sm:h-12 px-6 bg-[#1f2023] text-[#80828d] font-semibold text-xs sm:text-sm uppercase tracking-wider rounded-lg opacity-75 cursor-not-allowed flex items-center justify-center text-center select-none border border-white/[0.05]"
                   >
                     Verify Email to Enable Payment
                   </button>
@@ -1205,12 +1277,12 @@ function CheckoutContent() {
                     type="button"
                     onClick={handleProceedToPayment}
                     disabled={quoteLoading || isSubmitting}
-                    className="w-full h-[50px] sm:h-[54px] px-6 py-3.5 bg-black hover:bg-[#262626] active:bg-[#171717] text-white font-bold text-base sm:text-[17px] rounded-none transition-all disabled:opacity-60 flex items-center justify-center gap-2.5 cursor-pointer select-none"
+                    className="w-full h-11 sm:h-12 px-6 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-sm sm:text-[15px] rounded-lg transition-colors disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer select-none shadow-sm"
                   >
                     {isSubmitting || quoteLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin text-white" />
+                      <Loader2 className="w-4 h-4 animate-spin text-black" />
                     ) : (
-                      <Lock className="w-4.5 h-4.5 text-white stroke-[2.5]" />
+                      <Lock className="w-4 h-4 text-black stroke-[2.5]" />
                     )}
                     <span>
                       Pay ₹{(finalPricePaise / 100).toLocaleString('en-IN')} with Razorpay
@@ -1220,57 +1292,66 @@ function CheckoutContent() {
               </div>
 
               {/* Payment Methods and Security Guarantee */}
-              <div className="-mx-5 sm:-mx-7 border-t border-neutral-200/80 pt-4 px-5 sm:px-7 space-y-2 text-center">
+              <div className="-mx-5 sm:-mx-6 border-t border-white/[0.06] pt-4 px-5 sm:px-6 space-y-2 text-center">
                 {/* Secured by Razorpay in Center */}
-                <div className="flex items-center justify-center gap-1.5 text-neutral-600 text-xs sm:text-[13px] font-medium">
+                <div className="flex items-center justify-center gap-1.5 text-[#c2c4cc] text-xs font-medium">
                   <span>Secured by</span>
-                  <RazorpayLogo className="h-4 sm:h-[18px] w-auto" />
+                  <RazorpayLogo className="h-4 w-auto" />
                 </div>
 
-                {/* Accepted Payment Methods under Secured by Razorpay */}
-                <div className="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-wider text-neutral-400">
+                {/* Accepted Payment Methods */}
+                <div className="text-[10px] font-mono uppercase tracking-wider text-[#80828d]">
                   Accepted Payment Methods
                 </div>
 
-                {/* Real Brand Logos in One Single Row: GPay, Visa, Mastercard, Paytm */}
-                <div className="flex items-center justify-center gap-5 sm:gap-6 pt-0.5 pb-0.5 flex-nowrap">
+                {/* Brand Logos: GPay, Visa, Mastercard, Paytm */}
+                <div className="flex items-center justify-center gap-3 pt-1 pb-0.5">
                   <div
                     title="Google Pay (GPay)"
-                    className="shrink-0 flex items-center justify-center translate-x-1"
+                    className="h-7 px-2.5 bg-white rounded-md flex items-center justify-center shadow-sm"
                   >
-                    <GPayLogo className="h-[18px] sm:h-[21px] w-auto" />
+                    <GPayLogo className="h-4 w-auto" />
                   </div>
-                  <div title="Visa" className="shrink-0 flex items-center justify-center">
-                    <VisaLogo className="h-[14px] sm:h-[16px] w-auto" />
+                  <div
+                    title="Visa"
+                    className="h-7 px-2.5 bg-white rounded-md flex items-center justify-center shadow-sm"
+                  >
+                    <VisaLogo className="h-3.5 w-auto" />
                   </div>
-                  <div title="Mastercard" className="shrink-0 flex items-center justify-center">
-                    <MastercardLogo className="h-[18px] sm:h-[21px] w-auto" />
+                  <div
+                    title="Mastercard"
+                    className="h-7 px-2.5 bg-white rounded-md flex items-center justify-center shadow-sm"
+                  >
+                    <MastercardLogo className="h-4 w-auto" />
                   </div>
-                  <div title="Paytm" className="shrink-0 flex items-center justify-center">
-                    <PaytmLogo className="h-[17px] sm:h-[20px] w-auto" />
+                  <div
+                    title="Paytm"
+                    className="h-7 px-2.5 bg-white rounded-md flex items-center justify-center shadow-sm"
+                  >
+                    <PaytmLogo className="h-3.5 w-auto" />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Terms & Refund Disclaimer (Below Billing Info - Desktop & Mobile) */}
-            <div className="pt-1 text-center text-xs text-neutral-500 space-y-1">
+            {/* Terms & Refund Disclaimer */}
+            <div className="pt-1 text-center text-xs text-[#80828d] space-y-1">
               <p>
                 By completing this payment, you agree to the{' '}
-                <Link href="/terms" className="underline hover:text-neutral-800">
+                <Link href="/terms" className="underline hover:text-white transition-colors">
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link href="/refunds" className="underline hover:text-neutral-800">
+                <Link href="/refunds" className="underline hover:text-white transition-colors">
                   Refund Policy
                 </Link>
                 .
               </p>
-              <p className="text-[11px] text-neutral-400">
+              <p className="text-[11px] text-[#80828d]/80">
                 Need assistance? Contact{' '}
                 <a
                   href={`mailto:${siteConfig.supportEmail}`}
-                  className="underline hover:text-neutral-700"
+                  className="underline hover:text-white transition-colors"
                 >
                   {siteConfig.supportEmail}
                 </a>
@@ -1280,6 +1361,7 @@ function CheckoutContent() {
           </div>
         </div>
       </div>
+
       {/* Payment Success Popup Modal */}
       <PaymentSuccessModal
         isOpen={paymentModalOpen}
@@ -1294,10 +1376,10 @@ function CheckoutContent() {
 }
 
 export default function CheckoutPage() {
-  // Sync document background to clean white so split layout renders seamlessly
+  // Sync document background to dark theme so split layout renders seamlessly
   useEffect(() => {
-    document.documentElement.style.backgroundColor = '#FFFFFF';
-    document.body.style.backgroundColor = '#FFFFFF';
+    document.documentElement.style.backgroundColor = '#000000';
+    document.body.style.backgroundColor = '#000000';
     return () => {
       document.documentElement.style.backgroundColor = '';
       document.body.style.backgroundColor = '';
@@ -1305,12 +1387,12 @@ export default function CheckoutPage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden bg-white font-reddit selection:bg-black selection:text-white">
+    <div className="fixed inset-0 w-full h-full overflow-hidden bg-black font-reddit selection:bg-white selection:text-black">
       <Suspense
         fallback={
-          <div className="w-full h-full flex flex-col items-center justify-center space-y-4 bg-white">
-            <Loader2 className="w-10 h-10 animate-spin text-black" />
-            <p className="text-sm font-semibold tracking-wider uppercase text-neutral-600">
+          <div className="w-full h-full flex flex-col items-center justify-center space-y-4 bg-black">
+            <Loader2 className="w-8 h-8 animate-spin text-white/80" />
+            <p className="text-xs font-mono tracking-wider uppercase text-[#c2c4cc]">
               Loading Checkout Session...
             </p>
           </div>
