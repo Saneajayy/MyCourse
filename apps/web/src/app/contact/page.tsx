@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { siteConfig } from '../../config/site';
 import { useToast } from '../../components/ui';
 import { apiClient } from '../../lib/api-client';
-import { Mail, Loader2, CheckCircle2, AlertCircle, Send, ArrowLeft, Phone, MapPin, Building2 } from 'lucide-react';
+import { Mail, Loader2, CheckCircle2, AlertCircle, ArrowLeft, Phone, MapPin, Building2 } from 'lucide-react';
 
 export default function ContactPage() {
   useEffect(() => {
@@ -308,22 +308,19 @@ export default function ContactPage() {
                   />
                 </div>
 
-                <div className="pt-1 flex items-center justify-end">
+                <div className="pt-2">
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="h-9 px-5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50"
+                    className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50 select-none"
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Sending...</span>
+                        <Loader2 className="w-4 h-4 animate-spin text-black" />
+                        <span>Sending Message...</span>
                       </>
                     ) : (
-                      <>
-                        <Send className="w-3.5 h-3.5" />
-                        <span>Send Message</span>
-                      </>
+                      <span>Send Message &rarr;</span>
                     )}
                   </button>
                 </div>
