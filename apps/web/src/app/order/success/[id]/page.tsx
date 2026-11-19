@@ -138,7 +138,8 @@ export default function OrderSuccessPage() {
           <div className="space-y-1">
             <h2 className="text-xl font-bold text-white tracking-tight">Order Not Found</h2>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              We couldn&apos;t retrieve the order details for this reference. Please check your student portal or contact support.
+              We couldn&apos;t retrieve the order details for this reference. Please check your
+              student portal or contact support.
             </p>
           </div>
           <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
@@ -207,7 +208,11 @@ export default function OrderSuccessPage() {
       <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative">
         {/* Top Header Bar */}
         <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
-          <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+          <Link
+            href="/"
+            className="lg:hidden flex flex-col select-none group"
+            title="HYDRO BASICS Home"
+          >
             <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
               HYDRO
             </span>

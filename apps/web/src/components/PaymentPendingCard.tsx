@@ -113,7 +113,8 @@ export function PaymentPendingCard({
         <div className="p-3 rounded-lg border border-amber-500/20 bg-amber-500/10 text-amber-300 text-xs text-center space-y-1">
           <p className="font-semibold">Taking longer than usual?</p>
           <p className="text-[11px] text-amber-400/80 leading-normal">
-            If money was debited from your bank, your course access will activate automatically once confirmed.
+            If money was debited from your bank, your course access will activate automatically once
+            confirmed.
           </p>
         </div>
       ) : null}

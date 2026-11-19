@@ -95,7 +95,8 @@ function ResetPasswordForm() {
             Reset Token Required
           </h2>
           <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-            To reset your password, please start by requesting a 6-digit code for your email address.
+            To reset your password, please start by requesting a 6-digit code for your email
+            address.
           </p>
           <div className="pt-2">
             <Link
@@ -286,7 +287,11 @@ export default function ResetPasswordPage() {
       <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative">
         {/* Top Header Bar */}
         <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
-          <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+          <Link
+            href="/"
+            className="lg:hidden flex flex-col select-none group"
+            title="HYDRO BASICS Home"
+          >
             <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
               HYDRO
             </span>

@@ -61,7 +61,8 @@ function createBurstParticles(cx: number, cy: number, count = 28): ConfettiParti
     const speed = 2.2 + Math.random() * 3.5;
     const shapes: ('rect' | 'circle' | 'sparkle')[] = ['rect', 'circle', 'sparkle'];
     const chosenShape = shapes[Math.floor(Math.random() * shapes.length)] || 'rect';
-    const chosenColor = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)] || '#FFFFFF';
+    const chosenColor =
+      CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)] || '#FFFFFF';
 
     particles.push({
       x: cx,
@@ -107,11 +108,7 @@ function ConfettiBurst() {
     };
 
     burst();
-    const timers = [
-      setTimeout(burst, 800),
-      setTimeout(burst, 2200),
-      setTimeout(burst, 4200),
-    ];
+    const timers = [setTimeout(burst, 800), setTimeout(burst, 2200), setTimeout(burst, 4200)];
     const burstInterval = setInterval(burst, 6000);
 
     const render = () => {

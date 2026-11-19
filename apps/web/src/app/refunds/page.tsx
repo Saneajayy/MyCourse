@@ -57,7 +57,11 @@ export default function RefundPage() {
         {/* Top Header Bar: Heading on left, Back link on right, lines touch outer ends */}
         <div className="px-6 sm:px-8 lg:px-10 py-4 sm:py-5 border-b border-white/[0.08] flex items-center justify-between shrink-0 select-none bg-[#101012]">
           <div className="flex items-center gap-3">
-            <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+            <Link
+              href="/"
+              className="lg:hidden flex flex-col select-none group"
+              title="HYDRO BASICS Home"
+            >
               <span className="font-extrabold text-[14px] text-white leading-[1.05] tracking-wider uppercase">
                 HYDRO
               </span>
@@ -92,7 +96,11 @@ export default function RefundPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              Every student who enrolls in a Hydro Basics course is entitled to evaluate the curriculum risk-free for seven (7) calendar days starting from the timestamp of payment confirmation. If you conclude that the course does not meet your technical expectations, you may submit a formal cancellation request for a 100% full tuition refund.
+              Every student who enrolls in a Hydro Basics course is entitled to evaluate the
+              curriculum risk-free for seven (7) calendar days starting from the timestamp of
+              payment confirmation. If you conclude that the course does not meet your technical
+              expectations, you may submit a formal cancellation request for a 100% full tuition
+              refund.
             </p>
           </section>
 
@@ -105,25 +113,32 @@ export default function RefundPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              To prevent curriculum scraping and intellectual property exploitation, refund requests must satisfy each of the following objective criteria at the moment of application:
+              To prevent curriculum scraping and intellectual property exploitation, refund requests
+              must satisfy each of the following objective criteria at the moment of application:
             </p>
             <div className="space-y-2 text-xs">
               <div className="p-3.5 rounded-lg bg-[#151619] border border-white/[0.08] flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <p className="text-[#c2c4cc] leading-relaxed">
-                  <strong className="text-white">Curriculum Consumption:</strong> You must have completed less than <strong>20%</strong> of the total video lecture lessons in the enrolled course (as monitored by our automated lesson heartbeat system).
+                  <strong className="text-white">Curriculum Consumption:</strong> You must have
+                  completed less than <strong>20%</strong> of the total video lecture lessons in the
+                  enrolled course (as monitored by our automated lesson heartbeat system).
                 </p>
               </div>
               <div className="p-3.5 rounded-lg bg-[#151619] border border-white/[0.08] flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <p className="text-[#c2c4cc] leading-relaxed">
-                  <strong className="text-white">Time Window:</strong> Your refund notice must be received within <strong>7 calendar days (168 hours)</strong> from the exact transaction timestamp recorded on your tax invoice.
+                  <strong className="text-white">Time Window:</strong> Your refund notice must be
+                  received within <strong>7 calendar days (168 hours)</strong> from the exact
+                  transaction timestamp recorded on your tax invoice.
                 </p>
               </div>
               <div className="p-3.5 rounded-lg bg-[#151619] border border-white/[0.08] flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <p className="text-[#c2c4cc] leading-relaxed">
-                  <strong className="text-white">No Certificate Issued:</strong> No completion credentials or verified engineering certificates may have been unlocked or generated for your account.
+                  <strong className="text-white">No Certificate Issued:</strong> No completion
+                  credentials or verified engineering certificates may have been unlocked or
+                  generated for your account.
                 </p>
               </div>
             </div>
@@ -141,10 +156,18 @@ export default function RefundPage() {
               Refunds will not be approved under any of the following circumstances:
             </p>
             <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed pl-1">
-              <li>Requests submitted after the expiration of the 7-calendar-day evaluation window.</li>
+              <li>
+                Requests submitted after the expiration of the 7-calendar-day evaluation window.
+              </li>
               <li>Accounts that have watched 20% or more of the course video curriculum.</li>
-              <li>Accounts found in violation of our Terms of Service (e.g., credential sharing, ripping video streams, tampering with DRM watermarks).</li>
-              <li>Custom corporate plant training cohorts or bulk enterprise invoices executed under negotiated B2B contracts.</li>
+              <li>
+                Accounts found in violation of our Terms of Service (e.g., credential sharing,
+                ripping video streams, tampering with DRM watermarks).
+              </li>
+              <li>
+                Custom corporate plant training cohorts or bulk enterprise invoices executed under
+                negotiated B2B contracts.
+              </li>
             </ul>
           </section>
 
@@ -164,7 +187,10 @@ export default function RefundPage() {
                 Original Payment Method Reversal (5–7 Business Days)
               </div>
               <p>
-                The reimbursement is transmitted via Razorpay directly back to the original source of payment (UPI VPA, Credit Card, Debit Card, or Net Banking account). Depending on your bank&apos;s clearing cycles, the credit will appear on your statement within 5 to 7 Indian banking days.
+                The reimbursement is transmitted via Razorpay directly back to the original source
+                of payment (UPI VPA, Credit Card, Debit Card, or Net Banking account). Depending on
+                your bank&apos;s clearing cycles, the credit will appear on your statement within 5
+                to 7 Indian banking days.
               </p>
             </div>
           </section>
@@ -178,7 +204,8 @@ export default function RefundPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              To request a cancellation and refund within the 7-day window, send an email with your Order ID from your registered address to{' '}
+              To request a cancellation and refund within the 7-day window, send an email with your
+              Order ID from your registered address to{' '}
               <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
                 {siteConfig.supportEmail}
               </code>{' '}
@@ -193,10 +220,7 @@ export default function RefundPage() {
 
         {/* Bottom Legal Navigation Bar: lines touch outer ends */}
         <div className="px-6 sm:px-8 lg:px-10 py-4 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs select-none shrink-0 bg-[#101012]">
-          <nav
-            aria-label="Footer Legal Links"
-            className="flex items-center gap-4 text-xs"
-          >
+          <nav aria-label="Footer Legal Links" className="flex items-center gap-4 text-xs">
             <Link href="/terms" className="text-[#80828d] hover:text-white transition-colors">
               Terms
             </Link>

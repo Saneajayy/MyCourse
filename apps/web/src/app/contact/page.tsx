@@ -6,7 +6,16 @@ import Image from 'next/image';
 import { siteConfig } from '../../config/site';
 import { useToast } from '../../components/ui';
 import { apiClient } from '../../lib/api-client';
-import { Mail, Loader2, CheckCircle2, AlertCircle, ArrowLeft, Phone, MapPin, Building2 } from 'lucide-react';
+import {
+  Mail,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  ArrowLeft,
+  Phone,
+  MapPin,
+  Building2,
+} from 'lucide-react';
 
 export default function ContactPage() {
   useEffect(() => {
@@ -101,7 +110,11 @@ export default function ContactPage() {
         {/* Top Header Bar: Heading on left, Back link on right, lines touch outer ends */}
         <div className="px-6 sm:px-8 lg:px-10 py-4 sm:py-5 border-b border-white/[0.08] flex items-center justify-between shrink-0 select-none bg-[#101012]">
           <div className="flex items-center gap-3">
-            <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+            <Link
+              href="/"
+              className="lg:hidden flex flex-col select-none group"
+              title="HYDRO BASICS Home"
+            >
               <span className="font-extrabold text-[14px] text-white leading-[1.05] tracking-wider uppercase">
                 HYDRO
               </span>
@@ -132,7 +145,9 @@ export default function ContactPage() {
             <div className="p-3.5 rounded-xl bg-[#151619] border border-white/[0.08] space-y-1.5">
               <div className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 text-white/70 shrink-0" />
-                <h3 className="text-xs sm:text-sm font-semibold text-white">Direct Support Email</h3>
+                <h3 className="text-xs sm:text-sm font-semibold text-white">
+                  Direct Support Email
+                </h3>
               </div>
               <p className="text-xs text-[#c2c4cc] leading-relaxed">
                 For login issues, video playback assistance, and refund requests:
@@ -148,7 +163,9 @@ export default function ContactPage() {
             <div className="p-3.5 rounded-xl bg-[#151619] border border-white/[0.08] space-y-1.5">
               <div className="flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5 text-white/70 shrink-0" />
-                <h3 className="text-xs sm:text-sm font-semibold text-white">Telephone &amp; WhatsApp</h3>
+                <h3 className="text-xs sm:text-sm font-semibold text-white">
+                  Telephone &amp; WhatsApp
+                </h3>
               </div>
               <p className="text-xs text-[#c2c4cc] leading-relaxed">
                 Direct engineer helpline for urgent enrollment or billing inquiries:
@@ -164,7 +181,9 @@ export default function ContactPage() {
             <div className="p-3.5 rounded-xl bg-[#151619] border border-white/[0.08] space-y-1.5">
               <div className="flex items-center gap-2">
                 <Building2 className="w-3.5 h-3.5 text-white/70 shrink-0" />
-                <h3 className="text-xs sm:text-sm font-semibold text-white">Corporate &amp; Plant Training</h3>
+                <h3 className="text-xs sm:text-sm font-semibold text-white">
+                  Corporate &amp; Plant Training
+                </h3>
               </div>
               <p className="text-xs text-[#c2c4cc] leading-relaxed">
                 Custom cohort training for factory engineering teams and bulk B2B purchase orders.
@@ -182,9 +201,7 @@ export default function ContactPage() {
               <p className="text-xs text-[#c2c4cc] leading-relaxed">
                 Operating headquarters and legal notice address:
               </p>
-              <p className="text-xs font-mono text-white/90 pt-0.5">
-                {siteConfig.contact.address}
-              </p>
+              <p className="text-xs font-mono text-white/90 pt-0.5">{siteConfig.contact.address}</p>
             </div>
           </div>
 
@@ -198,7 +215,8 @@ export default function ContactPage() {
                 Send an Online Message
               </h2>
               <p className="text-xs text-[#c2c4cc] leading-relaxed">
-                Fill out the form below and our technical operations desk will respond within 24 business hours.
+                Fill out the form below and our technical operations desk will respond within 24
+                business hours.
               </p>
             </div>
 
@@ -229,7 +247,10 @@ export default function ContactPage() {
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="p-4 sm:p-5 rounded-xl bg-[#151619] border border-white/[0.08] space-y-3.5">
+              <form
+                onSubmit={handleSubmit}
+                className="p-4 sm:p-5 rounded-xl bg-[#151619] border border-white/[0.08] space-y-3.5"
+              >
                 {/* Honeypot field */}
                 <div className="hidden" aria-hidden="true">
                   <label htmlFor="website-field">Website</label>
@@ -333,19 +354,21 @@ export default function ContactPage() {
 
           {/* Operational Hours Strip */}
           <div className="p-3.5 rounded-xl bg-[#151619] border border-white/[0.08] space-y-1.5 text-xs">
-            <h3 className="font-semibold text-white">Desk Working Hours &amp; Response Guarantee</h3>
+            <h3 className="font-semibold text-white">
+              Desk Working Hours &amp; Response Guarantee
+            </h3>
             <p className="text-[#c2c4cc] leading-relaxed">
-              Our engineering helpdesk operates <strong>{siteConfig.contact.hours}</strong> (Closed Sundays and Indian National Holidays). All inquiries received via email or form submission receive a personalized engineering response within <strong>24 business hours</strong>.
+              Our engineering helpdesk operates <strong>{siteConfig.contact.hours}</strong> (Closed
+              Sundays and Indian National Holidays). All inquiries received via email or form
+              submission receive a personalized engineering response within{' '}
+              <strong>24 business hours</strong>.
             </p>
           </div>
         </div>
 
         {/* Bottom Legal Navigation Bar: lines touch outer ends */}
         <div className="px-6 sm:px-8 lg:px-10 py-4 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs select-none shrink-0 bg-[#101012]">
-          <nav
-            aria-label="Footer Legal Links"
-            className="flex items-center gap-4 text-xs"
-          >
+          <nav aria-label="Footer Legal Links" className="flex items-center gap-4 text-xs">
             <Link href="/terms" className="text-[#80828d] hover:text-white transition-colors">
               Terms
             </Link>

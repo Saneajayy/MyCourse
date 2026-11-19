@@ -68,7 +68,8 @@ export function PaymentSuccessModal({
               Verifying Payment...
             </h2>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed max-w-sm mx-auto">
-              Please wait while we confirm your transaction and activate your course enrollment with the bank.
+              Please wait while we confirm your transaction and activate your course enrollment with
+              the bank.
             </p>
           </div>
         ) : data ? (

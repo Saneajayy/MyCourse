@@ -65,7 +65,11 @@ export default function GlobalError({
       <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative select-text">
         {/* Top Header Bar: lines touch outer ends */}
         <div className="px-6 sm:px-8 lg:px-10 py-4 sm:py-5 border-b border-white/[0.08] flex items-center justify-between shrink-0 select-none bg-[#101012]">
-          <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+          <Link
+            href="/"
+            className="lg:hidden flex flex-col select-none group"
+            title="HYDRO BASICS Home"
+          >
             <span className="font-extrabold text-[14px] text-white leading-[1.05] tracking-wider uppercase">
               HYDRO
             </span>
@@ -97,7 +101,8 @@ export default function GlobalError({
                   Operation Interrupted
                 </h1>
                 <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-                  An unexpected system anomaly interrupted this operation. Our monitoring service has logged the technical stack trace.
+                  An unexpected system anomaly interrupted this operation. Our monitoring service
+                  has logged the technical stack trace.
                 </p>
               </div>
 
@@ -132,10 +137,7 @@ export default function GlobalError({
 
         {/* Bottom Legal Navigation Bar: lines touch outer ends */}
         <div className="px-6 sm:px-8 lg:px-10 py-4 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs select-none shrink-0 bg-[#101012]">
-          <nav
-            aria-label="Footer Legal Links"
-            className="flex items-center gap-4 text-xs"
-          >
+          <nav aria-label="Footer Legal Links" className="flex items-center gap-4 text-xs">
             <Link href="/terms" className="text-[#80828d] hover:text-white transition-colors">
               Terms
             </Link>

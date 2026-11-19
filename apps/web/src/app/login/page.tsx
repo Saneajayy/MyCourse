@@ -207,9 +207,7 @@ function LoginForm() {
       <div className="pt-1 text-center text-xs text-[#c2c4cc]">
         New here?{' '}
         <Link
-          href={
-            redirectUrl ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : '/register'
-          }
+          href={redirectUrl ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : '/register'}
           className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1"
         >
           Create an account &rarr;
@@ -286,7 +284,11 @@ export default function LoginPage() {
       <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative">
         {/* Top Header Bar */}
         <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
-          <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+          <Link
+            href="/"
+            className="lg:hidden flex flex-col select-none group"
+            title="HYDRO BASICS Home"
+          >
             <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
               HYDRO
             </span>

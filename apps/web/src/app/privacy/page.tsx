@@ -3,7 +3,6 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { siteConfig } from '../../config/site';
 import { ArrowLeft } from 'lucide-react';
 
 export default function PrivacyPage() {
@@ -57,7 +56,11 @@ export default function PrivacyPage() {
         {/* Top Header Bar: Heading on left, Back link on right, lines touch outer ends */}
         <div className="px-6 sm:px-8 lg:px-10 py-4 sm:py-5 border-b border-white/[0.08] flex items-center justify-between shrink-0 select-none bg-[#101012]">
           <div className="flex items-center gap-3">
-            <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
+            <Link
+              href="/"
+              className="lg:hidden flex flex-col select-none group"
+              title="HYDRO BASICS Home"
+            >
               <span className="font-extrabold text-[14px] text-white leading-[1.05] tracking-wider uppercase">
                 HYDRO
               </span>
@@ -92,17 +95,24 @@ export default function PrivacyPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              We collect only the minimum personal data strictly necessary to authenticate course access, fulfill taxation compliance, and ensure platform security:
+              We collect only the minimum personal data strictly necessary to authenticate course
+              access, fulfill taxation compliance, and ensure platform security:
             </p>
             <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed pl-1">
               <li>
-                <strong className="text-white">Identity &amp; Contact:</strong> Full legal name, verified email address, and mobile phone number for authentication and OTP verification.
+                <strong className="text-white">Identity &amp; Contact:</strong> Full legal name,
+                verified email address, and mobile phone number for authentication and OTP
+                verification.
               </li>
               <li>
-                <strong className="text-white">Commercial &amp; Invoicing:</strong> Optional Goods &amp; Services Tax Identification Number (GSTIN) and registered company name for business tax credit.
+                <strong className="text-white">Commercial &amp; Invoicing:</strong> Optional Goods
+                &amp; Services Tax Identification Number (GSTIN) and registered company name for
+                business tax credit.
               </li>
               <li>
-                <strong className="text-white">Technical &amp; Telemetry:</strong> Anonymized browser agent, IP address, playback timestamps, and completed lesson progress for session resumption and anti-piracy validation.
+                <strong className="text-white">Technical &amp; Telemetry:</strong> Anonymized
+                browser agent, IP address, playback timestamps, and completed lesson progress for
+                session resumption and anti-piracy validation.
               </li>
             </ul>
           </section>
@@ -116,14 +126,16 @@ export default function PrivacyPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              All payment transactions are handled exclusively through RBI-authorized payment aggregator <strong>Razorpay</strong>, operating under strict <strong>PCI-DSS Level 1</strong> compliance.
+              All payment transactions are handled exclusively through RBI-authorized payment
+              aggregator <strong>Razorpay</strong>, operating under strict{' '}
+              <strong>PCI-DSS Level 1</strong> compliance.
             </p>
             <div className="p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 leading-relaxed space-y-1">
-              <div className="font-semibold text-white">
-                Zero Financial Credential Storage
-              </div>
+              <div className="font-semibold text-white">Zero Financial Credential Storage</div>
               <p>
-                Hydro Basics never stores, logs, or views your credit/debit card numbers, CVVs, expiration dates, bank net banking passwords, or UPI PINs. All sensitive tokenization occurs within Razorpay&apos;s isolated vault.
+                Hydro Basics never stores, logs, or views your credit/debit card numbers, CVVs,
+                expiration dates, bank net banking passwords, or UPI PINs. All sensitive
+                tokenization occurs within Razorpay&apos;s isolated vault.
               </p>
             </div>
           </section>
@@ -137,7 +149,13 @@ export default function PrivacyPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              We uphold a strict zero-compromise policy: <strong>we do not sell, rent, monetize, or trade your personal information or contact details</strong> with third-party marketing networks, telemarketers, or advertisement brokers. Your information is used strictly to deliver educational course services.
+              We uphold a strict zero-compromise policy:{' '}
+              <strong>
+                we do not sell, rent, monetize, or trade your personal information or contact
+                details
+              </strong>{' '}
+              with third-party marketing networks, telemarketers, or advertisement brokers. Your
+              information is used strictly to deliver educational course services.
             </p>
           </section>
 
@@ -150,21 +168,27 @@ export default function PrivacyPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              Our authentication architecture protects your account against Cross-Site Scripting (XSS) and Session Hijacking:
+              Our authentication architecture protects your account against Cross-Site Scripting
+              (XSS) and Session Hijacking:
             </p>
             <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed pl-1">
               <li>
-                <strong className="text-white">Volatile Memory Tokens:</strong> Short-lived JWT access tokens reside in client memory and are never persisted in accessible browser local storage.
+                <strong className="text-white">Volatile Memory Tokens:</strong> Short-lived JWT
+                access tokens reside in client memory and are never persisted in accessible browser
+                local storage.
               </li>
               <li>
-                <strong className="text-white">HttpOnly Cookies:</strong> Session refresh tokens are transmitted with{' '}
+                <strong className="text-white">HttpOnly Cookies:</strong> Session refresh tokens are
+                transmitted with{' '}
                 <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
                   HttpOnly; Secure; SameSite=Strict
                 </code>{' '}
                 attributes, rendering them inaccessible to malicious client scripts.
               </li>
               <li>
-                <strong className="text-white">No Tracking Cookies:</strong> We do not deploy third-party advertising pixels, behavioral retargeting trackers, or invasive cross-site beacons.
+                <strong className="text-white">No Tracking Cookies:</strong> We do not deploy
+                third-party advertising pixels, behavioral retargeting trackers, or invasive
+                cross-site beacons.
               </li>
             </ul>
           </section>
@@ -178,7 +202,11 @@ export default function PrivacyPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              During video playback, our platform logs heartbeat telemetry (lesson position, playback state, and dynamic DRM token authorization). A semi-transparent overlay displays your registered Student ID to deter illegal screen recording. This processing is strictly justified under our legitimate interest in protecting intellectual property.
+              During video playback, our platform logs heartbeat telemetry (lesson position,
+              playback state, and dynamic DRM token authorization). A semi-transparent overlay
+              displays your registered Student ID to deter illegal screen recording. This processing
+              is strictly justified under our legitimate interest in protecting intellectual
+              property.
             </p>
           </section>
 
@@ -191,24 +219,38 @@ export default function PrivacyPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              As a student enrolled with Hydro Basics, Indian privacy legislation grants you clear rights regarding your personal data:
+              As a student enrolled with Hydro Basics, Indian privacy legislation grants you clear
+              rights regarding your personal data:
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="p-3.5 rounded-lg bg-[#151619] border border-white/[0.08] space-y-1">
-                <span className="font-semibold text-white block">Right to Access &amp; Summary</span>
-                <p className="text-[#c2c4cc] leading-relaxed">Request a full summary of your processed data and enrolled curriculum history.</p>
+                <span className="font-semibold text-white block">
+                  Right to Access &amp; Summary
+                </span>
+                <p className="text-[#c2c4cc] leading-relaxed">
+                  Request a full summary of your processed data and enrolled curriculum history.
+                </p>
               </div>
               <div className="p-3.5 rounded-lg bg-[#151619] border border-white/[0.08] space-y-1">
-                <span className="font-semibold text-white block">Right to Correction &amp; Update</span>
-                <p className="text-[#c2c4cc] leading-relaxed">Update your phone number, name spelling, or billing address in your dashboard.</p>
+                <span className="font-semibold text-white block">
+                  Right to Correction &amp; Update
+                </span>
+                <p className="text-[#c2c4cc] leading-relaxed">
+                  Update your phone number, name spelling, or billing address in your dashboard.
+                </p>
               </div>
               <div className="p-3.5 rounded-lg bg-[#151619] border border-white/[0.08] space-y-1">
                 <span className="font-semibold text-white block">Right to Erasure</span>
-                <p className="text-[#c2c4cc] leading-relaxed">Request deletion of your account and personal records (subject to statutory GST tax retention).</p>
+                <p className="text-[#c2c4cc] leading-relaxed">
+                  Request deletion of your account and personal records (subject to statutory GST
+                  tax retention).
+                </p>
               </div>
               <div className="p-3.5 rounded-lg bg-[#151619] border border-white/[0.08] space-y-1">
                 <span className="font-semibold text-white block">Right to Grievance Redressal</span>
-                <p className="text-[#c2c4cc] leading-relaxed">Lodge questions directly with our designated Data Protection Officer.</p>
+                <p className="text-[#c2c4cc] leading-relaxed">
+                  Lodge questions directly with our designated Data Protection Officer.
+                </p>
               </div>
             </div>
           </section>
@@ -222,17 +264,17 @@ export default function PrivacyPage() {
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              We retain account data for the duration of your 365-day access license plus any period necessary to maintain certificate verification authenticity. Transaction invoices and GST tax records are retained for seven (7) years in compliance with Section 36 of the Central Goods and Services Tax Act, 2017.
+              We retain account data for the duration of your 365-day access license plus any period
+              necessary to maintain certificate verification authenticity. Transaction invoices and
+              GST tax records are retained for seven (7) years in compliance with Section 36 of the
+              Central Goods and Services Tax Act, 2017.
             </p>
           </section>
         </div>
 
         {/* Bottom Legal Navigation Bar: lines touch outer ends */}
         <div className="px-6 sm:px-8 lg:px-10 py-4 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs select-none shrink-0 bg-[#101012]">
-          <nav
-            aria-label="Footer Legal Links"
-            className="flex items-center gap-4 text-xs"
-          >
+          <nav aria-label="Footer Legal Links" className="flex items-center gap-4 text-xs">
             <Link href="/terms" className="text-[#80828d] hover:text-white transition-colors">
               Terms
             </Link>
