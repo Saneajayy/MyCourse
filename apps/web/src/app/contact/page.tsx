@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { siteConfig } from '../../config/site';
 import { useToast } from '../../components/ui';
 import { apiClient } from '../../lib/api-client';
@@ -10,8 +9,8 @@ import { Mail, MessageSquare, X, Loader2, CheckCircle2, AlertCircle, Send } from
 
 export default function ContactPage() {
   useEffect(() => {
-    document.documentElement.style.backgroundColor = '#FFFFFF';
-    document.body.style.backgroundColor = '#FFFFFF';
+    document.documentElement.style.backgroundColor = '#000000';
+    document.body.style.backgroundColor = '#000000';
     return () => {
       document.documentElement.style.backgroundColor = '';
       document.body.style.backgroundColor = '';
@@ -75,165 +74,146 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-white font-reddit selection:bg-black selection:text-white flex flex-col lg:flex-row overflow-hidden">
-      {/* Left Column (Desktop Only): Signature Dot Halftone Graphic on Black */}
-      <div className="hidden lg:relative lg:flex lg:w-1/2 h-full bg-black overflow-hidden select-none">
-        <Image
-          src="/split-pixelated.png"
-          alt="HydroBasics Industrial Hydraulic Engineer"
-          fill
-          priority
-          sizes="50vw"
-          className="object-cover object-center mix-blend-screen opacity-95 select-none"
-        />
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none"
-          aria-hidden="true"
-        />
-      </div>
+    <div className="min-h-screen bg-black text-white font-reddit selection:bg-white selection:text-black flex flex-col justify-between">
+      {/* Top Header Bar */}
+      <header className="w-full max-w-4xl mx-auto px-5 pt-6 sm:px-8 sm:pt-8 flex items-center justify-between shrink-0">
+        <Link
+          href="/"
+          className="text-[#80828d] hover:text-white font-medium text-xs sm:text-sm transition-colors flex items-center gap-1.5 py-1"
+        >
+          <span aria-hidden="true">&larr;</span> Back to Course
+        </Link>
 
-      {/* Right Column: Clean White Background */}
-      <div className="w-full lg:w-1/2 h-full bg-white flex flex-col justify-between overflow-y-auto lg:overflow-hidden relative">
-        {/* Top Header Bar */}
-        <header className="w-full flex items-center justify-between px-5 pt-4 sm:px-8 sm:pt-6 shrink-0 z-20 lg:absolute lg:top-0 lg:inset-x-0">
-          <Link
-            href="/"
-            className="text-neutral-500 hover:text-black font-semibold text-xs sm:text-sm tracking-normal transition-colors flex items-center gap-1.5 py-1"
-          >
-            <span aria-hidden="true">&larr;</span> Back to Course
-          </Link>
+        <Link
+          href="/"
+          className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-white hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
+          aria-label="HYDRO BASICS Home"
+        >
+          <span className="font-extrabold text-[16px] sm:text-[18px] tracking-[0.02em] uppercase leading-[0.92]">
+            HYDRO
+          </span>
+          <span className="font-extrabold text-[16px] sm:text-[18px] tracking-[0.02em] uppercase leading-[0.92]">
+            BASICS
+          </span>
+        </Link>
+      </header>
 
-          <Link
-            href="/"
-            className="flex flex-col items-end -space-y-0.5 leading-[0.92] text-black hover:opacity-90 transition-opacity select-none text-right cursor-pointer"
-            aria-label="HYDRO BASICS Home"
-          >
-            <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-              HYDRO
-            </span>
-            <span className="font-extrabold text-[18px] sm:text-[20px] tracking-[0.02em] uppercase leading-[0.92]">
-              BASICS
-            </span>
-          </Link>
-        </header>
+      {/* Main Content Area */}
+      <main className="w-full max-w-2xl mx-auto px-4 py-8 sm:py-12 my-auto">
+        <div className="relative w-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden shadow-2xl select-text">
+          {/* Header */}
+          <div className="p-5 sm:p-6 border-b border-white/[0.08]">
+            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              Contact Support
+            </h1>
+            <p className="text-xs sm:text-sm text-[#c2c4cc] leading-relaxed mt-1">
+              Reach our engineering desk for technical support, billing inquiries, or enterprise
+              access.
+            </p>
+          </div>
 
-        {/* Center Content Card - Vertically Centered */}
-        <main className="my-auto w-full max-w-xl mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-0 relative z-10 flex flex-col justify-center">
-          <div className="relative w-full bg-white border border-neutral-200/80 rounded-none select-text overflow-hidden">
-            {/* Header: divider line touches outer box border */}
-            <div className="p-5 sm:p-6 border-b border-neutral-200/80">
-              <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight">
-                Contact Support
-              </h1>
-              <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed mt-1">
-                Reach our engineering desk for technical support, billing inquiries, or enterprise
-                access.
+          {/* Points List */}
+          <div className="divide-y divide-white/[0.06] text-xs sm:text-[13px] text-[#c2c4cc]">
+            <div className="px-5 sm:px-6 py-3.5">
+              <p className="leading-relaxed">
+                <span className="font-mono font-semibold text-white/50 mr-2.5">01.</span>
+                <strong className="font-semibold text-white mr-1.5">Direct Support Email:</strong>
+                Send technical or billing queries to{' '}
+                <a
+                  href={`mailto:${siteConfig.supportEmail}`}
+                  className="font-medium underline text-white hover:text-white/80 transition-colors"
+                >
+                  {siteConfig.supportEmail}
+                </a>
+                ; answered within 24 business hours.
               </p>
             </div>
 
-            {/* Concise 1-2 line points with full-width separation lines touching border */}
-            <div className="divide-y divide-neutral-200/80 text-xs sm:text-[13px] text-neutral-700">
-              <div className="px-5 sm:px-6 py-2.5 sm:py-3">
-                <p className="leading-relaxed">
-                  <span className="font-mono font-bold text-neutral-900 mr-2">01.</span>
-                  <strong className="font-bold text-neutral-950 mr-1">Direct Support Email:</strong>
-                  Send technical or billing queries to{' '}
-                  <a
-                    href={`mailto:${siteConfig.supportEmail}`}
-                    className="font-semibold underline text-black hover:opacity-80"
-                  >
-                    {siteConfig.supportEmail}
-                  </a>
-                  ; answered within 24 business hours.
-                </p>
-              </div>
-
-              <div className="px-5 sm:px-6 py-2.5 sm:py-3">
-                <p className="leading-relaxed">
-                  <span className="font-mono font-bold text-neutral-900 mr-2">02.</span>
-                  <strong className="font-bold text-neutral-950 mr-1">Helpline Phone:</strong>
-                  Call or WhatsApp{' '}
-                  <a
-                    href={`tel:${siteConfig.contact.phone.replace(/\s+/g, '')}`}
-                    className="font-semibold font-mono text-black hover:underline"
-                  >
-                    {siteConfig.contact.phone}
-                  </a>{' '}
-                  ({siteConfig.contact.hours}, closed Sundays).
-                </p>
-              </div>
-
-              <div className="px-5 sm:px-6 py-2.5 sm:py-3">
-                <p className="leading-relaxed">
-                  <span className="font-mono font-bold text-neutral-900 mr-2">03.</span>
-                  <strong className="font-bold text-neutral-950 mr-1">Registered Facility:</strong>
-                  {siteConfig.contact.address}.
-                </p>
-              </div>
-
-              <div className="px-5 sm:px-6 py-2.5 sm:py-3 last:pb-0">
-                <p className="leading-relaxed">
-                  <span className="font-mono font-bold text-neutral-900 mr-2">04.</span>
-                  <strong className="font-bold text-neutral-950 mr-1">
-                    Corporate &amp; Enterprise:
-                  </strong>
-                  For bulk engineering enrollments, custom plant training, or GST tax invoices,
-                  reach out directly.
-                </p>
-              </div>
+            <div className="px-5 sm:px-6 py-3.5">
+              <p className="leading-relaxed">
+                <span className="font-mono font-semibold text-white/50 mr-2.5">02.</span>
+                <strong className="font-semibold text-white mr-1.5">Helpline Phone:</strong>
+                Call or WhatsApp{' '}
+                <a
+                  href={`tel:${siteConfig.contact.phone.replace(/\s+/g, '')}`}
+                  className="font-medium font-mono text-white underline hover:text-white/80 transition-colors"
+                >
+                  {siteConfig.contact.phone}
+                </a>{' '}
+                ({siteConfig.contact.hours}, closed Sundays).
+              </p>
             </div>
 
-            {/* Direct Action Bar: full-width border touching outer box border */}
-            <div className="p-4 sm:p-5 border-t border-neutral-200/80 bg-neutral-50/40 flex flex-col sm:flex-row items-center gap-2.5">
-              <a
-                href={`mailto:${siteConfig.supportEmail}?subject=HydroBasics%20Support%20Inquiry`}
-                className="w-full sm:flex-1 h-10 px-4 bg-black hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors flex items-center justify-center gap-2 cursor-pointer select-none"
-              >
-                <Mail className="w-3.5 h-3.5" />
-                <span>Email Support Desk &rarr;</span>
-              </a>
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(true)}
-                className="w-full sm:w-auto h-10 px-4 bg-white hover:bg-neutral-50 text-neutral-900 border border-neutral-300 font-semibold text-xs rounded-none transition-colors flex items-center justify-center gap-1.5 cursor-pointer select-none"
-              >
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>Send Message Online</span>
-              </button>
+            <div className="px-5 sm:px-6 py-3.5">
+              <p className="leading-relaxed">
+                <span className="font-mono font-semibold text-white/50 mr-2.5">03.</span>
+                <strong className="font-semibold text-white mr-1.5">Registered Facility:</strong>
+                {siteConfig.contact.address}.
+              </p>
             </div>
 
-            {/* Bottom metadata strip: divider line touches outer box border */}
-            <div className="px-5 sm:px-6 py-2.5 border-t border-neutral-200/80 flex items-center justify-between text-[11px] font-mono text-neutral-400 bg-neutral-50/70">
-              <span>Desk: Mon–Fri, 9AM–6PM IST</span>
-              <span>Response: &lt;24 Business Hours</span>
+            <div className="px-5 sm:px-6 py-3.5">
+              <p className="leading-relaxed">
+                <span className="font-mono font-semibold text-white/50 mr-2.5">04.</span>
+                <strong className="font-semibold text-white mr-1.5">
+                  Corporate &amp; Enterprise:
+                </strong>
+                For bulk engineering enrollments, custom plant training, or GST tax invoices, reach
+                out directly.
+              </p>
             </div>
           </div>
-        </main>
 
-        {/* Footer: Lifted up from bottom edge */}
-        <footer className="shrink-0 pb-6 sm:pb-8 lg:pb-7 px-5 sm:px-8 text-center z-20 lg:absolute lg:bottom-0 lg:inset-x-0">
-          <nav
-            aria-label="Footer Legal Links"
-            className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-neutral-500 mb-1"
-          >
-            <Link href="/terms" className="hover:text-black transition-colors">
-              Terms
-            </Link>
-            <Link href="/privacy" className="hover:text-black transition-colors">
-              Privacy
-            </Link>
-            <Link href="/refunds" className="hover:text-black transition-colors">
-              Refunds
-            </Link>
-            <Link href="/contact" className="text-black font-bold">
-              Contact
-            </Link>
-          </nav>
-          <p className="text-[11px] text-neutral-400">
-            &copy; {currentYear} Hydro Basics. All rights reserved.
-          </p>
-        </footer>
-      </div>
+          {/* Direct Action Bar */}
+          <div className="p-4 sm:p-5 border-t border-white/[0.08] bg-[#0c0d0e]/60 flex flex-col sm:flex-row items-center gap-2.5">
+            <a
+              href={`mailto:${siteConfig.supportEmail}?subject=HydroBasics%20Support%20Inquiry`}
+              className="w-full sm:flex-1 h-10 px-4 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm select-none"
+            >
+              <Mail className="w-3.5 h-3.5" />
+              <span>Email Support Desk &rarr;</span>
+            </a>
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="w-full sm:w-auto h-10 px-4 rounded-lg border border-white/[0.08] hover:border-white/[0.14] bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer select-none"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>Send Message Online</span>
+            </button>
+          </div>
+
+          {/* Bottom metadata strip */}
+          <div className="px-5 sm:px-6 py-3 border-t border-white/[0.08] flex items-center justify-between text-[11px] font-mono text-[#80828d] bg-[#0c0d0e]">
+            <span>Desk: Mon–Fri, 9AM–6PM IST</span>
+            <span>Response: &lt;24 Business Hours</span>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="w-full max-w-4xl mx-auto pb-6 sm:pb-8 px-5 sm:px-8 text-center shrink-0">
+        <nav
+          aria-label="Footer Legal Links"
+          className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs mb-2"
+        >
+          <Link href="/terms" className="text-[#80828d] hover:text-white transition-colors">
+            Terms
+          </Link>
+          <Link href="/privacy" className="text-[#80828d] hover:text-white transition-colors">
+            Privacy
+          </Link>
+          <Link href="/refunds" className="text-[#80828d] hover:text-white transition-colors">
+            Refunds
+          </Link>
+          <Link href="/contact" className="text-white font-semibold">
+            Contact
+          </Link>
+        </nav>
+        <p className="text-[11px] text-[#5d5f6a]">
+          &copy; {currentYear} Hydro Basics. All rights reserved.
+        </p>
+      </footer>
 
       {/* Online Message Modal Dialog */}
       {isModalOpen && (
@@ -241,29 +221,29 @@ export default function ContactPage() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="contact-modal-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in"
           onClick={(e) => {
             if (e.target === e.currentTarget) setIsModalOpen(false);
           }}
         >
-          <div className="relative w-full max-w-lg bg-white border border-neutral-300 shadow-2xl rounded-none p-5 sm:p-7 space-y-4">
+          <div className="relative w-full max-w-lg bg-[#101012] border border-white/[0.1] shadow-2xl rounded-xl p-5 sm:p-7 space-y-4 text-white">
             {/* Modal Header */}
-            <div className="flex items-start justify-between gap-3 border-b border-neutral-200 pb-3">
+            <div className="flex items-start justify-between gap-3 border-b border-white/[0.08] pb-3">
               <div>
                 <h2
                   id="contact-modal-title"
-                  className="text-lg font-bold text-neutral-900 tracking-tight"
+                  className="text-lg font-bold text-white tracking-tight"
                 >
                   Send Support Inquiry
                 </h2>
-                <p className="text-xs text-neutral-500 mt-0.5">
+                <p className="text-xs text-[#c2c4cc] mt-0.5">
                   Our engineering team will get back to you within 24 business hours.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 text-neutral-400 hover:text-black transition-colors"
+                className="p-1 text-[#80828d] hover:text-white transition-colors cursor-pointer"
                 aria-label="Close dialog"
               >
                 <X className="w-5 h-5" />
@@ -271,14 +251,14 @@ export default function ContactPage() {
             </div>
 
             {isSent ? (
-              <div className="py-6 text-center space-y-3 bg-neutral-50 border border-neutral-200 p-5">
-                <div className="w-10 h-10 bg-black text-white inline-flex items-center justify-center">
+              <div className="py-6 text-center space-y-3 bg-[#18191d] border border-white/[0.08] rounded-lg p-5">
+                <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 inline-flex items-center justify-center">
                   <CheckCircle2 className="w-5 h-5" />
                 </div>
-                <h3 className="text-base font-bold text-neutral-900">Message Sent Successfully</h3>
-                <p className="text-xs text-neutral-600 max-w-xs mx-auto leading-relaxed">
+                <h3 className="text-base font-bold text-white">Message Sent Successfully</h3>
+                <p className="text-xs text-[#c2c4cc] max-w-xs mx-auto leading-relaxed">
                   Thank you for reaching out. We have received your inquiry and will respond to{' '}
-                  {email} shortly.
+                  <span className="text-white font-medium">{email}</span> shortly.
                 </p>
                 <div className="pt-2">
                   <button
@@ -291,7 +271,7 @@ export default function ContactPage() {
                       setMessage('');
                       setIsModalOpen(false);
                     }}
-                    className="h-9 px-4 bg-black hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors"
+                    className="h-9 px-5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors cursor-pointer shadow-sm"
                   >
                     Done
                   </button>
@@ -313,16 +293,16 @@ export default function ContactPage() {
                 </div>
 
                 {errorMessage && (
-                  <div className="p-2.5 border border-rose-300 bg-rose-50 text-rose-900 text-xs font-semibold rounded-none flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  <div className="p-3 border border-rose-500/20 bg-rose-500/10 text-rose-300 text-xs font-medium rounded-lg flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
                     <span>{errorMessage}</span>
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-semibold text-neutral-700 block mb-1">
-                      Full Name <span className="text-rose-600">*</span>
+                    <label className="text-xs font-medium text-[#c2c4cc] block mb-1">
+                      Full Name <span className="text-rose-400">*</span>
                     </label>
                     <input
                       type="text"
@@ -330,13 +310,13 @@ export default function ContactPage() {
                       placeholder="e.g. Ramesh Kumar"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full h-9 px-3 bg-white border border-neutral-300 focus:border-black rounded-none text-neutral-900 text-xs font-medium focus:outline-none transition-all placeholder:text-neutral-400"
+                      className="w-full h-10 px-3.5 bg-[#18191d] border border-white/[0.08] focus:border-white/20 rounded-lg text-white text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-[#5d5f6a]"
                     />
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-neutral-700 block mb-1">
-                      Email Address <span className="text-rose-600">*</span>
+                    <label className="text-xs font-medium text-[#c2c4cc] block mb-1">
+                      Email Address <span className="text-rose-400">*</span>
                     </label>
                     <input
                       type="email"
@@ -344,14 +324,14 @@ export default function ContactPage() {
                       placeholder="engineer@plant.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full h-9 px-3 bg-white border border-neutral-300 focus:border-black rounded-none text-neutral-900 text-xs font-medium focus:outline-none transition-all placeholder:text-neutral-400"
+                      className="w-full h-10 px-3.5 bg-[#18191d] border border-white/[0.08] focus:border-white/20 rounded-lg text-white text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-[#5d5f6a]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-neutral-700 block mb-1">
-                    Subject <span className="text-rose-600">*</span>
+                  <label className="text-xs font-medium text-[#c2c4cc] block mb-1">
+                    Subject <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -359,13 +339,13 @@ export default function ContactPage() {
                     placeholder="e.g. Corporate team enrollment question"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="w-full h-9 px-3 bg-white border border-neutral-300 focus:border-black rounded-none text-neutral-900 text-xs font-medium focus:outline-none transition-all placeholder:text-neutral-400"
+                    className="w-full h-10 px-3.5 bg-[#18191d] border border-white/[0.08] focus:border-white/20 rounded-lg text-white text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-[#5d5f6a]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-semibold text-neutral-700 block mb-1">
-                    Message <span className="text-rose-600">*</span>
+                  <label className="text-xs font-medium text-[#c2c4cc] block mb-1">
+                    Message <span className="text-rose-400">*</span>
                   </label>
                   <textarea
                     required
@@ -373,22 +353,22 @@ export default function ContactPage() {
                     placeholder="Describe your inquiry..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="w-full p-2.5 bg-white border border-neutral-300 focus:border-black rounded-none text-neutral-900 text-xs font-medium focus:outline-none transition-all placeholder:text-neutral-400 resize-none"
+                    className="w-full p-3 bg-[#18191d] border border-white/[0.08] focus:border-white/20 rounded-lg text-white text-xs sm:text-sm font-medium focus:outline-none transition-all placeholder:text-[#5d5f6a] resize-none"
                   />
                 </div>
 
-                <div className="pt-1 flex items-center justify-end gap-2">
+                <div className="pt-2 flex items-center justify-end gap-2.5">
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="h-9 px-4 bg-white hover:bg-neutral-100 text-neutral-700 border border-neutral-300 font-semibold text-xs rounded-none transition-colors"
+                    className="h-10 px-4 rounded-lg border border-white/[0.08] hover:border-white/[0.14] bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white text-xs font-medium transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="h-9 px-5 bg-black hover:bg-neutral-800 text-white font-bold text-xs uppercase tracking-wider rounded-none transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                    className="h-10 px-5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm disabled:opacity-50"
                   >
                     {isLoading ? (
                       <>
