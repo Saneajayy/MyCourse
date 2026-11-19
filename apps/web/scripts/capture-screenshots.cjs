@@ -110,7 +110,7 @@ async function main() {
   console.log('Saved: mycourses_360px.png');
 
   // 6. Player
-  await setupPage.goto('http://localhost:3000/learn/hydraulic-engineering-mastery');
+  await setupPage.goto('http://localhost:3000/learn/hydraulic-system-basics');
   await setupPage.waitForSelector('video');
   await setupPage.waitForTimeout(1000);
   await setupPage.setViewportSize({ width: 1280, height: 800 });

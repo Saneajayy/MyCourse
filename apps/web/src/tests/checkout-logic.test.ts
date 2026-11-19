@@ -130,8 +130,8 @@ describe('Checkout State & Price Computation Logic', () => {
     // Simulating server quote response
     const serverQuote = {
       productId: 'prod_hydraulic',
-      courseTitle: 'Industrial Hydraulic Systems',
-      courseSlug: 'hydraulic-engineering-mastery',
+      courseTitle: 'Hydraulic System Basics',
+      courseSlug: 'hydraulic-system-basics',
       basePricePaise: 499900,
       discountPaise: 50000,
       subtotalPaise: 381271,

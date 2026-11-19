@@ -16,7 +16,7 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const slug = 'hydraulic-engineering-mastery';
+  const slug = 'hydraulic-system-basics';
   const product = await prisma.product.findUnique({
     where: { slug },
   });

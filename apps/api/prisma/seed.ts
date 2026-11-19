@@ -163,7 +163,7 @@ async function main() {
 
   console.log('Development/Test mode detected. Seeding sample hydraulic engineering course...');
 
-  const sampleSlug = 'hydraulic-engineering-mastery';
+  const sampleSlug = 'hydraulic-system-basics';
   const existingProduct = await prisma.product.findUnique({
     where: { slug: sampleSlug },
   });
@@ -174,7 +174,7 @@ async function main() {
       data: {
         id: productId,
         slug: sampleSlug,
-        title: 'Industrial Hydraulic Systems & Circuit Design',
+        title: 'Hydraulic System Basics',
         description:
           'Learn hydraulic systems, core components, and practical circuit design from the ground up.',
         thumbnailUrl:

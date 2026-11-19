@@ -97,7 +97,7 @@ async function main() {
   console.log('✅ Configured default app settings.');
 
   // 4. Seed the clean course: "Hydraulic System Basics"
-  const slug = 'hydraulic-engineering-mastery';
+  const slug = 'hydraulic-system-basics';
   const productId = uuidv7();
 
   const product = await prisma.product.create({

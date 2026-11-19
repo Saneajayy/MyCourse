@@ -86,7 +86,7 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
       .getByRole('link', { name: /Continue Learning/i })
       .first()
       .click();
-    await page.waitForURL('**/learn/hydraulic-engineering-mastery');
+    await page.waitForURL('**/learn/hydraulic-system-basics');
 
     // Verify Player Components
     await expect(page.locator('aside')).toContainText('Course Curriculum');
@@ -117,7 +117,7 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
         url.pathname === '/account',
     );
 
-    await page.goto('/learn/hydraulic-engineering-mastery');
+    await page.goto('/learn/hydraulic-system-basics');
     await expect(page.locator('video')).toBeVisible();
   });
 
@@ -155,7 +155,7 @@ test.describe('Student Learning & Checkout Journey (E2E)', () => {
 
   test('Blocks non-entitled users from learning classroom', async ({ page }) => {
     // Unauthenticated access
-    await page.goto('/learn/hydraulic-engineering-mastery');
-    await page.waitForURL('**/login?redirect=/learn/hydraulic-engineering-mastery');
+    await page.goto('/learn/hydraulic-system-basics');
+    await page.waitForURL('**/login?redirect=/learn/hydraulic-system-basics');
   });
 });
