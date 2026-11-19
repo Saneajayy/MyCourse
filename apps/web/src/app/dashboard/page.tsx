@@ -126,11 +126,24 @@ function StudentDashboardContent() {
   const { error: toastError, success: toastSuccess } = useToast();
 
   const tabParam = searchParams.get('tab') as DashboardTab | null;
+  const isPreviewUnlocked = searchParams.get('preview_unlocked') === 'true';
   const [activeTab, setActiveTab] = useState<DashboardTab>(
     tabParam && ['courses', 'certificates', 'calculator', 'profile', 'orders'].includes(tabParam)
       ? tabParam
-      : 'courses',
+      : isPreviewUnlocked
+        ? 'certificates'
+        : 'courses',
   );
+
+  useEffect(() => {
+    const tab = searchParams.get('tab') as DashboardTab | null;
+    const preview = searchParams.get('preview_unlocked') === 'true';
+    if (tab && ['courses', 'certificates', 'calculator', 'profile', 'orders'].includes(tab)) {
+      setActiveTab(tab);
+    } else if (preview) {
+      setActiveTab('certificates');
+    }
+  }, [searchParams]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const tabRefs = useRef<{ [key in DashboardTab]?: HTMLButtonElement | null }>({});
   const [indicatorStyle, setIndicatorStyle] = useState<{
@@ -355,10 +368,50 @@ function StudentDashboardContent() {
     );
   }, [courses, searchQuery]);
 
-  // Completed courses eligible for certificate (unlocks at >= 90%)
+  // Completed courses eligible for certificate (unlocks at >= 90% or with preview_unlocked=true)
   const completedCourses = useMemo(() => {
-    return courses.filter((c) => (c.progress?.percentComplete ?? 0) >= 90);
-  }, [courses]);
+    if (courses.length > 0) {
+      const realCompleted = courses.filter((c) => (c.progress?.percentComplete ?? 0) >= 90);
+      if (realCompleted.length > 0 && !isPreviewUnlocked) return realCompleted;
+      if (isPreviewUnlocked) {
+        // Treat enrolled courses as 100% completed
+        return courses.map((c) => ({
+          ...c,
+          progress: {
+            ...c.progress,
+            percentComplete: 100,
+            completedLessons: c.progress?.totalLessons || 16,
+            totalLessons: c.progress?.totalLessons || 16,
+          },
+        }));
+      }
+    } else if (isPreviewUnlocked) {
+      // Mock sample course for instant preview
+      return [
+        {
+          product: {
+            id: 'demo-unlocked-course',
+            title: 'Hydraulic System Basics',
+            slug: 'hydraulic-system-basics',
+            shortDescription: 'Industrial hydraulic engineering fundamentals and circuit design.',
+          },
+          progress: {
+            percentComplete: 100,
+            completedLessons: 16,
+            totalLessons: 16,
+            lastAccessedAt: new Date().toISOString(),
+          },
+          enrollment: {
+            id: 'enr-demo-unlocked',
+            enrolledAt: new Date().toISOString(),
+            status: 'ACTIVE',
+            expiresAt: new Date(Date.now() + 365 * 86400000).toISOString(),
+          },
+        } as unknown as EnrolledCourse,
+      ];
+    }
+    return [];
+  }, [courses, isPreviewUnlocked]);
 
   const navTabs: {
     id: DashboardTab;
