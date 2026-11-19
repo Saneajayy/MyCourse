@@ -67,9 +67,9 @@ export default function TermsPage() {
       {/* ============================================================== */}
       {/* RIGHT CARD: Full Scrollable Terms (Starts Top-Left)           */}
       {/* ============================================================== */}
-      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-y-auto relative p-6 sm:p-8 lg:p-10 select-text scroll-smooth">
-        {/* Top Navigation Bar */}
-        <div className="flex items-center justify-between pb-5 border-b border-white/[0.08] shrink-0 select-none">
+      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative select-text">
+        {/* Top Header Bar: lines touch outer ends */}
+        <div className="px-6 sm:px-8 lg:px-10 py-4 sm:py-5 border-b border-white/[0.08] flex items-center justify-between shrink-0 select-none bg-[#101012]">
           <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
             <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
               HYDRO
@@ -89,35 +89,63 @@ export default function TermsPage() {
           </Link>
         </div>
 
-        {/* Main Terms Document Body */}
-        <div className="pt-6 pb-12 space-y-8 max-w-2xl text-left">
-          {/* Document Header */}
+        {/* Scrollable Document Body */}
+        <div className="flex-1 overflow-y-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8 space-y-7 scroll-smooth text-left">
+          {/* Document Title & Preamble */}
           <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-mono text-white/80 px-2.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08]">
-                Effective: November 2026
-              </span>
-              <span className="text-[11px] font-mono text-[#80828d]">
-                Version 2.4 • Standard Enrollment Terms
-              </span>
-            </div>
-
             <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
-              Terms of Service &amp; Enrollment Agreement
+              Terms of Service
             </h1>
 
             <p className="text-xs sm:text-sm text-[#c2c4cc] leading-relaxed">
-              These Terms of Service (&ldquo;Agreement&rdquo;, &ldquo;Terms&rdquo;) constitute a legally binding agreement between you (&ldquo;Student&rdquo;, &ldquo;User&rdquo;, or &ldquo;Licensee&rdquo;) and <strong>{siteConfig.brandName}</strong> (&ldquo;Company&rdquo;, &ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;). By accessing our website, purchasing an enrollment, or streaming instructional lecture content, you acknowledge that you have read, understood, and agreed to be bound by all provisions set forth below.
+              These Terms of Service (
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                Agreement
+              </code>
+              ,{' '}
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                Terms
+              </code>
+              ) constitute a legally binding agreement between you (
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                Student
+              </code>
+              ,{' '}
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                User
+              </code>
+              , or{' '}
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                Licensee
+              </code>
+              ) and <strong>{siteConfig.brandName}</strong> (
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                Company
+              </code>
+              ,{' '}
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                we
+              </code>
+              ,{' '}
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                our
+              </code>
+              , or{' '}
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                us
+              </code>
+              ). By accessing our website, purchasing an enrollment, or streaming instructional lecture content, you acknowledge that you have read, understood, and agreed to be bound by all provisions set forth below.
             </p>
           </div>
 
-          <div className="border-t border-white/[0.08]" />
+          {/* Divider line touching outer ends */}
+          <div className="-mx-6 sm:-mx-8 lg:-mx-10 border-b border-white/[0.08]" />
 
           {/* Section 1 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">01.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">01.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 Acceptance of Terms &amp; Eligibility
               </h2>
             </div>
@@ -127,10 +155,10 @@ export default function TermsPage() {
           </section>
 
           {/* Section 2 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">02.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">02.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 Educational License Grant &amp; 365-Day Validity
               </h2>
             </div>
@@ -151,10 +179,10 @@ export default function TermsPage() {
           </section>
 
           {/* Section 3 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">03.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">03.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 Cryptographic Watermarking &amp; Anti-Piracy DRM
               </h2>
             </div>
@@ -167,10 +195,10 @@ export default function TermsPage() {
           </section>
 
           {/* Section 4 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">04.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">04.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 Single Concurrent Streaming &amp; Device Concurrency
               </h2>
             </div>
@@ -189,10 +217,10 @@ export default function TermsPage() {
           </section>
 
           {/* Section 5 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">05.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">05.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 High-Pressure Hydraulic Safety Disclaimer
               </h2>
             </div>
@@ -211,10 +239,10 @@ export default function TermsPage() {
           </section>
 
           {/* Section 6 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">06.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">06.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 Payments, GST Tax Invoices &amp; Billing
               </h2>
             </div>
@@ -227,10 +255,10 @@ export default function TermsPage() {
           </section>
 
           {/* Section 7 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">07.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">07.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 7-Day Money-Back Guarantee &amp; Refund Terms
               </h2>
             </div>
@@ -243,10 +271,10 @@ export default function TermsPage() {
           </section>
 
           {/* Section 8 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">08.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">08.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 Account Security &amp; Prohibited Conduct
               </h2>
             </div>
@@ -262,15 +290,23 @@ export default function TermsPage() {
           </section>
 
           {/* Section 9 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">09.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">09.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 Limitation of Liability &amp; Warranty Disclaimer
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              The services and instructional materials are provided strictly on an &ldquo;as is&rdquo; and &ldquo;as available&rdquo; basis without warranties of any kind, whether express or implied. Under no circumstances shall Hydro Basics, its instructors, engineers, directors, or technology partners be liable for indirect, incidental, special, punitive, or consequential damages resulting from platform downtime or application of curriculum techniques.
+              The services and instructional materials are provided strictly on an{' '}
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                as is
+              </code>{' '}
+              and{' '}
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                as available
+              </code>{' '}
+              basis without warranties of any kind, whether express or implied. Under no circumstances shall Hydro Basics, its instructors, engineers, directors, or technology partners be liable for indirect, incidental, special, punitive, or consequential damages resulting from platform downtime or application of curriculum techniques.
             </p>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
               In any event, our total cumulative liability under this Agreement shall not exceed the actual tuition amount paid by you for the specific course enrollment.
@@ -278,10 +314,10 @@ export default function TermsPage() {
           </section>
 
           {/* Section 10 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">10.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">10.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 Governing Law &amp; Dispute Resolution
               </h2>
             </div>
@@ -291,60 +327,45 @@ export default function TermsPage() {
           </section>
 
           {/* Section 11 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">11.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">11.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 Modifications to Terms
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              We reserve the right to revise or update these Terms periodically to reflect changes in regulatory standards, tax rates, or platform security updates. The updated version will be indicated by an updated &ldquo;Effective Date&rdquo; at the top of this document. Continued platform usage after amendments signifies your acceptance.
+              We reserve the right to revise or update these Terms periodically to reflect changes in regulatory standards, tax rates, or platform security updates. The updated version will be indicated by an updated{' '}
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                Effective Date
+              </code>{' '}
+              at the top of this document. Continued platform usage after amendments signifies your acceptance.
             </p>
           </section>
+        </div>
 
-          {/* Section 12 */}
-          <section className="space-y-2.5">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">12.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                Legal Inquiries &amp; Official Contact
-              </h2>
-            </div>
-            <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              For corporate enterprise agreements, formal legal notices, or clarification regarding these Terms, contact our administration desk:
-            </p>
-            <div className="p-4 rounded-lg bg-[#151619] border border-white/[0.08] text-xs text-[#c2c4cc] space-y-1.5 font-mono">
-              <p><span className="text-[#80828d]">Email:</span> <a href={`mailto:${siteConfig.supportEmail}`} className="text-white underline">{siteConfig.supportEmail}</a></p>
-              <p><span className="text-[#80828d]">Phone:</span> <a href={`tel:${siteConfig.contact.phone.replace(/\s+/g, '')}`} className="text-white">{siteConfig.contact.phone}</a></p>
-              <p><span className="text-[#80828d]">Address:</span> <span className="text-white">{siteConfig.contact.address}</span></p>
-              <p><span className="text-[#80828d]">Jurisdiction:</span> <span className="text-white">{siteConfig.contact.jurisdiction}</span></p>
-            </div>
-          </section>
-
-          {/* Bottom Legal Navigation Bar */}
-          <div className="pt-8 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs select-none">
-            <nav
-              aria-label="Footer Legal Links"
-              className="flex items-center gap-4 text-xs"
-            >
-              <Link href="/terms" className="text-white font-semibold">
-                Terms
-              </Link>
-              <Link href="/privacy" className="text-[#80828d] hover:text-white transition-colors">
-                Privacy
-              </Link>
-              <Link href="/refunds" className="text-[#80828d] hover:text-white transition-colors">
-                Refunds
-              </Link>
-              <Link href="/contact" className="text-[#80828d] hover:text-white transition-colors">
-                Contact
-              </Link>
-            </nav>
-            <p className="text-[11px] text-[#5d5f6a]">
-              &copy; {currentYear} Hydro Basics. All rights reserved.
-            </p>
-          </div>
+        {/* Bottom Legal Navigation Bar: lines touch outer ends */}
+        <div className="px-6 sm:px-8 lg:px-10 py-4 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs select-none shrink-0 bg-[#101012]">
+          <nav
+            aria-label="Footer Legal Links"
+            className="flex items-center gap-4 text-xs"
+          >
+            <Link href="/terms" className="text-white font-semibold">
+              Terms
+            </Link>
+            <Link href="/privacy" className="text-[#80828d] hover:text-white transition-colors">
+              Privacy
+            </Link>
+            <Link href="/refunds" className="text-[#80828d] hover:text-white transition-colors">
+              Refunds
+            </Link>
+            <Link href="/contact" className="text-[#80828d] hover:text-white transition-colors">
+              Contact
+            </Link>
+          </nav>
+          <p className="text-[11px] text-[#5d5f6a]">
+            &copy; {currentYear} Hydro Basics. All rights reserved.
+          </p>
         </div>
       </div>
     </div>

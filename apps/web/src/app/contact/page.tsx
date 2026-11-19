@@ -123,9 +123,9 @@ export default function ContactPage() {
       {/* ============================================================== */}
       {/* RIGHT CARD: Full Scrollable Contact Desk (Starts Top-Left)    */}
       {/* ============================================================== */}
-      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-y-auto relative p-6 sm:p-8 lg:p-10 select-text scroll-smooth">
-        {/* Top Navigation Bar */}
-        <div className="flex items-center justify-between pb-5 border-b border-white/[0.08] shrink-0 select-none">
+      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative select-text">
+        {/* Top Header Bar: lines touch outer ends */}
+        <div className="px-6 sm:px-8 lg:px-10 py-4 sm:py-5 border-b border-white/[0.08] flex items-center justify-between shrink-0 select-none bg-[#101012]">
           <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
             <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
               HYDRO
@@ -145,19 +145,10 @@ export default function ContactPage() {
           </Link>
         </div>
 
-        {/* Main Document Body */}
-        <div className="pt-6 pb-12 space-y-8 max-w-2xl text-left">
-          {/* Header */}
+        {/* Scrollable Document Body */}
+        <div className="flex-1 overflow-y-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8 space-y-7 scroll-smooth text-left">
+          {/* Document Title & Preamble */}
           <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-mono text-white/80 px-2.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08]">
-                Desk Response: &lt;24 Business Hours
-              </span>
-              <span className="text-[11px] font-mono text-emerald-400">
-                • Operations Live
-              </span>
-            </div>
-
             <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
               Engineering Support &amp; Contact Desk
             </h1>
@@ -186,7 +177,8 @@ export default function ContactPage() {
             </button>
           </div>
 
-          <div className="border-t border-white/[0.08]" />
+          {/* Divider line touching outer ends */}
+          <div className="-mx-6 sm:-mx-8 lg:-mx-10 border-b border-white/[0.08]" />
 
           {/* Contact Channels Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -256,30 +248,30 @@ export default function ContactPage() {
               Our engineering helpdesk operates <strong>{siteConfig.contact.hours}</strong> (Closed Sundays and Indian National Holidays). All inquiries received via email or form submission receive a personalized engineering response within <strong>24 business hours</strong>.
             </p>
           </div>
+        </div>
 
-          {/* Bottom Legal Navigation Bar */}
-          <div className="pt-8 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs select-none">
-            <nav
-              aria-label="Footer Legal Links"
-              className="flex items-center gap-4 text-xs"
-            >
-              <Link href="/terms" className="text-[#80828d] hover:text-white transition-colors">
-                Terms
-              </Link>
-              <Link href="/privacy" className="text-[#80828d] hover:text-white transition-colors">
-                Privacy
-              </Link>
-              <Link href="/refunds" className="text-[#80828d] hover:text-white transition-colors">
-                Refunds
-              </Link>
-              <Link href="/contact" className="text-white font-semibold">
-                Contact
-              </Link>
-            </nav>
-            <p className="text-[11px] text-[#5d5f6a]">
-              &copy; {currentYear} Hydro Basics. All rights reserved.
-            </p>
-          </div>
+        {/* Bottom Legal Navigation Bar: lines touch outer ends */}
+        <div className="px-6 sm:px-8 lg:px-10 py-4 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs select-none shrink-0 bg-[#101012]">
+          <nav
+            aria-label="Footer Legal Links"
+            className="flex items-center gap-4 text-xs"
+          >
+            <Link href="/terms" className="text-[#80828d] hover:text-white transition-colors">
+              Terms
+            </Link>
+            <Link href="/privacy" className="text-[#80828d] hover:text-white transition-colors">
+              Privacy
+            </Link>
+            <Link href="/refunds" className="text-[#80828d] hover:text-white transition-colors">
+              Refunds
+            </Link>
+            <Link href="/contact" className="text-white font-semibold">
+              Contact
+            </Link>
+          </nav>
+          <p className="text-[11px] text-[#5d5f6a]">
+            &copy; {currentYear} Hydro Basics. All rights reserved.
+          </p>
         </div>
       </div>
 

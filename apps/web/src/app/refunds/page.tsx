@@ -67,9 +67,9 @@ export default function RefundPage() {
       {/* ============================================================== */}
       {/* RIGHT CARD: Full Scrollable Refund Policy (Starts Top-Left)   */}
       {/* ============================================================== */}
-      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-y-auto relative p-6 sm:p-8 lg:p-10 select-text scroll-smooth">
-        {/* Top Navigation Bar */}
-        <div className="flex items-center justify-between pb-5 border-b border-white/[0.08] shrink-0 select-none">
+      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-hidden relative select-text">
+        {/* Top Header Bar: lines touch outer ends */}
+        <div className="px-6 sm:px-8 lg:px-10 py-4 sm:py-5 border-b border-white/[0.08] flex items-center justify-between shrink-0 select-none bg-[#101012]">
           <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
             <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
               HYDRO
@@ -89,19 +89,10 @@ export default function RefundPage() {
           </Link>
         </div>
 
-        {/* Main Document Body */}
-        <div className="pt-6 pb-12 space-y-8 max-w-2xl text-left">
-          {/* Header */}
+        {/* Scrollable Document Body */}
+        <div className="flex-1 overflow-y-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8 space-y-7 scroll-smooth text-left">
+          {/* Document Title & Preamble */}
           <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-mono text-white/80 px-2.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08]">
-                Effective: November 2026
-              </span>
-              <span className="text-[11px] font-mono text-[#80828d]">
-                Version 2.4 • Student Protection Terms
-              </span>
-            </div>
-
             <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
               Cancellation &amp; Refund Policy
             </h1>
@@ -111,13 +102,14 @@ export default function RefundPage() {
             </p>
           </div>
 
-          <div className="border-t border-white/[0.08]" />
+          {/* Divider line touching outer ends */}
+          <div className="-mx-6 sm:-mx-8 lg:-mx-10 border-b border-white/[0.08]" />
 
           {/* Section 1 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">01.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">01.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 7-Day Money-Back Guarantee
               </h2>
             </div>
@@ -127,10 +119,10 @@ export default function RefundPage() {
           </section>
 
           {/* Section 2 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">02.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">02.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 Eligibility Criteria &amp; Progress Threshold
               </h2>
             </div>
@@ -160,10 +152,10 @@ export default function RefundPage() {
           </section>
 
           {/* Section 3 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">03.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">03.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 Non-Refundable Circumstances
               </h2>
             </div>
@@ -179,10 +171,10 @@ export default function RefundPage() {
           </section>
 
           {/* Section 4 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">04.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">04.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 Direct Settlement &amp; Processing Timelines
               </h2>
             </div>
@@ -201,47 +193,49 @@ export default function RefundPage() {
           </section>
 
           {/* Section 5 */}
-          <section className="space-y-2.5">
+          <section className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-white/40">05.</span>
-              <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <span className="text-xs font-mono font-bold text-white/50">05.</span>
+              <h2 className="text-sm sm:text-base font-semibold text-white tracking-tight">
                 How to Submit a Refund Request
               </h2>
             </div>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              To ensure prompt processing, email your refund notice directly from your <strong>registered student email address</strong> to our support desk:
+              To request a cancellation and refund within the 7-day window, send an email with your Order ID from your registered address to{' '}
+              <code className="font-mono text-[11px] sm:text-xs px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white font-medium">
+                {siteConfig.supportEmail}
+              </code>{' '}
+              or submit a request through our{' '}
+              <Link href="/contact" className="text-white underline hover:text-white/80">
+                Contact Desk
+              </Link>
+              . Our administration team processes eligible claims within 24 business hours.
             </p>
-            <div className="p-4 rounded-lg bg-[#151619] border border-white/[0.08] text-xs text-[#c2c4cc] space-y-2 font-mono">
-              <p><span className="text-[#80828d]">To:</span> <a href={`mailto:${siteConfig.supportEmail}`} className="text-white underline">{siteConfig.supportEmail}</a></p>
-              <p><span className="text-[#80828d]">Subject:</span> <span className="text-white">Refund Request - [Your Order ID]</span></p>
-              <p><span className="text-[#80828d]">Body details:</span> Registered Name, Phone Number, and brief reason for cancellation.</p>
-              <p><span className="text-[#80828d]">Response:</span> <span className="text-emerald-400 font-semibold">&lt;24 Business Hours</span></p>
-            </div>
           </section>
+        </div>
 
-          {/* Bottom Legal Navigation Bar */}
-          <div className="pt-8 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs select-none">
-            <nav
-              aria-label="Footer Legal Links"
-              className="flex items-center gap-4 text-xs"
-            >
-              <Link href="/terms" className="text-[#80828d] hover:text-white transition-colors">
-                Terms
-              </Link>
-              <Link href="/privacy" className="text-[#80828d] hover:text-white transition-colors">
-                Privacy
-              </Link>
-              <Link href="/refunds" className="text-white font-semibold">
-                Refunds
-              </Link>
-              <Link href="/contact" className="text-[#80828d] hover:text-white transition-colors">
-                Contact
-              </Link>
-            </nav>
-            <p className="text-[11px] text-[#5d5f6a]">
-              &copy; {currentYear} Hydro Basics. All rights reserved.
-            </p>
-          </div>
+        {/* Bottom Legal Navigation Bar: lines touch outer ends */}
+        <div className="px-6 sm:px-8 lg:px-10 py-4 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs select-none shrink-0 bg-[#101012]">
+          <nav
+            aria-label="Footer Legal Links"
+            className="flex items-center gap-4 text-xs"
+          >
+            <Link href="/terms" className="text-[#80828d] hover:text-white transition-colors">
+              Terms
+            </Link>
+            <Link href="/privacy" className="text-[#80828d] hover:text-white transition-colors">
+              Privacy
+            </Link>
+            <Link href="/refunds" className="text-white font-semibold">
+              Refunds
+            </Link>
+            <Link href="/contact" className="text-[#80828d] hover:text-white transition-colors">
+              Contact
+            </Link>
+          </nav>
+          <p className="text-[11px] text-[#5d5f6a]">
+            &copy; {currentYear} Hydro Basics. All rights reserved.
+          </p>
         </div>
       </div>
     </div>
