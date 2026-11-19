@@ -1236,9 +1236,40 @@ function StudentDashboardContent() {
                 </div>
 
                 {ordersLoading ? (
-                  <div className="relative w-fit max-w-full bg-[#151619] border border-white/[0.08] rounded-xl p-6 text-xs sm:text-[13px] text-[#c2c4cc] flex items-center gap-3 select-none">
-                    <Loader2 className="w-4 h-4 animate-spin text-white" />
-                    <span>Loading payment orders...</span>
+                  <div className="w-full flex flex-col gap-5 items-start text-left">
+                    {[1, 2].map((idx) => (
+                      <div
+                        key={idx}
+                        className="relative w-full max-w-[520px] bg-[#151619] border border-white/[0.08] rounded-xl overflow-hidden animate-pulse select-none"
+                      >
+                        {/* Header Bar Skeleton */}
+                        <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-white/[0.06] flex items-center justify-between gap-3 bg-white/[0.02]">
+                          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                            <div className="h-3.5 w-24 bg-white/10 rounded" />
+                            <span className="text-white/20">•</span>
+                            <div className="h-3 w-20 bg-white/5 rounded" />
+                          </div>
+                          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+                            <div className="h-5 w-14 bg-white/10 rounded-md" />
+                            <div className="h-4 w-16 bg-white/10 rounded" />
+                          </div>
+                        </div>
+
+                        {/* Card Body Skeleton */}
+                        <div className="p-4 sm:p-5 space-y-4">
+                          <div className="space-y-1.5 min-w-0">
+                            <div className="h-4 w-3/5 bg-white/10 rounded" />
+                            <div className="h-3 w-28 bg-white/5 rounded" />
+                          </div>
+
+                          {/* Action Buttons Skeleton */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 w-full">
+                            <div className="h-9 sm:h-10 bg-white/5 rounded-lg border border-white/5" />
+                            <div className="h-9 sm:h-10 bg-white/10 rounded-lg" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : orders.length === 0 ? (
                   <div className="w-full flex flex-col gap-5 items-start text-left">
