@@ -23,6 +23,7 @@ export default function StyleguidePage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [previewModal, setPreviewModal] = useState<'success' | 'failed' | 'pending' | null>(null);
+  const [triggerError, setTriggerError] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [progressVal, setProgressVal] = useState(65);
 
@@ -33,8 +34,15 @@ export default function StyleguidePage() {
       if (m === 'success' || m === 'failed' || m === 'pending') {
         setPreviewModal(m);
       }
+      if (params.get('test_error') === '500') {
+        setTriggerError(true);
+      }
     }
   }, []);
+
+  if (triggerError) {
+    throw new Error('Test 500 Global Error for UI preview');
+  }
 
   const tabItems = [
     { id: 'overview', label: 'Overview', count: 12 },
