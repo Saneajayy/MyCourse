@@ -225,10 +225,10 @@ function ForgotPasswordContent() {
           {/* Header */}
           <div className="space-y-1">
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Forgot Password
+              Forgot your Password?
             </h1>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              Enter the email address associated with your account to receive a 6-digit reset code.
+              Enter your registered email address to receive a 6-digit verification code.
             </p>
           </div>
 
@@ -308,10 +308,10 @@ function ForgotPasswordContent() {
           {/* Header */}
           <div className="space-y-1">
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Check Your Email
+              Please check your email
             </h1>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              Enter the 6-digit code sent to <span className="text-white font-medium">{email}</span>.
+              Enter the 6 digit OTP we sent to <span className="text-white font-medium">{email}</span>.
             </p>
           </div>
 

@@ -228,10 +228,10 @@ function VerifyEmailForm() {
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-          Check Your Email
+          Please check your email
         </h1>
         <div className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-          <span>Enter the 6-digit code sent to </span>
+          <span>Enter the 6 digit OTP we sent to </span>
           {isEditingEmail ? (
             <div className="inline-flex items-center gap-2 mt-2 w-full">
               <input
