@@ -1039,7 +1039,7 @@ function StudentDashboardContent() {
                           {!user?.emailVerifiedAt && (
                             <div className="flex items-center gap-3 pt-1">
                               <Link
-                                href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
+                                href="/verify-email"
                                 className="text-xs font-medium text-amber-400 hover:text-amber-300 underline"
                               >
                                 Enter 6-digit OTP &rarr;

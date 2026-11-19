@@ -12,7 +12,6 @@ function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialToken = searchParams.get('token') || '';
-  const initialEmail = searchParams.get('email') || '';
 
   const { error: toastError, success: toastSuccess } = useToast();
 
@@ -115,11 +114,7 @@ function ResetPasswordForm() {
               Create New Password
             </h1>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              {initialEmail ? (
-                <>Enter a new password for <span className="text-white font-medium">{initialEmail}</span>.</>
-              ) : (
-                'Choose a secure new password of at least 10 characters.'
-              )}
+              Choose a secure new password of at least 10 characters.
             </p>
           </div>
 

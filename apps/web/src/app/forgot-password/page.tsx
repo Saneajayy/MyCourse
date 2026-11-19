@@ -181,9 +181,7 @@ function ForgotPasswordContent() {
       }
 
       toastSuccess('Code Verified', 'Please enter your new password.');
-      router.push(
-        `/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email.trim().toLowerCase())}`,
-      );
+      router.push(`/reset-password?token=${encodeURIComponent(token)}`);
     } catch (err: unknown) {
       isVerifyingRef.current = false;
       setIsVerifying(false);

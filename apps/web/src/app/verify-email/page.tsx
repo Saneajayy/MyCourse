@@ -12,8 +12,8 @@ import { Loader2, RotateCw, Check, ArrowLeft, AlertCircle } from 'lucide-react';
 function VerifyEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setSession } = useAuth();
-  const initialEmail = searchParams.get('email') || '';
+  const { setSession, user } = useAuth();
+  const initialEmail = searchParams.get('email') || user?.email || '';
   const initialOtp = searchParams.get('otp') || searchParams.get('token') || '';
   const redirectParam = searchParams.get('redirect');
 
@@ -44,6 +44,15 @@ function VerifyEmailForm() {
     }, 1000);
     return () => clearInterval(interval);
   }, [resendCooldown]);
+
+  // Sync email from auth session if navigated without email in URL
+  useEffect(() => {
+    if (!email && user?.email) {
+      setEmail(user.email);
+      setIsEditingEmail(false);
+      setResendCooldown(60);
+    }
+  }, [user?.email, email]);
 
   // Focus first empty input on mount
   useEffect(() => {

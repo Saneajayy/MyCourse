@@ -1080,7 +1080,7 @@ function CheckoutContent() {
                   </p>
                   <div className="flex flex-wrap items-center gap-2 pt-1">
                     <Link
-                      href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
+                      href="/verify-email"
                       className="h-8 sm:h-9 px-3.5 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center cursor-pointer shadow-sm"
                     >
                       Enter 6-Digit OTP
