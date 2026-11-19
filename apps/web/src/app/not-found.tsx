@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, BookOpen } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export default function NotFound() {
   useEffect(() => {
@@ -80,72 +80,39 @@ export default function NotFound() {
           </Link>
         </div>
 
-        {/* Scrollable Document Body */}
-        <div className="flex-1 overflow-y-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8 space-y-7 scroll-smooth text-left flex flex-col justify-center">
-          {/* Main Error Title */}
-          <div className="space-y-2">
-            <span className="text-4xl sm:text-5xl font-black font-mono text-white tracking-tight block">
-              404
-            </span>
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Page Not Located
-            </h2>
-            <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed max-w-lg">
-              The hydraulic schematic, course module, or page you requested does not exist or may have been relocated.
-            </p>
-          </div>
+        {/* Center Container with Login/Signup-style Tab Box */}
+        <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col items-center justify-center">
+          <div className="w-full max-w-[420px] sm:max-w-[440px]">
+            <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-6 sm:p-8 select-none overflow-hidden space-y-5 transition-all text-left">
+              {/* Header */}
+              <div className="space-y-1.5">
+                <span className="text-xs font-mono font-bold text-white/40 uppercase tracking-widest">
+                  404 &bull; Not Found
+                </span>
+                <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                  Page Not Found
+                </h1>
+                <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+                  The page or module you are looking for does not exist, has been removed, or is temporarily unavailable.
+                </p>
+              </div>
 
-          {/* Divider line touching outer ends */}
-          <div className="-mx-6 sm:-mx-8 lg:-mx-10 border-b border-white/[0.08]" />
-
-          {/* Concise recovery points */}
-          <div className="space-y-3 text-xs sm:text-[13px] text-[#c2c4cc]">
-            <div className="flex items-start gap-2.5">
-              <span className="text-xs font-mono font-bold text-white/50 shrink-0 mt-0.5">01.</span>
-              <p className="leading-relaxed">
-                <strong className="text-white font-medium">Verify the URL:</strong> Double-check for typos or extra symbols in the link address.
-              </p>
-            </div>
-            <div className="flex items-start gap-2.5">
-              <span className="text-xs font-mono font-bold text-white/50 shrink-0 mt-0.5">02.</span>
-              <p className="leading-relaxed">
-                <strong className="text-white font-medium">Enrolled Students:</strong> Access curriculum lessons directly from your{' '}
-                <Link href="/dashboard" className="text-white underline hover:text-white/80 font-medium">
-                  Student Dashboard
+              {/* Action Buttons */}
+              <div className="pt-2 flex flex-col gap-2.5">
+                <Link
+                  href="/"
+                  className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors flex items-center justify-center cursor-pointer shadow-sm select-none"
+                >
+                  Return to Home &rarr;
                 </Link>
-                .
-              </p>
-            </div>
-            <div className="flex items-start gap-2.5">
-              <span className="text-xs font-mono font-bold text-white/50 shrink-0 mt-0.5">03.</span>
-              <p className="leading-relaxed">
-                <strong className="text-white font-medium">Need Assistance:</strong> If you followed a broken link, reach our technical{' '}
-                <Link href="/contact" className="text-white underline hover:text-white/80 font-medium">
-                  Support Desk
+                <Link
+                  href="/dashboard"
+                  className="w-full h-10 rounded-lg border border-white/[0.08] hover:border-white/[0.14] bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white text-xs font-medium flex items-center justify-center transition-colors cursor-pointer select-none"
+                >
+                  Go to Dashboard
                 </Link>
-                .
-              </p>
+              </div>
             </div>
-          </div>
-
-          {/* Divider line touching outer ends */}
-          <div className="-mx-6 sm:-mx-8 lg:-mx-10 border-b border-white/[0.08]" />
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <Link
-              href="/"
-              className="w-full sm:flex-1 h-11 px-5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm select-none"
-            >
-              <span>Return to Home &rarr;</span>
-            </Link>
-            <Link
-              href="/dashboard"
-              className="w-full sm:w-auto h-11 px-5 rounded-lg border border-white/[0.1] hover:border-white/[0.18] bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer select-none"
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>My Dashboard</span>
-            </Link>
           </div>
         </div>
 

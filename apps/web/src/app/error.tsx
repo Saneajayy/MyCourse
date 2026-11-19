@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { RotateCcw, ArrowLeft } from 'lucide-react';
-import { siteConfig } from '../config/site';
 
 export default function GlobalError({
   error,
@@ -91,78 +90,49 @@ export default function GlobalError({
           </Link>
         </div>
 
-        {/* Scrollable Document Body */}
-        <div className="flex-1 overflow-y-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8 space-y-7 scroll-smooth text-left flex flex-col justify-center">
-          {/* Main Error Title */}
-          <div className="space-y-2">
-            <span className="text-4xl sm:text-5xl font-black font-mono text-white tracking-tight block">
-              500
-            </span>
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Operation Interrupted
-            </h2>
-            <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed max-w-lg">
-              An unexpected system anomaly interrupted this operation. Our monitoring service has logged the technical stack trace.
-            </p>
-          </div>
-
-          {/* Divider line touching outer ends */}
-          <div className="-mx-6 sm:-mx-8 lg:-mx-10 border-b border-white/[0.08]" />
-
-          {/* Concise recovery points */}
-          <div className="space-y-3 text-xs sm:text-[13px] text-[#c2c4cc]">
-            <div className="flex items-start gap-2.5">
-              <span className="text-xs font-mono font-bold text-white/50 shrink-0 mt-0.5">01.</span>
-              <p className="leading-relaxed">
-                <strong className="text-white font-medium">Immediate Recovery:</strong> Click &ldquo;Try Again&rdquo; below to re-execute the request or reload the current page.
-              </p>
-            </div>
-            <div className="flex items-start gap-2.5">
-              <span className="text-xs font-mono font-bold text-white/50 shrink-0 mt-0.5">02.</span>
-              <p className="leading-relaxed">
-                <strong className="text-white font-medium">Need Assistance:</strong> If the anomaly persists, reach our administration desk at{' '}
-                <a
-                  href={`mailto:${siteConfig.supportEmail}`}
-                  className="text-white underline hover:text-white/80 font-mono"
-                >
-                  {siteConfig.supportEmail}
-                </a>{' '}
-                or visit our{' '}
-                <Link href="/contact" className="text-white underline hover:text-white/80 font-medium">
-                  Contact Desk
-                </Link>
-                .
-              </p>
-            </div>
-
-            {error.digest && (
-              <div className="pt-1">
-                <code className="font-mono text-[11px] px-2 py-1 rounded bg-white/[0.06] border border-white/[0.08] text-white/70 block w-fit">
-                  Digest: {error.digest}
-                </code>
+        {/* Center Container with Login/Signup-style Tab Box */}
+        <div className="flex-1 overflow-y-auto overscroll-contain custom-scrollbar p-4 sm:p-6 lg:p-8 flex flex-col items-center justify-center">
+          <div className="w-full max-w-[420px] sm:max-w-[440px]">
+            <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-6 sm:p-8 select-none overflow-hidden space-y-5 transition-all text-left">
+              {/* Header */}
+              <div className="space-y-1.5">
+                <span className="text-xs font-mono font-bold text-rose-400 uppercase tracking-widest">
+                  500 &bull; System Error
+                </span>
+                <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                  Operation Interrupted
+                </h1>
+                <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+                  An unexpected system anomaly interrupted this operation. Our monitoring service has logged the technical stack trace.
+                </p>
               </div>
-            )}
-          </div>
 
-          {/* Divider line touching outer ends */}
-          <div className="-mx-6 sm:-mx-8 lg:-mx-10 border-b border-white/[0.08]" />
+              {error.digest && (
+                <div className="pt-0.5">
+                  <code className="font-mono text-[11px] px-2.5 py-1 rounded bg-black/40 border border-white/[0.08] text-white/60 block w-fit truncate max-w-full">
+                    Digest: {error.digest}
+                  </code>
+                </div>
+              )}
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <button
-              type="button"
-              onClick={() => reset()}
-              className="w-full sm:flex-1 h-11 px-5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm select-none"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Try Again</span>
-            </button>
-            <Link
-              href="/"
-              className="w-full sm:w-auto h-11 px-5 rounded-lg border border-white/[0.1] hover:border-white/[0.18] bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer select-none"
-            >
-              <span>Return Home</span>
-            </Link>
+              {/* Action Buttons */}
+              <div className="pt-2 flex flex-col gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => reset()}
+                  className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm select-none"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Try Again</span>
+                </button>
+                <Link
+                  href="/"
+                  className="w-full h-10 rounded-lg border border-white/[0.08] hover:border-white/[0.14] bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white text-xs font-medium flex items-center justify-center transition-colors cursor-pointer select-none"
+                >
+                  Return to Home
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
 
