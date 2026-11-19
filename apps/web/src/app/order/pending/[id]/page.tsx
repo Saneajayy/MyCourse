@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { apiClient } from '../../../../lib/api-client';
-import { Loader2, BookOpen } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 import { PaymentPendingCard } from '../../../../components/PaymentPendingCard';
 
 interface OrderResponse {
@@ -90,14 +90,12 @@ export default function OrderPendingPage() {
     setErrorMsg(null);
   };
 
-  const displayCourse = order?.product?.title || 'Hydraulic System Basics';
-
   return (
     <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit selection:bg-white selection:text-black z-10 flex flex-col lg:flex-row gap-2.5 sm:gap-3">
       {/* ============================================================== */}
       {/* LEFT CARD (Desktop Only): Signature Fractal Glass Graphic     */}
       {/* ============================================================== */}
-      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-between lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
         {/* Full-Bleed Fractal Glass Graphic */}
         <Image
           src="/fractal-glass-5.jpg"
@@ -112,11 +110,6 @@ export default function OrderPendingPage() {
           className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none"
           aria-hidden="true"
         />
-        {/* Bottom Gradient for Text Legibility while keeping image vivid */}
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/35 to-transparent pointer-events-none"
-          aria-hidden="true"
-        />
 
         {/* Top Header Row over Image */}
         <div className="relative z-10 w-full flex items-center justify-between">
@@ -128,25 +121,6 @@ export default function OrderPendingPage() {
               BASICS
             </span>
           </Link>
-        </div>
-
-        {/* Bottom Details over Image */}
-        <div className="relative z-10 w-full space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-md inline-flex items-center gap-1.5">
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              <span>PAYMENT VERIFYING</span>
-            </span>
-          </div>
-
-          <div className="space-y-1">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
-              {displayCourse}
-            </h2>
-            <p className="text-xs sm:text-[13px] text-[#c2c4cc]">
-              Awaiting confirmation from bank. Please do not close or refresh this page.
-            </p>
-          </div>
         </div>
       </div>
 

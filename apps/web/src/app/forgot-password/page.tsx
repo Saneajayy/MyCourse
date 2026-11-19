@@ -441,7 +441,7 @@ export default function ForgotPasswordPage() {
       {/* ============================================================== */}
       {/* LEFT CARD (Desktop Only): Signature Fractal Glass Graphic     */}
       {/* ============================================================== */}
-      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-between lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
         {/* Full-Bleed Fractal Glass Graphic */}
         <Image
           src="/fractal-glass-5.jpg"
@@ -456,11 +456,6 @@ export default function ForgotPasswordPage() {
           className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none"
           aria-hidden="true"
         />
-        {/* Bottom Gradient for Text Legibility while keeping image vivid */}
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/35 to-transparent pointer-events-none"
-          aria-hidden="true"
-        />
 
         {/* Top Header Row over Image */}
         <div className="relative z-10 w-full flex items-center justify-between">
@@ -472,21 +467,6 @@ export default function ForgotPasswordPage() {
               BASICS
             </span>
           </Link>
-        </div>
-
-        {/* Bottom Details over Image */}
-        <div className="relative z-10 w-full space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
-              SECURITY &amp; RECOVERY
-            </span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
-            Reset Your Password
-          </h2>
-          <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed max-w-lg">
-            Regain access to your account with our secure verification protocol. We will verify your identity before restoring credentials.
-          </p>
         </div>
       </div>
 

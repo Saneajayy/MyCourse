@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { apiClient, getAccessToken } from '../../../../lib/api-client';
 import { siteConfig } from '../../../../config/site';
-import { Loader2, BookOpen, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, BookOpen, AlertCircle } from 'lucide-react';
 import { PaymentSuccessCard } from '../../../../components/PaymentSuccessCard';
 
 interface OrderSuccessData {
@@ -161,14 +161,6 @@ export default function OrderSuccessPage() {
   }
 
   const amountPaise = order.totalPaise ?? order.amountPaise ?? 0;
-  const amountRupees = amountPaise / 100;
-  const formattedAmount =
-    amountRupees % 1 === 0
-      ? amountRupees.toLocaleString('en-IN')
-      : amountRupees.toLocaleString('en-IN', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
 
   const displayCourseTitle =
     order.product.title === 'Industrial Hydraulic Systems & Circuit Design'
@@ -180,7 +172,7 @@ export default function OrderSuccessPage() {
       {/* ============================================================== */}
       {/* LEFT CARD (Desktop Only): Signature Fractal Glass Graphic     */}
       {/* ============================================================== */}
-      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-between lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
         {/* Full-Bleed Fractal Glass Graphic */}
         <Image
           src="/fractal-glass-5.jpg"
@@ -195,11 +187,6 @@ export default function OrderSuccessPage() {
           className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent pointer-events-none"
           aria-hidden="true"
         />
-        {/* Bottom Gradient for Text Legibility while keeping image vivid */}
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-[#101012] via-[#101012]/35 to-transparent pointer-events-none"
-          aria-hidden="true"
-        />
 
         {/* Top Header Row over Image */}
         <div className="relative z-10 w-full flex items-center justify-between">
@@ -211,35 +198,6 @@ export default function OrderSuccessPage() {
               BASICS
             </span>
           </Link>
-        </div>
-
-        {/* Bottom Details over Image */}
-        <div className="relative z-10 w-full space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md inline-flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>PAYMENT CONFIRMED</span>
-            </span>
-          </div>
-
-          <div className="flex items-end justify-between gap-4">
-            <div className="space-y-1">
-              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
-                {displayCourseTitle}
-              </h2>
-              <p className="text-xs sm:text-[13px] text-[#c2c4cc]">
-                12 Months Full Access Activated
-              </p>
-            </div>
-            <div className="flex flex-col items-end shrink-0 text-right">
-              <span className="text-[10px] uppercase font-mono tracking-wider text-[#80828d]">
-                Amount Paid
-              </span>
-              <span className="text-3xl sm:text-4xl font-black font-mono tracking-tight text-white leading-none">
-                ₹{formattedAmount}
-              </span>
-            </div>
-          </div>
         </div>
       </div>
 
