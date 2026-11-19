@@ -1017,13 +1017,23 @@ function StudentDashboardContent() {
                           >
                             Email Address
                           </label>
-                          <input
-                            id="profile-email"
-                            type="email"
-                            disabled
-                            value={user?.email || ''}
-                            className="w-full h-10 px-3.5 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-[#80828d] cursor-not-allowed select-none focus:outline-none"
-                          />
+                          <div className="relative">
+                            <input
+                              id="profile-email"
+                              type="email"
+                              disabled
+                              value={user?.email || ''}
+                              className="w-full h-10 px-3.5 pr-10 bg-[#131417] border border-white/[0.05] rounded-lg text-xs sm:text-[13px] text-[#80828d] cursor-not-allowed select-none"
+                            />
+                            {user?.emailVerifiedAt && (
+                              <div
+                                className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-emerald-400 select-none pointer-events-none"
+                                title="Verified"
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                              </div>
+                            )}
+                          </div>
                           {!user?.emailVerifiedAt && (
                             <div className="flex items-center gap-3 pt-1">
                               <Link
