@@ -821,22 +821,22 @@ function StudentDashboardContent() {
             {/* TAB 2: CREDENTIALS */}
             {activeTab === 'certificates' && (
               <div className="space-y-6 text-left">
-                <div>
-                  <h1 className="text-xl sm:text-2xl font-medium text-white tracking-tight">
+                <div className="text-left">
+                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal">
                     Credentials
                   </h1>
-                  <p className="text-xs sm:text-sm text-[#8a8c95] mt-1">
+                  <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">
                     Official verified credentials of completion signed by instructor{' '}
                     {siteConfig.instructor.name}.
                   </p>
                 </div>
 
                 {completedCourses.length === 0 ? (
-                  <div className="w-full max-w-[650px]">
-                    {/* Clean No-Credentials Card */}
-                    <div className="bg-[#151619] border border-white/[0.08] rounded-xl p-6 sm:p-8 text-left space-y-4 select-none">
+                  <div className="w-full flex flex-col gap-5 items-start text-left">
+                    {/* Clean No-Credentials Card: Exact same width & padding as course card */}
+                    <div className="relative w-full max-w-[650px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 text-left space-y-4 select-none">
                       <div className="space-y-1.5">
-                        <h2 className="text-base sm:text-[17px] font-medium text-white tracking-tight">
+                        <h2 className="text-base sm:text-[18px] font-medium text-white tracking-tight leading-snug">
                           No Credentials Earned Yet
                         </h2>
                         <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
@@ -846,7 +846,7 @@ function StudentDashboardContent() {
                         </p>
                       </div>
 
-                      <div className="pt-2">
+                      <div className="pt-1">
                         <button
                           type="button"
                           onClick={() => handleTabChange('courses')}
