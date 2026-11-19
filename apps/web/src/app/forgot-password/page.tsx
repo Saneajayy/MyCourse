@@ -311,7 +311,7 @@ function ForgotPasswordContent() {
               Please check your email
             </h1>
             <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              Enter the 6 digit OTP we sent to <span className="text-white font-medium">{email}</span>.
+              Enter the 6 digit OTP we sent to your email.
             </p>
           </div>
 
