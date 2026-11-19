@@ -330,33 +330,21 @@ body {
   -webkit-backface-visibility: hidden;
 }
 
-/* Straight Vertical Glass Shine Beam (Horizontal sweep left to right) */
-@keyframes straight-glass-shine {
-  0% {
-    transform: translate3d(-120%, 0, 0);
-    opacity: 0;
+/* Ambient Caustic Breathing for Fractal Glass Graphic */
+@keyframes ambient-glass-breathe {
+  0%, 100% {
+    filter: brightness(0.97) contrast(1);
+    transform: scale(1);
   }
-  8% {
-    opacity: 1;
-  }
-  58% {
-    transform: translate3d(360%, 0, 0);
-    opacity: 1;
-  }
-  64% {
-    transform: translate3d(380%, 0, 0);
-    opacity: 0;
-  }
-  100% {
-    transform: translate3d(380%, 0, 0);
-    opacity: 0;
+  50% {
+    filter: brightness(1.09) contrast(1.04);
+    transform: scale(1.02);
   }
 }
 
-.animate-glass-shine {
-  animation: straight-glass-shine 6.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  will-change: transform, opacity;
-  pointer-events: none;
+.animate-glass-breathe {
+  animation: ambient-glass-breathe 8s ease-in-out infinite;
+  will-change: filter, transform;
 }
 
 
