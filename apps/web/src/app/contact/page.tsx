@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { siteConfig } from '../../config/site';
 import { useToast } from '../../components/ui';
 import { apiClient } from '../../lib/api-client';
-import { Mail, MessageSquare, X, Loader2, CheckCircle2, AlertCircle, Send, ArrowLeft } from 'lucide-react';
+import { Mail, MessageSquare, X, Loader2, CheckCircle2, AlertCircle, Send, ArrowLeft, Clock, Phone, MapPin, Building2 } from 'lucide-react';
 
 export default function ContactPage() {
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function ContactPage() {
       {/* ============================================================== */}
       {/* LEFT CARD (Desktop Only): Signature Fractal Glass Graphic     */}
       {/* ============================================================== */}
-      <div className="hidden lg:relative lg:flex lg:flex-col lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
+      <div className="hidden lg:relative lg:flex lg:flex-col lg:justify-between lg:w-1/2 h-full bg-[#101012] border border-white/[0.08] rounded-xl overflow-hidden select-none p-6 sm:p-8 shrink-0">
         <Image
           src="/fractal-glass-5.jpg"
           alt="HydroBasics Industrial Hydraulic Engineer"
@@ -103,15 +103,29 @@ export default function ContactPage() {
               BASICS
             </span>
           </Link>
+          <span className="text-[11px] font-mono tracking-wider text-white/70 px-2.5 py-1 rounded bg-black/40 border border-white/10 backdrop-blur-md">
+            Support &amp; Operations
+          </span>
+        </div>
+
+        {/* Bottom Highlights over Left Card Image */}
+        <div className="relative z-10 w-full space-y-2">
+          <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
+            <Clock className="w-3.5 h-3.5" />
+            <span>Mon–Fri, 9:00 AM – 6:00 PM IST</span>
+          </div>
+          <p className="text-xs text-[#c2c4cc]/80 leading-relaxed max-w-sm">
+            Technical troubleshooting desk, corporate plant training coordination, and enrollment assistance.
+          </p>
         </div>
       </div>
 
       {/* ============================================================== */}
-      {/* RIGHT CARD: Contact Support Content                           */}
+      {/* RIGHT CARD: Full Scrollable Contact Desk (Starts Top-Left)    */}
       {/* ============================================================== */}
-      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col justify-between overflow-y-auto relative p-5 sm:p-7 select-text">
-        {/* Top Header Bar */}
-        <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] shrink-0 select-none">
+      <div className="w-full flex-1 min-h-0 lg:w-1/2 lg:h-full bg-[#101012] border border-white/[0.08] rounded-xl flex flex-col overflow-y-auto relative p-6 sm:p-8 lg:p-10 select-text scroll-smooth">
+        {/* Top Navigation Bar */}
+        <div className="flex items-center justify-between pb-5 border-b border-white/[0.08] shrink-0 select-none">
           <Link href="/" className="lg:hidden flex flex-col select-none group" title="HYDRO BASICS Home">
             <span className="font-extrabold text-[15px] text-white leading-[1.05] tracking-wider uppercase">
               HYDRO
@@ -120,122 +134,152 @@ export default function ContactPage() {
               BASICS
             </span>
           </Link>
+
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-[#c2c4cc]/70 hover:text-white transition-colors ml-auto"
+            className="inline-flex items-center gap-1.5 text-xs font-mono tracking-wider text-[#c2c4cc]/80 hover:text-white transition-colors ml-auto"
             title="Back to Course"
           >
-            <ArrowLeft className="w-3 h-3" />
+            <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to Course</span>
           </Link>
         </div>
 
-        {/* Main Content */}
-        <div className="my-auto py-5 space-y-4 max-w-xl mx-auto w-full">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Contact Support
+        {/* Main Document Body */}
+        <div className="pt-6 pb-12 space-y-8 max-w-2xl text-left">
+          {/* Header */}
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[11px] font-mono text-white/80 px-2.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08]">
+                Desk Response: &lt;24 Business Hours
+              </span>
+              <span className="text-[11px] font-mono text-emerald-400">
+                • Operations Live
+              </span>
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-tight">
+              Engineering Support &amp; Contact Desk
             </h1>
-            <p className="text-xs sm:text-sm text-[#c2c4cc] leading-relaxed mt-1">
-              Reach our engineering desk for technical support, billing inquiries, or enterprise access.
+
+            <p className="text-xs sm:text-sm text-[#c2c4cc] leading-relaxed">
+              Have questions regarding curriculum access, GST tax invoices, circuit blueprints, or enterprise plant training? Our technical operations desk is available to assist you.
             </p>
           </div>
 
-          <div className="rounded-lg border border-white/[0.08] bg-[#151619] overflow-hidden divide-y divide-white/[0.06] text-xs sm:text-[13px] text-[#c2c4cc]">
-            <div className="p-3.5 sm:p-4">
-              <p className="leading-relaxed">
-                <span className="font-mono font-semibold text-white/50 mr-2">01.</span>
-                <strong className="font-semibold text-white mr-1.5">Direct Support Email:</strong>
-                Send technical or billing queries to{' '}
-                <a
-                  href={`mailto:${siteConfig.supportEmail}`}
-                  className="font-medium underline text-white hover:text-white/80 transition-colors"
-                >
-                  {siteConfig.supportEmail}
-                </a>
-                ; answered within 24 business hours.
-              </p>
-            </div>
+          {/* Quick Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 select-none">
+            <a
+              href={`mailto:${siteConfig.supportEmail}?subject=HydroBasics%20Support%20Inquiry`}
+              className="w-full sm:flex-1 h-11 px-5 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+            >
+              <Mail className="w-4 h-4" />
+              <span>Email Support Desk &rarr;</span>
+            </a>
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="w-full sm:w-auto h-11 px-5 rounded-lg border border-white/[0.1] hover:border-white/[0.18] bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white text-xs font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span>Send Message Online</span>
+            </button>
+          </div>
 
-            <div className="p-3.5 sm:p-4">
-              <p className="leading-relaxed">
-                <span className="font-mono font-semibold text-white/50 mr-2">02.</span>
-                <strong className="font-semibold text-white mr-1.5">Helpline Phone:</strong>
-                Call or WhatsApp{' '}
-                <a
-                  href={`tel:${siteConfig.contact.phone.replace(/\s+/g, '')}`}
-                  className="font-medium font-mono text-white underline hover:text-white/80 transition-colors"
-                >
-                  {siteConfig.contact.phone}
-                </a>{' '}
-                ({siteConfig.contact.hours}, closed Sundays).
-              </p>
-            </div>
+          <div className="border-t border-white/[0.08]" />
 
-            <div className="p-3.5 sm:p-4">
-              <p className="leading-relaxed">
-                <span className="font-mono font-semibold text-white/50 mr-2">03.</span>
-                <strong className="font-semibold text-white mr-1.5">Registered Facility:</strong>
-                {siteConfig.contact.address}.
+          {/* Contact Channels Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl bg-[#151619] border border-white/[0.08] space-y-2">
+              <div className="w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white">
+                <Mail className="w-4 h-4" />
+              </div>
+              <h3 className="text-sm font-semibold text-white">Direct Support Email</h3>
+              <p className="text-xs text-[#c2c4cc] leading-relaxed">
+                For student login assistance, video playback issues, and refund requests:
               </p>
-            </div>
-
-            <div className="p-3.5 sm:p-4">
-              <p className="leading-relaxed">
-                <span className="font-mono font-semibold text-white/50 mr-2">04.</span>
-                <strong className="font-semibold text-white mr-1.5">Corporate &amp; Enterprise:</strong>
-                For bulk engineering enrollments, custom plant training, or GST tax invoices, reach out directly.
-              </p>
-            </div>
-
-            {/* Direct Action Bar */}
-            <div className="p-3.5 sm:p-4 border-t border-white/[0.08] bg-[#0c0d0e]/60 flex flex-col sm:flex-row items-center gap-2.5">
               <a
-                href={`mailto:${siteConfig.supportEmail}?subject=HydroBasics%20Support%20Inquiry`}
-                className="w-full sm:flex-1 h-9 sm:h-10 px-4 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm select-none"
+                href={`mailto:${siteConfig.supportEmail}`}
+                className="text-xs font-mono font-medium text-white underline hover:text-white/80 block pt-1"
               >
-                <Mail className="w-3.5 h-3.5" />
-                <span>Email Support Desk &rarr;</span>
+                {siteConfig.supportEmail}
               </a>
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(true)}
-                className="w-full sm:w-auto h-9 sm:h-10 px-4 rounded-lg border border-white/[0.08] hover:border-white/[0.14] bg-[#1b1c20] hover:bg-[#22242a] text-[#c2c4cc] hover:text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer select-none"
-              >
-                <MessageSquare className="w-3.5 h-3.5" />
-                <span>Send Message Online</span>
-              </button>
             </div>
 
-            <div className="px-4 py-2.5 border-t border-white/[0.08] flex items-center justify-between text-[11px] font-mono text-[#80828d] bg-[#0c0d0e]">
-              <span>Desk: Mon–Fri, 9AM–6PM IST</span>
-              <span>Response: &lt;24 Business Hours</span>
+            <div className="p-4 rounded-xl bg-[#151619] border border-white/[0.08] space-y-2">
+              <div className="w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white">
+                <Phone className="w-4 h-4" />
+              </div>
+              <h3 className="text-sm font-semibold text-white">Telephone &amp; WhatsApp</h3>
+              <p className="text-xs text-[#c2c4cc] leading-relaxed">
+                Direct engineer helpline for urgent enrollment or billing inquiries:
+              </p>
+              <a
+                href={`tel:${siteConfig.contact.phone.replace(/\s+/g, '')}`}
+                className="text-xs font-mono font-medium text-white underline hover:text-white/80 block pt-1"
+              >
+                {siteConfig.contact.phone}
+              </a>
+            </div>
+
+            <div className="p-4 rounded-xl bg-[#151619] border border-white/[0.08] space-y-2">
+              <div className="w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white">
+                <Building2 className="w-4 h-4" />
+              </div>
+              <h3 className="text-sm font-semibold text-white">Corporate &amp; Plant Training</h3>
+              <p className="text-xs text-[#c2c4cc] leading-relaxed">
+                Custom cohort training for factory engineering teams and bulk B2B purchase orders.
+              </p>
+              <span className="text-xs font-mono text-emerald-400 block pt-1">
+                GST B2B Invoices Included
+              </span>
+            </div>
+
+            <div className="p-4 rounded-xl bg-[#151619] border border-white/[0.08] space-y-2">
+              <div className="w-9 h-9 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white">
+                <MapPin className="w-4 h-4" />
+              </div>
+              <h3 className="text-sm font-semibold text-white">Registered Facility</h3>
+              <p className="text-xs text-[#c2c4cc] leading-relaxed">
+                Operating headquarters and legal notice address:
+              </p>
+              <p className="text-xs font-mono text-white/90 pt-1">
+                {siteConfig.contact.address}
+              </p>
             </div>
           </div>
-        </div>
 
-        {/* Footer */}
-        <div className="pt-4 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs select-none shrink-0">
-          <nav
-            aria-label="Footer Legal Links"
-            className="flex items-center gap-4 text-xs"
-          >
-            <Link href="/terms" className="text-[#80828d] hover:text-white transition-colors">
-              Terms
-            </Link>
-            <Link href="/privacy" className="text-[#80828d] hover:text-white transition-colors">
-              Privacy
-            </Link>
-            <Link href="/refunds" className="text-[#80828d] hover:text-white transition-colors">
-              Refunds
-            </Link>
-            <Link href="/contact" className="text-white font-semibold">
-              Contact
-            </Link>
-          </nav>
-          <p className="text-[11px] text-[#5d5f6a]">
-            &copy; {currentYear} Hydro Basics. All rights reserved.
-          </p>
+          {/* Operational Hours Strip */}
+          <div className="p-4 rounded-xl bg-[#151619] border border-white/[0.08] space-y-2 text-xs">
+            <h3 className="font-semibold text-white">Desk Working Hours &amp; Response Guarantee</h3>
+            <p className="text-[#c2c4cc] leading-relaxed">
+              Our engineering helpdesk operates <strong>{siteConfig.contact.hours}</strong> (Closed Sundays and Indian National Holidays). All inquiries received via email or form submission receive a personalized engineering response within <strong>24 business hours</strong>.
+            </p>
+          </div>
+
+          {/* Bottom Legal Navigation Bar */}
+          <div className="pt-8 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs select-none">
+            <nav
+              aria-label="Footer Legal Links"
+              className="flex items-center gap-4 text-xs"
+            >
+              <Link href="/terms" className="text-[#80828d] hover:text-white transition-colors">
+                Terms
+              </Link>
+              <Link href="/privacy" className="text-[#80828d] hover:text-white transition-colors">
+                Privacy
+              </Link>
+              <Link href="/refunds" className="text-[#80828d] hover:text-white transition-colors">
+                Refunds
+              </Link>
+              <Link href="/contact" className="text-white font-semibold">
+                Contact
+              </Link>
+            </nav>
+            <p className="text-[11px] text-[#5d5f6a]">
+              &copy; {currentYear} Hydro Basics. All rights reserved.
+            </p>
+          </div>
         </div>
       </div>
 
