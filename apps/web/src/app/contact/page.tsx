@@ -128,8 +128,8 @@ export default function ContactPage() {
         {/* Scrollable Document Body */}
         <div className="flex-1 overflow-y-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8 space-y-7 scroll-smooth text-left">
           {/* Contact Channels Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
-            <div className="space-y-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="p-3.5 rounded-xl bg-[#151619] border border-white/[0.08] space-y-1.5">
               <div className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 text-white/70 shrink-0" />
                 <h3 className="text-xs sm:text-sm font-semibold text-white">Direct Support Email</h3>
@@ -139,13 +139,13 @@ export default function ContactPage() {
               </p>
               <a
                 href={`mailto:${siteConfig.supportEmail}`}
-                className="text-xs font-mono font-medium text-white underline hover:text-white/80 inline-block pt-0.5"
+                className="text-xs font-mono font-medium text-white underline hover:text-white/80 block pt-0.5"
               >
                 {siteConfig.supportEmail}
               </a>
             </div>
 
-            <div className="space-y-1">
+            <div className="p-3.5 rounded-xl bg-[#151619] border border-white/[0.08] space-y-1.5">
               <div className="flex items-center gap-2">
                 <Phone className="w-3.5 h-3.5 text-white/70 shrink-0" />
                 <h3 className="text-xs sm:text-sm font-semibold text-white">Telephone &amp; WhatsApp</h3>
@@ -155,13 +155,13 @@ export default function ContactPage() {
               </p>
               <a
                 href={`tel:${siteConfig.contact.phone.replace(/\s+/g, '')}`}
-                className="text-xs font-mono font-medium text-white underline hover:text-white/80 inline-block pt-0.5"
+                className="text-xs font-mono font-medium text-white underline hover:text-white/80 block pt-0.5"
               >
                 {siteConfig.contact.phone}
               </a>
             </div>
 
-            <div className="space-y-1">
+            <div className="p-3.5 rounded-xl bg-[#151619] border border-white/[0.08] space-y-1.5">
               <div className="flex items-center gap-2">
                 <Building2 className="w-3.5 h-3.5 text-white/70 shrink-0" />
                 <h3 className="text-xs sm:text-sm font-semibold text-white">Corporate &amp; Plant Training</h3>
@@ -169,12 +169,12 @@ export default function ContactPage() {
               <p className="text-xs text-[#c2c4cc] leading-relaxed">
                 Custom cohort training for factory engineering teams and bulk B2B purchase orders.
               </p>
-              <span className="text-[11px] font-mono text-emerald-400 inline-block pt-0.5">
+              <span className="text-[11px] font-mono text-emerald-400 block pt-0.5">
                 GST B2B Invoices Included
               </span>
             </div>
 
-            <div className="space-y-1">
+            <div className="p-3.5 rounded-xl bg-[#151619] border border-white/[0.08] space-y-1.5">
               <div className="flex items-center gap-2">
                 <MapPin className="w-3.5 h-3.5 text-white/70 shrink-0" />
                 <h3 className="text-xs sm:text-sm font-semibold text-white">Registered Facility</h3>
