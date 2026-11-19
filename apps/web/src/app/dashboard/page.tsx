@@ -17,7 +17,6 @@ import {
   ShieldCheck,
   Download,
   Loader2,
-  Sparkles,
   Eye,
   EyeOff,
   Lock,
@@ -838,8 +837,8 @@ function StudentDashboardContent() {
                           No Credentials Earned Yet
                         </h2>
                         <p className="text-xs text-[#c2c4cc] leading-relaxed">
-                          Complete all lesson modules and practical evaluations in your enrolled
-                          courses to unlock your verified certificates.
+                          Complete all lesson modules in your enrolled courses to unlock your
+                          verified certificates.
                         </p>
                       </div>
 
@@ -969,287 +968,284 @@ function StudentDashboardContent() {
             {/* TAB 4: SETTINGS */}
             {activeTab === 'profile' && (
               <div className="space-y-6 text-left">
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                    Settings &amp; Account
+                <div className="text-left">
+                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal">
+                    Settings
                   </h1>
-                  <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+                  <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">
                     Manage your personal details, email verification, and security credentials.
                   </p>
                 </div>
 
-                {/* 2-Column Responsive Grid: Profile on Left, Password on Right (Compact horizontal width on desktop) */}
+                {/* 2-Column Responsive Grid: Profile on Left, Password on Right */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 items-start w-full max-w-md lg:max-w-[720px]">
                   {/* Personal Details Card (Left) */}
-                  <div className="bg-white border border-neutral-200/80 rounded-none overflow-hidden shadow-none text-left w-full lg:max-w-[345px]">
-                    {/* Header with border joining outer outline */}
-                    <div className="px-5 sm:px-7 py-4 sm:py-4.5 border-b border-neutral-200 flex items-center gap-2.5">
-                      <UserIcon className="w-4 h-4 text-neutral-900" />
-                      <h2 className="text-base sm:text-[17px] font-bold text-neutral-900">
+                  <div className="relative w-full lg:max-w-[345px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-5 transition-all select-none">
+                    <div className="flex items-center gap-2.5 pb-3 border-b border-white/[0.06]">
+                      <UserIcon className="w-4 h-4 text-white/70" strokeWidth={1.8} />
+                      <h2 className="text-sm sm:text-[15px] font-semibold text-white uppercase tracking-wider">
                         Personal Information
                       </h2>
                     </div>
 
-                    <div className="p-5 sm:p-7">
-                      <form onSubmit={handleSaveProfile} className="space-y-4 sm:space-y-4.5">
-                        {/* Name Input */}
-                        <div className="space-y-1.5 text-left">
-                          <label
-                            htmlFor="profile-name"
-                            className="text-sm font-bold text-neutral-900 block"
-                          >
-                            Full Name
-                          </label>
-                          <input
-                            id="profile-name"
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Your name"
-                            className="w-full h-11 px-3.5 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
-                          />
-                        </div>
+                    <form onSubmit={handleSaveProfile} className="space-y-4">
+                      {/* Name Input */}
+                      <div className="space-y-1.5 text-left">
+                        <label
+                          htmlFor="profile-name"
+                          className="text-xs font-medium text-[#c2c4cc] block"
+                        >
+                          Full Name
+                        </label>
+                        <input
+                          id="profile-name"
+                          type="text"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          placeholder="Your name"
+                          className="w-full h-10 px-3.5 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
+                        />
+                      </div>
 
-                        {/* Email Address */}
-                        <div className="space-y-1.5 text-left">
-                          <label
-                            htmlFor="profile-email"
-                            className="text-sm font-bold text-neutral-900 block"
-                          >
-                            Email Address
-                          </label>
-                          <input
-                            id="profile-email"
-                            type="email"
-                            disabled
-                            value={user?.email || ''}
-                            className="w-full h-11 px-3.5 bg-neutral-100 border border-neutral-200 rounded-none text-sm text-neutral-600 cursor-not-allowed select-none shadow-none disabled:bg-neutral-100 disabled:text-neutral-600 disabled:cursor-not-allowed"
-                          />
-                          {!user?.emailVerifiedAt && (
-                            <div className="flex items-center gap-3 pt-1">
-                              <Link
-                                href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
-                                className="text-xs font-semibold text-black hover:underline"
-                              >
-                                Enter 6-digit OTP &rarr;
-                              </Link>
-                              <button
-                                type="button"
-                                onClick={handleResendVerification}
-                                disabled={resendingVerification}
-                                className="text-xs font-semibold text-neutral-600 hover:text-black underline cursor-pointer disabled:opacity-50"
-                              >
-                                {resendingVerification ? 'Sending...' : 'Resend OTP'}
-                              </button>
-                            </div>
-                          )}
-                        </div>
+                      {/* Email Address */}
+                      <div className="space-y-1.5 text-left">
+                        <label
+                          htmlFor="profile-email"
+                          className="text-xs font-medium text-[#c2c4cc] block"
+                        >
+                          Email Address
+                        </label>
+                        <input
+                          id="profile-email"
+                          type="email"
+                          disabled
+                          value={user?.email || ''}
+                          className="w-full h-10 px-3.5 bg-[#131417] border border-white/[0.05] rounded-lg text-xs sm:text-[13px] text-[#80828d] cursor-not-allowed select-none"
+                        />
+                        {!user?.emailVerifiedAt && (
+                          <div className="flex items-center gap-3 pt-1">
+                            <Link
+                              href={`/verify-email?email=${encodeURIComponent(user?.email || '')}`}
+                              className="text-xs font-medium text-amber-400 hover:text-amber-300 underline"
+                            >
+                              Enter 6-digit OTP &rarr;
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={handleResendVerification}
+                              disabled={resendingVerification}
+                              className="text-xs font-medium text-[#c2c4cc] hover:text-white underline cursor-pointer disabled:opacity-50"
+                            >
+                              {resendingVerification ? 'Sending...' : 'Resend OTP'}
+                            </button>
+                          </div>
+                        )}
+                      </div>
 
-                        {/* Phone Input */}
-                        <div className="space-y-1.5 text-left">
-                          <label
-                            htmlFor="profile-phone"
-                            className="text-sm font-bold text-neutral-900 block"
-                          >
-                            Phone Number
-                          </label>
-                          <input
-                            id="profile-phone"
-                            type="tel"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            placeholder="+91 98765 43210"
-                            className="w-full h-11 px-3.5 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none font-mono"
-                          />
-                        </div>
+                      {/* Phone Input */}
+                      <div className="space-y-1.5 text-left">
+                        <label
+                          htmlFor="profile-phone"
+                          className="text-xs font-medium text-[#c2c4cc] block"
+                        >
+                          Phone Number
+                        </label>
+                        <input
+                          id="profile-phone"
+                          type="tel"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          placeholder="+91 98765 43210"
+                          className="w-full h-10 px-3.5 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all font-mono"
+                        />
+                      </div>
 
-                        <div className="pt-1.5">
-                          <button
-                            type="submit"
-                            disabled={profileSaving}
-                            className="w-full h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-none transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
-                          >
-                            {profileSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                            <span>{profileSaving ? 'Saving...' : 'Save Profile'}</span>
-                          </button>
-                        </div>
-                      </form>
-                    </div>
+                      <div className="pt-2">
+                        <button
+                          type="submit"
+                          disabled={profileSaving}
+                          className="w-full h-9 sm:h-10 px-4 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                        >
+                          {profileSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                          <span>{profileSaving ? 'Saving...' : 'Save Profile'}</span>
+                        </button>
+                      </div>
+                    </form>
                   </div>
 
                   {/* Change Password Card (Right) */}
-                  <div className="bg-white border border-neutral-200/80 rounded-none overflow-hidden shadow-none text-left w-full lg:max-w-[345px]">
-                    {/* Header with border joining outer outline */}
-                    <div className="px-5 sm:px-7 py-4 sm:py-4.5 border-b border-neutral-200 flex items-center gap-2.5">
-                      <Lock className="w-4 h-4 text-neutral-900" />
-                      <h2 className="text-base sm:text-[17px] font-bold text-neutral-900">
+                  <div className="relative w-full lg:max-w-[345px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-5 transition-all select-none">
+                    <div className="flex items-center gap-2.5 pb-3 border-b border-white/[0.06]">
+                      <Lock className="w-4 h-4 text-white/70" strokeWidth={1.8} />
+                      <h2 className="text-sm sm:text-[15px] font-semibold text-white uppercase tracking-wider">
                         Security &amp; Password
                       </h2>
                     </div>
 
-                    <div className="p-5 sm:p-7">
-                      <form onSubmit={handleChangePassword} className="space-y-4 sm:space-y-4.5">
-                        {passwordError && (
-                          <div className="p-3.5 rounded-none bg-red-500/10 border border-red-500/25 text-red-700 text-xs sm:text-[13px] font-medium">
-                            {passwordError}
-                          </div>
-                        )}
-
-                        {/* Current Password */}
-                        <div className="space-y-1.5 text-left">
-                          <label
-                            htmlFor="profile-current-password"
-                            className="text-sm font-bold text-neutral-900 block"
-                          >
-                            Current Password
-                          </label>
-                          <div className="relative">
-                            <input
-                              id="profile-current-password"
-                              type={showCurrentPassword ? 'text' : 'password'}
-                              value={currentPassword}
-                              onChange={(e) => setCurrentPassword(e.target.value)}
-                              required
-                              placeholder="Your current password"
-                              className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
-                              aria-label={showCurrentPassword ? 'Hide password' : 'Show password'}
-                            >
-                              {showCurrentPassword ? (
-                                <Eye className="w-4 h-4" />
-                              ) : (
-                                <EyeOff className="w-4 h-4" />
-                              )}
-                            </button>
-                          </div>
+                    <form onSubmit={handleChangePassword} className="space-y-4">
+                      {passwordError && (
+                        <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium">
+                          {passwordError}
                         </div>
+                      )}
 
-                        {/* New Password */}
-                        <div className="space-y-1.5 text-left">
-                          <label
-                            htmlFor="profile-new-password"
-                            className="text-sm font-bold text-neutral-900 block"
-                          >
-                            New Password
-                          </label>
-                          <div className="relative">
-                            <input
-                              id="profile-new-password"
-                              type={showNewPassword ? 'text' : 'password'}
-                              value={newPassword}
-                              onChange={(e) => setNewPassword(e.target.value)}
-                              required
-                              placeholder="At least 8 characters"
-                              className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowNewPassword(!showNewPassword)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
-                              aria-label={showNewPassword ? 'Hide password' : 'Show password'}
-                            >
-                              {showNewPassword ? (
-                                <Eye className="w-4 h-4" />
-                              ) : (
-                                <EyeOff className="w-4 h-4" />
-                              )}
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Confirm Password */}
-                        <div className="space-y-1.5 text-left">
-                          <label
-                            htmlFor="profile-confirm-password"
-                            className="text-sm font-bold text-neutral-900 block"
-                          >
-                            Confirm New Password
-                          </label>
-                          <div className="relative">
-                            <input
-                              id="profile-confirm-password"
-                              type={showConfirmPassword ? 'text' : 'password'}
-                              value={confirmPassword}
-                              onChange={(e) => setConfirmPassword(e.target.value)}
-                              required
-                              placeholder="Repeat new password"
-                              className="w-full h-11 px-3.5 pr-11 bg-white border border-neutral-300 rounded-none text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none transition-all shadow-none"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 p-1 cursor-pointer"
-                              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                            >
-                              {showConfirmPassword ? (
-                                <Eye className="w-4 h-4" />
-                              ) : (
-                                <EyeOff className="w-4 h-4" />
-                              )}
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="pt-1.5">
+                      {/* Current Password */}
+                      <div className="space-y-1.5 text-left">
+                        <label
+                          htmlFor="profile-current-password"
+                          className="text-xs font-medium text-[#c2c4cc] block"
+                        >
+                          Current Password
+                        </label>
+                        <div className="relative">
+                          <input
+                            id="profile-current-password"
+                            type={showCurrentPassword ? 'text' : 'password'}
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
+                            required
+                            placeholder="Your current password"
+                            className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
+                          />
                           <button
-                            type="submit"
-                            disabled={passwordSaving}
-                            className="w-full h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-none transition-colors shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                            type="button"
+                            onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white p-1 cursor-pointer transition-colors"
+                            aria-label={showCurrentPassword ? 'Hide password' : 'Show password'}
                           >
-                            {passwordSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                            <span>{passwordSaving ? 'Updating...' : 'Update Password'}</span>
+                            {showCurrentPassword ? (
+                              <Eye className="w-3.5 h-3.5" />
+                            ) : (
+                              <EyeOff className="w-3.5 h-3.5" />
+                            )}
                           </button>
                         </div>
-                      </form>
-                    </div>
+                      </div>
+
+                      {/* New Password */}
+                      <div className="space-y-1.5 text-left">
+                        <label
+                          htmlFor="profile-new-password"
+                          className="text-xs font-medium text-[#c2c4cc] block"
+                        >
+                          New Password
+                        </label>
+                        <div className="relative">
+                          <input
+                            id="profile-new-password"
+                            type={showNewPassword ? 'text' : 'password'}
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            required
+                            placeholder="At least 8 characters"
+                            className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white p-1 cursor-pointer transition-colors"
+                            aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+                          >
+                            {showNewPassword ? (
+                              <Eye className="w-3.5 h-3.5" />
+                            ) : (
+                              <EyeOff className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Confirm Password */}
+                      <div className="space-y-1.5 text-left">
+                        <label
+                          htmlFor="profile-confirm-password"
+                          className="text-xs font-medium text-[#c2c4cc] block"
+                        >
+                          Confirm New Password
+                        </label>
+                        <div className="relative">
+                          <input
+                            id="profile-confirm-password"
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                            placeholder="Repeat new password"
+                            className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white p-1 cursor-pointer transition-colors"
+                            aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                          >
+                            {showConfirmPassword ? (
+                              <Eye className="w-3.5 h-3.5" />
+                            ) : (
+                              <EyeOff className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="pt-2">
+                        <button
+                          type="submit"
+                          disabled={passwordSaving}
+                          className="w-full h-9 sm:h-10 px-4 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                        >
+                          {passwordSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                          <span>{passwordSaving ? 'Updating...' : 'Update Password'}</span>
+                        </button>
+                      </div>
+                    </form>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* TAB 4: PAYMENTS */}
+            {/* TAB 5: PAYMENTS */}
             {activeTab === 'orders' && (
               <div className="space-y-6 text-left">
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                <div className="text-left">
+                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal">
                     Payments &amp; Invoices
                   </h1>
-                  <p className="text-xs sm:text-sm text-neutral-400 mt-1">
+                  <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">
                     Download official GST tax invoices in PDF format for company or personal
                     reimbursement.
                   </p>
                 </div>
 
                 {ordersLoading ? (
-                  <div className="bg-white border border-neutral-200/80 rounded-none p-10 text-center text-sm font-semibold text-neutral-500 flex flex-col items-center justify-center gap-3 shadow-none w-full max-w-lg lg:max-w-[480px]">
-                    <Loader2 className="w-5 h-5 animate-spin text-black" />
+                  <div className="relative w-fit max-w-full bg-[#151619] border border-white/[0.08] rounded-xl p-6 text-xs sm:text-[13px] text-[#c2c4cc] flex items-center gap-3 select-none">
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
                     <span>Loading payment orders...</span>
                   </div>
                 ) : orders.length === 0 ? (
-                  <div className="bg-white border border-neutral-200/80 rounded-none p-7 sm:p-9 text-left space-y-4 w-full max-w-lg lg:max-w-[480px] shadow-none">
-                    <div className="space-y-1.5">
-                      <h2 className="text-lg font-bold text-neutral-900">No payment history yet</h2>
-                      <p className="text-xs sm:text-sm text-neutral-500 leading-relaxed">
-                        Once you enroll in a course, your official GST tax invoices and payment
-                        receipts will appear here.
-                      </p>
-                    </div>
-                    <div>
-                      <Link
-                        href="/#pricing"
-                        className="inline-flex items-center justify-center gap-2 h-11 px-6 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-sm rounded-none transition-colors shadow-none"
-                      >
-                        <Sparkles className="w-4 h-4" />
-                        <span>View Courses</span>
-                      </Link>
+                  <div className="w-full flex flex-col gap-5 items-start text-left">
+                    <div className="relative w-fit max-w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-4 select-none">
+                      <div className="space-y-1.5">
+                        <h2 className="text-sm sm:text-[15px] font-semibold text-white uppercase tracking-wider">
+                          No Payment History Yet
+                        </h2>
+                        <p className="text-xs text-[#c2c4cc] leading-relaxed">
+                          Once you enroll in a course, your official GST tax invoices and payment
+                          receipts will appear here.
+                        </p>
+                      </div>
+                      <div>
+                        <Link
+                          href="/#pricing"
+                          className="h-9 sm:h-10 px-4 sm:px-5 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg inline-flex items-center justify-center transition-colors select-none shadow-sm"
+                        >
+                          <span>Explore Masterclass &rarr;</span>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4 w-full max-w-lg lg:max-w-[480px] text-left">
+                  <div className="w-full flex flex-col gap-5 items-start text-left">
                     {orders.map((ord) => {
                       const amountFormatted = (
                         (ord.totalPaise ??
@@ -1262,17 +1258,17 @@ function StudentDashboardContent() {
                       return (
                         <div
                           key={ord.id}
-                          className="bg-white border border-neutral-200/80 rounded-none overflow-hidden select-none shadow-none text-left"
+                          className="relative w-full max-w-[650px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl overflow-hidden transition-all duration-200 select-none text-left"
                         >
-                          {/* 1. Header Bar: Order reference, date, status, and total amount */}
-                          <div className="px-5 sm:px-6 py-3.5 sm:py-4 border-b border-neutral-200 flex items-center justify-between gap-3 bg-neutral-50/50">
+                          {/* Header Bar: Order reference, date, status, and total amount */}
+                          <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-white/[0.06] flex items-center justify-between gap-3 bg-white/[0.02]">
                             {/* Order ID & Date */}
-                            <div className="flex items-center gap-2 sm:gap-2.5 text-xs sm:text-[13px] min-w-0">
-                              <span className="font-mono font-bold text-neutral-900 tracking-tight">
+                            <div className="flex items-center gap-2 sm:gap-2.5 text-xs text-[#c2c4cc] min-w-0">
+                              <span className="font-mono font-medium text-white tracking-tight">
                                 {formatDisplayOrderId(ord.orderNumber || ord.id)}
                               </span>
-                              <span className="text-neutral-300">•</span>
-                              <span className="text-neutral-500 font-medium whitespace-nowrap">
+                              <span className="text-white/20">•</span>
+                              <span className="text-[#c2c4cc] font-normal whitespace-nowrap">
                                 {new Date(ord.createdAt).toLocaleDateString('en-IN', {
                                   day: 'numeric',
                                   month: 'short',
@@ -1284,54 +1280,52 @@ function StudentDashboardContent() {
                             {/* Status Badge + Amount */}
                             <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
                               <span
-                                className={`px-2.5 py-0.5 sm:py-1 text-[11px] font-bold tracking-wider uppercase rounded-none shrink-0 select-none ${
+                                className={`px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase rounded-md shrink-0 select-none ${
                                   ord.status === 'PAID'
-                                    ? 'text-white bg-[#0e5c2f]'
+                                    ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20'
                                     : ord.status === 'FAILED'
-                                      ? 'text-white bg-rose-700'
-                                      : 'text-neutral-700 bg-neutral-200'
+                                      ? 'text-rose-400 bg-rose-500/10 border border-rose-500/20'
+                                      : 'text-[#c2c4cc] bg-white/5 border border-white/10'
                                 }`}
                               >
                                 {ord.status === 'PAID' ? 'PAID' : ord.status}
                               </span>
-                              <span className="font-mono font-bold text-sm sm:text-base text-neutral-900 whitespace-nowrap">
+                              <span className="font-mono font-medium text-xs sm:text-sm text-white whitespace-nowrap">
                                 ₹{amountFormatted}
                               </span>
                             </div>
                           </div>
 
-                          {/* 2. Card Body: Course information and direct action buttons */}
-                          <div className="p-5 sm:p-6 space-y-4">
+                          {/* Card Body: Course title and action buttons */}
+                          <div className="p-4 sm:p-5 space-y-4">
                             <div className="space-y-1 min-w-0">
-                              <h2 className="text-base sm:text-[17px] font-bold text-neutral-900 leading-snug">
+                              <h2 className="text-sm sm:text-[15px] font-semibold text-white leading-snug">
                                 {ord.product.title}
                               </h2>
-                              <p className="text-xs text-neutral-500 font-medium">
-                                12 Months Access
-                              </p>
+                              <p className="text-xs text-[#c2c4cc]">12 Months Access</p>
                             </div>
 
-                            {/* Actions: Download Invoice & Access Course equally spread on bottom */}
-                            <div className="grid grid-cols-2 gap-3 pt-1 w-full">
+                            {/* Actions: Download Invoice & Access Course */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 w-full">
                               {ord.invoice ? (
                                 <a
                                   href={`${siteConfig.urls.api}/api/v1/invoices/${ord.invoice.id}/download`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="h-10 px-3 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 border border-neutral-300 hover:border-neutral-400 font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center justify-center gap-2 shadow-none cursor-pointer w-full text-center select-none"
+                                  className="h-9 sm:h-10 px-3 bg-[#1f2023] hover:bg-[#27282c] text-white border border-white/[0.08] hover:border-white/[0.16] font-medium text-xs sm:text-[13px] rounded-lg transition-colors inline-flex items-center justify-center gap-2 select-none"
                                 >
-                                  <Download className="w-3.5 h-3.5 text-neutral-700 shrink-0" />
+                                  <Download className="w-3.5 h-3.5 text-white/70 shrink-0" />
                                   <span className="truncate">Download Invoice</span>
                                 </a>
                               ) : (
-                                <div className="h-10 px-3 bg-neutral-50 text-neutral-400 border border-neutral-200 font-medium text-xs rounded-none inline-flex items-center justify-center text-center w-full select-none">
+                                <div className="h-9 sm:h-10 px-3 bg-white/[0.02] text-[#80828d] border border-white/[0.05] font-medium text-xs rounded-lg inline-flex items-center justify-center text-center w-full select-none">
                                   <span className="truncate">Generating Invoice...</span>
                                 </div>
                               )}
 
                               <Link
                                 href={`/learn/${ord.product.slug}`}
-                                className="h-10 px-3 bg-black hover:bg-neutral-800 active:bg-neutral-900 text-white font-semibold text-xs sm:text-[13px] rounded-none transition-colors inline-flex items-center justify-center gap-1.5 shadow-none w-full text-center select-none"
+                                className="h-9 sm:h-10 px-4 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg transition-colors inline-flex items-center justify-center gap-1.5 shadow-sm text-center select-none"
                               >
                                 <span className="truncate">Go to Course</span>
                                 <span className="shrink-0">&rarr;</span>
