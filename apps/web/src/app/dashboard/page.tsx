@@ -1059,7 +1059,7 @@ function StudentDashboardContent() {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="Your name"
-                            className="w-full h-10 px-3.5 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
+                            className="w-full h-10 px-3.5 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 outline-none focus:outline-none focus:ring-0 transition-colors"
                           />
                         </div>
 
@@ -1123,7 +1123,7 @@ function StudentDashboardContent() {
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="+91 98765 43210"
-                            className="w-full h-10 px-3.5 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all font-mono"
+                            className="w-full h-10 px-3.5 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 outline-none focus:outline-none focus:ring-0 transition-colors font-mono"
                           />
                         </div>
 
@@ -1175,7 +1175,7 @@ function StudentDashboardContent() {
                               onChange={(e) => setCurrentPassword(e.target.value)}
                               required
                               placeholder="Your current password"
-                              className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
+                              className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 outline-none focus:outline-none focus:ring-0 transition-colors"
                             />
                             <button
                               type="button"
@@ -1208,7 +1208,7 @@ function StudentDashboardContent() {
                               onChange={(e) => setNewPassword(e.target.value)}
                               required
                               placeholder="At least 8 characters"
-                              className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
+                              className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 outline-none focus:outline-none focus:ring-0 transition-colors"
                             />
                             <button
                               type="button"
@@ -1241,7 +1241,7 @@ function StudentDashboardContent() {
                               onChange={(e) => setConfirmPassword(e.target.value)}
                               required
                               placeholder="Repeat new password"
-                              className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 focus:outline-none transition-all"
+                              className="w-full h-10 px-3.5 pr-10 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] rounded-lg text-xs sm:text-[13px] text-white placeholder:text-neutral-500 focus:border-white/30 outline-none focus:outline-none focus:ring-0 transition-colors"
                             />
                             <button
                               type="button"

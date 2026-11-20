@@ -282,7 +282,7 @@ export default function ContactPage() {
                       placeholder="e.g. Ramesh Kumar"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full h-9 px-3 bg-[#18191d] border border-white/[0.08] focus:border-white/20 rounded-lg text-white text-xs font-medium focus:outline-none transition-all placeholder:text-[#5d5f6a]"
+                      className="w-full h-9 px-3 bg-[#18191d] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 rounded-lg text-white text-xs font-medium outline-none focus:outline-none focus:ring-0 transition-colors placeholder:text-[#5d5f6a]"
                     />
                   </div>
 
@@ -296,7 +296,7 @@ export default function ContactPage() {
                       placeholder="engineer@plant.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full h-9 px-3 bg-[#18191d] border border-white/[0.08] focus:border-white/20 rounded-lg text-white text-xs font-medium focus:outline-none transition-all placeholder:text-[#5d5f6a]"
+                      className="w-full h-9 px-3 bg-[#18191d] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 rounded-lg text-white text-xs font-medium outline-none focus:outline-none focus:ring-0 transition-colors placeholder:text-[#5d5f6a]"
                     />
                   </div>
                 </div>
@@ -311,7 +311,7 @@ export default function ContactPage() {
                     placeholder="e.g. Corporate team enrollment question"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="w-full h-9 px-3 bg-[#18191d] border border-white/[0.08] focus:border-white/20 rounded-lg text-white text-xs font-medium focus:outline-none transition-all placeholder:text-[#5d5f6a]"
+                    className="w-full h-9 px-3 bg-[#18191d] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 rounded-lg text-white text-xs font-medium outline-none focus:outline-none focus:ring-0 transition-colors placeholder:text-[#5d5f6a]"
                   />
                 </div>
 
@@ -325,7 +325,7 @@ export default function ContactPage() {
                     placeholder="Describe your inquiry..."
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="w-full p-3 bg-[#18191d] border border-white/[0.08] focus:border-white/20 rounded-lg text-white text-xs font-medium focus:outline-none transition-all placeholder:text-[#5d5f6a] resize-none"
+                    className="w-full p-3 bg-[#18191d] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 rounded-lg text-white text-xs font-medium outline-none focus:outline-none focus:ring-0 transition-colors placeholder:text-[#5d5f6a] resize-none"
                   />
                 </div>
 
