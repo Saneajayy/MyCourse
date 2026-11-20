@@ -7,6 +7,7 @@ import {
   updateSectionSchema,
   createLessonSchema,
   updateLessonSchema,
+  moveLessonSchema,
   reorderSchema,
 } from '@course/shared';
 import { BadRequestError } from '../../common/errors/app-error.js';
@@ -195,6 +196,22 @@ export class CourseController {
       const input = updateLessonSchema.parse(req.body);
       const actorUserId = req.user!.id;
       const lesson = await courseService.updateLesson(req.params.id as string, input, actorUserId);
+      res.status(200).json({ success: true, data: lesson });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public async moveLesson(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const input = moveLessonSchema.parse(req.body);
+      const actorUserId = req.user!.id;
+      const lesson = await courseService.moveLesson(
+        req.params.id as string,
+        input.targetSectionId,
+        input.position,
+        actorUserId,
+      );
       res.status(200).json({ success: true, data: lesson });
     } catch (err) {
       next(err);

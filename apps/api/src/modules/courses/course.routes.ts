@@ -83,6 +83,9 @@ adminCourseRouter.post('/sections/:sectionId/lessons', (req, res, next) =>
 adminCourseRouter.patch('/lessons/:id', (req, res, next) =>
   courseController.updateLesson(req, res, next),
 );
+adminCourseRouter.post('/lessons/:id/move', (req, res, next) =>
+  courseController.moveLesson(req, res, next),
+);
 adminCourseRouter.delete('/lessons/:id', (req, res, next) =>
   courseController.deleteLesson(req, res, next),
 );

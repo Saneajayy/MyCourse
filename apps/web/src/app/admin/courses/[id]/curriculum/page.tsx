@@ -128,7 +128,12 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
   const [isActionLoading, setIsActionLoading] = useState(false);
 
   // Drag-and-drop state
-  const [draggedLessonId, setDraggedLessonId] = useState<string | null>(null);
+  const [draggedLesson, setDraggedLesson] = useState<{
+    lessonId: string;
+    sectionId: string;
+  } | null>(null);
+  const [dragOverLessonId, setDragOverLessonId] = useState<string | null>(null);
+  const [dragOverSectionId, setDragOverSectionId] = useState<string | null>(null);
 
   const fetchCurriculum = useCallback(async () => {
     setIsLoading(true);
@@ -210,6 +215,7 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
           body: JSON.stringify({
             title: lessonModal.title.trim(),
             description: lessonModal.description.trim() || null,
+            sectionId: lessonModal.sectionId,
             isFreePreview: lessonModal.isFreePreview,
           }),
         });
@@ -350,37 +356,74 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
     }
   };
 
-  // Drag and drop lesson reordering
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
+  const handleDropLesson = async (targetSectionId: string, targetLessonId?: string) => {
+    if (!draggedLesson || !course) return;
+    if (draggedLesson.lessonId === targetLessonId) {
+      setDraggedLesson(null);
+      return;
+    }
 
-  const handleDropLesson = async (targetSectionId: string, targetLessonId: string) => {
-    if (!draggedLessonId || !course || draggedLessonId === targetLessonId) return;
+    const { lessonId: movingLessonId, sectionId: sourceSectionId } = draggedLesson;
+    setDraggedLesson(null);
+    setDragOverLessonId(null);
+    setDragOverSectionId(null);
 
-    const section = course.sections.find((s) => s.id === targetSectionId);
-    if (!section) return;
+    // Case 1: Same Section Reordering
+    if (sourceSectionId === targetSectionId) {
+      if (!targetLessonId) return;
+      const section = course.sections.find((s) => s.id === targetSectionId);
+      if (!section) return;
 
-    const fromIndex = section.lessons.findIndex((l) => l.id === draggedLessonId);
-    const toIndex = section.lessons.findIndex((l) => l.id === targetLessonId);
-    if (fromIndex === -1 || toIndex === -1) return;
+      const fromIndex = section.lessons.findIndex((l) => l.id === movingLessonId);
+      const toIndex = section.lessons.findIndex((l) => l.id === targetLessonId);
+      if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
 
-    const reordered = [...section.lessons];
-    const [moved] = reordered.splice(fromIndex, 1);
-    if (!moved) return;
-    reordered.splice(toIndex, 0, moved);
+      const reordered = [...section.lessons];
+      const [moved] = reordered.splice(fromIndex, 1);
+      if (!moved) return;
+      reordered.splice(toIndex, 0, moved);
 
-    setDraggedLessonId(null);
-    const orderedIds = reordered.map((l) => l.id);
+      const orderedIds = reordered.map((l) => l.id);
+
+      try {
+        await apiClient(`/admin/sections/${targetSectionId}/lessons/reorder`, {
+          method: 'POST',
+          body: JSON.stringify({ orderedIds }),
+        });
+        await fetchCurriculum();
+      } catch (err: unknown) {
+        toastError(
+          'Reorder Failed',
+          err instanceof Error ? err.message : 'Error reordering lessons',
+        );
+      }
+      return;
+    }
+
+    // Case 2: Cross-Section Movement
+    const targetSection = course.sections.find((s) => s.id === targetSectionId);
+    if (!targetSection) return;
+
+    let targetPosition: number;
+    if (targetLessonId) {
+      const toIndex = targetSection.lessons.findIndex((l) => l.id === targetLessonId);
+      targetPosition = toIndex !== -1 ? toIndex + 1 : targetSection.lessons.length + 1;
+    } else {
+      targetPosition = targetSection.lessons.length + 1;
+    }
 
     try {
-      await apiClient(`/admin/sections/${targetSectionId}/lessons/reorder`, {
+      await apiClient(`/admin/lessons/${movingLessonId}/move`, {
         method: 'POST',
-        body: JSON.stringify({ orderedIds }),
+        body: JSON.stringify({
+          targetSectionId,
+          position: targetPosition,
+        }),
       });
+      toastSuccess('Lesson Moved', `Lesson moved to "${targetSection.title}".`);
       await fetchCurriculum();
     } catch (err: unknown) {
-      toastError('Reorder Failed', err instanceof Error ? err.message : 'Error');
+      toastError('Move Failed', err instanceof Error ? err.message : 'Failed to move lesson');
     }
   };
 
@@ -666,10 +709,48 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
             </div>
 
             {/* Lessons List in Section */}
-            <div className="divide-y divide-neutral-200/80">
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (dragOverSectionId !== section.id) {
+                  setDragOverSectionId(section.id);
+                }
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                if (dragOverSectionId === section.id) {
+                  setDragOverSectionId(null);
+                }
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragOverLessonId(null);
+                setDragOverSectionId(null);
+                handleDropLesson(section.id);
+              }}
+              className={`divide-y divide-neutral-200/80 transition-colors ${
+                dragOverSectionId === section.id && !dragOverLessonId
+                  ? 'bg-amber-50/40 ring-2 ring-course-orange ring-inset'
+                  : ''
+              }`}
+            >
               {section.lessons.length === 0 ? (
-                <div className="p-4 text-center text-xs text-neutral-400 italic">
-                  No lessons in this section. Click &quot;Add Lesson&quot; above to create one.
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    setDragOverSectionId(section.id);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setDragOverLessonId(null);
+                    setDragOverSectionId(null);
+                    handleDropLesson(section.id);
+                  }}
+                  className="p-6 text-center text-xs text-neutral-400 italic bg-neutral-50/50 border border-dashed border-neutral-200 m-3"
+                >
+                  No lessons in this module. Drag a lesson here or click &quot;Add Lesson&quot;.
                 </div>
               ) : (
                 section.lessons.map((lesson, lIndex) => (
@@ -677,10 +758,42 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
                     key={lesson.id}
                     data-lesson-id={lesson.id}
                     draggable
-                    onDragStart={() => setDraggedLessonId(lesson.id)}
-                    onDragOver={handleDragOver}
-                    onDrop={() => handleDropLesson(section.id, lesson.id)}
-                    className="p-3.5 bg-white hover:bg-neutral-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors"
+                    onDragStart={(e) => {
+                      setDraggedLesson({ lessonId: lesson.id, sectionId: section.id });
+                      e.dataTransfer.setData('text/plain', lesson.id);
+                      e.dataTransfer.effectAllowed = 'move';
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      e.dataTransfer.dropEffect = 'move';
+                      if (dragOverLessonId !== lesson.id) {
+                        setDragOverLessonId(lesson.id);
+                      }
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      if (dragOverLessonId === lesson.id) {
+                        setDragOverLessonId(null);
+                      }
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setDragOverLessonId(null);
+                      setDragOverSectionId(null);
+                      handleDropLesson(section.id, lesson.id);
+                    }}
+                    onDragEnd={() => {
+                      setDraggedLesson(null);
+                      setDragOverLessonId(null);
+                      setDragOverSectionId(null);
+                    }}
+                    className={`p-3.5 bg-white hover:bg-neutral-50/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
+                      dragOverLessonId === lesson.id
+                        ? 'border-t-2 border-course-orange bg-amber-50/60'
+                        : ''
+                    } ${draggedLesson?.lessonId === lesson.id ? 'opacity-40' : ''}`}
                   >
                     {/* Left: Drag Handle, Number, Title & Badges */}
                     <div className="flex items-start sm:items-center gap-2.5 min-w-0">
@@ -994,6 +1107,29 @@ export default function CurriculumEditorPage({ params }: { params: Promise<{ id:
             </div>
 
             <form onSubmit={handleSaveLesson} className="space-y-4">
+              {course?.sections && course.sections.length > 0 && (
+                <div className="space-y-1.5 text-left">
+                  <label
+                    htmlFor="lesson-section-select"
+                    className="block text-xs font-semibold uppercase tracking-wider text-neutral-700"
+                  >
+                    Module / Section
+                  </label>
+                  <select
+                    id="lesson-section-select"
+                    value={lessonModal.sectionId}
+                    onChange={(e) => setLessonModal({ ...lessonModal, sectionId: e.target.value })}
+                    className="w-full h-10 px-3 bg-white border border-neutral-300 text-xs text-neutral-900 rounded-none focus:border-neutral-900 focus:outline-none transition-colors"
+                  >
+                    {course.sections.map((s, idx) => (
+                      <option key={s.id} value={s.id}>
+                        Module {idx + 1}: {s.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <Input
                 label="Lesson Title"
                 type="text"

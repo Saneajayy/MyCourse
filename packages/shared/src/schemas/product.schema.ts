@@ -64,6 +64,7 @@ export type CreateLessonInput = z.infer<typeof createLessonSchema>;
 export const updateLessonSchema = z.object({
   title: z.string().trim().min(1).max(255).optional(),
   description: z.string().trim().max(5000).optional().nullable(),
+  sectionId: z.string().uuid().optional(),
   position: z.number().int().nonnegative().optional(),
   videoProviderId: z.string().optional().nullable(),
   thumbnailUrl: z.string().optional().nullable(),
@@ -74,6 +75,13 @@ export const updateLessonSchema = z.object({
 });
 
 export type UpdateLessonInput = z.infer<typeof updateLessonSchema>;
+
+export const moveLessonSchema = z.object({
+  targetSectionId: z.string().uuid('Invalid target section ID'),
+  position: z.number().int().positive().optional(),
+});
+
+export type MoveLessonInput = z.infer<typeof moveLessonSchema>;
 
 export const reorderSchema = z.object({
   orderedIds: z.array(z.string().uuid()).min(1, 'orderedIds must contain at least one ID'),

@@ -502,10 +502,110 @@ export class CourseService {
     return lesson;
   }
 
+  public async moveLesson(
+    lessonId: string,
+    targetSectionId: string,
+    targetPosition: number | undefined,
+    actorUserId: string,
+  ) {
+    const lesson = await prisma.lesson.findUnique({
+      where: { id: lessonId },
+    });
+    if (!lesson) {
+      throw new NotFoundError('Lesson not found');
+    }
+
+    const targetSection = await prisma.section.findUnique({
+      where: { id: targetSectionId },
+      include: {
+        lessons: {
+          orderBy: { position: 'asc' },
+        },
+      },
+    });
+    if (!targetSection) {
+      throw new NotFoundError('Target section not found');
+    }
+
+    if (targetSection.productId !== lesson.productId) {
+      throw new BadRequestError('Cannot move lesson to a section of a different course');
+    }
+
+    const sourceSectionId = lesson.sectionId;
+
+    await prisma.$transaction(async (tx) => {
+      // 1. Move lesson to target section
+      await tx.lesson.update({
+        where: { id: lessonId },
+        data: { sectionId: targetSectionId },
+      });
+
+      // 2. Re-sequence lessons in target section
+      const targetLessons = targetSection.lessons.filter((l) => l.id !== lessonId);
+      const insertIndex =
+        targetPosition !== undefined && targetPosition >= 1
+          ? Math.min(targetPosition - 1, targetLessons.length)
+          : targetLessons.length;
+
+      targetLessons.splice(insertIndex, 0, lesson);
+
+      for (let i = 0; i < targetLessons.length; i++) {
+        const item = targetLessons[i];
+        if (item) {
+          await tx.lesson.update({
+            where: { id: item.id },
+            data: { position: i + 1 },
+          });
+        }
+      }
+
+      // 3. Re-sequence lessons in source section if different
+      if (sourceSectionId !== targetSectionId) {
+        const sourceLessons = await tx.lesson.findMany({
+          where: { sectionId: sourceSectionId, NOT: { id: lessonId } },
+          orderBy: { position: 'asc' },
+        });
+
+        for (let i = 0; i < sourceLessons.length; i++) {
+          const item = sourceLessons[i];
+          if (item) {
+            await tx.lesson.update({
+              where: { id: item.id },
+              data: { position: i + 1 },
+            });
+          }
+        }
+      }
+    });
+
+    await auditService.log({
+      actorUserId,
+      action: 'COURSE_LESSON_MOVED',
+      entityType: 'Lesson',
+      entityId: lessonId,
+      beforeState: { sourceSectionId },
+      afterState: {
+        targetSectionId,
+        targetPosition,
+      },
+    });
+
+    await this.invalidateCatalogCache();
+
+    return prisma.lesson.findUnique({
+      where: { id: lessonId },
+      include: { section: true },
+    });
+  }
+
   public async updateLesson(id: string, input: UpdateLessonInput, actorUserId: string) {
     const current = await prisma.lesson.findUnique({ where: { id } });
     if (!current) {
       throw new NotFoundError('Lesson not found');
+    }
+
+    if (input.sectionId !== undefined && input.sectionId !== current.sectionId) {
+      await this.moveLesson(id, input.sectionId, input.position, actorUserId);
     }
 
     const updated = await prisma.lesson.update({
@@ -513,7 +613,9 @@ export class CourseService {
       data: {
         ...(input.title !== undefined ? { title: input.title } : {}),
         ...(input.description !== undefined ? { description: input.description } : {}),
-        ...(input.position !== undefined ? { position: input.position } : {}),
+        ...(input.position !== undefined && input.sectionId === undefined
+          ? { position: input.position }
+          : {}),
         ...(input.videoProviderId !== undefined ? { videoProviderId: input.videoProviderId } : {}),
         ...(input.thumbnailUrl !== undefined ? { thumbnailUrl: input.thumbnailUrl } : {}),
         ...(input.durationSeconds !== undefined ? { durationSeconds: input.durationSeconds } : {}),
