@@ -198,7 +198,7 @@ export function initializeWebhookQueue(): { queue: Queue; worker: Worker } {
     password: redisClient.options.password,
   };
 
-  webhookQueue = new Queue(RAZORPAY_WEBHOOK_QUEUE_NAME, { connection });
+  webhookQueue = new Queue(RAZORPAY_WEBHOOK_QUEUE_NAME, { connection: redisClient });
 
   webhookWorker = new Worker(
     RAZORPAY_WEBHOOK_QUEUE_NAME,

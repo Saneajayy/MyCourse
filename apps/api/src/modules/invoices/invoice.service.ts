@@ -5,6 +5,7 @@ import PDFDocument from 'pdfkit';
 import { Queue, Worker } from 'bullmq';
 import { env } from '../../config/env.js';
 import { prisma } from '../../common/db/prisma.js';
+import { redisClient } from '../../common/redis/redis.js';
 import { emailService } from '../../common/email/email.service.js';
 import { logger } from '../../common/logger/logger.js';
 import { EmailLogStatus, OrderStatus, Prisma } from '@prisma/client';
@@ -133,7 +134,9 @@ export class InvoiceService {
   constructor() {
     try {
       const connection = { url: env.REDIS_URL };
-      this.receiptQueue = new Queue<{ orderId: string }>('receipt_delivery', { connection });
+      this.receiptQueue = new Queue<{ orderId: string }>('receipt_delivery', {
+        connection: redisClient,
+      });
 
       if (env.NODE_ENV !== 'test') {
         this.receiptWorker = new Worker<{ orderId: string }>(

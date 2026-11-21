@@ -3,6 +3,7 @@ import { uuidv7 } from 'uuidv7';
 import { env } from '../../config/env.js';
 import { logger } from '../logger/logger.js';
 import { prisma } from '../db/prisma.js';
+import { redisClient } from '../redis/redis.js';
 import { EmailLogStatus, Prisma } from '@prisma/client';
 import {
   EmailProvider,
@@ -53,7 +54,7 @@ export class EmailService {
     // 2. Initialize BullMQ Queue and Worker
     try {
       const connection = { url: env.REDIS_URL };
-      this.queue = new Queue<EmailJobData>('email_delivery', { connection });
+      this.queue = new Queue<EmailJobData>('email_delivery', { connection: redisClient });
 
       // In production and dev, start background worker
       // Provider rate limit: Resend allows 5-10 requests per second across the team; we set limiter to 5 sends/sec

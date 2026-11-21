@@ -80,7 +80,7 @@ export function initializeExpiryWorker(): { queue: Queue; worker: Worker } {
     password: redisClient.options.password,
   };
 
-  expiryQueue = new Queue(EXPIRY_QUEUE_NAME, { connection });
+  expiryQueue = new Queue(EXPIRY_QUEUE_NAME, { connection: redisClient });
 
   expiryWorker = new Worker(
     EXPIRY_QUEUE_NAME,

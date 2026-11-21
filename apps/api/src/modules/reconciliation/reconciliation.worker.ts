@@ -23,7 +23,7 @@ export function initializeReconciliationWorker(): { queue: Queue; worker: Worker
     password: redisClient.options.password,
   };
 
-  reconciliationQueue = new Queue(RECONCILIATION_QUEUE_NAME, { connection });
+  reconciliationQueue = new Queue(RECONCILIATION_QUEUE_NAME, { connection: redisClient });
 
   reconciliationWorker = new Worker(
     RECONCILIATION_QUEUE_NAME,
