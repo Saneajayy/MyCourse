@@ -11,8 +11,6 @@ import localFont from 'next/font/local';
 import './globals.css';
 import { AuthProvider } from '../context/auth-context';
 import { ToastProvider } from '../components/ui';
-import { Header } from '../components/Header';
-import { Footer } from '../components/Footer';
 import { siteConfig } from '../config/site';
 
 const redditSans = localFont({
@@ -109,11 +107,9 @@ export default function RootLayout({
         </a>
         <AuthProvider>
           <ToastProvider>
-            <Header />
             <main id="main-content" className="flex-1">
               {children}
             </main>
-            <Footer />
           </ToastProvider>
         </AuthProvider>
       </body>
