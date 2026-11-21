@@ -22,7 +22,7 @@
     "db:studio": "dotenv -e .env -- pnpm --filter @course/api prisma:studio",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.7.1",
