@@ -35,7 +35,7 @@ function LoginForm() {
         toastSuccess('Password verified', 'Please enter your two-factor authentication code.');
         const targetRedirect = searchParams.get('redirect') || '/admin';
         router.push(
-          `/admin/2fa?tempToken=${encodeURIComponent(result.tempToken)}&redirect=${encodeURIComponent(targetRedirect)}`,
+          `/admin/2fa?redirect=${encodeURIComponent(targetRedirect)}`,
         );
         return;
       }

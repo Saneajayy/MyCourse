@@ -29,6 +29,7 @@ interface AuthContextValue {
   user: User | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  twoFactorTempToken: string | null;
   login: (email: string, password: string) => Promise<LoginResult>;
   verify2FA: (tempToken: string, code: string) => Promise<void>;
   register: (name: string, email: string, password: string, phone?: string) => Promise<void>;
@@ -42,6 +43,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [twoFactorTempToken, setTwoFactorTempToken] = useState<string | null>(null);
 
   const fetchCurrentUser = useCallback(async (): Promise<User | null> => {
     try {
@@ -97,6 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (res.requires2FA && res.tempToken) {
+      setTwoFactorTempToken(res.tempToken);
       return { requires2FA: true, tempToken: res.tempToken };
     }
 
@@ -120,6 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     setAccessToken(res.accessToken);
     setUser(res.user);
+    setTwoFactorTempToken(null);
   };
 
   const register = async (
@@ -156,6 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       clearAccessToken();
       setUser(null);
+      setTwoFactorTempToken(null);
     }
   };
 
@@ -172,6 +177,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         isLoading,
         isAuthenticated: !!user,
+        twoFactorTempToken,
         login,
         verify2FA,
         register,

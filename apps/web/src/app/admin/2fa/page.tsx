@@ -18,11 +18,27 @@ interface Setup2FAResponse {
 function TwoFactorFlow() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const tempToken = searchParams.get('tempToken') || '';
+  const urlTempToken = searchParams.get('tempToken') || '';
   const redirectUrl = searchParams.get('redirect') || '/admin';
 
-  const { user, verify2FA, refreshUser } = useAuth();
+  const { user, verify2FA, refreshUser, twoFactorTempToken } = useAuth();
   const { error: toastError, success: toastSuccess } = useToast();
+
+  const [tempToken, setTempToken] = useState<string>(twoFactorTempToken || urlTempToken);
+
+  useEffect(() => {
+    if (twoFactorTempToken) {
+      setTempToken(twoFactorTempToken);
+    } else if (urlTempToken) {
+      setTempToken(urlTempToken);
+      // Clean up the URL query param so the token is never visible in the browser address bar
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('tempToken');
+        window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+      }
+    }
+  }, [twoFactorTempToken, urlTempToken]);
 
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);

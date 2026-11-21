@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { UnauthorizedError } from '../errors/app-error.js';
 
 /**
  * Generates cryptographically secure random token (32 bytes = 64 hex characters)
@@ -108,10 +109,16 @@ export function decryptData(encryptedString: string, secretKey: string): string 
     decipher.setAuthTag(authTag);
     return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
   } catch {
-    // 2. Safe fallback to legacy key derivation for pre-existing records
-    const legacyKey = deriveLegacyKey(secretKey);
-    const decipher = crypto.createDecipheriv('aes-256-gcm', legacyKey, iv);
-    decipher.setAuthTag(authTag);
-    return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
+    try {
+      // 2. Safe fallback to legacy key derivation for pre-existing records
+      const legacyKey = deriveLegacyKey(secretKey);
+      const decipher = crypto.createDecipheriv('aes-256-gcm', legacyKey, iv);
+      decipher.setAuthTag(authTag);
+      return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
+    } catch {
+      throw new UnauthorizedError(
+        'Unable to decrypt two-factor authentication secret. The encryption key may have been rotated or is invalid.',
+      );
+    }
   }
 }
