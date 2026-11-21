@@ -40,7 +40,8 @@ const envSchema = z.object({
   RAZORPAY_KEY_ID: z.string().default('rzp_test_placeholder_key_id'),
   RAZORPAY_KEY_SECRET: z.string().default('placeholder_razorpay_secret'),
   RAZORPAY_WEBHOOK_SECRET: z.string().default('placeholder_razorpay_webhook_secret_hex'),
-  PAYMENT_PROVIDER: z.enum(['razorpay', 'fake']).default('fake'),
+  PAYMENT_PROVIDER: z.enum(['razorpay', 'fake']).default('razorpay'),
+  ALLOW_TEST_PAYMENTS: z.coerce.boolean().default(false),
 
   // Video delivery (Bunny Stream)
   BUNNY_STREAM_API_KEY: z.string().default('placeholder_bunny_api_key'),
@@ -92,6 +93,7 @@ export function validateProductionSafety(config: {
   paymentProvider: string;
   razorpayKeyId: string;
   enableDevRoutes?: boolean;
+  allowTestPayments?: boolean;
 }): void {
   if (config.nodeEnv === 'production') {
     if (config.paymentProvider === 'fake') {
@@ -99,9 +101,9 @@ export function validateProductionSafety(config: {
         'FATAL SAFETY VIOLATION: PAYMENT_PROVIDER cannot be "fake" in production mode.',
       );
     }
-    if (config.razorpayKeyId.startsWith('rzp_test_')) {
+    if (config.razorpayKeyId.startsWith('rzp_test_') && !config.allowTestPayments) {
       throw new Error(
-        'FATAL SAFETY VIOLATION: Cannot boot in production mode with Razorpay test keys (rzp_test_*)',
+        'FATAL SAFETY VIOLATION: Cannot boot in production mode with Razorpay test keys (rzp_test_*). Set ALLOW_TEST_PAYMENTS=true to enable testing mode.',
       );
     }
     if (config.enableDevRoutes) {
@@ -125,6 +127,7 @@ try {
     paymentProvider: env.PAYMENT_PROVIDER,
     razorpayKeyId: env.RAZORPAY_KEY_ID,
     enableDevRoutes: env.ENABLE_DEV_ROUTES,
+    allowTestPayments: env.ALLOW_TEST_PAYMENTS,
   });
 } catch (err: any) {
   console.error(err.message);
