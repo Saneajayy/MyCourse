@@ -18,6 +18,7 @@ import { getVideoProvider } from '../video/video.service.js';
 import { UploadTicket } from '../video/video-provider.interface.js';
 import { redisClient } from '../../common/redis/redis.js';
 import { logger } from '../../common/logger/logger.js';
+import { env } from '../../config/env.js';
 
 export class CourseService {
   /**
@@ -1262,7 +1263,53 @@ export class CourseService {
     const targetFilePath = path.join(uploadDir, filename);
 
     await fs.promises.writeFile(targetFilePath, file.buffer);
-    const thumbnailUrl = `/uploads/thumbnails/${filename}`;
+    let thumbnailUrl = `/uploads/thumbnails/${filename}`;
+
+    // If Bunny Stream is configured and lesson has a real video, push custom thumbnail directly to Bunny CDN
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (
+      lesson.videoProviderId &&
+      uuidRegex.test(lesson.videoProviderId) &&
+      env.BUNNY_STREAM_API_KEY &&
+      env.BUNNY_STREAM_API_KEY !== 'placeholder_bunny_api_key'
+    ) {
+      try {
+        const uploadRes = await fetch(
+          `https://video.bunnycdn.com/library/${env.BUNNY_STREAM_LIBRARY_ID}/videos/${lesson.videoProviderId}/thumbnail`,
+          {
+            method: 'POST',
+            headers: {
+              AccessKey: env.BUNNY_STREAM_API_KEY,
+              'Content-Type': 'application/octet-stream',
+            },
+            body: file.buffer,
+          },
+        );
+
+        if (uploadRes.ok) {
+          const videoRes = await fetch(
+            `https://video.bunnycdn.com/library/${env.BUNNY_STREAM_LIBRARY_ID}/videos/${lesson.videoProviderId}`,
+            {
+              headers: {
+                AccessKey: env.BUNNY_STREAM_API_KEY,
+                Accept: 'application/json',
+              },
+            },
+          );
+          if (videoRes.ok) {
+            const videoData = (await videoRes.json()) as { thumbnailUrl?: string };
+            if (videoData.thumbnailUrl) {
+              thumbnailUrl = videoData.thumbnailUrl;
+            }
+          }
+        }
+      } catch (err) {
+        logger.warn(
+          { err, lessonId },
+          'Failed to upload custom thumbnail to Bunny Stream, keeping local thumbnail',
+        );
+      }
+    }
 
     const updated = await prisma.lesson.update({
       where: { id: lessonId },
