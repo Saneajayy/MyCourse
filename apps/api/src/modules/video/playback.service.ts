@@ -1,5 +1,6 @@
 import { uuidv7 } from 'uuidv7';
 import { prisma } from '../../common/db/prisma.js';
+import { env } from '../../config/env.js';
 import { getVideoProvider } from './video.service.js';
 import { streamService } from './stream.service.js';
 import { entitlementService } from '../entitlements/entitlement.service.js';
@@ -43,6 +44,20 @@ export interface HeartbeatResult {
   isCompleted: boolean;
   lastPositionSeconds: number;
   watchedSeconds: number;
+}
+
+export function resolveLessonThumbnail(
+  thumbnailUrl?: string | null,
+  videoProviderId?: string | null,
+): string | null {
+  if (thumbnailUrl && !thumbnailUrl.startsWith('/uploads/')) {
+    return thumbnailUrl;
+  }
+  if (videoProviderId) {
+    const cdnHostname = env.BUNNY_STREAM_CDN_HOSTNAME || 'vz-2f983eda-800.b-cdn.net';
+    return `https://${cdnHostname}/${videoProviderId}/thumbnail.jpg`;
+  }
+  return thumbnailUrl ?? null;
 }
 
 export class PlaybackService {
@@ -152,7 +167,7 @@ export class PlaybackService {
       sessionId,
       lessonId: lesson.id,
       title: lesson.title,
-      thumbnailUrl: lesson.thumbnailUrl ?? null,
+      thumbnailUrl: resolveLessonThumbnail(lesson.thumbnailUrl, lesson.videoProviderId),
       durationSeconds: lesson.durationSeconds,
       playbackUrl: playbackInfo.playbackUrl,
       embedUrl: playbackInfo.embedUrl,
@@ -446,7 +461,7 @@ export class PlaybackService {
           lessonId: lesson.id,
           title: lesson.title,
           durationSeconds: lesson.durationSeconds,
-          thumbnailUrl: lesson.thumbnailUrl ?? null,
+          thumbnailUrl: resolveLessonThumbnail(lesson.thumbnailUrl, lesson.videoProviderId),
           isCompleted: !!prog?.completedAt,
           completedAt: prog?.completedAt ?? null,
           lastPositionSeconds: prog?.lastPositionSeconds ?? 0,

@@ -37,10 +37,12 @@ function RegisterForm() {
     try {
       await register(name, email, password);
       toastSuccess('Account Registered', '6-digit verification code sent to your email.');
-      const dest = redirectUrl
-        ? `/verify-email?redirect=${encodeURIComponent(redirectUrl)}`
-        : '/verify-email';
-      router.push(dest);
+      const params = new URLSearchParams();
+      params.set('email', email);
+      if (redirectUrl) {
+        params.set('redirect', redirectUrl);
+      }
+      router.push(`/verify-email?${params.toString()}`);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Registration failed';
       setErrorMsg(message);

@@ -49,7 +49,7 @@ const envSchema = z.object({
   BUNNY_STREAM_LIBRARY_ID: z.string().default('placeholder_bunny_library_id'),
   BUNNY_STREAM_TOKEN_AUTH_KEY: z.string().default('placeholder_bunny_token_auth_key'),
   BUNNY_STREAM_WEBHOOK_SECRET: z.string().optional(),
-  BUNNY_STREAM_CDN_HOSTNAME: z.string().default('video.hydrobasics.com'),
+  BUNNY_STREAM_CDN_HOSTNAME: z.string().default('vz-2f983eda-800.b-cdn.net'),
   VIDEO_PROVIDER: z.enum(['bunny', 'fake']).default('fake'),
   MAX_CONCURRENT_STREAMS: z.coerce.number().default(2),
 

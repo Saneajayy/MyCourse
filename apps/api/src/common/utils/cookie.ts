@@ -11,7 +11,7 @@ export function getRefreshTokenCookieOptions(): CookieOptions {
   return {
     httpOnly: true,
     secure: isProduction,
-    sameSite: 'lax',
+    sameSite: isProduction ? 'none' : 'lax',
     path: '/',
     ...(cookieDomain ? { domain: cookieDomain } : {}),
     maxAge: env.REFRESH_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000,

@@ -1385,6 +1385,9 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                       <img
                         src={activeThumbnailUrl}
                         alt={currentLessonTitle}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.opacity = '0';
+                        }}
                         className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 opacity-90 group-hover:opacity-100"
                       />
                       <div className="absolute inset-0 bg-black/20 group-hover:bg-black/5 transition-colors duration-300" />

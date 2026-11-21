@@ -16,6 +16,7 @@ import { NotFoundError, BadRequestError, ForbiddenError } from '../../common/err
 import { auditService } from '../audit/audit.service.js';
 import { getVideoProvider } from '../video/video.service.js';
 import { UploadTicket } from '../video/video-provider.interface.js';
+import { resolveLessonThumbnail } from '../video/playback.service.js';
 import { redisClient } from '../../common/redis/redis.js';
 import { logger } from '../../common/logger/logger.js';
 
@@ -996,7 +997,9 @@ export class CourseService {
         position: lesson.position,
         durationSeconds: lesson.durationSeconds,
         isFreePreview: lesson.isFreePreview,
-        thumbnailUrl: lesson.thumbnailUrl || product.thumbnailUrl,
+        thumbnailUrl:
+          resolveLessonThumbnail(lesson.thumbnailUrl, lesson.videoProviderId) ||
+          product.thumbnailUrl,
         status: lesson.status,
       })),
     }));
@@ -1088,7 +1091,9 @@ export class CourseService {
     return {
       lessonId: foundLesson.id,
       title: foundLesson.title,
-      thumbnailUrl: foundLesson.thumbnailUrl || product.thumbnailUrl,
+      thumbnailUrl:
+        resolveLessonThumbnail(foundLesson.thumbnailUrl, foundLesson.videoProviderId) ||
+        product.thumbnailUrl,
       token: playback.token,
       expiresAt: playback.expiresAt,
       embedUrl: playback.embedUrl,
