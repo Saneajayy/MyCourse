@@ -187,7 +187,7 @@ export function createApp(): Express {
       success: true,
       data: {
         service: 'Hydraulic Engineering Course API',
-        version: 'v1',
+        version: 'v1.1.0',
       },
     });
   });

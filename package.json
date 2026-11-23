@@ -9,6 +9,7 @@
     "dev:api": "pnpm --filter @course/api dev",
     "dev:web": "pnpm --filter @course/web dev",
     "build": "pnpm --filter @course/shared build && pnpm --filter @course/api build && pnpm --filter @course/web build",
+    "build:api": "pnpm --filter @course/shared build && pnpm --filter @course/api build",
     "typecheck": "pnpm --filter @course/shared build && pnpm --recursive --parallel typecheck",
     "lint": "pnpm --filter @course/shared build && pnpm --recursive lint",
     "test": "pnpm --filter @course/shared build && pnpm --recursive test",
