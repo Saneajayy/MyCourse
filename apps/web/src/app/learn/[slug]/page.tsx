@@ -26,7 +26,10 @@ import {
   X,
   ArrowLeft,
   RefreshCw,
+  MessageSquare,
 } from 'lucide-react';
+import { LikeButton } from '../../../components/learn/like-button';
+import { CommentsPanel } from '../../../components/learn/comments-panel';
 
 interface LessonProgressItem {
   lessonId: string;
@@ -73,6 +76,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
   // Dragger vertical offset state (allows moving video up/down on desktop)
   const [videoOffsetY, setVideoOffsetY] = useState(0);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [showMobileComments, setShowMobileComments] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const isDraggingRef = useRef(false);
   const dragStartYRef = useRef(0);
@@ -1301,7 +1305,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       </aside>
 
       {/* ============================================================== */}
-      {/* 2. RIGHT CARD: VIDEO PLAYER & BOTTOM CONTROLS                 */}
+      {/* 2. CENTER CARD: VIDEO PLAYER & BOTTOM CONTROLS                 */}
       {/* ============================================================== */}
       <main className="w-full h-auto shrink-0 md:flex-1 md:h-full md:min-w-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden relative order-1 md:order-2">
         {/* Top Header Bar: Clean Lesson Title */}
@@ -1874,21 +1878,46 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         </div>
 
         {/* Bottom Bar below video: Full-width matching top strip */}
-        <div className="h-12 px-5 border-t border-white/[0.08] flex items-center justify-between shrink-0 bg-[#101012]">
-          <div className="flex items-center gap-2 text-xs text-white/50 font-mono">
+        <div className="h-12 px-3 sm:px-5 border-t border-white/[0.08] flex items-center justify-between shrink-0 bg-[#101012] gap-2">
+          <div className="flex items-center h-full gap-2 sm:gap-3 text-xs text-white/50 font-mono">
             {isPageLoading ? (
               <div className="h-3 w-10 bg-white/10 rounded animate-pulse" />
             ) : currentLesson?.durationSeconds ? (
-              <span>{formatTime(currentLesson.durationSeconds)}</span>
+              <span className="hidden xs:inline">{formatTime(currentLesson.durationSeconds)}</span>
             ) : null}
+
+            {/* Independent Like/Unlike Button with right vertical separation line touching ends completely */}
+            {selectedLessonId && (
+              <div className="flex items-center h-full gap-2 sm:gap-3">
+                <LikeButton lessonId={selectedLessonId} isAuthenticated={isAuthenticated} />
+                <div className="h-full w-px bg-white/[0.08]" />
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center h-full gap-1.5 shrink-0">
+            {/* Mobile Comment Button: Only on mobile (< md), placed on right side of strip with vertical separation lines on left and right */}
+            {selectedLessonId && (
+              <div className="flex items-center h-full gap-1.5 md:hidden">
+                <div className="h-full w-px bg-white/[0.08] mx-0.5" />
+                <button
+                  type="button"
+                  onClick={() => setShowMobileComments(true)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer outline-none focus:outline-none focus-visible:outline-none"
+                  title="View Comments"
+                  aria-label="View Comments"
+                >
+                  <MessageSquare className="w-4 h-4 text-[#337df6]" />
+                </button>
+                <div className="h-full w-px bg-white/[0.08] mx-0.5" />
+              </div>
+            )}
+
             <button
               type="button"
               onClick={handlePrevLesson}
               disabled={isPageLoading || !hasPrevLesson}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-20 disabled:pointer-events-none transition-colors cursor-pointer"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-20 disabled:pointer-events-none transition-colors cursor-pointer outline-none focus:outline-none focus-visible:outline-none"
               title="Previous Lesson"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -1897,7 +1926,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
               type="button"
               onClick={handleNextLesson}
               disabled={isPageLoading || !hasNextLesson}
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-20 disabled:pointer-events-none transition-colors cursor-pointer"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 disabled:opacity-20 disabled:pointer-events-none transition-colors cursor-pointer outline-none focus:outline-none focus-visible:outline-none"
               title="Next Lesson"
             >
               <ChevronRight className="w-4 h-4" />
@@ -1905,6 +1934,39 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
           </div>
         </div>
       </main>
+
+      {/* ============================================================== */}
+      {/* 3. RIGHT CARD: COMMENTS & DISCUSSION (DESKTOP - FIXED)         */}
+      {/* ============================================================== */}
+      {selectedLessonId && (
+        <aside className="hidden md:flex md:w-80 lg:w-[350px] xl:w-[380px] md:h-full md:shrink-0 flex-col overflow-hidden order-3">
+          <CommentsPanel lessonId={selectedLessonId} lessonTitle={currentLessonTitle} />
+        </aside>
+      )}
+
+      {/* ============================================================== */}
+      {/* 4. MOBILE COMMENTS POPUP SHEET                                 */}
+      {/* ============================================================== */}
+      {showMobileComments && selectedLessonId && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end md:hidden animate-in fade-in duration-200">
+          <div
+            className="flex-1 w-full"
+            onClick={() => setShowMobileComments(false)}
+            aria-hidden="true"
+          />
+          <div className="w-full h-[75vh] max-h-[85vh] bg-[#101012] border-t border-white/15 rounded-t-2xl flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200">
+            <div className="w-10 h-1 bg-white/20 rounded-full mx-auto my-2.5 shrink-0" />
+            <div className="flex-1 min-h-0">
+              <CommentsPanel
+                lessonId={selectedLessonId}
+                lessonTitle={currentLessonTitle}
+                onClose={() => setShowMobileComments(false)}
+                className="border-0 rounded-none h-full"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

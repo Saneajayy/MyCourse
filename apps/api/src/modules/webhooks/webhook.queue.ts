@@ -199,6 +199,9 @@ export function initializeWebhookQueue(): { queue: Queue; worker: Worker } {
   };
 
   webhookQueue = new Queue(RAZORPAY_WEBHOOK_QUEUE_NAME, { connection: redisClient });
+  webhookQueue.on('error', (err) => {
+    logger.warn({ err: err.message }, 'Razorpay webhook queue redis warning');
+  });
 
   webhookWorker = new Worker(
     RAZORPAY_WEBHOOK_QUEUE_NAME,
@@ -207,6 +210,10 @@ export function initializeWebhookQueue(): { queue: Queue; worker: Worker } {
     },
     { connection, concurrency: 5 },
   );
+
+  webhookWorker.on('error', (err) => {
+    logger.warn({ err: err.message }, 'Razorpay webhook worker redis warning');
+  });
 
   webhookWorker.on('failed', (job, err) => {
     logger.error({ jobId: job?.id, err }, 'Razorpay webhook worker job failed');

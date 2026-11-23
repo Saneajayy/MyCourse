@@ -55,6 +55,9 @@ export class EmailService {
     try {
       const connection = { url: env.REDIS_URL };
       this.queue = new Queue<EmailJobData>('email_delivery', { connection: redisClient });
+      this.queue.on('error', (err) => {
+        logger.warn({ err: err.message }, 'BullMQ email queue redis warning');
+      });
 
       // In production and dev, start background worker
       // Provider rate limit: Resend allows 5-10 requests per second across the team; we set limiter to 5 sends/sec
@@ -91,6 +94,10 @@ export class EmailService {
             },
           },
         );
+
+        this.worker.on('error', (err) => {
+          logger.warn({ err: err.message }, 'BullMQ email worker redis warning');
+        });
 
         this.worker.on('failed', (job, err) => {
           logger.error(

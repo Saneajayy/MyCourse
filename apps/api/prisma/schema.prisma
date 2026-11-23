@@ -105,6 +105,8 @@ model User {
   couponRedemptions      CouponRedemption[]
   auditLogs              AuditLog[]
   emailLogs              EmailLog[]
+  lessonLikes            LessonLike[]
+  lessonComments         LessonComment[]
 
   @@index([role, status])
   @@index([email])
@@ -216,6 +218,8 @@ model Lesson {
   section         Section        @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   product         Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
   progresses      LessonProgress[]
+  likes           LessonLike[]
+  comments        LessonComment[]
 
   @@index([sectionId, position])
   @@index([productId])
@@ -496,5 +500,39 @@ model ContactSubmission {
   @@index([email])
   @@index([status])
   @@index([createdAt])
+}
+
+model LessonLike {
+  id        String   @id @db.Uuid
+  lessonId  String   @db.Uuid
+  userId    String   @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz
+
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([lessonId, userId])
+  @@index([lessonId])
+  @@index([userId])
+}
+
+model LessonComment {
+  id        String          @id @db.Uuid
+  lessonId  String          @db.Uuid
+  userId    String          @db.Uuid
+  parentId  String?         @db.Uuid
+  content   String          @db.Text
+  isDeleted Boolean         @default(false)
+  createdAt DateTime        @default(now()) @db.Timestamptz
+  updatedAt DateTime        @updatedAt @db.Timestamptz
+
+  lesson    Lesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent    LessonComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   LessonComment[] @relation("CommentReplies")
+
+  @@index([lessonId, createdAt])
+  @@index([parentId])
+  @@index([userId])
 }
 

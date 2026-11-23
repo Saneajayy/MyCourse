@@ -81,6 +81,9 @@ export function initializeExpiryWorker(): { queue: Queue; worker: Worker } {
   };
 
   expiryQueue = new Queue(EXPIRY_QUEUE_NAME, { connection: redisClient });
+  expiryQueue.on('error', (err) => {
+    logger.warn({ err: err.message }, 'Expiry queue redis warning');
+  });
 
   expiryWorker = new Worker(
     EXPIRY_QUEUE_NAME,
@@ -92,15 +95,23 @@ export function initializeExpiryWorker(): { queue: Queue; worker: Worker } {
     { connection, concurrency: 1 },
   );
 
+  expiryWorker.on('error', (err) => {
+    logger.warn({ err: err.message }, 'Expiry worker redis warning');
+  });
+
   expiryWorker.on('failed', (job, err) => {
     logger.error({ jobId: job?.id, err }, 'Entitlement expiry cleanup job failed');
   });
 
   // Schedule repeatable job every 60 minutes in non-test environments
   if (env.NODE_ENV !== 'test') {
-    expiryQueue.upsertJobScheduler('hourly-expiry-cleanup', {
-      every: 60 * 60 * 1000, // 1 hour
-    });
+    expiryQueue
+      .upsertJobScheduler('hourly-expiry-cleanup', {
+        every: 60 * 60 * 1000, // 1 hour
+      })
+      .catch((err) => {
+        logger.warn({ err: err.message }, 'Failed to schedule expiry job in Redis');
+      });
   }
 
   return { queue: expiryQueue, worker: expiryWorker };

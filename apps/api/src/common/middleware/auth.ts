@@ -145,3 +145,50 @@ export function requireAdmin2FA(req: Request, _res: Response, next: NextFunction
 
   next();
 }
+
+export async function optionalAuth(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): Promise<void> {
+  let token: string | undefined;
+
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.substring(7).trim();
+  } else if (typeof req.query.token === 'string') {
+    token = req.query.token.trim();
+  }
+
+  if (!token) {
+    next();
+    return;
+  }
+
+  try {
+    const payload = verifyAccessToken(token);
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.sub },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phone: true,
+        role: true,
+        status: true,
+        emailVerifiedAt: true,
+        twoFactorEnabled: true,
+        tokenVersion: true,
+      },
+    });
+
+    if (user && user.status !== UserStatus.BANNED && user.tokenVersion === payload.tokenVersion) {
+      req.user = user as AuthenticatedUser;
+    }
+  } catch {
+    // Ignore invalid token for optional auth
+  }
+
+  next();
+}

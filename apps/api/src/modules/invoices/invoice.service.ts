@@ -137,6 +137,9 @@ export class InvoiceService {
       this.receiptQueue = new Queue<{ orderId: string }>('receipt_delivery', {
         connection: redisClient,
       });
+      this.receiptQueue.on('error', (err) => {
+        logger.warn({ err: err.message }, 'BullMQ receipt queue redis warning');
+      });
 
       if (env.NODE_ENV !== 'test') {
         this.receiptWorker = new Worker<{ orderId: string }>(
@@ -149,6 +152,10 @@ export class InvoiceService {
             concurrency: 5,
           },
         );
+
+        this.receiptWorker.on('error', (err) => {
+          logger.warn({ err: err.message }, 'BullMQ receipt worker redis warning');
+        });
 
         this.receiptWorker.on('failed', (job, err) => {
           logger.error(

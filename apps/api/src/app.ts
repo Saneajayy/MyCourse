@@ -27,6 +27,10 @@ import { adminRouter } from './modules/admin/admin.routes.js';
 import { resendWebhookController } from './modules/webhooks/resend.webhook.js';
 import { contactController } from './modules/contact/contact.controller.js';
 import { contactFormRateLimiter } from './common/middleware/email-rate-limiter.js';
+import {
+  interactionsRouter,
+  adminInteractionsRouter,
+} from './modules/interactions/interactions.routes.js';
 
 declare global {
   namespace Express {
@@ -203,6 +207,7 @@ export function createApp(): Express {
   // Student video playback, heartbeat, and course progress
   v1Router.use(playbackRouter);
   v1Router.use(studentCourseRouter);
+  v1Router.use(interactionsRouter);
 
   // Admin Management routes (Protected by Auth + Admin Role + Mandatory 2FA)
   v1Router.use('/admin', adminCourseRouter);
@@ -210,6 +215,7 @@ export function createApp(): Express {
   v1Router.use('/admin', adminCouponRouter);
   v1Router.use('/admin', adminEntitlementRouter);
   v1Router.use('/admin', adminRouter);
+  v1Router.use('/admin', adminInteractionsRouter);
 
   // Webhook endpoints (Signature-verified, exempt from CORS/CSRF)
   v1Router.post('/webhooks/bunny', (req, res, next) =>

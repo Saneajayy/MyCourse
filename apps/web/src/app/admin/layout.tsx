@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   BookOpen,
   Users,
+  MessageSquare,
   CreditCard,
   Tag,
   Settings,
@@ -47,6 +48,12 @@ const NAV_ITEMS: NavItem[] = [
     href: '/admin/students',
     icon: Users,
     description: 'Student directory, grant access, ban, and active sessions',
+  },
+  {
+    label: 'Comments',
+    href: '/admin/comments',
+    icon: MessageSquare,
+    description: 'Student video questions, replies, and discussion moderation',
   },
   {
     label: 'Orders & Payments',

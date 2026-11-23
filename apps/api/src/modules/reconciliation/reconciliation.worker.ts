@@ -24,6 +24,9 @@ export function initializeReconciliationWorker(): { queue: Queue; worker: Worker
   };
 
   reconciliationQueue = new Queue(RECONCILIATION_QUEUE_NAME, { connection: redisClient });
+  reconciliationQueue.on('error', (err) => {
+    logger.warn({ err: err.message }, 'Reconciliation queue redis warning');
+  });
 
   reconciliationWorker = new Worker(
     RECONCILIATION_QUEUE_NAME,
@@ -40,15 +43,26 @@ export function initializeReconciliationWorker(): { queue: Queue; worker: Worker
     { connection, concurrency: 1 },
   );
 
+  reconciliationWorker.on('error', (err) => {
+    logger.warn({ err: err.message }, 'Reconciliation worker redis warning');
+  });
+
   reconciliationWorker.on('failed', (job, err) => {
     logger.error({ jobId: job?.id, err }, 'Reconciliation job failed');
   });
 
   // Schedule repeatable job every 15 minutes in non-test mode
   if (env.NODE_ENV !== 'test') {
-    reconciliationQueue.upsertJobScheduler('periodic-reconcile', {
-      every: 15 * 60 * 1000, // every 15 minutes
-    });
+    reconciliationQueue
+      .upsertJobScheduler('periodic-reconcile', {
+        every: 15 * 60 * 1000, // every 15 minutes
+      })
+      .catch((err) => {
+        logger.warn(
+          { err: err.message },
+          'Failed to schedule periodic reconciliation job in Redis',
+        );
+      });
   }
 
   return { queue: reconciliationQueue, worker: reconciliationWorker };

@@ -69,7 +69,7 @@ export function createRateLimiter(options: RateLimiterOptions) {
       );
 
       // In production, fail-closed on sensitive routes or refuse to proceed
-      if (isProduction || options.isSensitive) {
+      if (isProduction) {
         next(
           new ServiceUnavailableError(
             'Security rate-limit verification service unavailable. Request rejected.',
@@ -79,7 +79,10 @@ export function createRateLimiter(options: RateLimiterOptions) {
       }
 
       // In non-sensitive local development, allow through with warning
-      logger.warn('Non-sensitive request permitted during local development Redis outage');
+      logger.warn(
+        { keyPrefix: options.keyPrefix },
+        'Request permitted during local development Redis outage',
+      );
       next();
     }
   };
