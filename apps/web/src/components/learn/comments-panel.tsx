@@ -45,7 +45,7 @@ function formatRelativeTime(dateString: string): string {
 function insertReplyIntoTree(
   items: LessonComment[],
   targetParentId: string,
-  newReply: LessonComment
+  newReply: LessonComment,
 ): LessonComment[] {
   return items.map((item) => {
     if (item.id === targetParentId) {
@@ -94,7 +94,9 @@ function CommentThreadItem({
   const isTopLevel = depth === 0;
 
   return (
-    <div className={`group/comment relative flex gap-2.5 ${depth > 0 ? 'mt-2.5' : 'pb-2 last:pb-0'}`}>
+    <div
+      className={`group/comment relative flex gap-2.5 ${depth > 0 ? 'mt-2.5' : 'pb-2 last:pb-0'}`}
+    >
       {/* Left: Avatar & Continuous Vertical Thread Line */}
       <div className="flex flex-col items-center shrink-0">
         <div
