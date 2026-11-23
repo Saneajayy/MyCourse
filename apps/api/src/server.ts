@@ -26,8 +26,29 @@ async function startServer(): Promise<void> {
   initializeWebhookQueue();
   initializeExpiryWorker();
 
-  // Pre-flight boot readiness check
-  const [dbHealthy, redisHealthy] = await Promise.all([checkDatabaseHealth(), checkRedisHealth()]);
+  // Pre-flight boot readiness check with retry in production
+  let dbHealthy = false;
+  let redisHealthy = false;
+  const maxAttempts = env.NODE_ENV === 'production' ? 5 : 1;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    [dbHealthy, redisHealthy] = await Promise.all([
+      checkDatabaseHealth(),
+      checkRedisHealth(attempt === 1 ? 5000 : 3000),
+    ]);
+
+    if (dbHealthy && redisHealthy) {
+      break;
+    }
+
+    if (attempt < maxAttempts) {
+      logger.warn(
+        { attempt, maxAttempts, dbHealthy, redisHealthy },
+        'Pre-flight check failed, retrying in 2 seconds...',
+      );
+      await new Promise((r) => setTimeout(r, 2000));
+    }
+  }
 
   checkTurnstileConfiguration();
 

@@ -21,18 +21,55 @@ redisClient.on('connect', () => {
   logger.info('Connected to Redis');
 });
 
+redisClient.on('ready', () => {
+  logger.info('Redis client ready');
+});
+
 redisClient.on('error', (err) => {
   logger.error({ err }, 'Redis connection error');
 });
 
-export async function checkRedisHealth(): Promise<boolean> {
+export async function checkRedisHealth(timeoutMs = 3000): Promise<boolean> {
+  // If not ready yet but connecting or connected, wait for 'ready' event
   if (redisClient.status !== 'ready') {
-    return false;
+    if (
+      redisClient.status === 'connecting' ||
+      redisClient.status === 'connect' ||
+      redisClient.status === 'wait'
+    ) {
+      const isReady = await new Promise<boolean>((resolve) => {
+        const timer = setTimeout(() => {
+          cleanup();
+          resolve(false);
+        }, timeoutMs);
+
+        const onReady = () => {
+          cleanup();
+          resolve(true);
+        };
+
+        const cleanup = () => {
+          clearTimeout(timer);
+          redisClient.off('ready', onReady);
+        };
+
+        redisClient.once('ready', onReady);
+      });
+
+      if (!isReady) {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
+
   try {
     const pong = await Promise.race([
       redisClient.ping(),
-      new Promise<string>((_, reject) => setTimeout(() => reject(new Error('timeout')), 1500)),
+      new Promise<string>((_, reject) =>
+        setTimeout(() => reject(new Error('timeout')), Math.min(timeoutMs, 2000)),
+      ),
     ]);
     return pong === 'PONG';
   } catch (error) {
