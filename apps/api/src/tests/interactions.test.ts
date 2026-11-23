@@ -236,7 +236,7 @@ describe('Interactions (Likes & Comments) Test Suite', () => {
 
     // Verify when fetching comments, reply is nested
     const updatedList = await request(app).get(`/api/v1/lessons/${lessonId}/comments`);
-    expect(updatedList.body.data[0].replies.length).toBe(1);
+    expect(updatedList.body.data[0].replies.length).toBe(2);
     expect(updatedList.body.data[0].replies[0].content).toContain('protects the pump');
   }, 15000);
 

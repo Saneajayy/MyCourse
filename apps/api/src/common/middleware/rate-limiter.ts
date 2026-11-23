@@ -69,7 +69,7 @@ export function createRateLimiter(options: RateLimiterOptions) {
       );
 
       // In production, fail-closed on sensitive routes or refuse to proceed
-      if (isProduction) {
+      if (isProduction || options.isSensitive) {
         next(
           new ServiceUnavailableError(
             'Security rate-limit verification service unavailable. Request rejected.',
