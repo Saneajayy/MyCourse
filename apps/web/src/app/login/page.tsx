@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/auth-context';
 import { useToast } from '../../components/ui';
 import { siteConfig } from '../../config/site';
-import { AlertCircle, Check, Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react';
+import { AlertCircle, Check, Eye, EyeOff, Loader2, ArrowLeft, X } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
@@ -89,9 +89,17 @@ function LoginForm() {
     <div className="relative w-full">
       {/* Error Alert outside the card - floats softly above without shifting card position */}
       {errorMsg && (
-        <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-max max-w-full px-4 py-2.5 rounded-none bg-[#ef5543] text-white text-xs font-medium flex items-center justify-center gap-2 text-center shadow-lg animate-in fade-in duration-200 pointer-events-auto">
-          <AlertCircle className="w-4 h-4 shrink-0 text-white/90" />
-          <span>{errorMsg}</span>
+        <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-max max-w-full rounded-none bg-[#ef5543] text-white text-xs font-medium flex items-center shadow-lg animate-in fade-in duration-200 pointer-events-auto overflow-hidden">
+          <span className="py-2.5 pl-4 pr-3.5 leading-normal">{errorMsg}</span>
+          <div className="w-[1px] self-stretch bg-white/40 shrink-0" />
+          <button
+            type="button"
+            onClick={() => setErrorMsg(null)}
+            className="px-3 self-stretch flex items-center justify-center text-white/90 hover:text-white hover:bg-black/10 transition-colors cursor-pointer outline-none focus:outline-none shrink-0"
+            title="Dismiss error"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
