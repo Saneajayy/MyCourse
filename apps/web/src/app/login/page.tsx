@@ -86,11 +86,11 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full space-y-3">
-      {/* Error Alert outside the card */}
+    <div className="relative w-full">
+      {/* Error Alert outside the card - floats softly above without shifting card position */}
       {errorMsg && (
-        <div className="w-full p-3 rounded-lg bg-red-600 text-white text-xs font-medium flex items-center justify-center gap-2 text-center shadow-lg animate-in fade-in duration-150">
-          <AlertCircle className="w-4 h-4 shrink-0 text-white" />
+        <div className="absolute bottom-full mb-3 left-0 right-0 p-3 rounded-lg bg-[#991b1b] text-white text-xs font-medium flex items-center justify-center gap-2 text-center shadow-lg border border-red-500/20 animate-in fade-in duration-200 pointer-events-auto">
+          <AlertCircle className="w-4 h-4 shrink-0 text-white/90" />
           <span>{errorMsg}</span>
         </div>
       )}
