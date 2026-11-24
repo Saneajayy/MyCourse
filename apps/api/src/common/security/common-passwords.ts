@@ -53,8 +53,6 @@ export function validatePasswordStrength(password: string): void {
   }
 
   if (isCommonPassword(password)) {
-    throw new BadRequestError(
-      'Password is too common or easily guessable. Please choose a stronger, more unique password.',
-    );
+    throw new BadRequestError('Please choose a strong password');
   }
 }

@@ -83,7 +83,7 @@ describe('Phase 2 Authentication, Sessions, and Security Integration Suite', () 
 
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
-      expect(res.body.error.message).toContain('too common or easily guessable');
+      expect(res.body.error.message).toContain('Please choose a strong password');
     });
 
     it('rejects short passwords under 10 characters', async () => {
