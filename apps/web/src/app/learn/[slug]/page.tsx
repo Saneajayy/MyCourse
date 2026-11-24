@@ -1954,11 +1954,43 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       {/* ============================================================== */}
       {/* 3. RIGHT CARD: COMMENTS & DISCUSSION (DESKTOP - FIXED)         */}
       {/* ============================================================== */}
-      {selectedLessonId && (
-        <aside className="hidden md:flex md:w-80 lg:w-[350px] xl:w-[380px] md:h-full md:shrink-0 flex-col overflow-hidden order-3">
+      <aside className="hidden md:flex md:w-80 lg:w-[350px] xl:w-[380px] md:h-full md:shrink-0 flex-col overflow-hidden order-3">
+        {selectedLessonId && !isPageLoading ? (
           <CommentsPanel lessonId={selectedLessonId} lessonTitle={currentLessonTitle} />
-        </aside>
-      )}
+        ) : (
+          <div className="bg-[#101012] rounded-xl flex flex-col h-full border border-white/[0.08] overflow-hidden select-none animate-pulse">
+            {/* Header skeleton */}
+            <div className="h-12 px-4 border-b border-white/[0.08] flex items-center justify-between shrink-0 bg-[#101012]">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded bg-white/10" />
+                <div className="h-4 w-20 bg-white/10 rounded" />
+              </div>
+            </div>
+
+            {/* Input bar skeleton */}
+            <div className="p-3 bg-[#101012] shrink-0 border-b border-white/[0.04]">
+              <div className="h-10 rounded-lg bg-[#0c0c0e] border border-white/[0.08]" />
+            </div>
+
+            {/* Comments list skeleton */}
+            <div className="p-3 sm:p-4 space-y-4 flex-1 overflow-hidden">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="space-y-2">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-white/10 shrink-0" />
+                    <div className="h-3 w-28 bg-white/10 rounded" />
+                    <div className="h-2.5 w-12 bg-white/5 rounded ml-auto" />
+                  </div>
+                  <div className="pl-8 space-y-1.5">
+                    <div className="h-3 bg-white/5 rounded w-4/5" />
+                    <div className="h-3 bg-white/5 rounded w-3/5" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </aside>
     </div>
   );
 }
