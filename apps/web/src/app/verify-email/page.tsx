@@ -241,20 +241,20 @@ function VerifyEmailForm() {
 
       <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
       {/* Header */}
-      <div className="space-y-1">
+      <div className="space-y-1 text-center">
         <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
           Please check your email
         </h1>
         <div className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
           <span>Enter the 6 digit OTP we sent to </span>
           {isEditingEmail ? (
-            <div className="inline-flex items-center gap-2 mt-2 w-full">
+            <div className="inline-flex items-center justify-center gap-2 mt-2 w-full">
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="flex-1 h-8 px-2.5 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-xs text-white placeholder:text-neutral-500 rounded-lg outline-none"
+                className="flex-1 max-w-[240px] h-8 px-2.5 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-xs text-white placeholder:text-neutral-500 rounded-lg outline-none"
                 autoFocus
               />
               <button
