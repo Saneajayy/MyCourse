@@ -93,29 +93,35 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 }
 
 function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }) {
-  const bgColors: Record<ToastType, string> = {
-    error: 'bg-[#ef5543]',
-    success: 'bg-[#10b981]',
-    warning: 'bg-[#f59e0b]',
-    info: 'bg-[#3b82f6]',
+  const iconConfigs: Record<ToastType, { bg: string; symbol: string }> = {
+    error: { bg: 'bg-[#ed5d00]', symbol: '!' },
+    warning: { bg: 'bg-[#f59e0b]', symbol: '!' },
+    success: { bg: 'bg-[#10b981]', symbol: '✓' },
+    info: { bg: 'bg-[#3b82f6]', symbol: 'i' },
   };
-  const bgClass = bgColors[toast.type] || 'bg-[#ef5543]';
+  const { bg: iconBg, symbol: iconSymbol } = iconConfigs[toast.type] || iconConfigs.error;
 
   return (
     <div
       role="alert"
-      className={`pointer-events-auto w-max max-w-full rounded-none ${bgClass} text-white text-xs font-medium flex items-center shadow-lg animate-in fade-in slide-in-from-top-3 duration-200 select-none overflow-hidden`}
+      className="pointer-events-auto relative w-max max-w-[90vw] sm:max-w-md bg-white text-black text-xs sm:text-[13px] rounded-[4px] shadow-[0_4px_18px_rgba(0,0,0,0.35)] border border-black/10 px-3.5 py-2.5 flex items-center gap-2.5 animate-in fade-in slide-in-from-top-3 duration-200 select-none"
     >
+      <div
+        className={`w-4 h-4 rounded-[2.5px] ${iconBg} text-white flex items-center justify-center shrink-0 font-bold text-[11px] leading-none select-none`}
+      >
+        {iconSymbol}
+      </div>
+      <span className="leading-snug break-words font-normal text-neutral-900">
+        {toast.message || toast.title}
+      </span>
       <button
         type="button"
         onClick={onDismiss}
-        className="px-3 self-stretch flex items-center justify-center text-white/90 hover:text-white hover:bg-black/10 transition-colors cursor-pointer outline-none focus:outline-none shrink-0"
+        className="text-neutral-400 hover:text-black transition-colors cursor-pointer outline-none focus:outline-none p-0.5 -mr-1 shrink-0 ml-1"
         title="Dismiss notification"
       >
-        <X className="w-3.5 h-3.5" />
+        <X className="w-3.5 h-3.5 stroke-[2.2]" />
       </button>
-      <div className="w-[1px] self-stretch bg-white/40 shrink-0" />
-      <span className="py-2.5 pl-3.5 pr-4 leading-normal">{toast.message || toast.title}</span>
     </div>
   );
 }
@@ -133,6 +139,7 @@ export interface ToastTabProps {
   onDismiss?: () => void;
   className?: string;
   variant?: 'error' | 'success' | 'warning' | 'info';
+  notch?: 'bottom' | 'top' | 'none';
 }
 
 export function ToastTab({
@@ -140,32 +147,46 @@ export function ToastTab({
   onDismiss,
   className = '',
   variant = 'error',
+  notch = 'bottom',
 }: ToastTabProps) {
   if (!message) return null;
 
-  const bgColors: Record<string, string> = {
-    error: 'bg-[#ef5543]',
-    success: 'bg-[#10b981]',
-    warning: 'bg-[#f59e0b]',
-    info: 'bg-[#3b82f6]',
+  const iconConfigs: Record<ToastType, { bg: string; symbol: string }> = {
+    error: { bg: 'bg-[#ed5d00]', symbol: '!' },
+    warning: { bg: 'bg-[#f59e0b]', symbol: '!' },
+    success: { bg: 'bg-[#10b981]', symbol: '✓' },
+    info: { bg: 'bg-[#3b82f6]', symbol: 'i' },
   };
-  const bgClass = bgColors[variant] || 'bg-[#ef5543]';
+  const config = (variant && iconConfigs[variant]) ? iconConfigs[variant] : iconConfigs.error;
+  const { bg: iconBg, symbol: iconSymbol } = config;
 
   return (
     <div
       role="alert"
-      className={`w-max max-w-full rounded-none ${bgClass} text-white text-xs font-medium flex items-center shadow-lg animate-in fade-in duration-200 pointer-events-auto overflow-hidden ${className}`}
+      className={`relative w-max max-w-[90vw] sm:max-w-md bg-white text-black text-xs sm:text-[13px] rounded-[4px] shadow-[0_4px_18px_rgba(0,0,0,0.35)] border border-black/10 px-3.5 py-2.5 flex items-center gap-2.5 animate-in fade-in zoom-in-95 duration-200 pointer-events-auto select-none ${className}`}
     >
-      <button
-        type="button"
-        onClick={onDismiss}
-        className="px-3 self-stretch flex items-center justify-center text-white/90 hover:text-white hover:bg-black/10 transition-colors cursor-pointer outline-none focus:outline-none shrink-0"
-        title="Dismiss notification"
+      <div
+        className={`w-4 h-4 rounded-[2.5px] ${iconBg} text-white flex items-center justify-center shrink-0 font-bold text-[11px] leading-none select-none`}
       >
-        <X className="w-3.5 h-3.5" />
-      </button>
-      <div className="w-[1px] self-stretch bg-white/40 shrink-0" />
-      <span className="py-2.5 pl-3.5 pr-4 leading-normal">{message}</span>
+        {iconSymbol}
+      </div>
+      <span className="leading-snug break-words font-normal text-neutral-900">{message}</span>
+      {onDismiss && (
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="text-neutral-400 hover:text-black transition-colors cursor-pointer outline-none focus:outline-none p-0.5 -mr-1 shrink-0 ml-1"
+          title="Dismiss notification"
+        >
+          <X className="w-3.5 h-3.5 stroke-[2.2]" />
+        </button>
+      )}
+      {notch === 'bottom' && (
+        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-[0.5px] w-0 h-0 border-x-[6px] border-x-transparent border-t-[6px] border-t-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.12)] pointer-events-none" />
+      )}
+      {notch === 'top' && (
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 -mb-[0.5px] w-0 h-0 border-x-[6px] border-x-transparent border-b-[6px] border-b-white drop-shadow-[0_-1px_1px_rgba(0,0,0,0.12)] pointer-events-none" />
+      )}
     </div>
   );
 }
