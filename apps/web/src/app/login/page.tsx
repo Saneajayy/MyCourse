@@ -90,8 +90,6 @@ function LoginForm() {
       {/* Error Alert outside the card - floats softly above without shifting card position */}
       {errorMsg && (
         <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-max max-w-full rounded-none bg-[#ef5543] text-white text-xs font-medium flex items-center shadow-lg animate-in fade-in duration-200 pointer-events-auto overflow-hidden">
-          <span className="py-2.5 pl-4 pr-3.5 leading-normal">{errorMsg}</span>
-          <div className="w-[1px] self-stretch bg-white/40 shrink-0" />
           <button
             type="button"
             onClick={() => setErrorMsg(null)}
@@ -100,6 +98,8 @@ function LoginForm() {
           >
             <X className="w-3.5 h-3.5" />
           </button>
+          <div className="w-[1px] self-stretch bg-white/40 shrink-0" />
+          <span className="py-2.5 pl-3.5 pr-4 leading-normal">{errorMsg}</span>
         </div>
       )}
 
