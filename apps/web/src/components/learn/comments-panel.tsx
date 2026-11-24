@@ -91,14 +91,8 @@ function CommentThreadItem({
       {/* Left: Avatar & Continuous Vertical Thread Line */}
       <div className="flex flex-col items-center shrink-0">
         <div
-          className={`rounded-full overflow-hidden flex items-center justify-center shrink-0 select-none ${
-            isTopLevel
-              ? isCommentAdmin
-                ? 'w-6 h-6 bg-[#337df6]/20 text-[#337df6]'
-                : 'w-6 h-6 bg-white/[0.08] text-white/60'
-              : isCommentAdmin
-                ? 'w-5 h-5 bg-[#337df6]/20 text-[#337df6]'
-                : 'w-5 h-5 bg-white/[0.08] text-white/60'
+          className={`rounded-full overflow-hidden flex items-center justify-center shrink-0 select-none bg-white/[0.08] text-white/60 ${
+            isTopLevel ? 'w-6 h-6' : 'w-5 h-5'
           }`}
         >
           <svg
