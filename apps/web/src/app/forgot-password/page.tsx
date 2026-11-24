@@ -367,7 +367,7 @@ function ForgotPasswordContent() {
                 {isVerifying && (
                   <Loader2 className="w-4 h-4 animate-spin text-black" aria-hidden="true" />
                 )}
-                <span>{isVerifying ? 'Verifying...' : 'Verify'}</span>
+                <span>{isVerifying ? 'Verifying...' : 'Verify \u2192'}</span>
               </button>
             </div>
           </form>
