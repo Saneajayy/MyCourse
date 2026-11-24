@@ -219,6 +219,14 @@ describe('Interactions (Likes & Comments) Test Suite', () => {
   });
 
   it('5. Admin CAN reply to a comment (showing Instructor role)', async () => {
+    // 5a. Admin blocked from posting comments directly via student player endpoint
+    const blockedRes = await request(app)
+      .post(`/api/v1/lessons/${lessonId}/comments`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ content: 'Direct comment from player' });
+    expect(blockedRes.status).toBe(403);
+
+    // 5b. Admin successfully replies via admin moderation endpoint
     const listRes = await request(app).get(`/api/v1/lessons/${lessonId}/comments`);
     const parentId = listRes.body.data[0].id;
 

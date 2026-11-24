@@ -6,7 +6,6 @@ import {
   Search,
   Reply,
   Trash2,
-  ShieldCheck,
   Loader2,
   AlertCircle,
   ChevronLeft,
@@ -274,13 +273,7 @@ export default function AdminCommentsPage() {
                       {comment.replies.map((reply) => (
                         <div key={reply.id} className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-white/90">
-                              {reply.user.name}
-                            </span>
-                            <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[9px] font-bold uppercase tracking-wider">
-                              <ShieldCheck className="w-2.5 h-2.5" />
-                              Instructor
-                            </span>
+                            <span className="text-xs font-semibold text-[#337df6]">INSTRUCTOR</span>
                             <span className="text-[10px] font-mono text-white/40">
                               {new Date(reply.createdAt).toLocaleDateString(undefined, {
                                 month: 'short',

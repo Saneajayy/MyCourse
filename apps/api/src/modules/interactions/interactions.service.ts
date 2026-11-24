@@ -189,10 +189,16 @@ export class InteractionsService {
   async createComment(
     lessonId: string,
     userId: string,
-    _userRole: UserRole,
+    userRole: UserRole,
     content: string,
     parentId?: string | null,
   ): Promise<CommentItem> {
+    if (userRole === UserRole.ADMIN) {
+      throw new ForbiddenError(
+        'Admins must post comments and replies via the Admin Dashboard comments tab',
+      );
+    }
+
     const trimmed = (content || '').trim();
     if (!trimmed) {
       throw new BadRequestError('Comment content cannot be empty');

@@ -1,16 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  MessageSquare,
-  SendHorizontal,
-  Trash2,
-  ShieldCheck,
-  X,
-  Loader2,
-  AlertCircle,
-  User,
-} from 'lucide-react';
+import { MessageSquare, SendHorizontal, Trash2, X, Loader2, AlertCircle, User } from 'lucide-react';
 import { interactionsApi, LessonComment } from '../../lib/interactions';
 import { useAuth } from '../../context/auth-context';
 import Link from 'next/link';
@@ -102,9 +93,11 @@ function CommentThreadItem({
         <div
           className={`rounded-full flex items-center justify-center shrink-0 select-none ${
             isTopLevel
-              ? 'w-6 h-6 bg-white/[0.08] text-white/60'
+              ? isCommentAdmin
+                ? 'w-6 h-6 bg-[#337df6]/20 text-[#337df6]'
+                : 'w-6 h-6 bg-white/[0.08] text-white/60'
               : isCommentAdmin
-                ? 'w-5 h-5 bg-blue-500/20 text-blue-400'
+                ? 'w-5 h-5 bg-[#337df6]/20 text-[#337df6]'
                 : 'w-5 h-5 bg-white/[0.08] text-white/60'
           }`}
         >
@@ -115,29 +108,17 @@ function CommentThreadItem({
 
       {/* Right Column: Header, Body, Reply Action, Form, and Recursive Children */}
       <div className="flex-1 min-w-0 space-y-1.5 pb-1">
-        <div
-          className={`rounded-lg transition-colors ${
-            !isTopLevel && isCommentAdmin
-              ? 'bg-blue-500/[0.08] border border-blue-500/25 p-2.5 shadow-sm'
-              : ''
-          }`}
-        >
+        <div>
           {/* Header */}
           <div className="flex items-center justify-between gap-2 h-6">
             <div className="flex items-center gap-2 min-w-0">
               <span
                 className={`text-xs font-semibold truncate ${
-                  isCommentAdmin && !isTopLevel ? 'text-blue-400' : 'text-white/90'
+                  isCommentAdmin ? 'text-[#337df6]' : 'text-white/90'
                 }`}
               >
-                {comment.user.name}
+                {isCommentAdmin ? 'INSTRUCTOR' : comment.user.name}
               </span>
-              {isCommentAdmin && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] font-bold uppercase tracking-wider">
-                  <ShieldCheck className="w-2.5 h-2.5" />
-                  Instructor
-                </span>
-              )}
               <span className="text-[10px] font-mono text-white/40 shrink-0">
                 {formatRelativeTime(comment.createdAt)}
               </span>
@@ -163,29 +144,27 @@ function CommentThreadItem({
           {/* Comment Body */}
           <p
             className={`text-xs leading-relaxed whitespace-pre-wrap break-words ${
-              comment.isDeleted
-                ? 'italic text-white/30 text-[11px]'
-                : isCommentAdmin && !isTopLevel
-                  ? 'text-white/90'
-                  : 'text-white/80'
+              comment.isDeleted ? 'italic text-white/30 text-[11px]' : 'text-white/80'
             }`}
           >
             {comment.content}
           </p>
 
           {/* Reply Action Button (Comment Icon) */}
-          {!comment.isDeleted && (
+          {!comment.isDeleted && !isAdmin && (
             <div className="flex items-center gap-2 pt-0.5">
               <button
                 type="button"
-                onClick={() => onReplyClick(comment.id, comment.user.name)}
+                onClick={() =>
+                  onReplyClick(comment.id, isCommentAdmin ? 'INSTRUCTOR' : comment.user.name)
+                }
                 className={`inline-flex items-center justify-center w-5 h-5 rounded hover:bg-white/10 transition-colors cursor-pointer outline-none focus:outline-none ${
                   replyingToItemId === comment.id
                     ? 'text-[#337df6] bg-white/10'
                     : 'text-white/40 hover:text-white'
                 }`}
-                title={`Reply to ${comment.user.name}`}
-                aria-label={`Reply to ${comment.user.name}`}
+                title={`Reply to ${isCommentAdmin ? 'INSTRUCTOR' : comment.user.name}`}
+                aria-label={`Reply to ${isCommentAdmin ? 'INSTRUCTOR' : comment.user.name}`}
               >
                 <MessageSquare className="w-3.5 h-3.5" />
               </button>
@@ -397,6 +376,18 @@ export function CommentsPanel({ lessonId, onClose, className = '' }: CommentsPan
               className="px-2.5 py-1 bg-[#337df6] hover:bg-[#2b6ad0] text-white text-[11px] font-semibold rounded transition-colors shrink-0 outline-none focus:outline-none focus-visible:outline-none"
             >
               Sign In
+            </Link>
+          </div>
+        ) : user?.role === 'ADMIN' ? (
+          <div className="px-3.5 py-2 rounded-lg bg-[#0c0c0e] border border-white/[0.08] flex items-center justify-between gap-2">
+            <span className="text-[11px] text-white/50 truncate">
+              Admins reply via Admin Console
+            </span>
+            <Link
+              href="/admin/comments"
+              className="px-2.5 py-1 bg-[#337df6] hover:bg-[#2b6ad0] text-white text-[11px] font-semibold rounded transition-colors shrink-0 outline-none focus:outline-none focus-visible:outline-none"
+            >
+              Comments Tab
             </Link>
           </div>
         ) : (
