@@ -204,7 +204,7 @@ function ResetPasswordForm() {
                 {isLoading && (
                   <Loader2 className="w-4 h-4 animate-spin text-black" aria-hidden="true" />
                 )}
-                <span>{isLoading ? 'Updating Password...' : 'Save New Password \u2192'}</span>
+                <span>{isLoading ? 'Updating Password' : 'Save New Password \u2192'}</span>
               </button>
             </div>
           </form>

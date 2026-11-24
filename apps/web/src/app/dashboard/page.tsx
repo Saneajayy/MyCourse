@@ -1269,7 +1269,7 @@ function StudentDashboardContent() {
                             className="w-full h-9 sm:h-10 px-4 bg-white text-black hover:bg-neutral-200 active:bg-neutral-300 font-medium text-xs sm:text-[13px] rounded-lg transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
                           >
                             {passwordSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                            <span>{passwordSaving ? 'Updating...' : 'Update Password'}</span>
+                            <span>{passwordSaving ? 'Updating' : 'Update Password'}</span>
                           </button>
                         </div>
                       </form>
