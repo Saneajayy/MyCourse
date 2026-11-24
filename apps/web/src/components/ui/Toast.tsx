@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
-import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 export type ToastType = 'info' | 'success' | 'error' | 'warning';
 
@@ -93,59 +93,29 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 }
 
 function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }) {
-  const configs = {
-    info: {
-      badgeBg: 'bg-black/10 border-black/20 text-black',
-      borderAccent: 'border-l-[#000000]',
-      icon: <Info className="w-4 h-4 stroke-[2.5]" />,
-    },
-    success: {
-      badgeBg: 'bg-emerald-50 border-emerald-200/70 text-emerald-600',
-      borderAccent: 'border-l-emerald-500',
-      icon: <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />,
-    },
-    error: {
-      badgeBg: 'bg-rose-50 border-rose-200/70 text-rose-600',
-      borderAccent: 'border-l-rose-500',
-      icon: <AlertCircle className="w-4 h-4 stroke-[2.5]" />,
-    },
-    warning: {
-      badgeBg: 'bg-amber-50 border-amber-200/70 text-amber-600',
-      borderAccent: 'border-l-amber-500',
-      icon: <AlertTriangle className="w-4 h-4 stroke-[2.5]" />,
-    },
+  const bgColors: Record<ToastType, string> = {
+    error: 'bg-[#ef5543]',
+    success: 'bg-[#10b981]',
+    warning: 'bg-[#f59e0b]',
+    info: 'bg-[#3b82f6]',
   };
-
-  const config = configs[toast.type];
+  const bgClass = bgColors[toast.type] || 'bg-[#ef5543]';
 
   return (
     <div
-      role="status"
-      className={`pointer-events-auto flex items-start gap-3 p-3.5 sm:p-4 bg-white/95 backdrop-blur-md border border-neutral-200/90 border-l-[3.5px] ${config.borderAccent} rounded-none shadow-[0_10px_25px_-5px_rgba(0,0,0,0.08),0_4px_10px_-2px_rgba(0,0,0,0.04)] w-full transition-all animate-in fade-in slide-in-from-top-3 duration-200 select-none`}
+      role="alert"
+      className={`pointer-events-auto w-max max-w-full rounded-none ${bgClass} text-white text-xs font-medium flex items-center shadow-lg animate-in fade-in slide-in-from-top-3 duration-200 select-none overflow-hidden`}
     >
-      <div
-        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-none border flex items-center justify-center shrink-0 ${config.badgeBg}`}
-      >
-        {config.icon}
-      </div>
-      <div className="flex-1 text-left min-w-0 pt-0.5">
-        <h4 className="text-[13px] sm:text-sm font-bold text-neutral-900 leading-tight">
-          {toast.title}
-        </h4>
-        {toast.message && (
-          <p className="text-xs text-neutral-600 mt-1 leading-relaxed break-words font-normal">
-            {toast.message}
-          </p>
-        )}
-      </div>
       <button
         type="button"
         onClick={onDismiss}
-        aria-label="Dismiss notification"
-        className="p-1 rounded-none text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors -mr-1 -mt-1 cursor-pointer shrink-0"
+        className="px-3 self-stretch flex items-center justify-center text-white/90 hover:text-white hover:bg-black/10 transition-colors cursor-pointer outline-none focus:outline-none shrink-0"
+        title="Dismiss notification"
       >
-        <X className="w-3.5 h-3.5 stroke-[2.2]" />
+        <X className="w-3.5 h-3.5" />
       </button>
+      <div className="w-[1px] self-stretch bg-white/40 shrink-0" />
+      <span className="py-2.5 pl-3.5 pr-4 leading-normal">{toast.message || toast.title}</span>
     </div>
   );
 }
@@ -156,4 +126,46 @@ export function useToast(): ToastContextValue {
     throw new Error('useToast must be used within a ToastProvider');
   }
   return context;
+}
+
+export interface ToastTabProps {
+  message: string | null;
+  onDismiss?: () => void;
+  className?: string;
+  variant?: 'error' | 'success' | 'warning' | 'info';
+}
+
+export function ToastTab({
+  message,
+  onDismiss,
+  className = '',
+  variant = 'error',
+}: ToastTabProps) {
+  if (!message) return null;
+
+  const bgColors: Record<string, string> = {
+    error: 'bg-[#ef5543]',
+    success: 'bg-[#10b981]',
+    warning: 'bg-[#f59e0b]',
+    info: 'bg-[#3b82f6]',
+  };
+  const bgClass = bgColors[variant] || 'bg-[#ef5543]';
+
+  return (
+    <div
+      role="alert"
+      className={`w-max max-w-full rounded-none ${bgClass} text-white text-xs font-medium flex items-center shadow-lg animate-in fade-in duration-200 pointer-events-auto overflow-hidden ${className}`}
+    >
+      <button
+        type="button"
+        onClick={onDismiss}
+        className="px-3 self-stretch flex items-center justify-center text-white/90 hover:text-white hover:bg-black/10 transition-colors cursor-pointer outline-none focus:outline-none shrink-0"
+        title="Dismiss notification"
+      >
+        <X className="w-3.5 h-3.5" />
+      </button>
+      <div className="w-[1px] self-stretch bg-white/40 shrink-0" />
+      <span className="py-2.5 pl-3.5 pr-4 leading-normal">{message}</span>
+    </div>
+  );
 }

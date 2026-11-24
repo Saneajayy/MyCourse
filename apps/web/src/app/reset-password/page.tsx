@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useToast } from '../../components/ui';
+import { useToast, ToastTab } from '../../components/ui';
 import { apiClient } from '../../lib/api-client';
 import { Eye, EyeOff, Loader2, ArrowLeft, AlertCircle } from 'lucide-react';
 
@@ -80,7 +80,15 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
+    <div className="relative w-full">
+      {/* Error Alert outside the card - floats softly above without shifting card position */}
+      <ToastTab
+        message={errorMsg}
+        onDismiss={() => setErrorMsg(null)}
+        className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 z-20"
+      />
+
+      <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
       {isSuccess ? (
         <div className="text-center py-8 space-y-3">
           <Loader2 className="w-6 h-6 animate-spin text-white mx-auto" />
@@ -118,14 +126,6 @@ function ResetPasswordForm() {
               Choose a secure new password of at least 10 characters.
             </p>
           </div>
-
-          {/* Error Alert */}
-          {errorMsg && (
-            <div className="p-3 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-300 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-3.5 pt-1">
@@ -233,6 +233,7 @@ function ResetPasswordForm() {
           </p>
         </>
       )}
+    </div>
     </div>
   );
 }

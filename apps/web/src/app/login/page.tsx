@@ -5,9 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/auth-context';
-import { useToast } from '../../components/ui';
+import { useToast, ToastTab } from '../../components/ui';
 import { siteConfig } from '../../config/site';
-import { AlertCircle, Check, Eye, EyeOff, Loader2, ArrowLeft, X } from 'lucide-react';
+import { Check, Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
@@ -88,20 +88,11 @@ function LoginForm() {
   return (
     <div className="relative w-full">
       {/* Error Alert outside the card - floats softly above without shifting card position */}
-      {errorMsg && (
-        <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-max max-w-full rounded-none bg-[#ef5543] text-white text-xs font-medium flex items-center shadow-lg animate-in fade-in duration-200 pointer-events-auto overflow-hidden">
-          <button
-            type="button"
-            onClick={() => setErrorMsg(null)}
-            className="px-3 self-stretch flex items-center justify-center text-white/90 hover:text-white hover:bg-black/10 transition-colors cursor-pointer outline-none focus:outline-none shrink-0"
-            title="Dismiss error"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-          <div className="w-[1px] self-stretch bg-white/40 shrink-0" />
-          <span className="py-2.5 pl-3.5 pr-4 leading-normal">{errorMsg}</span>
-        </div>
-      )}
+      <ToastTab
+        message={errorMsg}
+        onDismiss={() => setErrorMsg(null)}
+        className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 z-20"
+      />
 
       <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
       {/* Header */}

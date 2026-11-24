@@ -4,10 +4,10 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useToast } from '../../components/ui';
+import { useToast, ToastTab } from '../../components/ui';
 import { useAuth, User } from '../../context/auth-context';
 import { apiClient } from '../../lib/api-client';
-import { Loader2, RotateCw, Check, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Loader2, RotateCw, Check, ArrowLeft } from 'lucide-react';
 
 function VerifyEmailForm() {
   const router = useRouter();
@@ -224,7 +224,22 @@ function VerifyEmailForm() {
   const isComplete = digits.every((d) => d.length === 1);
 
   return (
-    <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
+    <div className="relative w-full">
+      {/* Toast Tabs outside the card - floats softly above without shifting card position */}
+      <ToastTab
+        message={errorMessage}
+        onDismiss={() => setErrorMessage('')}
+        variant="error"
+        className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 z-20"
+      />
+      <ToastTab
+        message={infoMessage}
+        onDismiss={() => setInfoMessage('')}
+        variant="success"
+        className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 z-20"
+      />
+
+      <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
@@ -262,22 +277,6 @@ function VerifyEmailForm() {
           )}
         </div>
       </div>
-
-      {/* Info message */}
-      {infoMessage && (
-        <div className="p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 text-xs flex items-center gap-2">
-          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>{infoMessage}</span>
-        </div>
-      )}
-
-      {/* Error message */}
-      {errorMessage && (
-        <div className="p-3 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-300 text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-          <span>{errorMessage}</span>
-        </div>
-      )}
 
       {/* 6 Digit OTP Form */}
       <form onSubmit={handleManualSubmit} className="space-y-4 pt-1">
@@ -371,6 +370,7 @@ function VerifyEmailForm() {
         </Link>
         .
       </p>
+    </div>
     </div>
   );
 }

@@ -5,9 +5,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/auth-context';
-import { useToast } from '../../components/ui';
+import { useToast, ToastTab } from '../../components/ui';
 import { siteConfig } from '../../config/site';
-import { Eye, EyeOff, Loader2, ArrowLeft, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react';
 
 function RegisterForm() {
   const router = useRouter();
@@ -74,7 +74,15 @@ function RegisterForm() {
   };
 
   return (
-    <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
+    <div className="relative w-full">
+      {/* Error Alert outside the card - floats softly above without shifting card position */}
+      <ToastTab
+        message={errorMsg}
+        onDismiss={() => setErrorMsg(null)}
+        className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 z-20"
+      />
+
+      <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
       {/* Header */}
       <div className="space-y-1 text-center">
         <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
@@ -123,14 +131,6 @@ function RegisterForm() {
           OR
         </span>
       </div>
-
-      {/* Error Alert */}
-      {errorMsg && (
-        <div className="p-3 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-300 text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-          <span>{errorMsg}</span>
-        </div>
-      )}
 
       {/* Register Form */}
       <form onSubmit={handleSubmit} className="space-y-3.5">
@@ -241,6 +241,7 @@ function RegisterForm() {
         </Link>
         .
       </p>
+    </div>
     </div>
   );
 }
