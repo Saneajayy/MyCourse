@@ -316,15 +316,15 @@ function VerifyEmailForm() {
             {status === 'verifying' ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin text-black" aria-hidden="true" />
-                <span>Verifying Code...</span>
+                <span>Verifying</span>
               </>
             ) : status === 'success' ? (
               <>
                 <Check className="w-4 h-4 stroke-[2.5] text-emerald-600" aria-hidden="true" />
-                <span>Verified! Redirecting...</span>
+                <span>Verified! Redirecting</span>
               </>
             ) : (
-              <span>Verify &amp; Continue &rarr;</span>
+              <span>Verify &rarr;</span>
             )}
           </button>
         </div>
