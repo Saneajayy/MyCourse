@@ -310,7 +310,7 @@ export function CommentsPanel({ lessonId, onClose, className = '' }: CommentsPan
           maxLength={1000}
           disabled={isSubmittingReply}
           autoFocus
-          className="w-full h-10 bg-[#0c0c0e] hover:bg-[#121215] focus:bg-[#121215] border border-white/[0.08] focus:border-[#337df6] rounded-xl pl-3.5 pr-10 text-xs text-white placeholder-white/35 outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 transition-colors duration-150"
+          className="w-full h-10 bg-[#0c0c0e] hover:bg-[#121215] focus:bg-[#121215] border border-white focus:border-white rounded-xl pl-3.5 pr-10 text-xs text-white placeholder-white/35 outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 transition-colors duration-150"
         />
         <button
           type="submit"
@@ -400,7 +400,7 @@ export function CommentsPanel({ lessonId, onClose, className = '' }: CommentsPan
                 placeholder="Type your comment here."
                 maxLength={1000}
                 disabled={isSubmitting}
-                className="w-full h-10 bg-[#0c0c0e] hover:bg-[#121215] focus:bg-[#121215] border border-white/[0.08] focus:border-[#337df6] rounded-lg pl-3.5 pr-10 text-xs text-white placeholder-white/30 outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 transition-colors duration-150"
+                className="w-full h-10 bg-[#0c0c0e] hover:bg-[#121215] focus:bg-[#121215] border border-white focus:border-white rounded-lg pl-3.5 pr-10 text-xs text-white placeholder-white/30 outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 transition-colors duration-150"
               />
               <button
                 type="submit"
