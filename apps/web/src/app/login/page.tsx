@@ -86,7 +86,16 @@ function LoginForm() {
   };
 
   return (
-    <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
+    <div className="w-full space-y-3">
+      {/* Error Alert outside the card */}
+      {errorMsg && (
+        <div className="w-full p-3 rounded-lg bg-red-600 text-white text-xs font-medium flex items-center justify-center gap-2 text-center shadow-lg animate-in fade-in duration-150">
+          <AlertCircle className="w-4 h-4 shrink-0 text-white" />
+          <span>{errorMsg}</span>
+        </div>
+      )}
+
+      <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
       {/* Header */}
       <div className="space-y-1 text-center">
         <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
@@ -148,14 +157,6 @@ function LoginForm() {
 
       {/* 3. Credentials Form */}
       <form onSubmit={handleSubmit} className="space-y-3.5">
-        {/* Error Alert */}
-        {errorMsg && (
-          <div className="p-3 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-300 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
         {/* Email Field */}
         <div className="space-y-1.5 text-left">
           <label htmlFor="login-email" className="text-xs font-medium text-white block">
@@ -253,6 +254,7 @@ function LoginForm() {
         </Link>
         .
       </p>
+    </div>
     </div>
   );
 }
