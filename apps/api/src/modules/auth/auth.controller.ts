@@ -316,13 +316,23 @@ export class AuthController {
     }
   }
 
-  public async getGoogleAuthUrl(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  public async getGoogleAuthUrl(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const url = await googleOAuthService.generateAuthUrl();
-      res.status(200).json({
-        success: true,
-        data: { url },
-      });
+      // If requested as JSON explicitly (e.g. from fetch), return JSON
+      if (
+        req.headers.accept &&
+        req.headers.accept.includes('application/json') &&
+        !req.headers.accept.includes('text/html')
+      ) {
+        res.status(200).json({
+          success: true,
+          data: { url },
+        });
+        return;
+      }
+      // Standard browser navigation: redirect directly to Google consent screen
+      res.redirect(url);
     } catch (err) {
       next(err);
     }
