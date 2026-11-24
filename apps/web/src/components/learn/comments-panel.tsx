@@ -345,7 +345,7 @@ export function CommentsPanel({ lessonId, onClose, className = '' }: CommentsPan
 
   return (
     <div
-      className={`bg-[#101012] rounded-xl flex flex-col overflow-hidden h-full border border-white/[0.08] select-text font-reddit ${className}`}
+      className={`bg-[#101012] rounded-xl flex flex-col overflow-hidden h-full select-text font-reddit ${className}`}
     >
       {/* 1. Header */}
       <div className="h-12 px-4 border-b border-white/[0.08] flex items-center justify-between shrink-0 bg-[#101012]">

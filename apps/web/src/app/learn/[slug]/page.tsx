@@ -1958,7 +1958,7 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         {selectedLessonId && !isPageLoading ? (
           <CommentsPanel lessonId={selectedLessonId} lessonTitle={currentLessonTitle} />
         ) : (
-          <div className="bg-[#101012] rounded-xl flex flex-col h-full border border-white/[0.08] overflow-hidden select-none animate-pulse">
+          <div className="bg-[#101012] rounded-xl flex flex-col h-full overflow-hidden select-none animate-pulse">
             {/* Header skeleton */}
             <div className="h-12 px-4 border-b border-white/[0.08] flex items-center justify-between shrink-0 bg-[#101012]">
               <div className="flex items-center gap-2">
