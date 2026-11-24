@@ -223,7 +223,7 @@ function ForgotPasswordContent() {
       {step === 'email' ? (
         <>
           {/* Header */}
-          <div className="space-y-1">
+          <div className="space-y-1 text-center">
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Forgot your Password?
             </h1>
@@ -306,7 +306,7 @@ function ForgotPasswordContent() {
       ) : (
         <>
           {/* Header */}
-          <div className="space-y-1">
+          <div className="space-y-1 text-center">
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Please check your email
             </h1>
