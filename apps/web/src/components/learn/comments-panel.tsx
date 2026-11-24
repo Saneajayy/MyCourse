@@ -296,37 +296,52 @@ export function CommentsPanel({ lessonId, onClose, className = '' }: CommentsPan
     }
   };
 
-  const renderReplyForm = (parentId: string, targetName: string) => (
-    <form
-      onSubmit={(e) => handleReplySubmit(e, parentId)}
-      className="pt-2 pb-1 animate-in fade-in duration-150"
-    >
-      <div className="relative flex items-center">
-        <input
-          type="text"
-          value={replyContent}
-          onChange={(e) => setReplyContent(e.target.value)}
-          placeholder={`Reply to ${targetName}...`}
-          maxLength={1000}
-          disabled={isSubmittingReply}
-          autoFocus
-          className="w-full h-10 bg-[#0c0c0e] hover:bg-[#121215] focus:bg-[#121215] border border-white/25 hover:border-white/35 focus:border-white/40 rounded-xl pl-3.5 pr-10 text-xs text-white placeholder-white/35 outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 transition-colors duration-150"
-        />
-        <button
-          type="submit"
-          disabled={!replyContent.trim() || isSubmittingReply}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white disabled:opacity-20 disabled:pointer-events-none transition-colors cursor-pointer outline-none focus:outline-none"
-          title="Send reply"
-        >
-          {isSubmittingReply ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin text-white/50" />
-          ) : (
-            <SendHorizontal className="w-4 h-4" />
-          )}
-        </button>
-      </div>
-    </form>
-  );
+  const renderReplyForm = (parentId: string, targetName: string) => {
+    const hasReplyText = replyContent.length > 0;
+    const canSubmitReply = replyContent.trim().length > 0 && !isSubmittingReply;
+
+    return (
+      <form
+        onSubmit={(e) => handleReplySubmit(e, parentId)}
+        className="pt-2 pb-1 animate-in fade-in duration-150"
+      >
+        <div className="relative flex items-center">
+          <input
+            type="text"
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
+            placeholder={`Reply to ${targetName}...`}
+            maxLength={1000}
+            disabled={isSubmittingReply}
+            autoFocus
+            className={`w-full h-10 bg-[#0c0c0e] hover:bg-[#121215] focus:bg-[#121215] border rounded-xl pl-3.5 pr-10 text-xs text-white placeholder-white/35 outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 transition-colors duration-150 ${
+              hasReplyText
+                ? 'border-[#337df6] focus:border-[#337df6]'
+                : 'border-white/25 hover:border-white/35 focus:border-white/40'
+            }`}
+          />
+          <button
+            type="submit"
+            disabled={!canSubmitReply}
+            className={`absolute right-3 top-1/2 -translate-y-1/2 transition-colors outline-none focus:outline-none ${
+              hasReplyText
+                ? canSubmitReply
+                  ? 'text-[#337df6] hover:text-[#5293f8] cursor-pointer'
+                  : 'text-[#337df6]/60 cursor-default'
+                : 'text-white/25 cursor-default'
+            }`}
+            title="Send reply"
+          >
+            {isSubmittingReply ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#337df6]" />
+            ) : (
+              <SendHorizontal className="w-4 h-4" />
+            )}
+          </button>
+        </div>
+      </form>
+    );
+  };
 
   const handleDelete = async (commentId: string) => {
     if (deletingId) return;
@@ -342,6 +357,9 @@ export function CommentsPanel({ lessonId, onClose, className = '' }: CommentsPan
       setDeletingId(null);
     }
   };
+
+  const hasCommentText = content.length > 0;
+  const canSubmitComment = content.trim().length > 0 && !isSubmitting;
 
   return (
     <div
@@ -400,16 +418,26 @@ export function CommentsPanel({ lessonId, onClose, className = '' }: CommentsPan
                 placeholder="Type your comment here."
                 maxLength={1000}
                 disabled={isSubmitting}
-                className="w-full h-10 bg-[#0c0c0e] hover:bg-[#121215] focus:bg-[#121215] border border-white/25 hover:border-white/35 focus:border-white/40 rounded-lg pl-3.5 pr-10 text-xs text-white placeholder-white/30 outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 transition-colors duration-150"
+                className={`w-full h-10 bg-[#0c0c0e] hover:bg-[#121215] focus:bg-[#121215] border rounded-lg pl-3.5 pr-10 text-xs text-white placeholder-white/30 outline-none focus:outline-none focus-visible:outline-none ring-0 focus:ring-0 transition-colors duration-150 ${
+                  hasCommentText
+                    ? 'border-[#337df6] focus:border-[#337df6]'
+                    : 'border-white/25 hover:border-white/35 focus:border-white/40'
+                }`}
               />
               <button
                 type="submit"
-                disabled={!content.trim() || isSubmitting}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white disabled:opacity-20 disabled:pointer-events-none transition-colors cursor-pointer outline-none focus:outline-none"
+                disabled={!canSubmitComment}
+                className={`absolute right-3 top-1/2 -translate-y-1/2 transition-colors outline-none focus:outline-none ${
+                  hasCommentText
+                    ? canSubmitComment
+                      ? 'text-[#337df6] hover:text-[#5293f8] cursor-pointer'
+                      : 'text-[#337df6]/60 cursor-default'
+                    : 'text-white/25 cursor-default'
+                }`}
                 title="Post comment"
               >
                 {isSubmitting ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white/50" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-[#337df6]" />
                 ) : (
                   <SendHorizontal className="w-4 h-4" />
                 )}
