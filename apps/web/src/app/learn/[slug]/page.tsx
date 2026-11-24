@@ -1107,7 +1107,19 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
       {/* ============================================================== */}
       {/* 1. LEFT CARD: SYLLABUS                                        */}
       {/* ============================================================== */}
-      <aside className="w-full flex-1 min-h-0 md:flex-none md:w-72 lg:w-80 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden order-2 md:order-1">
+      <aside className="w-full flex-1 min-h-0 md:flex-none md:w-72 lg:w-80 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden order-2 md:order-1 relative">
+        {/* Mobile Comments: overlays only the syllabus card on mobile so the video stays visible */}
+        {showMobileComments && selectedLessonId && (
+          <div className="absolute inset-0 z-20 bg-[#101012] rounded-xl flex flex-col md:hidden animate-in fade-in duration-200">
+            <CommentsPanel
+              lessonId={selectedLessonId}
+              lessonTitle={currentLessonTitle}
+              onClose={() => setShowMobileComments(false)}
+              className="border-0 rounded-xl h-full"
+            />
+          </div>
+        )}
+
         {/* Brand Logo: Top Left Corner HYDRO BASICS */}
         <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
           <Link
@@ -1902,10 +1914,14 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
                 <div className="h-full w-px bg-white/[0.08] mx-0.5" />
                 <button
                   type="button"
-                  onClick={() => setShowMobileComments(true)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer outline-none focus:outline-none focus-visible:outline-none"
-                  title="View Comments"
-                  aria-label="View Comments"
+                  onClick={() => setShowMobileComments((prev) => !prev)}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors cursor-pointer outline-none focus:outline-none focus-visible:outline-none ${
+                    showMobileComments
+                      ? 'bg-[#337df6]/20 text-[#337df6]'
+                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                  }`}
+                  title={showMobileComments ? 'View Syllabus' : 'View Comments'}
+                  aria-label={showMobileComments ? 'View Syllabus' : 'View Comments'}
                 >
                   <MessageSquare className="w-4 h-4 text-[#337df6]" />
                 </button>
@@ -1942,30 +1958,6 @@ export default function CoursePlayerPage({ params }: { params: Promise<{ slug: s
         <aside className="hidden md:flex md:w-80 lg:w-[350px] xl:w-[380px] md:h-full md:shrink-0 flex-col overflow-hidden order-3">
           <CommentsPanel lessonId={selectedLessonId} lessonTitle={currentLessonTitle} />
         </aside>
-      )}
-
-      {/* ============================================================== */}
-      {/* 4. MOBILE COMMENTS POPUP SHEET                                 */}
-      {/* ============================================================== */}
-      {showMobileComments && selectedLessonId && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex flex-col justify-end md:hidden animate-in fade-in duration-200">
-          <div
-            className="flex-1 w-full"
-            onClick={() => setShowMobileComments(false)}
-            aria-hidden="true"
-          />
-          <div className="w-full h-[75vh] max-h-[85vh] bg-[#101012] border-t border-white/15 rounded-t-2xl flex flex-col overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-200">
-            <div className="w-10 h-1 bg-white/20 rounded-full mx-auto my-2.5 shrink-0" />
-            <div className="flex-1 min-h-0">
-              <CommentsPanel
-                lessonId={selectedLessonId}
-                lessonTitle={currentLessonTitle}
-                onClose={() => setShowMobileComments(false)}
-                className="border-0 rounded-none h-full"
-              />
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
