@@ -163,7 +163,7 @@ export function ToastTab({
   return (
     <div
       role="alert"
-      className={`relative w-max max-w-[90vw] sm:max-w-md bg-white text-black text-xs sm:text-[13px] rounded-[4px] shadow-[0_4px_18px_rgba(0,0,0,0.35)] border border-black/10 px-3.5 py-2.5 flex items-center gap-2.5 animate-in fade-in zoom-in-95 duration-200 pointer-events-auto select-none ${className}`}
+      className={`w-max max-w-[90vw] sm:max-w-md bg-white text-black text-xs sm:text-[13px] rounded-[4px] shadow-[0_4px_18px_rgba(0,0,0,0.35)] border border-black/10 px-3.5 py-2.5 flex items-center gap-2.5 animate-in fade-in zoom-in-95 duration-200 pointer-events-auto select-none ${className}`}
     >
       <div
         className={`w-4 h-4 rounded-[2.5px] ${iconBg} text-white flex items-center justify-center shrink-0 font-bold text-[11px] leading-none select-none`}
