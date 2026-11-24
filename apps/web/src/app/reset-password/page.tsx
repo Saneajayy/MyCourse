@@ -110,7 +110,7 @@ function ResetPasswordForm() {
       ) : (
         <>
           {/* Header */}
-          <div className="space-y-1">
+          <div className="space-y-1 text-center">
             <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Create New Password
             </h1>
