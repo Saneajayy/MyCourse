@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { MessageSquare, SendHorizontal, Trash2, X, Loader2, AlertCircle, User } from 'lucide-react';
+import { MessageSquare, SendHorizontal, Trash2, X, Loader2, AlertCircle } from 'lucide-react';
 import { interactionsApi, LessonComment } from '../../lib/interactions';
 import { useAuth } from '../../context/auth-context';
 import Link from 'next/link';
@@ -91,7 +91,7 @@ function CommentThreadItem({
       {/* Left: Avatar & Continuous Vertical Thread Line */}
       <div className="flex flex-col items-center shrink-0">
         <div
-          className={`rounded-full flex items-center justify-center shrink-0 select-none ${
+          className={`rounded-full overflow-hidden flex items-center justify-center shrink-0 select-none ${
             isTopLevel
               ? isCommentAdmin
                 ? 'w-6 h-6 bg-[#337df6]/20 text-[#337df6]'
@@ -101,7 +101,18 @@ function CommentThreadItem({
                 : 'w-5 h-5 bg-white/[0.08] text-white/60'
           }`}
         >
-          <User className={isTopLevel ? 'w-3.5 h-3.5' : 'w-3 h-3'} />
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-full h-full"
+          >
+            <circle cx="12" cy="7.5" r="3.5" />
+            <path d="M1.5 22.5c0-4.8 4.7-8 10.5-8s10.5 3.2 10.5 8" />
+          </svg>
         </div>
         <div className="w-[1.5px] bg-white/15 flex-1 my-1" />
       </div>
