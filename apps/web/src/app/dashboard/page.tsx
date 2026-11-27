@@ -25,7 +25,7 @@ import {
   Sigma,
   LogOut,
   Layers,
-  Scroll,
+  Files,
   IndianRupee,
   Settings,
   Search,
@@ -33,8 +33,11 @@ import {
   ChevronDown,
   Shapes,
 } from 'lucide-react';
-import { HydraulicCalculator } from '../../components/calculator/HydraulicCalculator';
-import { CourseLottieThumbnail } from '../../components/dashboard/CourseLottieThumbnail';
+import {
+  HydraulicCalculator,
+  CALCULATOR_SUB_SECTIONS,
+  type CalculatorSection,
+} from '../../components/calculator/HydraulicCalculator';
 
 export type DashboardTab =
   'courses' | 'certificates' | 'calculator' | 'symbols' | 'profile' | 'orders';
@@ -146,24 +149,37 @@ function StudentDashboardContent() {
   });
 
   const [isMainOpen, setIsMainOpen] = useState(true);
-  const [isToolsOpen, setIsToolsOpen] = useState<boolean>(() => {
-    return tabParam === 'calculator' || tabParam === 'symbols';
+  const [isToolsOpen, setIsToolsOpen] = useState(true);
+  const [isProfileOpen, setIsProfileOpen] = useState(true);
+
+  const [activeCalculatorSection, setActiveCalculatorSection] = useState<CalculatorSection>(() => {
+    const calcParam = searchParams.get('calc') as CalculatorSection | null;
+    if (calcParam && ['cylinder', 'motor', 'pump', 'pressure-drop', 'piping'].includes(calcParam)) {
+      return calcParam;
+    }
+    return 'cylinder';
   });
-  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(() => {
-    return tabParam === 'profile';
-  });
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(true);
 
   useEffect(() => {
     const tab = searchParams.get('tab');
+    const calc = searchParams.get('calc') as CalculatorSection | null;
+    if (calc && ['cylinder', 'motor', 'pump', 'pressure-drop', 'piping'].includes(calc)) {
+      setActiveCalculatorSection(calc);
+    }
     const preview = searchParams.get('preview_unlocked') === 'true';
     if (tab === 'tools') {
       setActiveTab('calculator');
       setIsToolsOpen(true);
+      setIsCalculatorOpen(true);
     } else if (tab && VALID_TABS.includes(tab as DashboardTab)) {
       setActiveTab(tab as DashboardTab);
-      if (tab === 'calculator' || tab === 'symbols') {
+      if (tab === 'calculator') {
         setIsToolsOpen(true);
-      } else if (tab === 'profile') {
+        setIsCalculatorOpen(true);
+      } else if (tab === 'symbols') {
+        setIsToolsOpen(true);
+      } else if (tab === 'profile' || tab === 'orders') {
         setIsProfileOpen(true);
       }
     } else if (preview) {
@@ -172,16 +188,33 @@ function StudentDashboardContent() {
   }, [searchParams]);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const desktopNavRef = useRef<HTMLElement | null>(null);
   const tabRefs = useRef<{ [key in DashboardTab]?: HTMLButtonElement | null }>({});
-  const [indicatorStyle, setIndicatorStyle] = useState<{
-    top: number;
-    height: number;
-    opacity: number;
+  const [mounted, setMounted] = useState(false);
+  const prevSectionRef = useRef<'main' | 'tool' | 'profile' | null>(null);
+  const [slideEnabledSection, setSlideEnabledSection] = useState<
+    'main' | 'tool' | 'profile' | null
+  >(null);
+  const [sectionIndicators, setSectionIndicators] = useState<{
+    main: { top: number; height: number };
+    tool: { top: number; height: number };
+    profile: { top: number; height: number };
   }>({
-    top: 0,
-    height: 0,
-    opacity: 0,
+    main: { top: 0, height: 0 },
+    tool: { top: 0, height: 0 },
+    profile: { top: 0, height: 0 },
   });
+
+  const currentSection: 'main' | 'tool' | 'profile' =
+    activeTab === 'courses' || activeTab === 'certificates'
+      ? 'main'
+      : activeTab === 'calculator' || activeTab === 'symbols'
+        ? 'tool'
+        : 'profile';
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Courses state
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
@@ -189,37 +222,100 @@ function StudentDashboardContent() {
   const [coursesError, setCoursesError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Sync tab with URL query parameter
-  const handleTabChange = useCallback((newTab: DashboardTab) => {
-    setActiveTab(newTab);
+  // Handler for selecting a specific calculator sub-section
+  const handleCalculatorSubSectionChange = useCallback((subSection: CalculatorSection) => {
+    setActiveTab('calculator');
+    setActiveCalculatorSection(subSection);
+    setIsToolsOpen(true);
+    setIsCalculatorOpen(true);
     setIsMobileMenuOpen(false);
-    if (newTab === 'calculator' || newTab === 'symbols') {
-      setIsToolsOpen(true);
-    } else if (newTab === 'profile') {
-      setIsProfileOpen(true);
-    }
+
     const url = new URL(window.location.href);
-    url.searchParams.set('tab', newTab);
+    url.searchParams.set('tab', 'calculator');
+    url.searchParams.set('calc', subSection);
     window.history.replaceState({}, '', url.toString());
   }, []);
 
+  // Sync tab with URL query parameter
+  const handleTabChange = useCallback(
+    (newTab: DashboardTab) => {
+      setActiveTab(newTab);
+      setIsMobileMenuOpen(false);
+      if (newTab === 'calculator') {
+        setIsToolsOpen(true);
+        setIsCalculatorOpen(true);
+      } else if (newTab === 'symbols') {
+        setIsToolsOpen(true);
+      } else if (newTab === 'profile' || newTab === 'orders') {
+        setIsProfileOpen(true);
+      } else if (newTab === 'courses' || newTab === 'certificates') {
+        setIsMainOpen(true);
+      }
+      const url = new URL(window.location.href);
+      url.searchParams.set('tab', newTab);
+      if (newTab === 'calculator') {
+        url.searchParams.set('calc', activeCalculatorSection);
+      } else {
+        url.searchParams.delete('calc');
+      }
+      window.history.replaceState({}, '', url.toString());
+    },
+    [activeCalculatorSection],
+  );
+
   useEffect(() => {
-    if (activeTab === 'calculator' || activeTab === 'symbols') {
+    if (activeTab === 'calculator') {
       setIsToolsOpen(true);
-    } else if (activeTab === 'profile') {
+      setIsCalculatorOpen(true);
+    } else if (activeTab === 'symbols') {
+      setIsToolsOpen(true);
+    } else if (activeTab === 'profile' || activeTab === 'orders') {
       setIsProfileOpen(true);
     }
   }, [activeTab]);
 
-  // Smoothly move highlight pill to active tab
+  // Smoothly move highlight pill to active tab within its own section
   const updateIndicator = useCallback(() => {
+    const isMainTab = activeTab === 'courses' || activeTab === 'certificates';
+    const isToolTab = activeTab === 'calculator' || activeTab === 'symbols';
+
+    const targetSection: 'main' | 'tool' | 'profile' = isMainTab
+      ? 'main'
+      : isToolTab
+        ? 'tool'
+        : 'profile';
+
     const activeEl = tabRefs.current[activeTab];
-    if (activeEl) {
-      setIndicatorStyle({
-        top: activeEl.offsetTop,
-        height: activeEl.offsetHeight,
-        opacity: 1,
+    if (!activeEl) return;
+
+    const isSameSection = prevSectionRef.current === targetSection;
+
+    if (targetSection === 'main') {
+      setSectionIndicators((prev) => ({
+        ...prev,
+        main: { top: activeEl.offsetTop, height: activeEl.offsetHeight },
+      }));
+    } else if (targetSection === 'tool') {
+      setSectionIndicators((prev) => ({
+        ...prev,
+        tool: { top: activeEl.offsetTop, height: activeEl.offsetHeight },
+      }));
+    } else if (targetSection === 'profile') {
+      setSectionIndicators((prev) => ({
+        ...prev,
+        profile: { top: activeEl.offsetTop, height: activeEl.offsetHeight },
+      }));
+    }
+
+    if (isSameSection) {
+      setSlideEnabledSection(targetSection);
+    } else {
+      // Cross-section switch: immediately disable transition so the previous section doesn't leave a ghost shadow
+      setSlideEnabledSection(null);
+      requestAnimationFrame(() => {
+        setSlideEnabledSection(targetSection);
       });
+      prevSectionRef.current = targetSection;
     }
   }, [activeTab]);
 
@@ -227,7 +323,7 @@ function StudentDashboardContent() {
     updateIndicator();
     const rafId = requestAnimationFrame(updateIndicator);
     const timer1 = setTimeout(updateIndicator, 50);
-    const timer2 = setTimeout(updateIndicator, 220);
+    const timer2 = setTimeout(updateIndicator, 320);
     window.addEventListener('resize', updateIndicator);
     return () => {
       cancelAnimationFrame(rafId);
@@ -235,7 +331,15 @@ function StudentDashboardContent() {
       clearTimeout(timer2);
       window.removeEventListener('resize', updateIndicator);
     };
-  }, [updateIndicator, isMainOpen, isToolsOpen, isProfileOpen, coursesLoading, authLoading]);
+  }, [
+    updateIndicator,
+    isMainOpen,
+    isToolsOpen,
+    isProfileOpen,
+    isCalculatorOpen,
+    coursesLoading,
+    authLoading,
+  ]);
 
   // Profile state
   const [name, setName] = useState('');
@@ -461,24 +565,17 @@ function StudentDashboardContent() {
     icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
   }[] = [
     { id: 'courses', label: 'Courses', icon: Layers },
-    { id: 'certificates', label: 'Credentials', icon: Scroll },
-    { id: 'orders', label: 'Payments', icon: IndianRupee },
-  ];
-
-  const toolNavTabs: {
-    id: DashboardTab;
-    label: string;
-    icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
-  }[] = [
-    { id: 'calculator', label: 'Calculator', icon: Sigma },
-    { id: 'symbols', label: 'Symbols', icon: Shapes },
+    { id: 'certificates', label: 'Credentials', icon: Files },
   ];
 
   const profileNavTabs: {
     id: DashboardTab;
     label: string;
     icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
-  }[] = [{ id: 'profile', label: 'Settings', icon: Settings }];
+  }[] = [
+    { id: 'profile', label: 'Settings', icon: Settings },
+    { id: 'orders', label: 'Payments', icon: IndianRupee },
+  ];
 
   const studentFirstName = useMemo(() => {
     if (!user?.name) return 'ENGINEER';
@@ -511,18 +608,18 @@ function StudentDashboardContent() {
       {/* ============================================================== */}
       {/* 1. LEFT CARD: NAVIGATION TABS                                  */}
       {/* ============================================================== */}
-      <aside className="w-full shrink-0 md:flex-none md:w-64 lg:w-72 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
+      <aside className="w-full shrink-0 md:flex-none md:w-60 lg:w-64 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
         {/* Top Header: Brand Logo HYDRO BASICS + Back / Home Link + Mobile Sandwich Button */}
-        <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
+        <div className="px-4 py-3 flex items-center justify-between shrink-0">
           <Link href="/" className="flex flex-col select-none group" title="HYDRO BASICS Home">
-            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
+            <span className="font-extrabold text-[14px] sm:text-[15px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
               HYDRO
             </span>
-            <span className="font-extrabold text-[15px] sm:text-[16px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
+            <span className="font-extrabold text-[14px] sm:text-[15px] text-white leading-[1.05] tracking-wider uppercase group-hover:text-white/80 transition-colors">
               BASICS
             </span>
           </Link>
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-2.5">
             <Link
               href="/"
               className="inline-flex items-center gap-1.5 text-[11px] font-mono tracking-wider text-[#c2c4cc]/70 hover:text-white transition-colors"
@@ -570,27 +667,31 @@ function StudentDashboardContent() {
           }`}
         >
           <div className="overflow-hidden">
-            <nav
-              aria-label="Student Navigation Mobile"
-              className="flex flex-col px-3 py-2 space-y-1"
-            >
+            <nav aria-label="Student Navigation Mobile" className="flex flex-col px-2 py-2 gap-0.5">
               {/* SECTION 1: MAIN */}
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setIsMainOpen((prev) => !prev)}
-                className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono font-medium tracking-wider text-[#8a8c95] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+                className="w-full flex items-center justify-between px-2.5 py-0.5 text-[9px] font-sans font-semibold tracking-widest text-[#7e828d] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
               >
                 <span>MAIN</span>
                 <ChevronDown
-                  strokeWidth={1.5}
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    isMainOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#8a8c95]'
+                  strokeWidth={2}
+                  className={`w-2.5 h-2.5 transition-transform duration-200 ${
+                    isMainOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#7e828d]'
                   }`}
                 />
               </button>
 
-              {isMainOpen && (
-                <div className="space-y-1">
+              <div
+                className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-200 ease-out ${
+                  isMainOpen
+                    ? 'grid-rows-[1fr] opacity-100'
+                    : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+                }`}
+              >
+                <div className="min-h-0 overflow-hidden flex flex-col gap-1 pt-1">
                   {mainNavTabs.map((tab) => {
                     const isActive = activeTab === tab.id;
                     const Icon = tab.icon;
@@ -599,18 +700,18 @@ function StudentDashboardContent() {
                         key={tab.id}
                         type="button"
                         onClick={() => handleTabChange(tab.id)}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none ${
                           isActive
-                            ? 'bg-[#1f2023] text-white font-semibold'
-                            : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                            ? 'bg-[#1f2023] text-white font-medium'
+                            : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
                         }`}
                       >
                         <Icon
-                          strokeWidth={1}
-                          className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${isActive ? 'text-white' : 'text-[#c2c4cc]'}`}
+                          strokeWidth={1.5}
+                          className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-[#9ca3af]'}`}
                         />
                         <span
-                          className={`transition-colors ${isActive ? 'text-white font-semibold' : 'text-[#c2c4cc] font-normal'}`}
+                          className={`transition-colors ${isActive ? 'text-white font-medium' : 'text-[#9ca3af] font-normal'}`}
                         >
                           {tab.label}
                         </span>
@@ -622,87 +723,189 @@ function StudentDashboardContent() {
                     <Link
                       href="/admin"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-emerald-400 hover:bg-emerald-500/10 font-normal transition-colors cursor-pointer select-none"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg text-emerald-400 hover:bg-emerald-500/10 font-normal transition-colors cursor-pointer select-none"
                     >
                       <ShieldCheck
-                        strokeWidth={1}
-                        className="w-4 h-4 shrink-0 stroke-1 text-emerald-400"
+                        strokeWidth={1.5}
+                        className="w-4 h-4 shrink-0 text-emerald-400"
                       />
                       <span>Admin Console</span>
                     </Link>
                   )}
                 </div>
-              )}
+              </div>
 
               {/* Section Divider */}
-              <div className="border-b border-white/[0.06] my-2 mx-1 shrink-0" />
+              <div className="border-b border-white/[0.06] my-1 mx-1.5 shrink-0" />
 
               {/* SECTION 2: TOOLS */}
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setIsToolsOpen((prev) => !prev)}
-                className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono font-medium tracking-wider text-[#8a8c95] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+                className="w-full flex items-center justify-between px-2.5 py-0.5 text-[9px] font-sans font-semibold tracking-widest text-[#7e828d] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
               >
                 <span>TOOLS</span>
                 <ChevronDown
-                  strokeWidth={1.5}
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    isToolsOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#8a8c95]'
+                  strokeWidth={2}
+                  className={`w-2.5 h-2.5 transition-transform duration-200 ${
+                    isToolsOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#7e828d]'
                   }`}
                 />
               </button>
 
-              {isToolsOpen && (
-                <div className="space-y-1">
-                  {toolNavTabs.map((tool) => {
-                    const isActive = activeTab === tool.id;
-                    const Icon = tool.icon;
-                    return (
-                      <button
-                        key={tool.id}
-                        type="button"
-                        onClick={() => handleTabChange(tool.id)}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
-                          isActive
-                            ? 'bg-[#1f2023] text-white font-semibold'
-                            : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
-                        }`}
-                      >
-                        <Icon
-                          strokeWidth={1}
-                          className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${isActive ? 'text-white' : 'text-[#c2c4cc]'}`}
+              <div
+                className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-200 ease-out ${
+                  isToolsOpen
+                    ? 'grid-rows-[1fr] opacity-100'
+                    : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+                }`}
+              >
+                <div className="min-h-0 overflow-hidden flex flex-col gap-1 pt-1">
+                  {/* Item 1: Calculator with expandable nested sub-sections */}
+                  <div className="flex flex-col">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsCalculatorOpen((prev) => !prev);
+                      }}
+                      className={`w-full flex items-center justify-between px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none group ${
+                        activeTab === 'calculator' && !isCalculatorOpen
+                          ? 'bg-[#1f2023] text-white font-medium'
+                          : activeTab === 'calculator' && isCalculatorOpen
+                            ? 'text-white font-medium'
+                            : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Sigma
+                          strokeWidth={1.5}
+                          className={`w-4 h-4 shrink-0 transition-colors ${
+                            activeTab === 'calculator' ? 'text-white' : 'text-[#9ca3af]'
+                          }`}
                         />
                         <span
-                          className={`transition-colors ${isActive ? 'text-white font-semibold' : 'text-[#c2c4cc] font-normal'}`}
+                          className={`truncate transition-colors ${
+                            activeTab === 'calculator' ? 'text-white font-medium' : 'text-[#9ca3af]'
+                          }`}
                         >
-                          {tool.label}
+                          Calculator
                         </span>
-                      </button>
-                    );
-                  })}
+                      </div>
+                      <ChevronDown
+                        strokeWidth={2}
+                        className={`w-3 h-3 shrink-0 transition-transform duration-200 ${
+                          isCalculatorOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#7e828d]'
+                        }`}
+                      />
+                    </button>
+
+                    {/* Nested Sub-sections with Tree Line */}
+                    <div
+                      className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
+                        isCalculatorOpen
+                          ? 'grid-rows-[1fr] opacity-100'
+                          : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+                      }`}
+                    >
+                      <div className="min-h-0 overflow-hidden flex flex-col pt-1">
+                        {CALCULATOR_SUB_SECTIONS.map((sub, idx) => {
+                          const isSubActive =
+                            activeTab === 'calculator' && activeCalculatorSection === sub.id;
+                          const isLast = idx === CALCULATOR_SUB_SECTIONS.length - 1;
+
+                          return (
+                            <div key={sub.id} className="relative flex items-center h-9">
+                              <svg
+                                className="absolute left-0 top-0 w-7 h-full pointer-events-none"
+                                viewBox="0 0 28 36"
+                                fill="none"
+                              >
+                                {!isLast && (
+                                  <line
+                                    x1="20"
+                                    y1="0"
+                                    x2="20"
+                                    y2="36"
+                                    stroke="rgba(255, 255, 255, 0.12)"
+                                    strokeWidth="1.5"
+                                  />
+                                )}
+                                <path
+                                  d="M 20 0 V 10 C 20 15, 23 18, 28 18"
+                                  stroke={isSubActive ? '#c2c4cc' : 'rgba(255, 255, 255, 0.12)'}
+                                  strokeWidth="1.5"
+                                  fill="none"
+                                />
+                              </svg>
+                              <button
+                                type="button"
+                                onClick={() => handleCalculatorSubSectionChange(sub.id)}
+                                className={`ml-7 w-full flex items-center px-3 py-1.5 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none truncate ${
+                                  isSubActive
+                                    ? 'bg-[#1f2023] text-white font-medium'
+                                    : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
+                                }`}
+                              >
+                                <span className="truncate">{sub.label}</span>
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Item 2: Symbols */}
+                  <button
+                    type="button"
+                    onClick={() => handleTabChange('symbols')}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none ${
+                      activeTab === 'symbols'
+                        ? 'bg-[#1f2023] text-white font-medium'
+                        : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
+                    }`}
+                  >
+                    <Shapes
+                      strokeWidth={1.5}
+                      className={`w-4 h-4 shrink-0 transition-colors ${activeTab === 'symbols' ? 'text-white' : 'text-[#9ca3af]'}`}
+                    />
+                    <span
+                      className={`transition-colors ${activeTab === 'symbols' ? 'text-white font-medium' : 'text-[#9ca3af] font-normal'}`}
+                    >
+                      Symbols
+                    </span>
+                  </button>
                 </div>
-              )}
+              </div>
 
               {/* Section Divider */}
-              <div className="border-b border-white/[0.06] my-2 mx-1 shrink-0" />
+              <div className="border-b border-white/[0.06] my-1 mx-1.5 shrink-0" />
 
               {/* SECTION 3: PROFILE */}
               <button
                 type="button"
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setIsProfileOpen((prev) => !prev)}
-                className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono font-medium tracking-wider text-[#8a8c95] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+                className="w-full flex items-center justify-between px-2.5 py-0.5 text-[9px] font-sans font-semibold tracking-widest text-[#7e828d] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
               >
                 <span>PROFILE</span>
                 <ChevronDown
-                  strokeWidth={1.5}
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    isProfileOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#8a8c95]'
+                  strokeWidth={2}
+                  className={`w-2.5 h-2.5 transition-transform duration-200 ${
+                    isProfileOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#7e828d]'
                   }`}
                 />
               </button>
 
-              {isProfileOpen && (
-                <div className="space-y-1">
+              <div
+                className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-200 ease-out ${
+                  isProfileOpen
+                    ? 'grid-rows-[1fr] opacity-100'
+                    : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+                }`}
+              >
+                <div className="min-h-0 overflow-hidden flex flex-col gap-1 pt-1">
                   {profileNavTabs.map((tab) => {
                     const isActive = activeTab === tab.id;
                     const Icon = tab.icon;
@@ -711,18 +914,18 @@ function StudentDashboardContent() {
                         key={tab.id}
                         type="button"
                         onClick={() => handleTabChange(tab.id)}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none ${
                           isActive
-                            ? 'bg-[#1f2023] text-white font-semibold'
-                            : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                            ? 'bg-[#1f2023] text-white font-medium'
+                            : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
                         }`}
                       >
                         <Icon
-                          strokeWidth={1}
-                          className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${isActive ? 'text-white' : 'text-[#c2c4cc]'}`}
+                          strokeWidth={1.5}
+                          className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-[#9ca3af]'}`}
                         />
                         <span
-                          className={`transition-colors ${isActive ? 'text-white font-semibold' : 'text-[#c2c4cc] font-normal'}`}
+                          className={`transition-colors ${isActive ? 'text-white font-medium' : 'text-[#9ca3af] font-normal'}`}
                         >
                           {tab.label}
                         </span>
@@ -736,56 +939,71 @@ function StudentDashboardContent() {
                       setIsMobileMenuOpen(false);
                       logout();
                     }}
-                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] font-normal transition-colors cursor-pointer select-none text-left"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg text-[#9ca3af] hover:text-rose-400 hover:bg-white/[0.04] font-normal transition-colors cursor-pointer select-none text-left"
                   >
-                    <LogOut strokeWidth={1} className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc]" />
-                    <span className="text-[#c2c4cc]">Log Out</span>
+                    <LogOut strokeWidth={1.5} className="w-4 h-4 shrink-0 text-[#9ca3af]" />
+                    <span>Log Out</span>
                   </button>
                 </div>
-              )}
+              </div>
             </nav>
           </div>
         </div>
 
         {/* Desktop Vertical Tabs Stack with Smooth Sliding Highlight Pill */}
         <nav
+          ref={desktopNavRef}
           aria-label="Student Navigation Desktop"
-          className="relative hidden md:flex flex-1 flex-col overflow-y-auto custom-scrollbar px-2.5 py-3 space-y-1"
+          style={{ overflowAnchor: 'none' }}
+          className="relative hidden md:flex flex-1 flex-col overflow-y-auto custom-scrollbar px-2 py-2 gap-0.5"
         >
-          {/* Smooth Sliding Highlight Pill (TUF #1f2023) */}
-          {indicatorStyle.opacity > 0 && (
-            <div
-              className="absolute left-2.5 right-2.5 rounded-xl bg-[#1f2023] pointer-events-none transition-[top,height,opacity] duration-200 ease-out z-0"
-              style={{
-                top: indicatorStyle.top,
-                height: indicatorStyle.height,
-              }}
-            />
-          )}
-
           {/* SECTION 1: MAIN */}
           <button
             type="button"
-            onClick={() => setIsMainOpen((prev) => !prev)}
-            className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono font-medium tracking-wider text-[#8a8c95] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              const nav = desktopNavRef.current;
+              const currentScroll = nav?.scrollTop ?? 0;
+              setIsMainOpen((prev) => !prev);
+              if (nav) {
+                requestAnimationFrame(() => {
+                  nav.scrollTop = currentScroll;
+                });
+              }
+            }}
+            className="w-full flex items-center justify-between px-2.5 py-0.5 text-[9px] font-sans font-semibold tracking-widest text-[#7e828d] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
           >
             <span>MAIN</span>
             <ChevronDown
-              strokeWidth={1.5}
-              className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                isMainOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#8a8c95]'
+              strokeWidth={2}
+              className={`w-2.5 h-2.5 transition-transform duration-200 ${
+                isMainOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#7e828d]'
               }`}
             />
           </button>
 
           <div
-            className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${
+            className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-200 ease-out ${
               isMainOpen
                 ? 'grid-rows-[1fr] opacity-100'
                 : 'grid-rows-[0fr] opacity-0 pointer-events-none'
             }`}
           >
-            <div className="overflow-hidden flex flex-col space-y-1 pt-0.5">
+            <div className="relative min-h-0 overflow-hidden flex flex-col gap-1 pt-1">
+              {/* Smooth Sliding Highlight Pill for MAIN */}
+              <div
+                className="absolute left-0 right-0 rounded-lg bg-[#1f2023] pointer-events-none z-0"
+                style={{
+                  top: sectionIndicators.main.top,
+                  height: sectionIndicators.main.height,
+                  opacity: currentSection === 'main' && isMainOpen ? 1 : 0,
+                  transition:
+                    slideEnabledSection === 'main'
+                      ? 'top 200ms cubic-bezier(0.4, 0, 0.2, 1), height 200ms cubic-bezier(0.4, 0, 0.2, 1)'
+                      : 'none',
+                }}
+              />
+
               {mainNavTabs.map((tab) => {
                 const isActive = activeTab === tab.id;
                 const Icon = tab.icon;
@@ -794,35 +1012,28 @@ function StudentDashboardContent() {
                     key={tab.id}
                     ref={(el) => {
                       tabRefs.current[tab.id] = el;
-                      if (el && tab.id === activeTab && indicatorStyle.opacity === 0) {
-                        setIndicatorStyle({
-                          top: el.offsetTop,
-                          height: el.offsetHeight,
-                          opacity: 1,
-                        });
-                      }
                     }}
                     type="button"
                     onClick={() => handleTabChange(tab.id)}
-                    className={`relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
+                    className={`relative z-10 w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none group ${
                       isActive
-                        ? indicatorStyle.opacity > 0
-                          ? 'text-white font-semibold'
-                          : 'bg-[#1f2023] text-white font-semibold'
-                        : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                        ? !mounted
+                          ? 'bg-[#1f2023] text-white font-medium'
+                          : 'text-white font-medium'
+                        : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
                     }`}
                   >
                     <Icon
-                      strokeWidth={1}
-                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
-                        isActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
+                      strokeWidth={1.5}
+                      className={`w-4 h-4 shrink-0 transition-colors ${
+                        isActive ? 'text-white' : 'text-[#9ca3af] group-hover:text-white'
                       }`}
                     />
                     <span
                       className={`truncate transition-colors ${
                         isActive
-                          ? 'text-white font-semibold'
-                          : 'text-[#c2c4cc] font-normal group-hover:text-white'
+                          ? 'text-white font-medium'
+                          : 'text-[#9ca3af] font-normal group-hover:text-white'
                       }`}
                     >
                       {tab.label}
@@ -834,11 +1045,11 @@ function StudentDashboardContent() {
               {user?.role === 'ADMIN' && (
                 <Link
                   href="/admin"
-                  className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 cursor-pointer select-none group"
+                  className="relative z-10 w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left font-normal text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 cursor-pointer select-none group"
                 >
                   <ShieldCheck
-                    strokeWidth={1}
-                    className="w-4 h-4 shrink-0 stroke-1 text-emerald-400 transition-colors"
+                    strokeWidth={1.5}
+                    className="w-4 h-4 shrink-0 text-emerald-400 transition-colors"
                   />
                   <span className="truncate">Admin Console</span>
                 </Link>
@@ -847,104 +1058,260 @@ function StudentDashboardContent() {
           </div>
 
           {/* Section Divider */}
-          <div className="border-b border-white/[0.06] my-2 mx-1 shrink-0" />
+          <div className="border-b border-white/[0.06] my-1 mx-1.5 shrink-0" />
 
           {/* SECTION 2: TOOLS (like ADDITIONAL in TUF) */}
           <button
             type="button"
-            onClick={() => setIsToolsOpen((prev) => !prev)}
-            className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono font-medium tracking-wider text-[#8a8c95] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              const nav = desktopNavRef.current;
+              const currentScroll = nav?.scrollTop ?? 0;
+              setIsToolsOpen((prev) => !prev);
+              if (nav) {
+                requestAnimationFrame(() => {
+                  nav.scrollTop = currentScroll;
+                });
+              }
+            }}
+            className="w-full flex items-center justify-between px-2.5 py-0.5 text-[9px] font-sans font-semibold tracking-widest text-[#7e828d] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
           >
             <span>TOOLS</span>
             <ChevronDown
-              strokeWidth={1.5}
-              className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                isToolsOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#8a8c95]'
+              strokeWidth={2}
+              className={`w-2.5 h-2.5 transition-transform duration-200 ${
+                isToolsOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#7e828d]'
               }`}
             />
           </button>
 
           <div
-            className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${
+            className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-200 ease-out ${
               isToolsOpen
                 ? 'grid-rows-[1fr] opacity-100'
                 : 'grid-rows-[0fr] opacity-0 pointer-events-none'
             }`}
           >
-            <div className="overflow-hidden flex flex-col space-y-1 pt-0.5">
-              {toolNavTabs.map((tool) => {
-                const isActive = activeTab === tool.id;
-                const Icon = tool.icon;
-                return (
-                  <button
-                    key={tool.id}
-                    ref={(el) => {
-                      tabRefs.current[tool.id] = el;
-                      if (el && tool.id === activeTab && indicatorStyle.opacity === 0) {
-                        setIndicatorStyle({
-                          top: el.offsetTop,
-                          height: el.offsetHeight,
-                          opacity: 1,
-                        });
-                      }
-                    }}
-                    type="button"
-                    onClick={() => handleTabChange(tool.id)}
-                    className={`relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
-                      isActive
-                        ? indicatorStyle.opacity > 0
-                          ? 'text-white font-semibold'
-                          : 'bg-[#1f2023] text-white font-semibold'
-                        : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
-                    }`}
-                  >
-                    <Icon
-                      strokeWidth={1}
-                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
-                        isActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
+            <div className="relative min-h-0 overflow-hidden flex flex-col gap-1 pt-1">
+              {/* Smooth Sliding Highlight Pill for TOOLS */}
+              <div
+                className="absolute left-0 right-0 rounded-lg bg-[#1f2023] pointer-events-none z-0"
+                style={{
+                  top: sectionIndicators.tool.top,
+                  height: sectionIndicators.tool.height,
+                  opacity:
+                    currentSection === 'tool' &&
+                    isToolsOpen &&
+                    (activeTab === 'symbols' || !isCalculatorOpen)
+                      ? 1
+                      : 0,
+                  transition:
+                    slideEnabledSection === 'tool'
+                      ? 'top 200ms cubic-bezier(0.4, 0, 0.2, 1), height 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 150ms ease-out'
+                      : 'opacity 150ms ease-out',
+                }}
+              />
+
+              {/* Item 1: Calculator with expandable nested sub-sections */}
+              <div className="flex flex-col">
+                <button
+                  ref={(el) => {
+                    tabRefs.current['calculator'] = el;
+                  }}
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    const nav = desktopNavRef.current;
+                    const currentScroll = nav?.scrollTop ?? 0;
+                    setIsCalculatorOpen((prev) => !prev);
+                    if (nav) {
+                      requestAnimationFrame(() => {
+                        nav.scrollTop = currentScroll;
+                      });
+                    }
+                  }}
+                  className={`relative z-10 w-full flex items-center justify-between px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none group ${
+                    activeTab === 'calculator' && !isCalculatorOpen
+                      ? !mounted
+                        ? 'bg-[#1f2023] text-white font-medium'
+                        : 'text-white font-medium'
+                      : activeTab === 'calculator' && isCalculatorOpen
+                        ? 'text-white font-medium'
+                        : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Sigma
+                      strokeWidth={1.5}
+                      className={`w-4 h-4 shrink-0 transition-colors ${
+                        activeTab === 'calculator'
+                          ? 'text-white'
+                          : 'text-[#9ca3af] group-hover:text-white'
                       }`}
                     />
                     <span
                       className={`truncate transition-colors ${
-                        isActive
-                          ? 'text-white font-semibold'
-                          : 'text-[#c2c4cc] font-normal group-hover:text-white'
+                        activeTab === 'calculator'
+                          ? 'text-white font-medium'
+                          : 'text-[#9ca3af] font-normal group-hover:text-white'
                       }`}
                     >
-                      {tool.label}
+                      Calculator
                     </span>
-                  </button>
-                );
-              })}
+                  </div>
+                  <ChevronDown
+                    strokeWidth={2}
+                    className={`w-3 h-3 shrink-0 transition-transform duration-200 ${
+                      isCalculatorOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#7e828d]'
+                    }`}
+                  />
+                </button>
+
+                {/* Nested Dropdown Sub-sections with Tree Line */}
+                <div
+                  className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
+                    isCalculatorOpen
+                      ? 'grid-rows-[1fr] opacity-100'
+                      : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+                  }`}
+                >
+                  <div className="min-h-0 overflow-hidden flex flex-col pt-1">
+                    {CALCULATOR_SUB_SECTIONS.map((sub, idx) => {
+                      const isSubActive =
+                        activeTab === 'calculator' && activeCalculatorSection === sub.id;
+                      const isLast = idx === CALCULATOR_SUB_SECTIONS.length - 1;
+
+                      return (
+                        <div key={sub.id} className="relative flex items-center h-9">
+                          {/* Tree Branch Connector SVG */}
+                          <svg
+                            className="absolute left-0 top-0 w-7 h-full pointer-events-none"
+                            viewBox="0 0 28 36"
+                            fill="none"
+                            preserveAspectRatio="none"
+                          >
+                            {!isLast && (
+                              <line
+                                x1="20"
+                                y1="0"
+                                x2="20"
+                                y2="36"
+                                stroke="rgba(255, 255, 255, 0.12)"
+                                strokeWidth="1.5"
+                              />
+                            )}
+                            <path
+                              d="M 20 0 V 10 C 20 15, 23 18, 28 18"
+                              stroke={isSubActive ? '#c2c4cc' : 'rgba(255, 255, 255, 0.12)'}
+                              strokeWidth="1.5"
+                              fill="none"
+                            />
+                          </svg>
+
+                          {/* Sub-item button */}
+                          <button
+                            type="button"
+                            onClick={() => handleCalculatorSubSectionChange(sub.id)}
+                            className={`ml-7 w-full flex items-center px-3 py-1.5 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none truncate ${
+                              isSubActive
+                                ? 'bg-[#1f2023] text-white font-medium'
+                                : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
+                            }`}
+                          >
+                            <span className="truncate">{sub.label}</span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Item 2: Symbols */}
+              <button
+                key="symbols"
+                ref={(el) => {
+                  tabRefs.current['symbols'] = el;
+                }}
+                type="button"
+                onClick={() => handleTabChange('symbols')}
+                className={`relative z-10 w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none group ${
+                  activeTab === 'symbols'
+                    ? !mounted
+                      ? 'bg-[#1f2023] text-white font-medium'
+                      : 'text-white font-medium'
+                    : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
+                }`}
+              >
+                <Shapes
+                  strokeWidth={1.5}
+                  className={`w-4 h-4 shrink-0 transition-colors ${
+                    activeTab === 'symbols' ? 'text-white' : 'text-[#9ca3af] group-hover:text-white'
+                  }`}
+                />
+                <span
+                  className={`truncate transition-colors ${
+                    activeTab === 'symbols'
+                      ? 'text-white font-medium'
+                      : 'text-[#9ca3af] font-normal group-hover:text-white'
+                  }`}
+                >
+                  Symbols
+                </span>
+              </button>
             </div>
           </div>
 
           {/* Section Divider */}
-          <div className="border-b border-white/[0.06] my-2 mx-1 shrink-0" />
+          <div className="border-b border-white/[0.06] my-1 mx-1.5 shrink-0" />
 
           {/* SECTION 3: PROFILE */}
           <button
             type="button"
-            onClick={() => setIsProfileOpen((prev) => !prev)}
-            className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono font-medium tracking-wider text-[#8a8c95] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              const nav = desktopNavRef.current;
+              const currentScroll = nav?.scrollTop ?? 0;
+              setIsProfileOpen((prev) => !prev);
+              if (nav) {
+                requestAnimationFrame(() => {
+                  nav.scrollTop = currentScroll;
+                });
+              }
+            }}
+            className="w-full flex items-center justify-between px-2.5 py-0.5 text-[9px] font-sans font-semibold tracking-widest text-[#7e828d] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
           >
             <span>PROFILE</span>
             <ChevronDown
-              strokeWidth={1.5}
-              className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                isProfileOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#8a8c95]'
+              strokeWidth={2}
+              className={`w-2.5 h-2.5 transition-transform duration-200 ${
+                isProfileOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#7e828d]'
               }`}
             />
           </button>
 
           <div
-            className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${
+            className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-200 ease-out ${
               isProfileOpen
                 ? 'grid-rows-[1fr] opacity-100'
                 : 'grid-rows-[0fr] opacity-0 pointer-events-none'
             }`}
           >
-            <div className="overflow-hidden flex flex-col space-y-1 pt-0.5">
+            <div className="relative min-h-0 overflow-hidden flex flex-col gap-1 pt-1">
+              {/* Smooth Sliding Highlight Pill for PROFILE */}
+              <div
+                className="absolute left-0 right-0 rounded-lg bg-[#1f2023] pointer-events-none z-0"
+                style={{
+                  top: sectionIndicators.profile.top,
+                  height: sectionIndicators.profile.height,
+                  opacity: currentSection === 'profile' && isProfileOpen ? 1 : 0,
+                  transition:
+                    slideEnabledSection === 'profile'
+                      ? 'top 200ms cubic-bezier(0.4, 0, 0.2, 1), height 200ms cubic-bezier(0.4, 0, 0.2, 1)'
+                      : 'none',
+                }}
+              />
+
               {profileNavTabs.map((tab) => {
                 const isActive = activeTab === tab.id;
                 const Icon = tab.icon;
@@ -953,35 +1320,28 @@ function StudentDashboardContent() {
                     key={tab.id}
                     ref={(el) => {
                       tabRefs.current[tab.id] = el;
-                      if (el && tab.id === activeTab && indicatorStyle.opacity === 0) {
-                        setIndicatorStyle({
-                          top: el.offsetTop,
-                          height: el.offsetHeight,
-                          opacity: 1,
-                        });
-                      }
                     }}
                     type="button"
                     onClick={() => handleTabChange(tab.id)}
-                    className={`relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
+                    className={`relative z-10 w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none group ${
                       isActive
-                        ? indicatorStyle.opacity > 0
-                          ? 'text-white font-semibold'
-                          : 'bg-[#1f2023] text-white font-semibold'
-                        : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                        ? !mounted
+                          ? 'bg-[#1f2023] text-white font-medium'
+                          : 'text-white font-medium'
+                        : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
                     }`}
                   >
                     <Icon
-                      strokeWidth={1}
-                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
-                        isActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
+                      strokeWidth={1.5}
+                      className={`w-4 h-4 shrink-0 transition-colors ${
+                        isActive ? 'text-white' : 'text-[#9ca3af] group-hover:text-white'
                       }`}
                     />
                     <span
                       className={`truncate transition-colors ${
                         isActive
-                          ? 'text-white font-semibold'
-                          : 'text-[#c2c4cc] font-normal group-hover:text-white'
+                          ? 'text-white font-medium'
+                          : 'text-[#9ca3af] font-normal group-hover:text-white'
                       }`}
                     >
                       {tab.label}
@@ -994,19 +1354,56 @@ function StudentDashboardContent() {
               <button
                 type="button"
                 onClick={() => logout()}
-                className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] cursor-pointer select-none group"
+                className="relative z-10 w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left font-normal text-[#9ca3af] hover:text-rose-400 hover:bg-white/[0.04] cursor-pointer select-none group"
               >
                 <LogOut
-                  strokeWidth={1}
-                  className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc] group-hover:text-rose-400 transition-colors"
+                  strokeWidth={1.5}
+                  className="w-4 h-4 shrink-0 text-[#9ca3af] group-hover:text-rose-400 transition-colors"
                 />
-                <span className="truncate transition-colors text-[#c2c4cc] group-hover:text-rose-400">
+                <span className="truncate transition-colors text-[#9ca3af] group-hover:text-rose-400">
                   Log Out
                 </span>
               </button>
             </div>
           </div>
         </nav>
+
+        {/* Bottom Pinned User Profile Footer */}
+        <div
+          className={`border-t border-white/[0.08] p-2 shrink-0 ${
+            isMobileMenuOpen ? 'block' : 'hidden md:block'
+          }`}
+        >
+          <button
+            type="button"
+            onClick={() => handleTabChange('profile')}
+            className="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg hover:bg-white/[0.04] transition-colors text-left cursor-pointer select-none group"
+            title="Account Settings"
+          >
+            <div className="w-9 h-9 rounded-full bg-white/[0.08] text-white/60 overflow-hidden flex items-center justify-center shrink-0 select-none group-hover:text-white/80 transition-colors">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-full h-full"
+              >
+                <circle cx="12" cy="7.5" r="3.5" />
+                <path d="M1.5 22.5c0-4.8 4.7-8 10.5-8s10.5 3.2 10.5 8" />
+              </svg>
+            </div>
+            <div className="flex flex-col justify-center min-w-0 leading-tight">
+              <span className="text-[13px] font-semibold text-white tracking-wide uppercase truncate group-hover:text-white transition-colors">
+                {user?.name ? user.name.toUpperCase() : 'STUDENT'}
+              </span>
+              <span className="text-[11px] font-medium text-[#7e828d] tracking-wider uppercase truncate mt-0.5">
+                ENROLLED
+              </span>
+            </div>
+          </button>
+        </div>
       </aside>
 
       {/* ============================================================== */}
@@ -1065,16 +1462,17 @@ function StudentDashboardContent() {
 
                 {/* Courses Loading Skeleton */}
                 {(coursesLoading || authLoading) && courses.length === 0 ? (
-                  <div className="w-full max-w-[650px] bg-white/5 border border-white/[0.08] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 animate-pulse select-none">
-                    <div className="w-full aspect-square md:w-[180px] md:h-[180px] bg-white/10 rounded-lg shrink-0 self-center" />
-                    <div className="flex-1 flex flex-col justify-between py-1 space-y-3">
-                      <div className="space-y-2.5">
+                  <div className="w-full md:w-fit max-w-full bg-white/5 border border-white/[0.08] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row items-start gap-5 lg:gap-6 animate-pulse select-none">
+                    <div className="w-full aspect-square md:w-[135px] md:h-[135px] bg-white/10 rounded-lg shrink-0 self-start" />
+                    <div className="flex-1 flex flex-col justify-start gap-3.5">
+                      <div className="space-y-2">
                         <div className="h-6 w-3/5 bg-white/10 rounded" />
-                        <div className="h-4 w-full bg-white/5 rounded" />
                         <div className="h-4 w-4/5 bg-white/5 rounded" />
                       </div>
-                      <div className="h-4 w-44 bg-white/5 rounded" />
-                      <div className="h-10 w-48 bg-white/10 rounded" />
+                      <div className="space-y-3">
+                        <div className="h-4 w-44 bg-white/5 rounded" />
+                        <div className="h-10 w-48 bg-white/10 rounded" />
+                      </div>
                     </div>
                   </div>
                 ) : courses.length === 0 && !coursesError ? (
@@ -1127,27 +1525,24 @@ function StudentDashboardContent() {
                       return (
                         <div
                           key={c.product.id}
-                          className="relative w-full max-w-[650px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 transition-all duration-200 select-none"
+                          className="relative w-full md:w-fit max-w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row items-start gap-5 lg:gap-6 transition-all duration-200 select-none"
                         >
                           {/* Desktop Active Status Badge: Top right-most corner of the course card */}
                           <span className="hidden md:inline-flex absolute top-5 right-5 px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md shrink-0 select-none z-10">
                             {c.entitlement?.status || 'ACTIVE'}
                           </span>
 
-                          {/* Course Thumbnail: Animated Lottie from coursecarddd.json */}
-                          <div className="relative w-full aspect-square md:w-[180px] md:h-[180px] shrink-0 self-center rounded-lg overflow-hidden bg-black/60 border border-white/[0.08] flex items-center justify-center">
-                            <CourseLottieThumbnail
-                              fallbackSrc={
-                                c.product.thumbnailUrl &&
-                                !c.product.thumbnailUrl.includes('unsplash')
-                                  ? c.product.thumbnailUrl
-                                  : '/course-halftone.jpg'
-                              }
+                          {/* Course Thumbnail */}
+                          <div className="relative w-full aspect-square md:w-[135px] md:h-[135px] shrink-0 self-start rounded-lg overflow-hidden bg-black/60 border border-white/[0.08] flex items-center justify-center">
+                            <img
+                              src="/HYDRAULIC.png"
+                              alt={c.product.title}
+                              className="w-full h-full object-cover select-none"
                             />
                           </div>
 
                           {/* Course Content Details */}
-                          <div className="flex-1 flex flex-col justify-between min-w-0 py-0.5">
+                          <div className="flex-1 flex flex-col justify-start gap-3.5 min-w-0">
                             <div>
                               {/* Course Title with mobile status badge and desktop right padding */}
                               <div className="flex items-start justify-between gap-3 md:pr-20">
@@ -1165,7 +1560,7 @@ function StudentDashboardContent() {
                               </div>
 
                               {/* Dynamic Course Description */}
-                              <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed mt-2 sm:mt-2.5 line-clamp-2">
+                              <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed mt-1.5 sm:mt-2 line-clamp-2 md:line-clamp-none">
                                 {c.product.description &&
                                 !c.product.description.includes('working principles of hydraulics')
                                   ? c.product.description
@@ -1173,10 +1568,10 @@ function StudentDashboardContent() {
                               </p>
                             </div>
 
-                            {/* Progress Bar & Action Buttons with identical spacing top and bottom */}
-                            <div className="flex flex-col">
-                              {/* Sleek Progress Bar: Equal spacing above (my-3.5 sm:my-4) and below */}
-                              <div className="my-3.5 sm:my-4">
+                            {/* Progress Bar & Action Buttons */}
+                            <div className="flex flex-col gap-3">
+                              {/* Sleek Progress Bar */}
+                              <div>
                                 <CloseBarsProgressBar percent={percent} />
                               </div>
 
@@ -1255,7 +1650,7 @@ function StudentDashboardContent() {
                     {completedCourses.map((c) => (
                       <div
                         key={c.product.id}
-                        className="relative w-full max-w-[650px] bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row gap-5 lg:gap-6 transition-all duration-200 select-none"
+                        className="relative w-full md:w-fit max-w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-4 sm:p-5 flex flex-col md:flex-row items-start gap-5 lg:gap-6 transition-all duration-200 select-none"
                       >
                         {/* Desktop Active/Verified Badge: Top right-most corner */}
                         <span className="hidden md:inline-flex absolute top-5 right-5 px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-md shrink-0 select-none z-10">
@@ -1263,7 +1658,7 @@ function StudentDashboardContent() {
                         </span>
 
                         {/* Certificate Miniature Preview Graphic */}
-                        <div className="relative w-full aspect-[4/3] md:w-[180px] md:h-[135px] shrink-0 self-center rounded-lg overflow-hidden bg-gradient-to-br from-[#1c1d22] via-[#121316] to-[#0a0b0d] border border-white/[0.1] flex flex-col justify-between p-3.5 shadow-inner">
+                        <div className="relative w-full aspect-[4/3] md:w-[180px] md:h-[135px] shrink-0 self-start rounded-lg overflow-hidden bg-gradient-to-br from-[#1c1d22] via-[#121316] to-[#0a0b0d] border border-white/[0.1] flex flex-col justify-between p-3.5 shadow-inner">
                           <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:8px_8px] pointer-events-none" />
 
                           {/* Top Row: Mini Certificate Header */}
@@ -1360,7 +1755,12 @@ function StudentDashboardContent() {
             )}
 
             {/* TAB 3: HYDRAULIC SYSTEM CALCULATOR */}
-            {activeTab === 'calculator' && <HydraulicCalculator />}
+            {activeTab === 'calculator' && (
+              <HydraulicCalculator
+                activeSection={activeCalculatorSection}
+                onSectionChange={handleCalculatorSubSectionChange}
+              />
+            )}
 
             {/* TAB: HYDRAULIC SYMBOLS (COMING SOON) */}
             {activeTab === 'symbols' && (
@@ -1669,40 +2069,20 @@ function StudentDashboardContent() {
                 </div>
 
                 {ordersLoading ? (
-                  <div className="w-full flex flex-col gap-5 items-start text-left">
-                    {[1, 2].map((idx) => (
-                      <div
-                        key={idx}
-                        className="relative w-full max-w-[520px] bg-[#151619] border border-white/[0.08] rounded-xl overflow-hidden animate-pulse select-none"
-                      >
-                        {/* Header Bar Skeleton */}
-                        <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-white/[0.06] flex items-center justify-between gap-3 bg-white/[0.02]">
-                          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
-                            <div className="h-3.5 w-24 bg-white/10 rounded" />
-                            <span className="text-white/20">•</span>
-                            <div className="h-3 w-20 bg-white/5 rounded" />
-                          </div>
-                          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-                            <div className="h-5 w-14 bg-white/10 rounded-md" />
-                            <div className="h-4 w-16 bg-white/10 rounded" />
-                          </div>
-                        </div>
-
-                        {/* Card Body Skeleton */}
-                        <div className="p-4 sm:p-5 space-y-4">
-                          <div className="space-y-1.5 min-w-0">
-                            <div className="h-4 w-3/5 bg-white/10 rounded" />
-                            <div className="h-3 w-28 bg-white/5 rounded" />
-                          </div>
-
-                          {/* Action Buttons Skeleton */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 w-full">
-                            <div className="h-9 sm:h-10 bg-white/5 rounded-lg border border-white/5" />
-                            <div className="h-9 sm:h-10 bg-white/10 rounded-lg" />
-                          </div>
-                        </div>
+                  <div className="w-full flex flex-col items-start text-left">
+                    <div className="relative w-full max-w-[520px] bg-[#151619] border border-white/[0.08] rounded-xl overflow-hidden animate-pulse select-none">
+                      {/* Header Bar Skeleton: Minimal order and amount placeholders */}
+                      <div className="px-4 sm:px-5 py-3 sm:py-3.5 border-b border-white/[0.06] flex items-center justify-between gap-3 bg-white/[0.02]">
+                        <div className="h-3.5 w-32 bg-white/[0.08] rounded" />
+                        <div className="h-3.5 w-16 bg-white/[0.08] rounded" />
                       </div>
-                    ))}
+
+                      {/* Card Body Skeleton: Clean title and subtitle without heavy button blocks */}
+                      <div className="p-4 sm:p-5 space-y-2.5">
+                        <div className="h-4 w-3/5 bg-white/[0.08] rounded" />
+                        <div className="h-3 w-28 bg-white/[0.04] rounded" />
+                      </div>
+                    </div>
                   </div>
                 ) : orders.length === 0 ? (
                   <div className="w-full flex flex-col gap-5 items-start text-left">
