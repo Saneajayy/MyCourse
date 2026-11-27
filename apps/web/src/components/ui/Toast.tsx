@@ -157,7 +157,7 @@ export function ToastTab({
     success: { bg: 'bg-[#10b981]', symbol: '✓' },
     info: { bg: 'bg-[#3b82f6]', symbol: 'i' },
   };
-  const config = (variant && iconConfigs[variant]) ? iconConfigs[variant] : iconConfigs.error;
+  const config = variant && iconConfigs[variant] ? iconConfigs[variant] : iconConfigs.error;
   const { bg: iconBg, symbol: iconSymbol } = config;
 
   return (

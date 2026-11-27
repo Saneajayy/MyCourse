@@ -240,137 +240,137 @@ function VerifyEmailForm() {
       />
 
       <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
-      {/* Header */}
-      <div className="space-y-1 text-center">
-        <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-          Please check your email
-        </h1>
-        <div className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-          <span>Enter the 6 digit OTP we sent to </span>
-          {isEditingEmail ? (
-            <div className="inline-flex items-center justify-center gap-2 mt-2 w-full">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com"
-                className="flex-1 max-w-[240px] h-8 px-2.5 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-xs text-white placeholder:text-neutral-500 rounded-lg outline-none"
-                autoFocus
-              />
+        {/* Header */}
+        <div className="space-y-1 text-center">
+          <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            Please check your email
+          </h1>
+          <div className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+            <span>Enter the 6 digit OTP we sent to </span>
+            {isEditingEmail ? (
+              <div className="inline-flex items-center justify-center gap-2 mt-2 w-full">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  className="flex-1 max-w-[240px] h-8 px-2.5 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-xs text-white placeholder:text-neutral-500 rounded-lg outline-none"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsEditingEmail(false)}
+                  className="h-8 px-3 bg-white text-black text-xs font-semibold rounded-lg hover:bg-neutral-200 transition-colors"
+                >
+                  Save
+                </button>
+              </div>
+            ) : (
               <button
                 type="button"
-                onClick={() => setIsEditingEmail(false)}
-                className="h-8 px-3 bg-white text-black text-xs font-semibold rounded-lg hover:bg-neutral-200 transition-colors"
+                onClick={() => setIsEditingEmail(true)}
+                className="text-white font-medium underline underline-offset-2 hover:text-white/80 transition-colors cursor-pointer"
+                title="Click to edit email"
               >
-                Save
+                {email || 'your email address'}
               </button>
-            </div>
+            )}
+          </div>
+        </div>
+
+        {/* 6 Digit OTP Form */}
+        <form onSubmit={handleManualSubmit} className="space-y-4 pt-1">
+          <div
+            className="flex items-center justify-between gap-1.5 sm:gap-2 my-2"
+            onPaste={handlePaste}
+          >
+            {digits.map((digit, index) => (
+              <input
+                key={index}
+                ref={(el) => {
+                  inputRefs.current[index] = el;
+                }}
+                id={`otp-input-${index}`}
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="\d*"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleDigitChange(index, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(index, e)}
+                disabled={status === 'verifying' || status === 'success'}
+                className="w-[44px] h-[50px] sm:w-[48px] sm:h-[54px] text-center text-xl sm:text-2xl font-bold font-mono text-white bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 rounded-lg outline-none transition-colors disabled:opacity-50 select-none"
+                aria-label={`Digit ${index + 1}`}
+              />
+            ))}
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-2">
+            <button
+              type="submit"
+              disabled={!isComplete || status === 'verifying' || status === 'success'}
+              className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+            >
+              {status === 'verifying' ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-black" aria-hidden="true" />
+                  <span>Verifying</span>
+                </>
+              ) : status === 'success' ? (
+                <>
+                  <Check className="w-4 h-4 stroke-[2.5] text-emerald-600" aria-hidden="true" />
+                  <span>Verified! Redirecting</span>
+                </>
+              ) : (
+                <span>Verify &rarr;</span>
+              )}
+            </button>
+          </div>
+        </form>
+
+        {/* Resend Section */}
+        <div className="pt-1 text-center text-xs text-[#c2c4cc]">
+          Didn&apos;t receive the code?{' '}
+          {resendCooldown > 0 ? (
+            <span className="text-[#80828d] font-mono ml-1">Resend in {resendCooldown}s</span>
           ) : (
             <button
               type="button"
-              onClick={() => setIsEditingEmail(true)}
-              className="text-white font-medium underline underline-offset-2 hover:text-white/80 transition-colors cursor-pointer"
-              title="Click to edit email"
+              onClick={handleResendOtp}
+              disabled={isResending}
+              className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1 inline-flex items-center gap-1 cursor-pointer"
             >
-              {email || 'your email address'}
+              {isResending && <RotateCw className="w-3 h-3 animate-spin text-white" />}
+              <span>Resend Code</span>
             </button>
           )}
         </div>
-      </div>
 
-      {/* 6 Digit OTP Form */}
-      <form onSubmit={handleManualSubmit} className="space-y-4 pt-1">
-        <div
-          className="flex items-center justify-between gap-1.5 sm:gap-2 my-2"
-          onPaste={handlePaste}
-        >
-          {digits.map((digit, index) => (
-            <input
-              key={index}
-              ref={(el) => {
-                inputRefs.current[index] = el;
-              }}
-              id={`otp-input-${index}`}
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              pattern="\d*"
-              maxLength={1}
-              value={digit}
-              onChange={(e) => handleDigitChange(index, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(index, e)}
-              disabled={status === 'verifying' || status === 'success'}
-              className="w-[44px] h-[50px] sm:w-[48px] sm:h-[54px] text-center text-xl sm:text-2xl font-bold font-mono text-white bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 rounded-lg outline-none transition-colors disabled:opacity-50 select-none"
-              aria-label={`Digit ${index + 1}`}
-            />
-          ))}
+        {/* Wrong Account Link */}
+        <div className="text-center text-xs text-[#80828d]">
+          Wrong account?{' '}
+          <Link
+            href="/register"
+            className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1"
+          >
+            Try another email &rarr;
+          </Link>
         </div>
 
-        {/* Submit Button */}
-        <div className="pt-2">
-          <button
-            type="submit"
-            disabled={!isComplete || status === 'verifying' || status === 'success'}
-            className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
-          >
-            {status === 'verifying' ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin text-black" aria-hidden="true" />
-                <span>Verifying</span>
-              </>
-            ) : status === 'success' ? (
-              <>
-                <Check className="w-4 h-4 stroke-[2.5] text-emerald-600" aria-hidden="true" />
-                <span>Verified! Redirecting</span>
-              </>
-            ) : (
-              <span>Verify &rarr;</span>
-            )}
-          </button>
-        </div>
-      </form>
+        {/* Horizontal Divider */}
+        <div className="-mx-5 sm:-mx-7 border-t border-white/[0.06] pt-4" />
 
-      {/* Resend Section */}
-      <div className="pt-1 text-center text-xs text-[#c2c4cc]">
-        Didn&apos;t receive the code?{' '}
-        {resendCooldown > 0 ? (
-          <span className="text-[#80828d] font-mono ml-1">Resend in {resendCooldown}s</span>
-        ) : (
-          <button
-            type="button"
-            onClick={handleResendOtp}
-            disabled={isResending}
-            className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1 inline-flex items-center gap-1 cursor-pointer"
-          >
-            {isResending && <RotateCw className="w-3 h-3 animate-spin text-white" />}
-            <span>Resend Code</span>
-          </button>
-        )}
+        {/* Footer Disclaimer */}
+        <p className="text-center text-[11px] text-[#80828d] leading-normal">
+          Need assistance? Contact our{' '}
+          <Link href="/contact" className="underline hover:text-white transition-colors">
+            support desk
+          </Link>
+          .
+        </p>
       </div>
-
-      {/* Wrong Account Link */}
-      <div className="text-center text-xs text-[#80828d]">
-        Wrong account?{' '}
-        <Link
-          href="/register"
-          className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1"
-        >
-          Try another email &rarr;
-        </Link>
-      </div>
-
-      {/* Horizontal Divider */}
-      <div className="-mx-5 sm:-mx-7 border-t border-white/[0.06] pt-4" />
-
-      {/* Footer Disclaimer */}
-      <p className="text-center text-[11px] text-[#80828d] leading-normal">
-        Need assistance? Contact our{' '}
-        <Link href="/contact" className="underline hover:text-white transition-colors">
-          support desk
-        </Link>
-        .
-      </p>
-    </div>
     </div>
   );
 }

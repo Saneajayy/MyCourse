@@ -228,191 +228,191 @@ function ForgotPasswordContent() {
       />
 
       <div className="relative w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-7 select-none overflow-hidden space-y-4 transition-all text-left">
-      {step === 'email' ? (
-        <>
-          {/* Header */}
-          <div className="space-y-1 text-center">
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Forgot your Password?
-            </h1>
-            <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              Enter your registered email address to receive a 6-digit verification code.
-            </p>
-          </div>
+        {step === 'email' ? (
+          <>
+            {/* Header */}
+            <div className="space-y-1 text-center">
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                Forgot your Password?
+              </h1>
+              <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+                Enter your registered email address to receive a 6-digit verification code.
+              </p>
+            </div>
 
-          {/* Email Input Form */}
-          <form onSubmit={handleSendCode} className="space-y-3.5 pt-1">
-            <div className="space-y-1.5 text-left">
-              <label htmlFor="forgot-email" className="text-xs font-medium text-white block">
-                Registered Email
-              </label>
-              <div className="relative">
-                <input
-                  id="forgot-email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="name@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-10 px-3 pr-9 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-sm text-white placeholder:text-neutral-500 rounded-lg outline-none transition-colors"
-                />
-                {email.includes('@') && email.length > 4 && (
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-400">
-                    <Check className="w-4 h-4 stroke-[2.5]" />
-                  </div>
-                )}
+            {/* Email Input Form */}
+            <form onSubmit={handleSendCode} className="space-y-3.5 pt-1">
+              <div className="space-y-1.5 text-left">
+                <label htmlFor="forgot-email" className="text-xs font-medium text-white block">
+                  Registered Email
+                </label>
+                <div className="relative">
+                  <input
+                    id="forgot-email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="name@example.com"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full h-10 px-3 pr-9 bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 text-sm text-white placeholder:text-neutral-500 rounded-lg outline-none transition-colors"
+                  />
+                  {email.includes('@') && email.length > 4 && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-400">
+                      <Check className="w-4 h-4 stroke-[2.5]" />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Send Reset Code Button */}
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={isLoading || !email.trim()}
-                className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+              {/* Send Reset Code Button */}
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={isLoading || !email.trim()}
+                  className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                >
+                  {isLoading && (
+                    <Loader2 className="w-4 h-4 animate-spin text-black" aria-hidden="true" />
+                  )}
+                  <span>{isLoading ? 'Sending Code...' : 'Send Reset Code \u2192'}</span>
+                </button>
+              </div>
+            </form>
+
+            {/* Back to Login */}
+            <div className="pt-1 text-center text-xs text-[#c2c4cc]">
+              Remember your password?{' '}
+              <Link
+                href="/login"
+                className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1"
               >
-                {isLoading && (
-                  <Loader2 className="w-4 h-4 animate-spin text-black" aria-hidden="true" />
-                )}
-                <span>{isLoading ? 'Sending Code...' : 'Send Reset Code \u2192'}</span>
-              </button>
+                Sign in &rarr;
+              </Link>
             </div>
-          </form>
 
-          {/* Back to Login */}
-          <div className="pt-1 text-center text-xs text-[#c2c4cc]">
-            Remember your password?{' '}
-            <Link
-              href="/login"
-              className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1"
-            >
-              Sign in &rarr;
-            </Link>
-          </div>
+            {/* Horizontal Divider */}
+            <div className="-mx-5 sm:-mx-7 border-t border-white/[0.06] pt-4" />
 
-          {/* Horizontal Divider */}
-          <div className="-mx-5 sm:-mx-7 border-t border-white/[0.06] pt-4" />
-
-          {/* Footer Disclaimer */}
-          <p className="text-center text-[11px] text-[#80828d] leading-normal">
-            Need assistance? Contact our{' '}
-            <Link href="/contact" className="underline hover:text-white transition-colors">
-              support desk
-            </Link>
-            .
-          </p>
-        </>
-      ) : (
-        <>
-          {/* Header */}
-          <div className="space-y-1 text-center">
-            <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-              Please check your email
-            </h1>
-            <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
-              Enter the 6 digit OTP we sent to your email.
+            {/* Footer Disclaimer */}
+            <p className="text-center text-[11px] text-[#80828d] leading-normal">
+              Need assistance? Contact our{' '}
+              <Link href="/contact" className="underline hover:text-white transition-colors">
+                support desk
+              </Link>
+              .
             </p>
-          </div>
+          </>
+        ) : (
+          <>
+            {/* Header */}
+            <div className="space-y-1 text-center">
+              <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                Please check your email
+              </h1>
+              <p className="text-xs sm:text-[13px] text-[#c2c4cc] leading-relaxed">
+                Enter the 6 digit OTP we sent to your email.
+              </p>
+            </div>
 
-          {/* 6 Digit OTP Inputs Form */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleVerifyOtp();
-            }}
-            className="space-y-4 pt-1"
-          >
-            <div
-              className="flex items-center justify-between gap-1.5 sm:gap-2 my-2"
-              onPaste={handlePaste}
+            {/* 6 Digit OTP Inputs Form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleVerifyOtp();
+              }}
+              className="space-y-4 pt-1"
             >
-              {digits.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => {
-                    inputRefs.current[index] = el;
-                  }}
-                  id={`otp-input-${index}`}
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  pattern="\d*"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleDigitChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  disabled={isVerifying}
-                  className="w-[44px] h-[50px] sm:w-[48px] sm:h-[54px] text-center text-xl sm:text-2xl font-bold font-mono text-white bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 rounded-lg outline-none transition-colors disabled:opacity-50 select-none"
-                  aria-label={`Digit ${index + 1}`}
-                />
-              ))}
-            </div>
-
-            {/* Verify & Continue Button */}
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={!isComplete || isVerifying}
-                className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+              <div
+                className="flex items-center justify-between gap-1.5 sm:gap-2 my-2"
+                onPaste={handlePaste}
               >
-                {isVerifying && (
-                  <Loader2 className="w-4 h-4 animate-spin text-black" aria-hidden="true" />
-                )}
-                <span>{isVerifying ? 'Verifying' : 'Verify \u2192'}</span>
-              </button>
-            </div>
-          </form>
+                {digits.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => {
+                      inputRefs.current[index] = el;
+                    }}
+                    id={`otp-input-${index}`}
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    pattern="\d*"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleDigitChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    disabled={isVerifying}
+                    className="w-[44px] h-[50px] sm:w-[48px] sm:h-[54px] text-center text-xl sm:text-2xl font-bold font-mono text-white bg-[#1b1c20] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/30 rounded-lg outline-none transition-colors disabled:opacity-50 select-none"
+                    aria-label={`Digit ${index + 1}`}
+                  />
+                ))}
+              </div>
 
-          {/* Resend Code Section */}
-          <div className="pt-1 text-center text-xs text-[#c2c4cc]">
-            Didn&apos;t receive the code?{' '}
-            {resendCooldown > 0 ? (
-              <span className="text-[#80828d] font-mono ml-1">Resend in {resendCooldown}s</span>
-            ) : (
+              {/* Verify & Continue Button */}
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={!isComplete || isVerifying}
+                  className="w-full h-11 bg-white hover:bg-neutral-200 active:bg-neutral-300 text-black font-semibold text-xs sm:text-sm rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                >
+                  {isVerifying && (
+                    <Loader2 className="w-4 h-4 animate-spin text-black" aria-hidden="true" />
+                  )}
+                  <span>{isVerifying ? 'Verifying' : 'Verify \u2192'}</span>
+                </button>
+              </div>
+            </form>
+
+            {/* Resend Code Section */}
+            <div className="pt-1 text-center text-xs text-[#c2c4cc]">
+              Didn&apos;t receive the code?{' '}
+              {resendCooldown > 0 ? (
+                <span className="text-[#80828d] font-mono ml-1">Resend in {resendCooldown}s</span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={isResending}
+                  className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1 inline-flex items-center gap-1 cursor-pointer"
+                >
+                  {isResending && <RotateCw className="w-3 h-3 animate-spin text-white" />}
+                  <span>Resend Code</span>
+                </button>
+              )}
+            </div>
+
+            {/* Wrong Account Link */}
+            <div className="text-center text-xs text-[#80828d]">
+              Wrong account?{' '}
               <button
                 type="button"
-                onClick={handleResend}
-                disabled={isResending}
-                className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1 inline-flex items-center gap-1 cursor-pointer"
+                onClick={() => {
+                  setStep('email');
+                  setErrorMsg(null);
+                  isVerifyingRef.current = false;
+                  setIsVerifying(false);
+                }}
+                className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1 cursor-pointer"
               >
-                {isResending && <RotateCw className="w-3 h-3 animate-spin text-white" />}
-                <span>Resend Code</span>
+                Try another email &rarr;
               </button>
-            )}
-          </div>
+            </div>
 
-          {/* Wrong Account Link */}
-          <div className="text-center text-xs text-[#80828d]">
-            Wrong account?{' '}
-            <button
-              type="button"
-              onClick={() => {
-                setStep('email');
-                setErrorMsg(null);
-                isVerifyingRef.current = false;
-                setIsVerifying(false);
-              }}
-              className="font-semibold text-white underline hover:text-white/80 transition-colors ml-1 cursor-pointer"
-            >
-              Try another email &rarr;
-            </button>
-          </div>
+            {/* Horizontal Divider */}
+            <div className="-mx-5 sm:-mx-7 border-t border-white/[0.06] pt-4" />
 
-          {/* Horizontal Divider */}
-          <div className="-mx-5 sm:-mx-7 border-t border-white/[0.06] pt-4" />
-
-          {/* Footer Disclaimer */}
-          <p className="text-center text-[11px] text-[#80828d] leading-normal">
-            Need assistance? Contact our{' '}
-            <Link href="/contact" className="underline hover:text-white transition-colors">
-              support desk
-            </Link>
-            .
-          </p>
-        </>
-      )}
-    </div>
+            {/* Footer Disclaimer */}
+            <p className="text-center text-[11px] text-[#80828d] leading-normal">
+              Need assistance? Contact our{' '}
+              <Link href="/contact" className="underline hover:text-white transition-colors">
+                support desk
+              </Link>
+              .
+            </p>
+          </>
+        )}
+      </div>
     </div>
   );
 }
