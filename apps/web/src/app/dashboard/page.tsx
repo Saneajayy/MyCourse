@@ -28,7 +28,6 @@ import {
   Files,
   IndianRupee,
   Settings,
-  Search,
   Award,
   ChevronDown,
   Shapes,
@@ -188,6 +187,44 @@ function StudentDashboardContent() {
   }, [searchParams]);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
+  const isTouchDraggingRef = useRef(false);
+
+  const handleMobileNavTouchStart = useCallback((e: React.TouchEvent) => {
+    const firstTouch = e.touches[0];
+    if (firstTouch) {
+      touchStartPosRef.current = {
+        x: firstTouch.clientX,
+        y: firstTouch.clientY,
+      };
+      isTouchDraggingRef.current = false;
+    }
+  }, []);
+
+  const handleMobileNavTouchMove = useCallback((e: React.TouchEvent) => {
+    const firstTouch = e.touches[0];
+    if (!touchStartPosRef.current || !firstTouch) return;
+    const deltaX = Math.abs(firstTouch.clientX - touchStartPosRef.current.x);
+    const deltaY = Math.abs(firstTouch.clientY - touchStartPosRef.current.y);
+    if (deltaX > 8 || deltaY > 8) {
+      isTouchDraggingRef.current = true;
+    }
+  }, []);
+
+  const handleMobileNavTouchEnd = useCallback(() => {
+    setTimeout(() => {
+      isTouchDraggingRef.current = false;
+      touchStartPosRef.current = null;
+    }, 120);
+  }, []);
+
+  const handleMobileNavClickCapture = useCallback((e: React.MouseEvent) => {
+    if (isTouchDraggingRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, []);
+
   const desktopNavRef = useRef<HTMLElement | null>(null);
   const tabRefs = useRef<{ [key in DashboardTab]?: HTMLButtonElement | null }>({});
   const [mounted, setMounted] = useState(false);
@@ -220,10 +257,10 @@ function StudentDashboardContent() {
   const [courses, setCourses] = useState<EnrolledCourse[]>([]);
   const [coursesLoading, setCoursesLoading] = useState(true);
   const [coursesError, setCoursesError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
 
   // Handler for selecting a specific calculator sub-section
   const handleCalculatorSubSectionChange = useCallback((subSection: CalculatorSection) => {
+    if (isTouchDraggingRef.current) return;
     setActiveTab('calculator');
     setActiveCalculatorSection(subSection);
     setIsToolsOpen(true);
@@ -239,6 +276,7 @@ function StudentDashboardContent() {
   // Sync tab with URL query parameter
   const handleTabChange = useCallback(
     (newTab: DashboardTab) => {
+      if (isTouchDraggingRef.current) return;
       setActiveTab(newTab);
       setIsMobileMenuOpen(false);
       if (newTab === 'calculator') {
@@ -505,15 +543,6 @@ function StudentDashboardContent() {
     }
   };
 
-  // Filtered courses
-  const filteredCourses = useMemo(() => {
-    if (!searchQuery.trim()) return courses;
-    const q = searchQuery.toLowerCase().trim();
-    return courses.filter(
-      (c) => c.product.title.toLowerCase().includes(q) || c.product.slug.toLowerCase().includes(q),
-    );
-  }, [courses, searchQuery]);
-
   // Completed courses eligible for certificate (unlocks at >= 90% or with preview_unlocked=true)
   const completedCourses = useMemo(() => {
     if (courses.length > 0) {
@@ -666,8 +695,16 @@ function StudentDashboardContent() {
               : 'grid-rows-[0fr] opacity-0 pointer-events-none'
           }`}
         >
-          <div className="overflow-hidden">
-            <nav aria-label="Student Navigation Mobile" className="flex flex-col px-2 py-2 gap-0.5">
+          <div className="max-h-[min(72vh,calc(100dvh-120px))] overflow-y-auto custom-scrollbar overscroll-contain [touch-action:pan-y]">
+            <nav
+              aria-label="Student Navigation Mobile"
+              onTouchStart={handleMobileNavTouchStart}
+              onTouchMove={handleMobileNavTouchMove}
+              onTouchEnd={handleMobileNavTouchEnd}
+              onTouchCancel={handleMobileNavTouchEnd}
+              onClickCapture={handleMobileNavClickCapture}
+              className="flex flex-col px-2 py-2 gap-0.5"
+            >
               {/* SECTION 1: MAIN */}
               <button
                 type="button"
@@ -1424,34 +1461,6 @@ function StudentDashboardContent() {
                   <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">{greeting.subtitle}</p>
                 </div>
 
-                {/* Minimal Search Bar matching TUF Dark Theme */}
-                {courses.length > 0 && (
-                  <div className="relative w-full max-w-md">
-                    <Search
-                      strokeWidth={1}
-                      className="w-4 h-4 text-[#c2c4cc]/50 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none stroke-1"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Search courses..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      style={{ outline: 'none', boxShadow: 'none' }}
-                      className="w-full h-10 pl-10 pr-9 bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] focus:border-white/[0.18] rounded-xl text-xs sm:text-sm text-white placeholder:text-[#c2c4cc]/50 outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 transition-colors duration-150 shadow-none"
-                    />
-                    {searchQuery && (
-                      <button
-                        type="button"
-                        onClick={() => setSearchQuery('')}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#c2c4cc]/60 hover:text-white p-1 cursor-pointer"
-                        aria-label="Clear search"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                )}
-
                 {/* Error Notice */}
                 {coursesError && (
                   <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs sm:text-sm font-medium flex items-center gap-2">
@@ -1497,26 +1506,10 @@ function StudentDashboardContent() {
                   </div>
                 ) : null}
 
-                {/* Empty Search Filter State */}
-                {courses.length > 0 && filteredCourses.length === 0 && (
-                  <div className="relative w-fit max-w-full bg-[#151619] border border-white/[0.08] rounded-xl p-5 sm:p-6 text-left space-y-2 select-none">
-                    <p className="text-sm font-medium text-white">
-                      No courses match &ldquo;{searchQuery}&rdquo;
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setSearchQuery('')}
-                      className="text-xs font-medium text-[#c2c4cc] hover:text-white underline cursor-pointer"
-                    >
-                      Clear Search
-                    </button>
-                  </div>
-                )}
-
                 {/* Courses List: Wide Horizontal Course Cards matching design */}
-                {filteredCourses.length > 0 && (
+                {courses.length > 0 && (
                   <div className="w-full flex flex-col gap-5 items-start text-left">
-                    {filteredCourses.map((c) => {
+                    {courses.map((c) => {
                       const percent = Math.min(
                         100,
                         Math.max(0, Math.round(c.progress?.percentComplete ?? 0)),
