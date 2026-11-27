@@ -82,7 +82,6 @@ function CommentThreadItem({
   const isAdmin = user?.role === 'ADMIN';
   const canDelete = !comment.isDeleted && (isAuthor || isAdmin);
   const isCommentAdmin = comment.user.role === 'ADMIN';
-  const isTopLevel = depth === 0;
 
   return (
     <div
@@ -90,16 +89,12 @@ function CommentThreadItem({
     >
       {/* Left: Avatar & Continuous Vertical Thread Line */}
       <div className="flex flex-col items-center shrink-0">
-        <div
-          className={`rounded-full overflow-hidden flex items-center justify-center shrink-0 select-none bg-white/[0.08] text-white/60 ${
-            isTopLevel ? 'w-6 h-6' : 'w-5 h-5'
-          }`}
-        >
+        <div className="w-6 h-6 rounded-full overflow-hidden flex items-center justify-center shrink-0 select-none bg-white/[0.08] text-white/60">
           <svg
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            strokeWidth="1.8"
+            strokeWidth="1.3"
             strokeLinecap="round"
             strokeLinejoin="round"
             className="w-full h-full"

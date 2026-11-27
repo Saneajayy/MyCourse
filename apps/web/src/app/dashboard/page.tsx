@@ -703,14 +703,14 @@ function StudentDashboardContent() {
               onTouchEnd={handleMobileNavTouchEnd}
               onTouchCancel={handleMobileNavTouchEnd}
               onClickCapture={handleMobileNavClickCapture}
-              className="flex flex-col px-2 py-2 gap-0.5"
+              className="flex flex-col px-2 py-2 gap-0.5 select-none [-webkit-tap-highlight-color:transparent]"
             >
               {/* SECTION 1: MAIN */}
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setIsMainOpen((prev) => !prev)}
-                className="w-full flex items-center justify-between px-2.5 py-0.5 text-[9px] font-sans font-semibold tracking-widest text-[#7e828d] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+                className="w-full flex items-center justify-between px-2.5 py-0.5 text-[9px] font-sans font-semibold tracking-widest text-[#7e828d] uppercase select-none transition-colors cursor-pointer group [-webkit-tap-highlight-color:transparent]"
               >
                 <span>MAIN</span>
                 <ChevronDown
@@ -737,10 +737,10 @@ function StudentDashboardContent() {
                         key={tab.id}
                         type="button"
                         onClick={() => handleTabChange(tab.id)}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none ${
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none [-webkit-tap-highlight-color:transparent] ${
                           isActive
                             ? 'bg-[#1f2023] text-white font-medium'
-                            : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
+                            : 'text-[#9ca3af] font-normal'
                         }`}
                       >
                         <Icon
@@ -760,7 +760,7 @@ function StudentDashboardContent() {
                     <Link
                       href="/admin"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg text-emerald-400 hover:bg-emerald-500/10 font-normal transition-colors cursor-pointer select-none"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg text-emerald-400 font-normal transition-colors cursor-pointer select-none [-webkit-tap-highlight-color:transparent]"
                     >
                       <ShieldCheck
                         strokeWidth={1.5}
@@ -780,7 +780,7 @@ function StudentDashboardContent() {
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setIsToolsOpen((prev) => !prev)}
-                className="w-full flex items-center justify-between px-2.5 py-0.5 text-[9px] font-sans font-semibold tracking-widest text-[#7e828d] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+                className="w-full flex items-center justify-between px-2.5 py-0.5 text-[9px] font-sans font-semibold tracking-widest text-[#7e828d] uppercase select-none transition-colors cursor-pointer group [-webkit-tap-highlight-color:transparent]"
               >
                 <span>TOOLS</span>
                 <ChevronDown
@@ -806,12 +806,12 @@ function StudentDashboardContent() {
                       onClick={() => {
                         setIsCalculatorOpen((prev) => !prev);
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none group ${
+                      className={`w-full flex items-center justify-between px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none group [-webkit-tap-highlight-color:transparent] ${
                         activeTab === 'calculator' && !isCalculatorOpen
                           ? 'bg-[#1f2023] text-white font-medium'
                           : activeTab === 'calculator' && isCalculatorOpen
                             ? 'text-white font-medium'
-                            : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
+                            : 'text-[#9ca3af] font-normal'
                       }`}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
@@ -878,10 +878,10 @@ function StudentDashboardContent() {
                               <button
                                 type="button"
                                 onClick={() => handleCalculatorSubSectionChange(sub.id)}
-                                className={`ml-7 w-full flex items-center px-3 py-1.5 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none truncate ${
+                                className={`ml-7 w-full flex items-center px-3 py-1.5 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none truncate [-webkit-tap-highlight-color:transparent] ${
                                   isSubActive
                                     ? 'bg-[#1f2023] text-white font-medium'
-                                    : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
+                                    : 'text-[#9ca3af] font-normal'
                                 }`}
                               >
                                 <span className="truncate">{sub.label}</span>
@@ -897,10 +897,10 @@ function StudentDashboardContent() {
                   <button
                     type="button"
                     onClick={() => handleTabChange('symbols')}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none ${
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none [-webkit-tap-highlight-color:transparent] ${
                       activeTab === 'symbols'
                         ? 'bg-[#1f2023] text-white font-medium'
-                        : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
+                        : 'text-[#9ca3af] font-normal'
                     }`}
                   >
                     <Shapes
@@ -924,7 +924,7 @@ function StudentDashboardContent() {
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setIsProfileOpen((prev) => !prev)}
-                className="w-full flex items-center justify-between px-2.5 py-0.5 text-[9px] font-sans font-semibold tracking-widest text-[#7e828d] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+                className="w-full flex items-center justify-between px-2.5 py-0.5 text-[9px] font-sans font-semibold tracking-widest text-[#7e828d] uppercase select-none transition-colors cursor-pointer group [-webkit-tap-highlight-color:transparent]"
               >
                 <span>PROFILE</span>
                 <ChevronDown
@@ -951,10 +951,10 @@ function StudentDashboardContent() {
                         key={tab.id}
                         type="button"
                         onClick={() => handleTabChange(tab.id)}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none ${
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg transition-colors text-left cursor-pointer select-none [-webkit-tap-highlight-color:transparent] ${
                           isActive
                             ? 'bg-[#1f2023] text-white font-medium'
-                            : 'text-[#9ca3af] hover:text-white hover:bg-white/[0.04] font-normal'
+                            : 'text-[#9ca3af] font-normal'
                         }`}
                       >
                         <Icon
@@ -976,7 +976,7 @@ function StudentDashboardContent() {
                       setIsMobileMenuOpen(false);
                       logout();
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg text-[#9ca3af] hover:text-rose-400 hover:bg-white/[0.04] font-normal transition-colors cursor-pointer select-none text-left"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] rounded-lg text-[#9ca3af] font-normal transition-colors cursor-pointer select-none text-left [-webkit-tap-highlight-color:transparent]"
                   >
                     <LogOut strokeWidth={1.5} className="w-4 h-4 shrink-0 text-[#9ca3af]" />
                     <span>Log Out</span>
