@@ -11,7 +11,7 @@ function DashboardSkeleton() {
   return (
     <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-black text-white p-2.5 sm:p-3 overflow-hidden font-reddit select-none z-10 flex flex-col md:flex-row gap-2.5 sm:gap-3">
       {/* Left Sidebar Skeleton */}
-      <aside className="w-full shrink-0 md:flex-none md:w-64 lg:w-72 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden justify-between">
+      <aside className="w-full shrink-0 md:flex-none md:w-64 lg:w-72 md:h-full md:shrink-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden">
         <div>
           {/* Logo Header */}
           <div className="px-5 py-3.5 flex items-center justify-between shrink-0">
@@ -52,17 +52,6 @@ function DashboardSkeleton() {
             <div className="h-9 w-full bg-white/[0.03] rounded-lg flex items-center px-3 gap-2.5">
               <div className="w-3.5 h-3.5 bg-white/10 rounded" />
               <div className="h-3.5 w-20 bg-white/10 rounded" />
-            </div>
-          </div>
-        </div>
-
-        {/* User Footer Skeleton */}
-        <div className="p-2.5 border-t border-white/[0.08]">
-          <div className="flex items-center gap-3 px-3 py-2 bg-white/[0.03] rounded-xl animate-pulse">
-            <div className="w-8 h-8 rounded-full bg-white/10 shrink-0" />
-            <div className="space-y-1.5 flex-1 min-w-0">
-              <div className="h-3 w-20 bg-white/20 rounded" />
-              <div className="h-2 w-14 bg-white/10 rounded" />
             </div>
           </div>
         </div>

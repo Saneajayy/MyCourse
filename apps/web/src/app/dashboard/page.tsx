@@ -1404,43 +1404,6 @@ function StudentDashboardContent() {
             </div>
           </div>
         </nav>
-
-        {/* Bottom Pinned User Profile Footer */}
-        <div
-          className={`border-t border-white/[0.08] p-2 shrink-0 ${
-            isMobileMenuOpen ? 'block' : 'hidden md:block'
-          }`}
-        >
-          <button
-            type="button"
-            onClick={() => handleTabChange('profile')}
-            className="w-full flex items-center gap-3 px-2.5 py-2 rounded-lg hover:bg-white/[0.04] transition-colors text-left cursor-pointer select-none group"
-            title="Account Settings"
-          >
-            <div className="w-9 h-9 rounded-full bg-white/[0.08] text-white/60 overflow-hidden flex items-center justify-center shrink-0 select-none group-hover:text-white/80 transition-colors">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-full h-full"
-              >
-                <circle cx="12" cy="7.5" r="3.5" />
-                <path d="M1.5 22.5c0-4.8 4.7-8 10.5-8s10.5 3.2 10.5 8" />
-              </svg>
-            </div>
-            <div className="flex flex-col justify-center min-w-0 leading-tight">
-              <span className="text-[13px] font-semibold text-white tracking-wide uppercase truncate group-hover:text-white transition-colors">
-                {user?.name ? user.name.toUpperCase() : 'STUDENT'}
-              </span>
-              <span className="text-[11px] font-medium text-[#7e828d] tracking-wider uppercase truncate mt-0.5">
-                ENROLLED
-              </span>
-            </div>
-          </button>
-        </div>
       </aside>
 
       {/* ============================================================== */}
