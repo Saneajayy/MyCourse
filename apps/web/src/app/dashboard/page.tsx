@@ -30,11 +30,15 @@ import {
   Settings,
   Search,
   Award,
+  Wrench,
+  ChevronDown,
+  Shapes,
 } from 'lucide-react';
 import { HydraulicCalculator } from '../../components/calculator/HydraulicCalculator';
 import { CourseLottieThumbnail } from '../../components/dashboard/CourseLottieThumbnail';
 
-export type DashboardTab = 'courses' | 'certificates' | 'calculator' | 'profile' | 'orders';
+export type DashboardTab =
+  'courses' | 'certificates' | 'calculator' | 'symbols' | 'profile' | 'orders';
 
 interface EnrolledCourse {
   product: {
@@ -125,26 +129,36 @@ function StudentDashboardContent() {
   const { user, isAuthenticated, isLoading: authLoading, refreshUser, logout } = useAuth();
   const { error: toastError, success: toastSuccess } = useToast();
 
-  const tabParam = searchParams.get('tab') as DashboardTab | null;
+  const VALID_TABS: DashboardTab[] = [
+    'courses',
+    'certificates',
+    'calculator',
+    'symbols',
+    'profile',
+    'orders',
+  ];
+
+  const tabParam = searchParams.get('tab');
   const isPreviewUnlocked = searchParams.get('preview_unlocked') === 'true';
-  const [activeTab, setActiveTab] = useState<DashboardTab>(
-    tabParam && ['courses', 'certificates', 'calculator', 'profile', 'orders'].includes(tabParam)
-      ? tabParam
-      : isPreviewUnlocked
-        ? 'certificates'
-        : 'courses',
-  );
+  const [activeTab, setActiveTab] = useState<DashboardTab>(() => {
+    if (tabParam === 'tools') return 'calculator';
+    if (tabParam && VALID_TABS.includes(tabParam as DashboardTab)) return tabParam as DashboardTab;
+    return isPreviewUnlocked ? 'certificates' : 'courses';
+  });
 
   useEffect(() => {
-    const tab = searchParams.get('tab') as DashboardTab | null;
+    const tab = searchParams.get('tab');
     const preview = searchParams.get('preview_unlocked') === 'true';
-    if (tab && ['courses', 'certificates', 'calculator', 'profile', 'orders'].includes(tab)) {
-      setActiveTab(tab);
+    if (tab === 'tools') {
+      setActiveTab('calculator');
+    } else if (tab && VALID_TABS.includes(tab as DashboardTab)) {
+      setActiveTab(tab as DashboardTab);
     } else if (preview) {
       setActiveTab('certificates');
     }
   }, [searchParams]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isToolsOpen, setIsToolsOpen] = useState<boolean>(true);
   const tabRefs = useRef<{ [key in DashboardTab]?: HTMLButtonElement | null }>({});
   const [indicatorStyle, setIndicatorStyle] = useState<{
     top: number;
@@ -162,14 +176,35 @@ function StudentDashboardContent() {
   const [coursesError, setCoursesError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const isToolsActive = activeTab === 'calculator' || activeTab === 'symbols';
+
   // Sync tab with URL query parameter
-  const handleTabChange = (newTab: DashboardTab) => {
+  const handleTabChange = useCallback((newTab: DashboardTab) => {
     setActiveTab(newTab);
     setIsMobileMenuOpen(false);
+    if (newTab === 'calculator' || newTab === 'symbols') {
+      setIsToolsOpen(true);
+    }
     const url = new URL(window.location.href);
     url.searchParams.set('tab', newTab);
     window.history.replaceState({}, '', url.toString());
-  };
+  }, []);
+
+  const toggleTools = useCallback(() => {
+    setIsToolsOpen((prev) => {
+      const next = !prev;
+      if (next && activeTab !== 'calculator' && activeTab !== 'symbols') {
+        handleTabChange('calculator');
+      }
+      return next;
+    });
+  }, [activeTab, handleTabChange]);
+
+  useEffect(() => {
+    if (activeTab === 'calculator' || activeTab === 'symbols') {
+      setIsToolsOpen(true);
+    }
+  }, [activeTab]);
 
   // Smoothly move highlight pill to active tab
   const updateIndicator = useCallback(() => {
@@ -186,14 +221,16 @@ function StudentDashboardContent() {
   useEffect(() => {
     updateIndicator();
     const rafId = requestAnimationFrame(updateIndicator);
-    const timer = setTimeout(updateIndicator, 50);
+    const timer1 = setTimeout(updateIndicator, 50);
+    const timer2 = setTimeout(updateIndicator, 220);
     window.addEventListener('resize', updateIndicator);
     return () => {
       cancelAnimationFrame(rafId);
-      clearTimeout(timer);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
       window.removeEventListener('resize', updateIndicator);
     };
-  }, [updateIndicator, coursesLoading, authLoading]);
+  }, [updateIndicator, isToolsOpen, coursesLoading, authLoading]);
 
   // Profile state
   const [name, setName] = useState('');
@@ -413,14 +450,29 @@ function StudentDashboardContent() {
     return [];
   }, [courses, isPreviewUnlocked]);
 
-  const navTabs: {
+  const primaryNavTabs: {
     id: DashboardTab;
     label: string;
     icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
   }[] = [
     { id: 'courses', label: 'Courses', icon: Layers },
     { id: 'certificates', label: 'Credentials', icon: Scroll },
+  ];
+
+  const toolTabs: {
+    id: DashboardTab;
+    label: string;
+    icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
+  }[] = [
     { id: 'calculator', label: 'Calculator', icon: Sigma },
+    { id: 'symbols', label: 'Symbols', icon: Shapes },
+  ];
+
+  const secondaryNavTabs: {
+    id: DashboardTab;
+    label: string;
+    icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
+  }[] = [
     { id: 'profile', label: 'Settings', icon: Settings },
     { id: 'orders', label: 'Payments', icon: IndianRupee },
   ];
@@ -519,7 +571,90 @@ function StudentDashboardContent() {
               aria-label="Student Navigation Mobile"
               className="flex flex-col px-3 py-2 space-y-1"
             >
-              {navTabs.map((tab) => {
+              {primaryNavTabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => handleTabChange(tab.id)}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
+                      isActive
+                        ? 'bg-[#1f2023] text-white font-semibold'
+                        : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                    }`}
+                  >
+                    <Icon
+                      strokeWidth={1}
+                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${isActive ? 'text-white' : 'text-[#c2c4cc]'}`}
+                    />
+                    <span
+                      className={`transition-colors ${isActive ? 'text-white font-semibold' : 'text-[#c2c4cc] font-normal'}`}
+                    >
+                      {tab.label}
+                    </span>
+                  </button>
+                );
+              })}
+
+              {/* Mobile Tools Dropdown Accordion */}
+              <div className="flex flex-col">
+                <button
+                  type="button"
+                  onClick={toggleTools}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
+                    isToolsActive && !isToolsOpen
+                      ? 'bg-[#1f2023] text-white font-semibold'
+                      : isToolsActive
+                        ? 'text-white font-medium'
+                        : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Wrench
+                      strokeWidth={1}
+                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${isToolsActive ? 'text-white' : 'text-[#c2c4cc]'}`}
+                    />
+                    <span className="transition-colors">Tools</span>
+                  </div>
+                  <ChevronDown
+                    strokeWidth={1.5}
+                    className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
+                      isToolsOpen ? 'rotate-180 text-white' : 'rotate-0 text-[#c2c4cc]'
+                    }`}
+                  />
+                </button>
+
+                {isToolsOpen && (
+                  <div className="space-y-1 pl-4 pt-1">
+                    {toolTabs.map((tool) => {
+                      const isActive = activeTab === tool.id;
+                      const Icon = tool.icon;
+                      return (
+                        <button
+                          key={tool.id}
+                          type="button"
+                          onClick={() => handleTabChange(tool.id)}
+                          className={`w-full flex items-center gap-2.5 pl-6 pr-3 py-2 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
+                            isActive
+                              ? 'bg-[#1f2023] text-white font-semibold'
+                              : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                          }`}
+                        >
+                          <Icon
+                            strokeWidth={1}
+                            className={`w-3.5 h-3.5 shrink-0 stroke-1 transition-colors ${isActive ? 'text-white' : 'text-[#c2c4cc]'}`}
+                          />
+                          <span className="transition-colors">{tool.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {secondaryNavTabs.map((tab) => {
                 const isActive = activeTab === tab.id;
                 const Icon = tab.icon;
                 return (
@@ -591,7 +726,151 @@ function StudentDashboardContent() {
             />
           )}
 
-          {navTabs.map((tab) => {
+          {/* 1. Primary Tabs: Courses & Credentials */}
+          {primaryNavTabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                ref={(el) => {
+                  tabRefs.current[tab.id] = el;
+                  if (el && tab.id === activeTab && indicatorStyle.opacity === 0) {
+                    setIndicatorStyle({
+                      top: el.offsetTop,
+                      height: el.offsetHeight,
+                      opacity: 1,
+                    });
+                  }
+                }}
+                type="button"
+                onClick={() => handleTabChange(tab.id)}
+                className={`relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
+                  isActive
+                    ? indicatorStyle.opacity > 0
+                      ? 'text-white font-semibold'
+                      : 'bg-[#1f2023] text-white font-semibold'
+                    : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                }`}
+              >
+                <Icon
+                  strokeWidth={1}
+                  className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
+                    isActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
+                  }`}
+                />
+                <span
+                  className={`truncate transition-colors ${
+                    isActive
+                      ? 'text-white font-semibold'
+                      : 'text-[#c2c4cc] font-normal group-hover:text-white'
+                  }`}
+                >
+                  {tab.label}
+                </span>
+              </button>
+            );
+          })}
+
+          {/* 2. Tools Accordion Dropdown Tab */}
+          <div className="flex flex-col">
+            <button
+              type="button"
+              onClick={toggleTools}
+              className={`relative z-10 w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
+                isToolsActive && !isToolsOpen
+                  ? 'bg-[#1f2023] text-white font-semibold'
+                  : isToolsActive
+                    ? 'text-white font-medium'
+                    : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <Wrench
+                  strokeWidth={1}
+                  className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
+                    isToolsActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
+                  }`}
+                />
+                <span
+                  className={`truncate transition-colors ${
+                    isToolsActive
+                      ? 'text-white font-medium'
+                      : 'text-[#c2c4cc] group-hover:text-white'
+                  }`}
+                >
+                  Tools
+                </span>
+              </div>
+              <ChevronDown
+                strokeWidth={1.5}
+                className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
+                  isToolsOpen
+                    ? 'rotate-180 text-white'
+                    : 'rotate-0 text-[#c2c4cc]/70 group-hover:text-white'
+                }`}
+              />
+            </button>
+
+            {/* Dropdown Items: Calculator & Symbols */}
+            <div
+              className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${
+                isToolsOpen
+                  ? 'grid-rows-[1fr] opacity-100'
+                  : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+              }`}
+            >
+              <div className="overflow-hidden flex flex-col space-y-1 pt-1">
+                {toolTabs.map((tool) => {
+                  const isActive = activeTab === tool.id;
+                  const Icon = tool.icon;
+                  return (
+                    <button
+                      key={tool.id}
+                      ref={(el) => {
+                        tabRefs.current[tool.id] = el;
+                        if (el && tool.id === activeTab && indicatorStyle.opacity === 0) {
+                          setIndicatorStyle({
+                            top: el.offsetTop,
+                            height: el.offsetHeight,
+                            opacity: 1,
+                          });
+                        }
+                      }}
+                      type="button"
+                      onClick={() => handleTabChange(tool.id)}
+                      className={`relative z-10 w-full flex items-center gap-2.5 pl-9 pr-3.5 py-2 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
+                        isActive
+                          ? indicatorStyle.opacity > 0
+                            ? 'text-white font-semibold'
+                            : 'bg-[#1f2023] text-white font-semibold'
+                          : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                      }`}
+                    >
+                      <Icon
+                        strokeWidth={1}
+                        className={`w-3.5 h-3.5 shrink-0 stroke-1 transition-colors ${
+                          isActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
+                        }`}
+                      />
+                      <span
+                        className={`truncate transition-colors ${
+                          isActive
+                            ? 'text-white font-semibold'
+                            : 'text-[#c2c4cc] font-normal group-hover:text-white'
+                        }`}
+                      >
+                        {tool.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Secondary Tabs: Settings & Payments */}
+          {secondaryNavTabs.map((tab) => {
             const isActive = activeTab === tab.id;
             const Icon = tab.icon;
             return (
@@ -1018,6 +1297,39 @@ function StudentDashboardContent() {
 
             {/* TAB 3: HYDRAULIC SYSTEM CALCULATOR */}
             {activeTab === 'calculator' && <HydraulicCalculator />}
+
+            {/* TAB: HYDRAULIC SYMBOLS (COMING SOON) */}
+            {activeTab === 'symbols' && (
+              <div className="space-y-6 text-left">
+                <div className="text-left">
+                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal leading-tight">
+                    Symbols
+                  </h1>
+                  <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">
+                    Standard ISO 1219 hydraulic circuit symbols library and schematic reference.
+                  </p>
+                </div>
+
+                <div className="w-full flex flex-col gap-5 items-start text-left">
+                  <div className="relative w-fit max-w-full bg-[#151619] border border-white/[0.08] hover:border-white/[0.14] rounded-xl p-5 sm:p-6 text-left space-y-4 select-none">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 text-[11px] font-mono font-medium tracking-wider uppercase text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-md shrink-0 select-none">
+                        COMING SOON
+                      </span>
+                    </div>
+                    <div className="space-y-1.5">
+                      <h2 className="text-sm sm:text-[15px] font-semibold text-white uppercase tracking-wider">
+                        Hydraulic Circuit Symbols
+                      </h2>
+                      <p className="text-xs text-[#c2c4cc] leading-relaxed max-w-md">
+                        Coming soon. We are building the interactive ISO 1219 hydraulic symbols
+                        library and schematic reading tools.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* TAB 4: SETTINGS */}
             {activeTab === 'profile' && (
