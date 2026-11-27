@@ -671,14 +671,14 @@ function StudentDashboardContent() {
       {/* ============================================================== */}
       <main className="w-full flex-1 min-h-0 md:h-full md:min-w-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden relative">
         {/* Scrollable Tab Content Workspace */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-7 md:p-8">
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-6 pt-5 pb-6 sm:px-8 sm:pt-6 sm:pb-8 md:px-9 md:pt-7 md:pb-9">
           <div className="w-full max-w-5xl space-y-6 text-left">
             {/* TAB 1: COURSES */}
             {activeTab === 'courses' && (
               <div className="space-y-6 text-left">
                 {/* TUF-Style Welcome Header */}
                 <div className="text-left">
-                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal">
+                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal leading-tight">
                     {greeting.title}
                   </h1>
                   <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">{greeting.subtitle}</p>
@@ -874,7 +874,7 @@ function StudentDashboardContent() {
             {activeTab === 'certificates' && (
               <div className="space-y-6 text-left">
                 <div className="text-left">
-                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal">
+                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal leading-tight">
                     Credentials
                   </h1>
                   <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">
@@ -1023,7 +1023,7 @@ function StudentDashboardContent() {
             {activeTab === 'profile' && (
               <div className="space-y-6 text-left">
                 <div className="text-left">
-                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal">
+                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal leading-tight">
                     Settings
                   </h1>
                   <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">
@@ -1283,7 +1283,7 @@ function StudentDashboardContent() {
             {activeTab === 'orders' && (
               <div className="space-y-6 text-left">
                 <div className="text-left">
-                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal">
+                  <h1 className="text-lg sm:text-[20px] font-medium text-white tracking-normal leading-tight">
                     Payments &amp; Invoices
                   </h1>
                   <p className="text-xs sm:text-[13px] text-[#c2c4cc] mt-1">
@@ -1495,7 +1495,7 @@ function DashboardShellSkeleton() {
 
       {/* Right Card Skeleton */}
       <main className="w-full flex-1 min-h-0 md:h-full md:min-w-0 bg-[#101012] rounded-xl flex flex-col overflow-hidden relative">
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-7 md:p-8 space-y-6">
+        <div className="flex-1 overflow-y-auto custom-scrollbar px-6 pt-5 pb-6 sm:px-8 sm:pt-6 sm:pb-8 md:px-9 md:pt-7 md:pb-9 space-y-6">
           <div className="space-y-2 animate-pulse">
             <div className="h-7 w-40 bg-white/10 rounded-md" />
             <div className="h-4 w-64 bg-white/5 rounded-md" />
