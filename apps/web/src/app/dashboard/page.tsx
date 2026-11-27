@@ -149,6 +149,9 @@ function StudentDashboardContent() {
   const [isToolsOpen, setIsToolsOpen] = useState<boolean>(() => {
     return tabParam === 'calculator' || tabParam === 'symbols';
   });
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(() => {
+    return tabParam === 'profile';
+  });
 
   useEffect(() => {
     const tab = searchParams.get('tab');
@@ -160,6 +163,8 @@ function StudentDashboardContent() {
       setActiveTab(tab as DashboardTab);
       if (tab === 'calculator' || tab === 'symbols') {
         setIsToolsOpen(true);
+      } else if (tab === 'profile') {
+        setIsProfileOpen(true);
       }
     } else if (preview) {
       setActiveTab('certificates');
@@ -190,6 +195,8 @@ function StudentDashboardContent() {
     setIsMobileMenuOpen(false);
     if (newTab === 'calculator' || newTab === 'symbols') {
       setIsToolsOpen(true);
+    } else if (newTab === 'profile') {
+      setIsProfileOpen(true);
     }
     const url = new URL(window.location.href);
     url.searchParams.set('tab', newTab);
@@ -199,6 +206,8 @@ function StudentDashboardContent() {
   useEffect(() => {
     if (activeTab === 'calculator' || activeTab === 'symbols') {
       setIsToolsOpen(true);
+    } else if (activeTab === 'profile') {
+      setIsProfileOpen(true);
     }
   }, [activeTab]);
 
@@ -226,21 +235,7 @@ function StudentDashboardContent() {
       clearTimeout(timer2);
       window.removeEventListener('resize', updateIndicator);
     };
-  }, [updateIndicator, isMainOpen, isToolsOpen, coursesLoading, authLoading]);
-
-  useEffect(() => {
-    updateIndicator();
-    const rafId = requestAnimationFrame(updateIndicator);
-    const timer1 = setTimeout(updateIndicator, 50);
-    const timer2 = setTimeout(updateIndicator, 220);
-    window.addEventListener('resize', updateIndicator);
-    return () => {
-      cancelAnimationFrame(rafId);
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      window.removeEventListener('resize', updateIndicator);
-    };
-  }, [updateIndicator, isToolsOpen, coursesLoading, authLoading]);
+  }, [updateIndicator, isMainOpen, isToolsOpen, isProfileOpen, coursesLoading, authLoading]);
 
   // Profile state
   const [name, setName] = useState('');
@@ -467,7 +462,6 @@ function StudentDashboardContent() {
   }[] = [
     { id: 'courses', label: 'Courses', icon: Layers },
     { id: 'certificates', label: 'Credentials', icon: Scroll },
-    { id: 'profile', label: 'Settings', icon: Settings },
     { id: 'orders', label: 'Payments', icon: IndianRupee },
   ];
 
@@ -479,6 +473,12 @@ function StudentDashboardContent() {
     { id: 'calculator', label: 'Calculator', icon: Sigma },
     { id: 'symbols', label: 'Symbols', icon: Shapes },
   ];
+
+  const profileNavTabs: {
+    id: DashboardTab;
+    label: string;
+    icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
+  }[] = [{ id: 'profile', label: 'Settings', icon: Settings }];
 
   const studentFirstName = useMemo(() => {
     if (!user?.name) return 'ENGINEER';
@@ -631,18 +631,6 @@ function StudentDashboardContent() {
                       <span>Admin Console</span>
                     </Link>
                   )}
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      logout();
-                    }}
-                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] font-normal transition-colors cursor-pointer select-none text-left"
-                  >
-                    <LogOut strokeWidth={1} className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc]" />
-                    <span className="text-[#c2c4cc]">Log Out</span>
-                  </button>
                 </div>
               )}
 
@@ -692,6 +680,67 @@ function StudentDashboardContent() {
                       </button>
                     );
                   })}
+                </div>
+              )}
+
+              {/* Section Divider */}
+              <div className="border-b border-white/[0.06] my-2 mx-1 shrink-0" />
+
+              {/* SECTION 3: PROFILE */}
+              <button
+                type="button"
+                onClick={() => setIsProfileOpen((prev) => !prev)}
+                className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono font-medium tracking-wider text-[#8a8c95] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+              >
+                <span>PROFILE</span>
+                <ChevronDown
+                  strokeWidth={1.5}
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    isProfileOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#8a8c95]'
+                  }`}
+                />
+              </button>
+
+              {isProfileOpen && (
+                <div className="space-y-1">
+                  {profileNavTabs.map((tab) => {
+                    const isActive = activeTab === tab.id;
+                    const Icon = tab.icon;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => handleTabChange(tab.id)}
+                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
+                          isActive
+                            ? 'bg-[#1f2023] text-white font-semibold'
+                            : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                        }`}
+                      >
+                        <Icon
+                          strokeWidth={1}
+                          className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${isActive ? 'text-white' : 'text-[#c2c4cc]'}`}
+                        />
+                        <span
+                          className={`transition-colors ${isActive ? 'text-white font-semibold' : 'text-[#c2c4cc] font-normal'}`}
+                        >
+                          {tab.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      logout();
+                    }}
+                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] font-normal transition-colors cursor-pointer select-none text-left"
+                  >
+                    <LogOut strokeWidth={1} className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc]" />
+                    <span className="text-[#c2c4cc]">Log Out</span>
+                  </button>
                 </div>
               )}
             </nav>
@@ -794,21 +843,6 @@ function StudentDashboardContent() {
                   <span className="truncate">Admin Console</span>
                 </Link>
               )}
-
-              {/* Log Out Button: Inside MAIN */}
-              <button
-                type="button"
-                onClick={() => logout()}
-                className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] cursor-pointer select-none group"
-              >
-                <LogOut
-                  strokeWidth={1}
-                  className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc] group-hover:text-rose-400 transition-colors"
-                />
-                <span className="truncate transition-colors text-[#c2c4cc] group-hover:text-rose-400">
-                  Log Out
-                </span>
-              </button>
             </div>
           </div>
 
@@ -882,6 +916,94 @@ function StudentDashboardContent() {
                   </button>
                 );
               })}
+            </div>
+          </div>
+
+          {/* Section Divider */}
+          <div className="border-b border-white/[0.06] my-2 mx-1 shrink-0" />
+
+          {/* SECTION 3: PROFILE */}
+          <button
+            type="button"
+            onClick={() => setIsProfileOpen((prev) => !prev)}
+            className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono font-medium tracking-wider text-[#8a8c95] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+          >
+            <span>PROFILE</span>
+            <ChevronDown
+              strokeWidth={1.5}
+              className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                isProfileOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#8a8c95]'
+              }`}
+            />
+          </button>
+
+          <div
+            className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${
+              isProfileOpen
+                ? 'grid-rows-[1fr] opacity-100'
+                : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+            }`}
+          >
+            <div className="overflow-hidden flex flex-col space-y-1 pt-0.5">
+              {profileNavTabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    ref={(el) => {
+                      tabRefs.current[tab.id] = el;
+                      if (el && tab.id === activeTab && indicatorStyle.opacity === 0) {
+                        setIndicatorStyle({
+                          top: el.offsetTop,
+                          height: el.offsetHeight,
+                          opacity: 1,
+                        });
+                      }
+                    }}
+                    type="button"
+                    onClick={() => handleTabChange(tab.id)}
+                    className={`relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
+                      isActive
+                        ? indicatorStyle.opacity > 0
+                          ? 'text-white font-semibold'
+                          : 'bg-[#1f2023] text-white font-semibold'
+                        : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                    }`}
+                  >
+                    <Icon
+                      strokeWidth={1}
+                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
+                        isActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
+                      }`}
+                    />
+                    <span
+                      className={`truncate transition-colors ${
+                        isActive
+                          ? 'text-white font-semibold'
+                          : 'text-[#c2c4cc] font-normal group-hover:text-white'
+                      }`}
+                    >
+                      {tab.label}
+                    </span>
+                  </button>
+                );
+              })}
+
+              {/* Log Out Button */}
+              <button
+                type="button"
+                onClick={() => logout()}
+                className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] cursor-pointer select-none group"
+              >
+                <LogOut
+                  strokeWidth={1}
+                  className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc] group-hover:text-rose-400 transition-colors"
+                />
+                <span className="truncate transition-colors text-[#c2c4cc] group-hover:text-rose-400">
+                  Log Out
+                </span>
+              </button>
             </div>
           </div>
         </nav>
