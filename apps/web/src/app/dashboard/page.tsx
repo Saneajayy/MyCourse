@@ -40,6 +40,8 @@ import { CourseLottieThumbnail } from '../../components/dashboard/CourseLottieTh
 export type DashboardTab =
   'courses' | 'certificates' | 'calculator' | 'symbols' | 'profile' | 'orders';
 
+export type NavTarget = DashboardTab | 'tools';
+
 interface EnrolledCourse {
   product: {
     id: string;
@@ -141,7 +143,12 @@ function StudentDashboardContent() {
   const tabParam = searchParams.get('tab');
   const isPreviewUnlocked = searchParams.get('preview_unlocked') === 'true';
   const [activeTab, setActiveTab] = useState<DashboardTab>(() => {
-    if (tabParam === 'tools') return 'calculator';
+    if (tabParam === 'tools') return 'courses';
+    if (tabParam && VALID_TABS.includes(tabParam as DashboardTab)) return tabParam as DashboardTab;
+    return isPreviewUnlocked ? 'certificates' : 'courses';
+  });
+  const [selectedNavId, setSelectedNavId] = useState<NavTarget>(() => {
+    if (tabParam === 'tools') return 'tools';
     if (tabParam && VALID_TABS.includes(tabParam as DashboardTab)) return tabParam as DashboardTab;
     return isPreviewUnlocked ? 'certificates' : 'courses';
   });
@@ -150,16 +157,26 @@ function StudentDashboardContent() {
     const tab = searchParams.get('tab');
     const preview = searchParams.get('preview_unlocked') === 'true';
     if (tab === 'tools') {
-      setActiveTab('calculator');
+      setSelectedNavId('tools');
+      setIsToolsOpen(true);
     } else if (tab && VALID_TABS.includes(tab as DashboardTab)) {
       setActiveTab(tab as DashboardTab);
+      setSelectedNavId(tab as DashboardTab);
+      if (tab === 'calculator' || tab === 'symbols') {
+        setIsToolsOpen(true);
+      }
     } else if (preview) {
       setActiveTab('certificates');
+      setSelectedNavId('certificates');
     }
   }, [searchParams]);
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isToolsOpen, setIsToolsOpen] = useState<boolean>(true);
-  const tabRefs = useRef<{ [key in DashboardTab]?: HTMLButtonElement | null }>({});
+  // Naturally when landing on dashboard, tools is closed unless user opened calculator/symbols
+  const [isToolsOpen, setIsToolsOpen] = useState<boolean>(() => {
+    return tabParam === 'calculator' || tabParam === 'symbols' || tabParam === 'tools';
+  });
+  const tabRefs = useRef<{ [key in NavTarget]?: HTMLButtonElement | null }>({});
   const [indicatorStyle, setIndicatorStyle] = useState<{
     top: number;
     height: number;
@@ -181,6 +198,7 @@ function StudentDashboardContent() {
   // Sync tab with URL query parameter
   const handleTabChange = useCallback((newTab: DashboardTab) => {
     setActiveTab(newTab);
+    setSelectedNavId(newTab);
     setIsMobileMenuOpen(false);
     if (newTab === 'calculator' || newTab === 'symbols') {
       setIsToolsOpen(true);
@@ -193,22 +211,31 @@ function StudentDashboardContent() {
   const toggleTools = useCallback(() => {
     setIsToolsOpen((prev) => {
       const next = !prev;
-      if (next && activeTab !== 'calculator' && activeTab !== 'symbols') {
-        handleTabChange('calculator');
+      if (next) {
+        // When opening tools, move highlighter to Tools first without opening calculator or symbols
+        setSelectedNavId('tools');
+      } else {
+        // When collapsing tools: if user is on a tool tab, keep Tools highlighted; otherwise revert to active tab
+        if (activeTab === 'calculator' || activeTab === 'symbols') {
+          setSelectedNavId('tools');
+        } else {
+          setSelectedNavId(activeTab);
+        }
       }
       return next;
     });
-  }, [activeTab, handleTabChange]);
+  }, [activeTab]);
 
   useEffect(() => {
     if (activeTab === 'calculator' || activeTab === 'symbols') {
       setIsToolsOpen(true);
+      setSelectedNavId(activeTab);
     }
   }, [activeTab]);
 
   // Smoothly move highlight pill to active tab
   const updateIndicator = useCallback(() => {
-    const activeEl = tabRefs.current[activeTab];
+    const activeEl = tabRefs.current[selectedNavId];
     if (activeEl) {
       setIndicatorStyle({
         top: activeEl.offsetTop,
@@ -216,7 +243,7 @@ function StudentDashboardContent() {
         opacity: 1,
       });
     }
-  }, [activeTab]);
+  }, [selectedNavId]);
 
   useEffect(() => {
     updateIndicator();
@@ -572,7 +599,7 @@ function StudentDashboardContent() {
               className="flex flex-col px-3 py-2 space-y-1"
             >
               {primaryNavTabs.map((tab) => {
-                const isActive = activeTab === tab.id;
+                const isActive = selectedNavId === tab.id;
                 const Icon = tab.icon;
                 return (
                   <button
@@ -604,17 +631,21 @@ function StudentDashboardContent() {
                   type="button"
                   onClick={toggleTools}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
-                    isToolsActive && !isToolsOpen
+                    selectedNavId === 'tools'
                       ? 'bg-[#1f2023] text-white font-semibold'
-                      : isToolsActive
-                        ? 'text-white font-medium'
-                        : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                      : isToolsActive && !isToolsOpen
+                        ? 'bg-[#1f2023] text-white font-semibold'
+                        : isToolsActive
+                          ? 'text-white font-medium'
+                          : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <Wrench
                       strokeWidth={1}
-                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${isToolsActive ? 'text-white' : 'text-[#c2c4cc]'}`}
+                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
+                        selectedNavId === 'tools' || isToolsActive ? 'text-white' : 'text-[#c2c4cc]'
+                      }`}
                     />
                     <span className="transition-colors">Tools</span>
                   </div>
@@ -629,7 +660,7 @@ function StudentDashboardContent() {
                 {isToolsOpen && (
                   <div className="space-y-1 pl-4 pt-1">
                     {toolTabs.map((tool) => {
-                      const isActive = activeTab === tool.id;
+                      const isToolActive = selectedNavId === tool.id;
                       const Icon = tool.icon;
                       return (
                         <button
@@ -637,14 +668,14 @@ function StudentDashboardContent() {
                           type="button"
                           onClick={() => handleTabChange(tool.id)}
                           className={`w-full flex items-center gap-2.5 pl-6 pr-3 py-2 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
-                            isActive
+                            isToolActive
                               ? 'bg-[#1f2023] text-white font-semibold'
                               : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
                           }`}
                         >
                           <Icon
                             strokeWidth={1}
-                            className={`w-3.5 h-3.5 shrink-0 stroke-1 transition-colors ${isActive ? 'text-white' : 'text-[#c2c4cc]'}`}
+                            className={`w-3.5 h-3.5 shrink-0 stroke-1 transition-colors ${isToolActive ? 'text-white' : 'text-[#c2c4cc]'}`}
                           />
                           <span className="transition-colors">{tool.label}</span>
                         </button>
@@ -655,7 +686,7 @@ function StudentDashboardContent() {
               </div>
 
               {secondaryNavTabs.map((tab) => {
-                const isActive = activeTab === tab.id;
+                const isActive = selectedNavId === tab.id;
                 const Icon = tab.icon;
                 return (
                   <button
@@ -728,14 +759,14 @@ function StudentDashboardContent() {
 
           {/* 1. Primary Tabs: Courses & Credentials */}
           {primaryNavTabs.map((tab) => {
-            const isActive = activeTab === tab.id;
+            const isActive = selectedNavId === tab.id;
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 ref={(el) => {
                   tabRefs.current[tab.id] = el;
-                  if (el && tab.id === activeTab && indicatorStyle.opacity === 0) {
+                  if (el && tab.id === selectedNavId && indicatorStyle.opacity === 0) {
                     setIndicatorStyle({
                       top: el.offsetTop,
                       height: el.offsetHeight,
@@ -775,28 +806,44 @@ function StudentDashboardContent() {
           {/* 2. Tools Accordion Dropdown Tab */}
           <div className="flex flex-col">
             <button
+              ref={(el) => {
+                tabRefs.current['tools'] = el;
+                if (el && selectedNavId === 'tools' && indicatorStyle.opacity === 0) {
+                  setIndicatorStyle({
+                    top: el.offsetTop,
+                    height: el.offsetHeight,
+                    opacity: 1,
+                  });
+                }
+              }}
               type="button"
               onClick={toggleTools}
               className={`relative z-10 w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
-                isToolsActive && !isToolsOpen
-                  ? 'bg-[#1f2023] text-white font-semibold'
-                  : isToolsActive
-                    ? 'text-white font-medium'
-                    : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                selectedNavId === 'tools'
+                  ? indicatorStyle.opacity > 0
+                    ? 'text-white font-semibold'
+                    : 'bg-[#1f2023] text-white font-semibold'
+                  : isToolsActive && !isToolsOpen
+                    ? 'bg-[#1f2023] text-white font-semibold'
+                    : isToolsActive
+                      ? 'text-white font-medium'
+                      : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
               }`}
             >
               <div className="flex items-center gap-3">
                 <Wrench
                   strokeWidth={1}
                   className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
-                    isToolsActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
+                    selectedNavId === 'tools' || isToolsActive
+                      ? 'text-white'
+                      : 'text-[#c2c4cc] group-hover:text-white'
                   }`}
                 />
                 <span
                   className={`truncate transition-colors ${
-                    isToolsActive
-                      ? 'text-white font-medium'
-                      : 'text-[#c2c4cc] group-hover:text-white'
+                    selectedNavId === 'tools' || isToolsActive
+                      ? 'text-white font-semibold'
+                      : 'text-[#c2c4cc] font-normal group-hover:text-white'
                   }`}
                 >
                   Tools
@@ -822,14 +869,14 @@ function StudentDashboardContent() {
             >
               <div className="overflow-hidden flex flex-col space-y-1 pt-1">
                 {toolTabs.map((tool) => {
-                  const isActive = activeTab === tool.id;
+                  const isToolActive = selectedNavId === tool.id;
                   const Icon = tool.icon;
                   return (
                     <button
                       key={tool.id}
                       ref={(el) => {
                         tabRefs.current[tool.id] = el;
-                        if (el && tool.id === activeTab && indicatorStyle.opacity === 0) {
+                        if (el && tool.id === selectedNavId && indicatorStyle.opacity === 0) {
                           setIndicatorStyle({
                             top: el.offsetTop,
                             height: el.offsetHeight,
@@ -840,7 +887,7 @@ function StudentDashboardContent() {
                       type="button"
                       onClick={() => handleTabChange(tool.id)}
                       className={`relative z-10 w-full flex items-center gap-2.5 pl-9 pr-3.5 py-2 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
-                        isActive
+                        isToolActive
                           ? indicatorStyle.opacity > 0
                             ? 'text-white font-semibold'
                             : 'bg-[#1f2023] text-white font-semibold'
@@ -850,12 +897,12 @@ function StudentDashboardContent() {
                       <Icon
                         strokeWidth={1}
                         className={`w-3.5 h-3.5 shrink-0 stroke-1 transition-colors ${
-                          isActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
+                          isToolActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
                         }`}
                       />
                       <span
                         className={`truncate transition-colors ${
-                          isActive
+                          isToolActive
                             ? 'text-white font-semibold'
                             : 'text-[#c2c4cc] font-normal group-hover:text-white'
                         }`}
@@ -871,14 +918,14 @@ function StudentDashboardContent() {
 
           {/* 3. Secondary Tabs: Settings & Payments */}
           {secondaryNavTabs.map((tab) => {
-            const isActive = activeTab === tab.id;
+            const isActive = selectedNavId === tab.id;
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 ref={(el) => {
                   tabRefs.current[tab.id] = el;
-                  if (el && tab.id === activeTab && indicatorStyle.opacity === 0) {
+                  if (el && tab.id === selectedNavId && indicatorStyle.opacity === 0) {
                     setIndicatorStyle({
                       top: el.offsetTop,
                       height: el.offsetHeight,
