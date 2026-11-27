@@ -30,7 +30,6 @@ import {
   Settings,
   Search,
   Award,
-  Wrench,
   ChevronDown,
   Shapes,
 } from 'lucide-react';
@@ -39,8 +38,6 @@ import { CourseLottieThumbnail } from '../../components/dashboard/CourseLottieTh
 
 export type DashboardTab =
   'courses' | 'certificates' | 'calculator' | 'symbols' | 'profile' | 'orders';
-
-export type NavTarget = DashboardTab | 'tools';
 
 interface EnrolledCourse {
   product: {
@@ -143,40 +140,34 @@ function StudentDashboardContent() {
   const tabParam = searchParams.get('tab');
   const isPreviewUnlocked = searchParams.get('preview_unlocked') === 'true';
   const [activeTab, setActiveTab] = useState<DashboardTab>(() => {
-    if (tabParam === 'tools') return 'courses';
+    if (tabParam === 'tools') return 'calculator';
     if (tabParam && VALID_TABS.includes(tabParam as DashboardTab)) return tabParam as DashboardTab;
     return isPreviewUnlocked ? 'certificates' : 'courses';
   });
-  const [selectedNavId, setSelectedNavId] = useState<NavTarget>(() => {
-    if (tabParam === 'tools') return 'tools';
-    if (tabParam && VALID_TABS.includes(tabParam as DashboardTab)) return tabParam as DashboardTab;
-    return isPreviewUnlocked ? 'certificates' : 'courses';
+
+  const [isMainOpen, setIsMainOpen] = useState(true);
+  const [isToolsOpen, setIsToolsOpen] = useState<boolean>(() => {
+    return tabParam === 'calculator' || tabParam === 'symbols';
   });
 
   useEffect(() => {
     const tab = searchParams.get('tab');
     const preview = searchParams.get('preview_unlocked') === 'true';
     if (tab === 'tools') {
-      setSelectedNavId('tools');
+      setActiveTab('calculator');
       setIsToolsOpen(true);
     } else if (tab && VALID_TABS.includes(tab as DashboardTab)) {
       setActiveTab(tab as DashboardTab);
-      setSelectedNavId(tab as DashboardTab);
       if (tab === 'calculator' || tab === 'symbols') {
         setIsToolsOpen(true);
       }
     } else if (preview) {
       setActiveTab('certificates');
-      setSelectedNavId('certificates');
     }
   }, [searchParams]);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // Naturally when landing on dashboard, tools is closed unless user opened calculator/symbols
-  const [isToolsOpen, setIsToolsOpen] = useState<boolean>(() => {
-    return tabParam === 'calculator' || tabParam === 'symbols' || tabParam === 'tools';
-  });
-  const tabRefs = useRef<{ [key in NavTarget]?: HTMLButtonElement | null }>({});
+  const tabRefs = useRef<{ [key in DashboardTab]?: HTMLButtonElement | null }>({});
   const [indicatorStyle, setIndicatorStyle] = useState<{
     top: number;
     height: number;
@@ -193,12 +184,9 @@ function StudentDashboardContent() {
   const [coursesError, setCoursesError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const isToolsActive = activeTab === 'calculator' || activeTab === 'symbols';
-
   // Sync tab with URL query parameter
   const handleTabChange = useCallback((newTab: DashboardTab) => {
     setActiveTab(newTab);
-    setSelectedNavId(newTab);
     setIsMobileMenuOpen(false);
     if (newTab === 'calculator' || newTab === 'symbols') {
       setIsToolsOpen(true);
@@ -208,34 +196,15 @@ function StudentDashboardContent() {
     window.history.replaceState({}, '', url.toString());
   }, []);
 
-  const toggleTools = useCallback(() => {
-    setIsToolsOpen((prev) => {
-      const next = !prev;
-      if (next) {
-        // When opening tools, move highlighter to Tools first without opening calculator or symbols
-        setSelectedNavId('tools');
-      } else {
-        // When collapsing tools: if user is on a tool tab, keep Tools highlighted; otherwise revert to active tab
-        if (activeTab === 'calculator' || activeTab === 'symbols') {
-          setSelectedNavId('tools');
-        } else {
-          setSelectedNavId(activeTab);
-        }
-      }
-      return next;
-    });
-  }, [activeTab]);
-
   useEffect(() => {
     if (activeTab === 'calculator' || activeTab === 'symbols') {
       setIsToolsOpen(true);
-      setSelectedNavId(activeTab);
     }
   }, [activeTab]);
 
   // Smoothly move highlight pill to active tab
   const updateIndicator = useCallback(() => {
-    const activeEl = tabRefs.current[selectedNavId];
+    const activeEl = tabRefs.current[activeTab];
     if (activeEl) {
       setIndicatorStyle({
         top: activeEl.offsetTop,
@@ -243,7 +212,21 @@ function StudentDashboardContent() {
         opacity: 1,
       });
     }
-  }, [selectedNavId]);
+  }, [activeTab]);
+
+  useEffect(() => {
+    updateIndicator();
+    const rafId = requestAnimationFrame(updateIndicator);
+    const timer1 = setTimeout(updateIndicator, 50);
+    const timer2 = setTimeout(updateIndicator, 220);
+    window.addEventListener('resize', updateIndicator);
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      window.removeEventListener('resize', updateIndicator);
+    };
+  }, [updateIndicator, isMainOpen, isToolsOpen, coursesLoading, authLoading]);
 
   useEffect(() => {
     updateIndicator();
@@ -477,31 +460,24 @@ function StudentDashboardContent() {
     return [];
   }, [courses, isPreviewUnlocked]);
 
-  const primaryNavTabs: {
+  const mainNavTabs: {
     id: DashboardTab;
     label: string;
     icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
   }[] = [
     { id: 'courses', label: 'Courses', icon: Layers },
     { id: 'certificates', label: 'Credentials', icon: Scroll },
+    { id: 'profile', label: 'Settings', icon: Settings },
+    { id: 'orders', label: 'Payments', icon: IndianRupee },
   ];
 
-  const toolTabs: {
+  const toolNavTabs: {
     id: DashboardTab;
     label: string;
     icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
   }[] = [
     { id: 'calculator', label: 'Calculator', icon: Sigma },
     { id: 'symbols', label: 'Symbols', icon: Shapes },
-  ];
-
-  const secondaryNavTabs: {
-    id: DashboardTab;
-    label: string;
-    icon: React.ComponentType<{ className?: string; strokeWidth?: number | string }>;
-  }[] = [
-    { id: 'profile', label: 'Settings', icon: Settings },
-    { id: 'orders', label: 'Payments', icon: IndianRupee },
   ];
 
   const studentFirstName = useMemo(() => {
@@ -598,145 +574,126 @@ function StudentDashboardContent() {
               aria-label="Student Navigation Mobile"
               className="flex flex-col px-3 py-2 space-y-1"
             >
-              {primaryNavTabs.map((tab) => {
-                const isActive = selectedNavId === tab.id;
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => handleTabChange(tab.id)}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
-                      isActive
-                        ? 'bg-[#1f2023] text-white font-semibold'
-                        : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
-                    }`}
-                  >
-                    <Icon
-                      strokeWidth={1}
-                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${isActive ? 'text-white' : 'text-[#c2c4cc]'}`}
-                    />
-                    <span
-                      className={`transition-colors ${isActive ? 'text-white font-semibold' : 'text-[#c2c4cc] font-normal'}`}
-                    >
-                      {tab.label}
-                    </span>
-                  </button>
-                );
-              })}
-
-              {/* Mobile Tools Dropdown Accordion */}
-              <div className="flex flex-col">
-                <button
-                  type="button"
-                  onClick={toggleTools}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
-                    selectedNavId === 'tools'
-                      ? 'bg-[#1f2023] text-white font-semibold'
-                      : isToolsActive && !isToolsOpen
-                        ? 'bg-[#1f2023] text-white font-semibold'
-                        : isToolsActive
-                          ? 'text-white font-medium'
-                          : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Wrench
-                      strokeWidth={1}
-                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
-                        selectedNavId === 'tools' || isToolsActive ? 'text-white' : 'text-[#c2c4cc]'
-                      }`}
-                    />
-                    <span className="transition-colors">Tools</span>
-                  </div>
-                  <ChevronDown
-                    strokeWidth={1.5}
-                    className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-                      isToolsOpen ? 'rotate-180 text-white' : 'rotate-0 text-[#c2c4cc]'
-                    }`}
-                  />
-                </button>
-
-                {isToolsOpen && (
-                  <div className="space-y-1 pl-4 pt-1">
-                    {toolTabs.map((tool) => {
-                      const isToolActive = selectedNavId === tool.id;
-                      const Icon = tool.icon;
-                      return (
-                        <button
-                          key={tool.id}
-                          type="button"
-                          onClick={() => handleTabChange(tool.id)}
-                          className={`w-full flex items-center gap-2.5 pl-6 pr-3 py-2 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
-                            isToolActive
-                              ? 'bg-[#1f2023] text-white font-semibold'
-                              : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
-                          }`}
-                        >
-                          <Icon
-                            strokeWidth={1}
-                            className={`w-3.5 h-3.5 shrink-0 stroke-1 transition-colors ${isToolActive ? 'text-white' : 'text-[#c2c4cc]'}`}
-                          />
-                          <span className="transition-colors">{tool.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {secondaryNavTabs.map((tab) => {
-                const isActive = selectedNavId === tab.id;
-                const Icon = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => handleTabChange(tab.id)}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
-                      isActive
-                        ? 'bg-[#1f2023] text-white font-semibold'
-                        : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
-                    }`}
-                  >
-                    <Icon
-                      strokeWidth={1}
-                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${isActive ? 'text-white' : 'text-[#c2c4cc]'}`}
-                    />
-                    <span
-                      className={`transition-colors ${isActive ? 'text-white font-semibold' : 'text-[#c2c4cc] font-normal'}`}
-                    >
-                      {tab.label}
-                    </span>
-                  </button>
-                );
-              })}
-
-              {user?.role === 'ADMIN' && (
-                <Link
-                  href="/admin"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-emerald-400 hover:bg-emerald-500/10 font-normal transition-colors cursor-pointer select-none"
-                >
-                  <ShieldCheck
-                    strokeWidth={1}
-                    className="w-4 h-4 shrink-0 stroke-1 text-emerald-400"
-                  />
-                  <span>Admin Console</span>
-                </Link>
-              )}
-
+              {/* SECTION 1: MAIN */}
               <button
                 type="button"
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  logout();
-                }}
-                className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] font-normal transition-colors cursor-pointer select-none text-left"
+                onClick={() => setIsMainOpen((prev) => !prev)}
+                className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono font-medium tracking-wider text-[#8a8c95] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
               >
-                <LogOut strokeWidth={1} className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc]" />
-                <span className="text-[#c2c4cc]">Log Out</span>
+                <span>MAIN</span>
+                <ChevronDown
+                  strokeWidth={1.5}
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    isMainOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#8a8c95]'
+                  }`}
+                />
               </button>
+
+              {isMainOpen && (
+                <div className="space-y-1">
+                  {mainNavTabs.map((tab) => {
+                    const isActive = activeTab === tab.id;
+                    const Icon = tab.icon;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => handleTabChange(tab.id)}
+                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
+                          isActive
+                            ? 'bg-[#1f2023] text-white font-semibold'
+                            : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                        }`}
+                      >
+                        <Icon
+                          strokeWidth={1}
+                          className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${isActive ? 'text-white' : 'text-[#c2c4cc]'}`}
+                        />
+                        <span
+                          className={`transition-colors ${isActive ? 'text-white font-semibold' : 'text-[#c2c4cc] font-normal'}`}
+                        >
+                          {tab.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+
+                  {user?.role === 'ADMIN' && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-emerald-400 hover:bg-emerald-500/10 font-normal transition-colors cursor-pointer select-none"
+                    >
+                      <ShieldCheck
+                        strokeWidth={1}
+                        className="w-4 h-4 shrink-0 stroke-1 text-emerald-400"
+                      />
+                      <span>Admin Console</span>
+                    </Link>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      logout();
+                    }}
+                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] font-normal transition-colors cursor-pointer select-none text-left"
+                  >
+                    <LogOut strokeWidth={1} className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc]" />
+                    <span className="text-[#c2c4cc]">Log Out</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Section Divider */}
+              <div className="border-b border-white/[0.06] my-2 mx-1 shrink-0" />
+
+              {/* SECTION 2: TOOLS */}
+              <button
+                type="button"
+                onClick={() => setIsToolsOpen((prev) => !prev)}
+                className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono font-medium tracking-wider text-[#8a8c95] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+              >
+                <span>TOOLS</span>
+                <ChevronDown
+                  strokeWidth={1.5}
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    isToolsOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#8a8c95]'
+                  }`}
+                />
+              </button>
+
+              {isToolsOpen && (
+                <div className="space-y-1">
+                  {toolNavTabs.map((tool) => {
+                    const isActive = activeTab === tool.id;
+                    const Icon = tool.icon;
+                    return (
+                      <button
+                        key={tool.id}
+                        type="button"
+                        onClick={() => handleTabChange(tool.id)}
+                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none ${
+                          isActive
+                            ? 'bg-[#1f2023] text-white font-semibold'
+                            : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                        }`}
+                      >
+                        <Icon
+                          strokeWidth={1}
+                          className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${isActive ? 'text-white' : 'text-[#c2c4cc]'}`}
+                        />
+                        <span
+                          className={`transition-colors ${isActive ? 'text-white font-semibold' : 'text-[#c2c4cc] font-normal'}`}
+                        >
+                          {tool.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </nav>
           </div>
         </div>
@@ -757,238 +714,176 @@ function StudentDashboardContent() {
             />
           )}
 
-          {/* 1. Primary Tabs: Courses & Credentials */}
-          {primaryNavTabs.map((tab) => {
-            const isActive = selectedNavId === tab.id;
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                ref={(el) => {
-                  tabRefs.current[tab.id] = el;
-                  if (el && tab.id === selectedNavId && indicatorStyle.opacity === 0) {
-                    setIndicatorStyle({
-                      top: el.offsetTop,
-                      height: el.offsetHeight,
-                      opacity: 1,
-                    });
-                  }
-                }}
-                type="button"
-                onClick={() => handleTabChange(tab.id)}
-                className={`relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
-                  isActive
-                    ? indicatorStyle.opacity > 0
-                      ? 'text-white font-semibold'
-                      : 'bg-[#1f2023] text-white font-semibold'
-                    : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
-                }`}
-              >
-                <Icon
-                  strokeWidth={1}
-                  className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
-                    isActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
-                  }`}
-                />
-                <span
-                  className={`truncate transition-colors ${
-                    isActive
-                      ? 'text-white font-semibold'
-                      : 'text-[#c2c4cc] font-normal group-hover:text-white'
-                  }`}
-                >
-                  {tab.label}
-                </span>
-              </button>
-            );
-          })}
-
-          {/* 2. Tools Accordion Dropdown Tab */}
-          <div className="flex flex-col">
-            <button
-              ref={(el) => {
-                tabRefs.current['tools'] = el;
-                if (el && selectedNavId === 'tools' && indicatorStyle.opacity === 0) {
-                  setIndicatorStyle({
-                    top: el.offsetTop,
-                    height: el.offsetHeight,
-                    opacity: 1,
-                  });
-                }
-              }}
-              type="button"
-              onClick={toggleTools}
-              className={`relative z-10 w-full flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
-                selectedNavId === 'tools'
-                  ? indicatorStyle.opacity > 0
-                    ? 'text-white font-semibold'
-                    : 'bg-[#1f2023] text-white font-semibold'
-                  : isToolsActive && !isToolsOpen
-                    ? 'bg-[#1f2023] text-white font-semibold'
-                    : isToolsActive
-                      ? 'text-white font-medium'
-                      : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+          {/* SECTION 1: MAIN */}
+          <button
+            type="button"
+            onClick={() => setIsMainOpen((prev) => !prev)}
+            className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono font-medium tracking-wider text-[#8a8c95] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
+          >
+            <span>MAIN</span>
+            <ChevronDown
+              strokeWidth={1.5}
+              className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                isMainOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#8a8c95]'
               }`}
-            >
-              <div className="flex items-center gap-3">
-                <Wrench
-                  strokeWidth={1}
-                  className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
-                    selectedNavId === 'tools' || isToolsActive
-                      ? 'text-white'
-                      : 'text-[#c2c4cc] group-hover:text-white'
-                  }`}
-                />
-                <span
-                  className={`truncate transition-colors ${
-                    selectedNavId === 'tools' || isToolsActive
-                      ? 'text-white font-semibold'
-                      : 'text-[#c2c4cc] font-normal group-hover:text-white'
-                  }`}
-                >
-                  Tools
-                </span>
-              </div>
-              <ChevronDown
-                strokeWidth={1.5}
-                className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${
-                  isToolsOpen
-                    ? 'rotate-180 text-white'
-                    : 'rotate-0 text-[#c2c4cc]/70 group-hover:text-white'
-                }`}
-              />
-            </button>
+            />
+          </button>
 
-            {/* Dropdown Items: Calculator & Symbols */}
-            <div
-              className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${
-                isToolsOpen
-                  ? 'grid-rows-[1fr] opacity-100'
-                  : 'grid-rows-[0fr] opacity-0 pointer-events-none'
-              }`}
-            >
-              <div className="overflow-hidden flex flex-col space-y-1 pt-1">
-                {toolTabs.map((tool) => {
-                  const isToolActive = selectedNavId === tool.id;
-                  const Icon = tool.icon;
-                  return (
-                    <button
-                      key={tool.id}
-                      ref={(el) => {
-                        tabRefs.current[tool.id] = el;
-                        if (el && tool.id === selectedNavId && indicatorStyle.opacity === 0) {
-                          setIndicatorStyle({
-                            top: el.offsetTop,
-                            height: el.offsetHeight,
-                            opacity: 1,
-                          });
-                        }
-                      }}
-                      type="button"
-                      onClick={() => handleTabChange(tool.id)}
-                      className={`relative z-10 w-full flex items-center gap-2.5 pl-9 pr-3.5 py-2 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
-                        isToolActive
-                          ? indicatorStyle.opacity > 0
-                            ? 'text-white font-semibold'
-                            : 'bg-[#1f2023] text-white font-semibold'
-                          : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+          <div
+            className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${
+              isMainOpen
+                ? 'grid-rows-[1fr] opacity-100'
+                : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+            }`}
+          >
+            <div className="overflow-hidden flex flex-col space-y-1 pt-0.5">
+              {mainNavTabs.map((tab) => {
+                const isActive = activeTab === tab.id;
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    ref={(el) => {
+                      tabRefs.current[tab.id] = el;
+                      if (el && tab.id === activeTab && indicatorStyle.opacity === 0) {
+                        setIndicatorStyle({
+                          top: el.offsetTop,
+                          height: el.offsetHeight,
+                          opacity: 1,
+                        });
+                      }
+                    }}
+                    type="button"
+                    onClick={() => handleTabChange(tab.id)}
+                    className={`relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
+                      isActive
+                        ? indicatorStyle.opacity > 0
+                          ? 'text-white font-semibold'
+                          : 'bg-[#1f2023] text-white font-semibold'
+                        : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                    }`}
+                  >
+                    <Icon
+                      strokeWidth={1}
+                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
+                        isActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
+                      }`}
+                    />
+                    <span
+                      className={`truncate transition-colors ${
+                        isActive
+                          ? 'text-white font-semibold'
+                          : 'text-[#c2c4cc] font-normal group-hover:text-white'
                       }`}
                     >
-                      <Icon
-                        strokeWidth={1}
-                        className={`w-3.5 h-3.5 shrink-0 stroke-1 transition-colors ${
-                          isToolActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
-                        }`}
-                      />
-                      <span
-                        className={`truncate transition-colors ${
-                          isToolActive
-                            ? 'text-white font-semibold'
-                            : 'text-[#c2c4cc] font-normal group-hover:text-white'
-                        }`}
-                      >
-                        {tool.label}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+                      {tab.label}
+                    </span>
+                  </button>
+                );
+              })}
+
+              {user?.role === 'ADMIN' && (
+                <Link
+                  href="/admin"
+                  className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 cursor-pointer select-none group"
+                >
+                  <ShieldCheck
+                    strokeWidth={1}
+                    className="w-4 h-4 shrink-0 stroke-1 text-emerald-400 transition-colors"
+                  />
+                  <span className="truncate">Admin Console</span>
+                </Link>
+              )}
+
+              {/* Log Out Button: Inside MAIN */}
+              <button
+                type="button"
+                onClick={() => logout()}
+                className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] cursor-pointer select-none group"
+              >
+                <LogOut
+                  strokeWidth={1}
+                  className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc] group-hover:text-rose-400 transition-colors"
+                />
+                <span className="truncate transition-colors text-[#c2c4cc] group-hover:text-rose-400">
+                  Log Out
+                </span>
+              </button>
             </div>
           </div>
 
-          {/* 3. Secondary Tabs: Settings & Payments */}
-          {secondaryNavTabs.map((tab) => {
-            const isActive = selectedNavId === tab.id;
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                ref={(el) => {
-                  tabRefs.current[tab.id] = el;
-                  if (el && tab.id === selectedNavId && indicatorStyle.opacity === 0) {
-                    setIndicatorStyle({
-                      top: el.offsetTop,
-                      height: el.offsetHeight,
-                      opacity: 1,
-                    });
-                  }
-                }}
-                type="button"
-                onClick={() => handleTabChange(tab.id)}
-                className={`relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
-                  isActive
-                    ? indicatorStyle.opacity > 0
-                      ? 'text-white font-semibold'
-                      : 'bg-[#1f2023] text-white font-semibold'
-                    : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
-                }`}
-              >
-                <Icon
-                  strokeWidth={1}
-                  className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
-                    isActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
-                  }`}
-                />
-                <span
-                  className={`truncate transition-colors ${
-                    isActive
-                      ? 'text-white font-semibold'
-                      : 'text-[#c2c4cc] font-normal group-hover:text-white'
-                  }`}
-                >
-                  {tab.label}
-                </span>
-              </button>
-            );
-          })}
+          {/* Section Divider */}
+          <div className="border-b border-white/[0.06] my-2 mx-1 shrink-0" />
 
-          {user?.role === 'ADMIN' && (
-            <Link
-              href="/admin"
-              className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 cursor-pointer select-none group"
-            >
-              <ShieldCheck
-                strokeWidth={1}
-                className="w-4 h-4 shrink-0 stroke-1 text-emerald-400 transition-colors"
-              />
-              <span className="truncate">Admin Console</span>
-            </Link>
-          )}
-
-          {/* Log Out Button: Last in the stack */}
+          {/* SECTION 2: TOOLS (like ADDITIONAL in TUF) */}
           <button
             type="button"
-            onClick={() => logout()}
-            className="relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left font-normal text-[#c2c4cc] hover:text-rose-400 hover:bg-white/[0.04] cursor-pointer select-none group"
+            onClick={() => setIsToolsOpen((prev) => !prev)}
+            className="w-full flex items-center justify-between px-3 py-1.5 text-[11px] font-mono font-medium tracking-wider text-[#8a8c95] hover:text-[#c2c4cc] uppercase select-none transition-colors cursor-pointer group"
           >
-            <LogOut
-              strokeWidth={1}
-              className="w-4 h-4 shrink-0 stroke-1 text-[#c2c4cc] group-hover:text-rose-400 transition-colors"
+            <span>TOOLS</span>
+            <ChevronDown
+              strokeWidth={1.5}
+              className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                isToolsOpen ? 'rotate-180 text-[#c2c4cc]' : 'rotate-0 text-[#8a8c95]'
+              }`}
             />
-            <span className="truncate transition-colors text-[#c2c4cc] group-hover:text-rose-400">
-              Log Out
-            </span>
           </button>
+
+          <div
+            className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${
+              isToolsOpen
+                ? 'grid-rows-[1fr] opacity-100'
+                : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+            }`}
+          >
+            <div className="overflow-hidden flex flex-col space-y-1 pt-0.5">
+              {toolNavTabs.map((tool) => {
+                const isActive = activeTab === tool.id;
+                const Icon = tool.icon;
+                return (
+                  <button
+                    key={tool.id}
+                    ref={(el) => {
+                      tabRefs.current[tool.id] = el;
+                      if (el && tool.id === activeTab && indicatorStyle.opacity === 0) {
+                        setIndicatorStyle({
+                          top: el.offsetTop,
+                          height: el.offsetHeight,
+                          opacity: 1,
+                        });
+                      }
+                    }}
+                    type="button"
+                    onClick={() => handleTabChange(tool.id)}
+                    className={`relative z-10 w-full flex items-center gap-3 px-3.5 py-2.5 text-xs sm:text-[13px] rounded-xl transition-colors text-left cursor-pointer select-none group ${
+                      isActive
+                        ? indicatorStyle.opacity > 0
+                          ? 'text-white font-semibold'
+                          : 'bg-[#1f2023] text-white font-semibold'
+                        : 'text-[#c2c4cc] hover:text-white hover:bg-white/[0.04] font-normal'
+                    }`}
+                  >
+                    <Icon
+                      strokeWidth={1}
+                      className={`w-4 h-4 shrink-0 stroke-1 transition-colors ${
+                        isActive ? 'text-white' : 'text-[#c2c4cc] group-hover:text-white'
+                      }`}
+                    />
+                    <span
+                      className={`truncate transition-colors ${
+                        isActive
+                          ? 'text-white font-semibold'
+                          : 'text-[#c2c4cc] font-normal group-hover:text-white'
+                      }`}
+                    >
+                      {tool.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </nav>
       </aside>
 
